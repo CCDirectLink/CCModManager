@@ -1,0 +1,6 @@
+{
+    "name": "cc-mod-manager",
+    "ccmodHumanName": "CCModManager",
+    "version": "0.0.1",
+    "plugin": "plugin.js"
+}
