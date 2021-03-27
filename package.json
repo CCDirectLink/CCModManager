@@ -1,6 +1,7 @@
 {
     "name": "cc-mod-manager",
     "ccmodHumanName": "CCModManager",
+    "module": true,
     "version": "0.0.1",
-    "plugin": "plugin.js"
+    "prestart": "prestart.js"
 }
