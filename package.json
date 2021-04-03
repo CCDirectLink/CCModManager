@@ -2,5 +2,8 @@
     "name": "cc-mod-manager",
     "ccmodHumanName": "CCModManager",
     "version": "0.0.1",
-    "plugin": "plugin.js"
+    "plugin": "plugin.js",
+    "devDependencies": {
+        "eslint": "^7.23.0"
+    }
 }
