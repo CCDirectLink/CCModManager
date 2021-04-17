@@ -101,7 +101,17 @@ export const ModListBoxEntry = ig.FocusGui.extend({
 		}
 		//*/
 	},
-	init(name, description, versionString, icon, modList) {
+	/**
+	 * 
+	 * @param {import('./moddb').ModDB} database 
+	 * @param {string} id 
+	 * @param {string} name 
+	 * @param {string} description 
+	 * @param {string} versionString 
+	 * @param {*} icon 
+	 * @param {*} modList 
+	 */
+	init(database, id, name, description, versionString, icon, modList) {
 		this.parent();
 		let buttonSquareSize = 14;
         
@@ -143,17 +153,22 @@ export const ModListBoxEntry = ig.FocusGui.extend({
 		this.addChildGui(this.versionText);
 
 		//*
-		this.installRemoveButton = new sc.ButtonGui("\\i[mod-config]", buttonSquareSize-1, true, this.modEntryActionButtons);
-		this.installRemoveButton.setPos(2, 1);
-		this.installRemoveButton.setAlign(ig.GUI_ALIGN.X_RIGHT, ig.GUI_ALIGN.Y_BOTTOM);
+		this.openModSettingsButton = new sc.ButtonGui("\\i[mod-config]", buttonSquareSize-1, true, this.modEntryActionButtons);
+		this.openModSettingsButton.setPos(2, 1);
+		this.openModSettingsButton.setAlign(ig.GUI_ALIGN.X_RIGHT, ig.GUI_ALIGN.Y_BOTTOM);
 
 		this.checkForUpdatesButton = new sc.ButtonGui("\\i[mod-refresh]", buttonSquareSize-1, true, this.modEntryActionButtons);
-		this.checkForUpdatesButton.setPos(this.installRemoveButton.hook.pos.x + this.installRemoveButton.hook.size.x + 1, 1);
+		this.checkForUpdatesButton.setPos(this.openModSettingsButton.hook.pos.x + this.openModSettingsButton.hook.size.x + 1, 1);
 		this.checkForUpdatesButton.setAlign(ig.GUI_ALIGN.X_RIGHT, ig.GUI_ALIGN.Y_BOTTOM);
 
-		this.openModSettingsButton = new sc.ButtonGui("\\i[mod-download]", buttonSquareSize-1, true, this.modEntryActionButtonStart);
-		this.openModSettingsButton.setPos(this.checkForUpdatesButton.hook.pos.x + this.checkForUpdatesButton.hook.size.x + 1, 1);
-		this.openModSettingsButton.setAlign(ig.GUI_ALIGN.X_RIGHT, ig.GUI_ALIGN.Y_BOTTOM);
+		this.installRemoveButton = new sc.ButtonGui("\\i[mod-download]", buttonSquareSize-1, true, this.modEntryActionButtonStart);
+		this.installRemoveButton.setPos(this.checkForUpdatesButton.hook.pos.x + this.checkForUpdatesButton.hook.size.x + 1, 1);
+		this.installRemoveButton.setAlign(ig.GUI_ALIGN.X_RIGHT, ig.GUI_ALIGN.Y_BOTTOM);
+		this.installRemoveButton.onButtonPress = () => {
+			database.downloadMod(id)
+				.then(() => sc.Dialogs.showDialog(`${name} installed.`))
+				.catch(err => sc.Dialogs.showErrorDialog(err.message));
+		};
 
 		[this.installRemoveButton, this.checkForUpdatesButton, this.openModSettingsButton].forEach(button => {
 			this.addChildGui(button);

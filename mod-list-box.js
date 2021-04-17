@@ -10,10 +10,15 @@ export const ModListBox = ig.GuiElementBase.extend({
 	entrySize: 0,
 	list: null,
 	listContent: null,
-	init(mods) {
+	database: null,
+	/**
+	 * 
+	 * @param {import('./moddb').ModDB} database 
+	 */
+	init(database) {
 		this.parent();
 
-		this.mods = mods;
+		this.database = database;
 
 		this.setSize(436, 258);
 		this.setAlign(ig.GUI_ALIGN.X_CENTER, ig.GUI_ALIGN.Y_CENTER);
@@ -50,14 +55,19 @@ export const ModListBox = ig.GuiElementBase.extend({
 		this.buttonGroup = this.list.buttonGroup;
 		this.addChildGui(this.list);
         
-		this._createList();
+		this.database.getMods()
+			.then(mods => {
+				this.mods = mods;
+				this._createList();
+			})
+			.catch(err => sc.Dialogs.showErrorDialog(err.message));
 
 		this.doStateTransition("HIDDEN", true);
 	},
 
 	_createList() {
 		this.mods.forEach(mod => {	
-			let newModEntry = new ModListBoxEntry(mod.name, mod.description, mod.versionString, null, this);
+			let newModEntry = new ModListBoxEntry(this.database, mod.id, mod.name, mod.description, mod.versionString, null, this);
 			this.modEntries.push(newModEntry);
 			this.list.addButton(newModEntry, false);
 		});

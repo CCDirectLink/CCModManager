@@ -1,23 +1,17 @@
 import { ModListBox } from './mod-list-box.js';
+import { ModDB } from './moddb.js';
 
 export const ModMenu = sc.BaseMenu.extend({
 	modList: null,
+	database: null,
 	init() {
 		this.parent();
 		this.hook.size.x = ig.system.width;
 		this.hook.size.y = ig.system.height;
 
-		this.modList = new ModListBox([
-			{name: "CCModManager", description: "An integrated mod manager for CrossCode", versionString: "v0.0.1"},
-			{name: "CCInventorySearch", description: "Inventory search mod", versionString: "v1.0.0"},
-			{name: "CCFillerText", description: "Lorem ipsum something or other", versionString: "v0.0.1"},
-			{name: "CCModManager", description: "An integrated mod manager for CrossCode", versionString: "v0.0.1"},
-			{name: "CCModManager", description: "An integrated mod manager for CrossCode", versionString: "v0.0.1"},
-			{name: "CCModManager", description: "An integrated mod manager for CrossCode", versionString: "v0.0.1"},
-			{name: "CCModManager", description: "An integrated mod manager for CrossCode", versionString: "v0.0.1"},
-			{name: "CCModManager", description: "An integrated mod manager for CrossCode", versionString: "v0.0.1"},
-			{name: "CCModManager", description: "An integrated mod manager for CrossCode", versionString: "v0.0.1"}
-		]);
+		this.database = new ModDB();
+
+		this.modList = new ModListBox(this.database);
 		this.addChildGui(this.modList);
 
 		this.doStateTransition("DEFAULT", true);
