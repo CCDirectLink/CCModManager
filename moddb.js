@@ -41,7 +41,7 @@ export class ModDB {
 	}
 
 	async _installCCMod(data, id) {
-		await fs.promises.writeFile(`assets/mods/${id}.ccmod`, data);
+		await fs.promises.writeFile(`assets/mods/${id}.ccmod`, new Uint8Array(data));
 	}
 	async _installModZip(data, id, source) {
 		const zip = await window.JSZip.loadAsync(data);
@@ -49,7 +49,7 @@ export class ModDB {
 		await Promise.all(Object.values(zip.files)
 			.filter(file => !file.dir)
 			.map(async file => {
-				const data = await file.async('arraybuffer');
+				const data = await file.async('uint8array');
 				const relative = path.relative(source, file.name);
 				if (relative.startsWith('..' + path.sep)) {
 					return;
