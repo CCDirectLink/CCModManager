@@ -4,8 +4,8 @@
 ## Building
 
 ```bash
-git clone https://github.com/krypciak/cc-ts-template-esbuild
-cd cc-ts-template-esbuild
+git clone https://github.com/CCDirectLink/CCModManager
+cd CCModManager
 npm install
 npm run start
 # this should return no errors (hopefully)
