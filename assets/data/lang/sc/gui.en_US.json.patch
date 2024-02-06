@@ -1,7 +1,9 @@
 {
-	"labels": {
-		"title-screen": {
-			"mods": "Mods"
-		}
-	}
+    "labels": {
+        "menu": {
+            "menu-titles": {
+                "mods": "Mods"
+            }
+        }
+    }
 }

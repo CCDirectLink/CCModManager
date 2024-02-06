@@ -22,7 +22,7 @@ sc.TitleScreenButtonGui.inject({
     postInit() {
         this.parent()
 
-        this.modsButton = new sc.ButtonGui('\\i[help2]' + ig.lang.get('sc.gui.title-screen.mods'), undefined, true, sc.BUTTON_TYPE.EQUIP)
+        this.modsButton = new sc.ButtonGui('\\i[help2]' + ig.lang.get('sc.gui.menu.menu-titles.mods'), undefined, true, sc.BUTTON_TYPE.EQUIP)
         this.modsButton.hook.transitions = {
             DEFAULT: {
                 state: {},
