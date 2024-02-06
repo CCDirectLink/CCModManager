@@ -1,2 +1,0 @@
-# CrossCode Mod Manager
-

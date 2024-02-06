@@ -1,9 +1,28 @@
 {
-    "name": "cc-mod-manager",
-    "ccmodHumanName": "CCModManager",
+    "name": "ccmodmanager",
     "version": "0.0.1",
+    "scripts": {
+        "start": "npx esbuild --target=es2018 --format=esm --platform=node --bundle --sourcemap=inline --outfile=plugin.js src/plugin.ts",
+        "watch": "npx esbuild --target=es2018 --format=esm --platform=node --bundle --sourcemap=inline --watch --outfile=plugin.js src/plugin.ts",
+        "build": "npx esbuild --target=es2018 --format=esm --platform=node --bundle --minify --outfile='plugin.js' 'src/plugin.ts'",
+        "format": "prettier ./src -w; npx prettier ./assets -w --tab-width 4 --no-semi --print-width 500 --bracket-same-line"
+    },
+    "license": "GPLv3",
+    "ccmodHumanName": "CCModManager",
+    "description": "mod manager",
     "plugin": "plugin.js",
     "devDependencies": {
-        "eslint": "^7.23.0"
+        "@types/node": "^11.6.0",
+        "@typescript-eslint/eslint-plugin": "^6.20.0",
+        "@typescript-eslint/parser": "^6.20.0",
+        "esbuild": "^0.20.0",
+        "eslint": "^8.56.0",
+        "eslint-config-prettier": "^9.1.0",
+        "prettier": "3.2.4",
+        "typescript": "^5.3.3",
+        "ultimate-crosscode-typedefs": "github:krypciak/ultimate-crosscode-typedefs"
+    },
+    "dependencies": {
+        "jszip": "^3.10.1"
     }
 }

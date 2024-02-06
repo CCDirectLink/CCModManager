@@ -1,0 +1,22 @@
+name: Build check
+
+on:
+    workflow_dispatch:
+    push:
+        branches:
+          - main
+
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+
+        steps:
+            # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+            - uses: actions/checkout@v2
+            
+            - name: Install dependencies
+              run: sudo apt update; sudo apt install npm
+
+            - name: Compile
+              run: npm install; npm run start
