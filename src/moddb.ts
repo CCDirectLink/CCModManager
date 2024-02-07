@@ -2,28 +2,40 @@ const fs: typeof import('fs') = (0, eval)("require('fs')")
 const path: typeof import('path') = (0, eval)("require('path')")
 
 import jszip from 'jszip'
-import { ModEntry, NPDatabase } from './types'
+import { ModEntry, ModID, NPDatabase } from './types'
+import { FileCache } from './cache'
 
 export class ModDB {
     modList!: NPDatabase
+    constructor(
+        public name: string,
+        public url: string
+    ) {
+        FileCache.addDatabase(name, url)
+    }
 
     async getMods(): Promise<ModEntry[]> {
-        await this.downloadDatabase()
+        const database = 'official'
+        this.modList = await FileCache.getDatabase(database)
 
         const result = []
         for (const [name, data] of Object.entries(this.modList)) {
+            const meta = data.metadata
+            const ccmod = data.metadataCCMod
             result.push({
+                database,
                 id: name,
-                name: data.metadata.ccmodHumanName || name,
-                description: data.metadata.description,
-                version: data.metadata.version,
-                versionString: data.metadata.version,
+                name: ccmod?.title ? ig.LangLabel.getText(ccmod.title) : meta!.ccmodHumanName || name,
+                description: ccmod?.description ? ig.LangLabel.getText(ccmod.description) : meta!.description,
+                version: ccmod?.version || meta!.version,
+                isLegacy: !ccmod,
+                hasIcon: ccmod?.icons ? !!ccmod.icons['24'] : false,
             })
         }
         return result
     }
 
-    async downloadMod(id: keyof NPDatabase) {
+    async downloadMod(id: ModID) {
         const meta = await this.getMod(id)
 
         const installation = meta.installation.find(i => i.type === 'ccmod') || meta.installation.find(i => i.type === 'modZip')
@@ -40,11 +52,11 @@ export class ModDB {
         }
     }
 
-    private async installCCMod(data: ArrayBuffer, id: keyof NPDatabase) {
+    private async installCCMod(data: ArrayBuffer, id: ModID) {
         await fs.promises.writeFile(`assets/mods/${id}.ccmod`, new Uint8Array(data))
     }
 
-    private async installModZip(data: ArrayBuffer, id: keyof NPDatabase, source: string) {
+    private async installModZip(data: ArrayBuffer, id: ModID, source: string) {
         const zip = await jszip.loadAsync(data)
 
         await Promise.all(
@@ -68,18 +80,12 @@ export class ModDB {
         )
     }
 
-    private async getMod(id: keyof NPDatabase) {
+    private async getMod(id: ModID) {
         const data = this.modList[id]
         if (data) return data
 
-        await this.downloadDatabase()
         const newData = this.modList[id]
         if (!newData) throw new Error('Could not find name')
         return newData
-    }
-
-    private async downloadDatabase() {
-        const resp = await fetch('https://raw.githubusercontent.com/CCDirectLink/CCModDB/master/npDatabase.json')
-        this.modList = (await resp.json()) as NPDatabase
     }
 }

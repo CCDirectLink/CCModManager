@@ -18,7 +18,8 @@ interface ModMenuConstructor extends ImpactClass<ModMenu> {
 
 export const ModMenu: ModMenuConstructor = sc.ListInfoMenu.extend({
     init() {
-        this.database = new ModDB()
+        // this.database = new ModDB('official', 'https://raw.githubusercontent.com/CCDirectLink/CCModDB/master/npDatabase.json')
+        this.database = new ModDB('official', 'https://raw.githubusercontent.com/krypciak/CCModDB/ccmodjson')
         this.parent(new ModMenuList(this.database))
         this.list.setPos(9, 21)
 

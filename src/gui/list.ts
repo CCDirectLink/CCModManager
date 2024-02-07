@@ -38,13 +38,11 @@ export const ModMenuList: ModMenuListConstructor = sc.ListTabbedPane.extend({
 
         this.addTab('Search', 0, {})
 
-        this.database
-            .getMods()
-            .then(mods => {
-                this.mods = mods
-                this.reloadEntries()
-            })
-            .catch(err => sc.Dialogs.showErrorDialog(err.message))
+        this.database.getMods().then(mods => {
+            this.mods = mods
+            this.reloadEntries()
+        })
+        //.catch(err => sc.Dialogs.showErrorDialog(err.message))
     },
     show() {
         this.parent()
@@ -97,7 +95,7 @@ export const ModMenuList: ModMenuListConstructor = sc.ListTabbedPane.extend({
         buttonGroup.clear()
         const mods = createFuzzyFilteredModList(this.filters, this.mods)
         for (const mod of mods) {
-            const newModEntry = new ModListEntry(this.database, mod.id, mod.name, mod.description ?? '', mod.versionString, null, this)
+            const newModEntry = new ModListEntry(mod, this)
             list.addButton(newModEntry, false)
         }
     },

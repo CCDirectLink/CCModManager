@@ -34,11 +34,43 @@ export type Mod1 = Mod & {
           }
     )
 
-export type NPDatabase = Record<string, NPDatabasePackage>
+export type ModID = string
+export type NPDatabase = Record<ModID, NPDatabasePackage>
 
 export interface NPDatabasePackage {
-    metadata: NPDatabasePackageMetadata
+    metadata?: NPDatabasePackageMetadata
+    metadataCCMod?: NPDatabaseCCMod
     installation: NPDatabasePackageInstallation[]
+}
+
+type LocalizedString = Record<string, string> | string
+
+type Person = PersonDetails | string
+interface PersonDetails {
+    name: LocalizedString
+    email?: LocalizedString
+    url?: LocalizedString
+    comment?: LocalizedString
+}
+
+
+export interface NPDatabaseCCMod {
+    id: string
+    version?: string
+
+    title?: LocalizedString
+    description?: LocalizedString
+    license?: string
+    homepage?: string
+    keywords?: string[]
+    authors?: Person[]
+    icons?: Record<string, string>
+    type?: 'mod' | 'library'
+
+    dependencies?: Record<ModID, string>
+
+    assetsDir?: string
+    modPrefix?: string
 }
 
 export interface NPDatabasePackageMetadata {
@@ -67,9 +99,19 @@ export type NPDatabasePackageInstallation = {
 )
 
 export type ModEntry = {
-    id: keyof NPDatabase
+    database: string
+    id: ModID
     name: string
     description?: string
     version: string
-    versionString: string
+    isLegacy: boolean
+    hasIcon: boolean
+}
+
+export type ModImageConfig = {
+    path: string
+    offsetX: number
+    offsetY: number
+    sizeX: number
+    sizeY: number
 }

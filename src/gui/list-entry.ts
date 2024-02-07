@@ -1,7 +1,7 @@
-import { NPDatabase } from '../types'
 import { ModListEntryHighlight } from './list-entry-highlight'
 import { ModMenuList } from './list'
-import { ModDB } from '../moddb'
+import { ModEntry } from '../types'
+import { FileCache } from '../cache'
 
 export interface ModListEntry extends ig.FocusGui {
     ninepatch: ig.NinePatch
@@ -15,10 +15,10 @@ export interface ModListEntry extends ig.FocusGui {
     highlight: ModListEntryHighlight
     modEntryActionButtonStart: { height: number; ninepatch: ig.NinePatch; highlight: sc.ButtonGui.Highlight }
     modEntryActionButtons: sc.ButtonGui.Type & { ninepatch: ig.NinePatch }
-    icon: unknown
+    iconGui: ig.ImageGui
 }
 interface ModListEntryConstructor extends ImpactClass<ModListEntry> {
-    new (database: ModDB, id: keyof NPDatabase, name: string, description: string, versionString: string, icon: unknown, modList: ModMenuList): ModListEntry
+    new (mod: ModEntry, modList: ModMenuList): ModListEntry
 }
 
 export const ModListEntry: ModListEntryConstructor = ig.FocusGui.extend({
@@ -74,72 +74,40 @@ export const ModListEntry: ModListEntryConstructor = ig.FocusGui.extend({
         },
     },
 
-    init(database, id, name, description, versionString, icon, modList) {
+    init(mod, modList) {
         this.parent()
-        const buttonSquareSize = 14
-
-        // 3 for the scrollbar
-        this.setSize(modList.hook.size.x - 3, 43 /*modList.entrySize*/)
-
         this.modList = modList
 
-        this.nameText = new sc.TextGui(name)
+        const buttonSquareSize = 14
 
-        this.description = new sc.TextGui(description ?? '', {
-            font: sc.fontsystem.smallFont,
-        })
+        this.setSize(modList.hook.size.x - 3 /* 3 for scrollbar */, 43 /*modList.entrySize*/)
 
-        this.nameText.setPos(4, 0)
-        this.description.setPos(4, 14)
+        this.nameText = new sc.TextGui(mod.name)
 
-        this.versionText = new sc.TextGui(versionString, {
-            font: sc.fontsystem.tinyFont,
-        })
+        this.description = new sc.TextGui(mod.description ?? '', { font: sc.fontsystem.smallFont })
+
+        const iconOffset = 24 + 1
+        this.nameText.setPos(4 + iconOffset, 0)
+        this.description.setPos(4 + iconOffset, 14)
+
+        this.versionText = new sc.TextGui(mod.version, { font: sc.fontsystem.tinyFont })
 
         this.versionText.setAlign(ig.GUI_ALIGN.X_RIGHT, ig.GUI_ALIGN.Y_TOP)
         this.versionText.setPos(3, 3)
 
-        // TODO: Icon implementation
-        if (icon) {
-        }
-        // this.icon = icon ? undefined : undefined
-        // this.icon && this.addChildGui(this.icon)
+        FileCache.getIconConfig(mod).then(config => {
+            const image = new ig.Image(config.path)
+            this.iconGui = new ig.ImageGui(image, config.offsetX, config.offsetY, config.sizeX, config.sizeY)
+            this.iconGui.setPos(2, 8)
+            this.addChildGui(this.iconGui)
+        })
 
         this.highlight = new ModListEntryHighlight(this.hook.size.x, this.hook.size.y, this.nameText.hook.size.x, buttonSquareSize * 3)
-        this.highlight.setPos(0, 0)
+        this.highlight.setPos(iconOffset, 0)
         this.addChildGui(this.highlight)
         this.addChildGui(this.nameText)
         this.addChildGui(this.description)
         this.addChildGui(this.versionText)
-
-        // this.openModSettingsButton = new sc.ButtonGui('\\i[mod-config]', buttonSquareSize - 1, true, this.modEntryActionButtons)
-        // this.openModSettingsButton.setPos(2, 1)
-        // this.openModSettingsButton.setAlign(ig.GUI_ALIGN.X_RIGHT, ig.GUI_ALIGN.Y_BOTTOM)
-
-        // this.checkForUpdatesButton = new sc.ButtonGui('\\i[mod-refresh]', buttonSquareSize - 1, true, this.modEntryActionButtons)
-        // this.checkForUpdatesButton.setPos(this.openModSettingsButton.hook.pos.x + this.openModSettingsButton.hook.size.x + 1, 1)
-        // this.checkForUpdatesButton.setAlign(ig.GUI_ALIGN.X_RIGHT, ig.GUI_ALIGN.Y_BOTTOM)
-
-        // this.installRemoveButton = new sc.ButtonGui('\\i[mod-download]', buttonSquareSize - 1, true, this.modEntryActionButtonStart)
-        // this.installRemoveButton.setPos(this.checkForUpdatesButton.hook.pos.x + this.checkForUpdatesButton.hook.size.x + 1, 1)
-        // this.installRemoveButton.setAlign(ig.GUI_ALIGN.X_RIGHT, ig.GUI_ALIGN.Y_BOTTOM)
-        // this.installRemoveButton.onButtonPress = () => {
-        //     database
-        //         .downloadMod(id)
-        //         .then(() => sc.Dialogs.showDialog(`${name} installed.`))
-        //         .catch(err => sc.Dialogs.showErrorDialog(err.message))
-        // }
-        // ;[this.installRemoveButton, this.checkForUpdatesButton, this.openModSettingsButton].forEach(button => {
-        //     this.addChildGui(button)
-        //     this.modList.buttonGroup.addFocusGui(button)
-        //     button.focusGained = () => {
-        //         this.focusGained()
-        //     }
-        //     button.focusLost = () => {
-        //         this.focusLost()
-        //     }
-        //     button.textChild.setPos(1, 3)
-        // })
     },
     updateDrawables(root) {
         if (this.modList.hook.currentStateName != 'HIDDEN') {
@@ -155,3 +123,32 @@ export const ModListEntry: ModListEntryConstructor = ig.FocusGui.extend({
         this.highlight.focus = this.focus
     },
 })
+
+// this.openModSettingsButton = new sc.ButtonGui('\\i[mod-config]', buttonSquareSize - 1, true, this.modEntryActionButtons)
+// this.openModSettingsButton.setPos(2, 1)
+// this.openModSettingsButton.setAlign(ig.GUI_ALIGN.X_RIGHT, ig.GUI_ALIGN.Y_BOTTOM)
+
+// this.checkForUpdatesButton = new sc.ButtonGui('\\i[mod-refresh]', buttonSquareSize - 1, true, this.modEntryActionButtons)
+// this.checkForUpdatesButton.setPos(this.openModSettingsButton.hook.pos.x + this.openModSettingsButton.hook.size.x + 1, 1)
+// this.checkForUpdatesButton.setAlign(ig.GUI_ALIGN.X_RIGHT, ig.GUI_ALIGN.Y_BOTTOM)
+
+// this.installRemoveButton = new sc.ButtonGui('\\i[mod-download]', buttonSquareSize - 1, true, this.modEntryActionButtonStart)
+// this.installRemoveButton.setPos(this.checkForUpdatesButton.hook.pos.x + this.checkForUpdatesButton.hook.size.x + 1, 1)
+// this.installRemoveButton.setAlign(ig.GUI_ALIGN.X_RIGHT, ig.GUI_ALIGN.Y_BOTTOM)
+// this.installRemoveButton.onButtonPress = () => {
+//     database
+//         .downloadMod(id)
+//         .then(() => sc.Dialogs.showDialog(`${name} installed.`))
+//         .catch(err => sc.Dialogs.showErrorDialog(err.message))
+// }
+// ;[this.installRemoveButton, this.checkForUpdatesButton, this.openModSettingsButton].forEach(button => {
+//     this.addChildGui(button)
+//     this.modList.buttonGroup.addFocusGui(button)
+//     button.focusGained = () => {
+//         this.focusGained()
+//     }
+//     button.focusLost = () => {
+//         this.focusLost()
+//     }
+//     button.textChild.setPos(1, 3)
+// })

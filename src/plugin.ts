@@ -1,3 +1,4 @@
+import {FileCache} from './cache'
 import { Mod1 } from './types'
 
 export default class ModManager {
@@ -12,6 +13,7 @@ export default class ModManager {
     }
 
     async prestart() {
+        FileCache.init()
         await import('./gui/gui.js')
     }
 
