@@ -7,9 +7,12 @@ export interface ModMenuList extends sc.ListTabbedPane {
     database: ModDB
     mods: ModEntry[]
     filters: Fliters
+    tabz: { name: string; populateFunc: (list: sc.ButtonListBox, buttonGroup: sc.ButtonGroup) => void }[]
 
     reloadFilters(this: this): void
     reloadEntries(this: this): void
+    populateStore(this: this, list: sc.ButtonListBox, buttonGroup: sc.ButtonGroup): void
+    populateSettings(this: this, list: sc.ButtonListBox, buttonGroup: sc.ButtonGroup): void
 }
 interface ModMenuListConstructor extends ImpactClass<ModMenuList> {
     new (database: ModDB): ModMenuList
@@ -24,11 +27,14 @@ export const ModMenuList: ModMenuListConstructor = sc.ListTabbedPane.extend({
         HIDDEN: { state: { alpha: 0, offsetX: 218 }, time: 0.2, timeFunction: KEY_SPLINES.LINEAR },
         HIDDEN_EASE: { state: { alpha: 0, offsetX: 218 }, time: 0.2, timeFunction: KEY_SPLINES.EASE },
     },
-
     init(database: ModDB) {
         this.database = database
         this.parent(false)
 
+        this.tabz = [
+            { name: 'Store', populateFunc: this.populateStore },
+            { name: 'Settings', populateFunc: this.populateSettings },
+        ]
         this.filters = {}
 
         this.setAlign(ig.GUI_ALIGN.X_LEFT, ig.GUI_ALIGN.Y_TOP)
@@ -36,7 +42,9 @@ export const ModMenuList: ModMenuListConstructor = sc.ListTabbedPane.extend({
         this.setPanelSize(modMenuListWidth, modMenuListHeight - 19)
         this.setPivot(modMenuListWidth, modMenuListHeight)
 
-        this.addTab('Search', 0, {})
+        for (let i = 0; i < this.tabz.length; i++) {
+            this.addTab(this.tabz[i].name, i, {})
+        }
 
         this.database.getMods().then(mods => {
             this.mods = mods
@@ -90,14 +98,24 @@ export const ModMenuList: ModMenuListConstructor = sc.ListTabbedPane.extend({
         this.currentGroup && this.currentGroup.clear()
         this.parent(index, settings)
     },
-    onCreateListEntries(list, buttonGroup, _type, _sort) {
-        list.clear()
-        buttonGroup.clear()
+    populateSettings(list) {
+        const repositoriesButton = new sc.ButtonGui('Repositories')
+        repositoriesButton.onButtonPress = () => {
+            console.log('press')
+        }
+        list.addButton(repositoriesButton)
+    },
+    populateStore(list) {
         const mods = createFuzzyFilteredModList(this.filters, this.mods)
         for (const mod of mods) {
             const newModEntry = new ModListEntry(mod, this)
-            list.addButton(newModEntry, false)
+            list.addButton(newModEntry)
         }
+    },
+    onCreateListEntries(list, buttonGroup, _type, _sort) {
+        list.clear()
+        buttonGroup.clear()
+        this.tabz[this.currentTabIndex].populateFunc.bind(this)(list, buttonGroup)
     },
     onListEntryPressed(_button) {
         sc.BUTTON_SOUND.submit.play()

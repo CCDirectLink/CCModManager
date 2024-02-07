@@ -5,10 +5,12 @@ import fuzzysort from 'fuzzysort'
 export interface Fliters {
     name?: string
     includeLegacy?: boolean
+    hasIcon?: boolean
 }
 
 function doesFilterApply(filters: Fliters, mod: ModEntry) {
     if (!filters.includeLegacy && mod.isLegacy) return false
+    if (filters.hasIcon && !mod.hasIcon) return false
     return true
 }
 

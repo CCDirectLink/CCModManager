@@ -29,8 +29,31 @@ export const ModMenu: ModMenuConstructor = sc.ListInfoMenu.extend({
             this.list.filters.name = this.inputField.getValueAsString()
             this.list.reloadFilters()
         }
-
         this.addChildGui(this.inputField)
+
+        const legacyCheckbox = new sc.CheckboxGui((this.list.filters.includeLegacy = true))
+        legacyCheckbox.setPos(9, 282)
+        legacyCheckbox.onButtonPress = () => {
+            this.list.filters.includeLegacy = legacyCheckbox.pressed
+            this.list.reloadFilters()
+        }
+        this.addChildGui(legacyCheckbox)
+        sc.menu.buttonInteract.addGlobalButton(legacyCheckbox, () => false)
+        const legacyText = new sc.TextGui('Include legacy mods')
+        legacyText.setPos(35, 282)
+        this.addChildGui(legacyText)
+
+        const hasIconCheckbox = new sc.CheckboxGui((this.list.filters.hasIcon = true))
+        hasIconCheckbox.setPos(9, 300)
+        hasIconCheckbox.onButtonPress = () => {
+            this.list.filters.hasIcon = hasIconCheckbox.pressed
+            this.list.reloadFilters()
+        }
+        this.addChildGui(hasIconCheckbox)
+        sc.menu.buttonInteract.addGlobalButton(hasIconCheckbox, () => false)
+        const hasIconText = new sc.TextGui('Has icon')
+        hasIconText.setPos(35, 300)
+        this.addChildGui(hasIconText)
 
         /* i dont think this is how it's supposed to work but it works so */
         sc.menu.buttonInteract.addGlobalButton(this.inputField as any, () => false)
