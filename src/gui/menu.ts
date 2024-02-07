@@ -24,6 +24,11 @@ export const ModMenu: ModMenuConstructor = sc.ListInfoMenu.extend({
 
         this.inputField = new nax.ccuilib.InputField(232, 20)
         this.inputField.setPos(124, 2)
+        this.inputField.onCharacterInput = () => {
+            this.list.filters.name = this.inputField.getValueAsString()
+            this.list.reloadFilters()
+        }
+
         this.addChildGui(this.inputField)
 
         /* i dont think this is how it's supposed to work but it works so */
