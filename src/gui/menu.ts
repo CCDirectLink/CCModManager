@@ -1,5 +1,5 @@
 import { ModMenuList } from './list'
-import { ModDB } from './moddb'
+import { ModDB } from '../moddb'
 
 import 'nax-ccuilib/src/headers/nax/input-field.d.ts'
 import 'nax-ccuilib/src/headers/nax/input-field-cursor.d.ts'

@@ -1,7 +1,7 @@
 import { NPDatabase } from '../types'
 import { ModListEntryHighlight } from './list-entry-highlight'
 import { ModMenuList } from './list'
-import { ModDB } from './moddb'
+import { ModDB } from '../moddb'
 
 export interface ModListEntry extends ig.FocusGui {
     ninepatch: ig.NinePatch

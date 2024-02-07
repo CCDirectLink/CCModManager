@@ -2,7 +2,7 @@ const fs: typeof import('fs') = (0, eval)("require('fs')")
 const path: typeof import('path') = (0, eval)("require('path')")
 
 import jszip from 'jszip'
-import { ModEntry, NPDatabase } from '../types'
+import { ModEntry, NPDatabase } from './types'
 
 export class ModDB {
     modList!: NPDatabase

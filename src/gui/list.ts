@@ -1,6 +1,6 @@
 import { ModEntry } from '../types'
 import { ModListEntry } from './list-entry'
-import { ModDB } from './moddb'
+import { ModDB } from '../moddb'
 
 export interface ModMenuList extends sc.ListTabbedPane {
     database: ModDB
