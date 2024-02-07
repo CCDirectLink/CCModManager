@@ -1,5 +1,5 @@
 declare global {
-    interface ModListBoxEntryHighLight extends ig.GuiElementBase {
+    interface ModListEntryHighlight extends ig.GuiElementBase {
         gfx: ig.Image
         ninepatch: ig.NinePatch
         buttonCover: ig.NinePatch
@@ -10,12 +10,12 @@ declare global {
         textTagHighlighted: ig.ImagePattern
         focus: boolean
     }
-    interface ModListBoxEntryHighLightConstructor extends ImpactClass<ModListBoxEntryHighLight> {
-        new (width: number, height: number, textWidth: number, buttonWidth: number): ModListBoxEntryHighLight
+    interface ModListEntryHighlightConstructor extends ImpactClass<ModListEntryHighlight> {
+        new (width: number, height: number, textWidth: number, buttonWidth: number): ModListEntryHighlight
     }
 }
 
-export const ModListBoxEntryHighlight: ModListBoxEntryHighLightConstructor = ig.GuiElementBase.extend({
+export const ModListEntryHighlight: ModListEntryHighlightConstructor = ig.GuiElementBase.extend({
     gfx: new ig.Image('media/gui/CCModManager.png'),
     ninepatch: new ig.NinePatch('media/gui/CCModManager.png', {
         left: 3,

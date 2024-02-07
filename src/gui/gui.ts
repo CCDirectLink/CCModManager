@@ -1,4 +1,4 @@
-import { ModMenu } from './mod-menu.js'
+import { ModMenu } from './menu'
 
 const icons = new ig.Font('media/font/CCModManagerIcons.png', 12, ig.MultiFont.ICON_START)
 const newFontIndex = sc.fontsystem.font.iconSets.length
@@ -47,6 +47,9 @@ sc.TitleScreenButtonGui.inject({
     _enterModsMenu() {
         sc.menu.setDirectMode(true, sc.MENU_SUBMENU.MODS)
         sc.model.enterMenu(true)
+        const main = ig.gui.guiHooks.find(h => h.gui instanceof sc.MainMenu)?.gui as sc.MainMenu | undefined
+        if (main?.info) main.info.doStateTransition('HIDDEN')
+        if (main?.topBar) main.topBar.doStateTransition('HIDDEN')
     },
     show() {
         this.parent()

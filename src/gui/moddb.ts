@@ -1,14 +1,13 @@
-import { ModListEntry, NPDatabase } from '../types.js'
-
 const fs: typeof import('fs') = (0, eval)("require('fs')")
 const path: typeof import('path') = (0, eval)("require('path')")
 
 import jszip from 'jszip'
+import { ModEntry, NPDatabase } from '../types'
 
 export class ModDB {
     modList!: NPDatabase
 
-    async getMods(): Promise<ModListEntry[]> {
+    async getMods(): Promise<ModEntry[]> {
         await this.downloadDatabase()
 
         const result = []

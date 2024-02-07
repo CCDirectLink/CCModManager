@@ -1,8 +1,20 @@
-import { Hash } from 'crypto'
 import { Mod } from 'ultimate-crosscode-typedefs/modloader/mod'
-import { ModDB } from './gui/moddb'
 
-export type Mod1 = Writable<Mod> & {
+export {}
+declare global {
+    namespace sc {
+        enum MENU_SUBMENU {
+            MODS,
+        }
+        interface TitleScreenButtonGui {
+            modsButton: sc.ButtonGui
+
+            _enterModsMenu(this: this): void
+        }
+    }
+}
+
+export type Mod1 = Mod & {
     isCCModPacked: boolean
     findAllAssets?(): void /* only there for ccl2, used to set isCCL3 */
 } & (
@@ -22,27 +34,14 @@ export type Mod1 = Writable<Mod> & {
           }
     )
 
-export declare global {
-    namespace sc {
-        enum MENU_SUBMENU {
-            MODS,
-        }
-        interface TitleScreenButtonGui {
-            modsButton: sc.ButtonGui
+export type NPDatabase = Record<string, NPDatabasePackage>
 
-            _enterModsMenu(this: this): void
-        }
-    }
-}
-
-type NPDatabase = Record<string, NPDatabasePackage>
-
-interface NPDatabasePackage {
+export interface NPDatabasePackage {
     metadata: NPDatabasePackageMetadata
     installation: NPDatabasePackageInstallation[]
 }
 
-interface NPDatabasePackageMetadata {
+export interface NPDatabasePackageMetadata {
     ccmodType?: 'base' | 'tool' /* so far only ccloader uses this */
     ccmodHumanName: string
     name: string
@@ -54,7 +53,7 @@ interface NPDatabasePackageMetadata {
     homepage?: string
 }
 
-type NPDatabasePackageInstallation = {
+export type NPDatabasePackageInstallation = {
     url: string
     hash: { sha256: string }
 } & (
@@ -67,14 +66,10 @@ type NPDatabasePackageInstallation = {
       }
 )
 
-type ModListEntry = {
+export type ModEntry = {
     id: keyof NPDatabase
     name: string
     description?: string
     version: string
     versionString: string
-}
-
-interface ToolsDatabase {
-    tools: { [id: string]: CCModDBPackage }
 }

@@ -18,9 +18,10 @@
         "esbuild": "^0.20.0",
         "eslint": "^8.56.0",
         "eslint-config-prettier": "^9.1.0",
+        "jszip": "^3.10.1",
         "prettier": "3.2.4",
         "typescript": "^5.3.3",
         "ultimate-crosscode-typedefs": "github:krypciak/ultimate-crosscode-typedefs",
-        "jszip": "^3.10.1"
+        "nax-ccuilib": "github:conorlawton/nax-ccuilib"
     }
 }
