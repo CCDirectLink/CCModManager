@@ -23,6 +23,7 @@ declare global {
             modEntryActionButtons: sc.ButtonGui.Type & { ninepatch: ig.NinePatch }
             iconGui: ig.ImageGui
 
+            stripModName(this: this, name: string): string
             onButtonPress(this: this): void
             setTextGreen(this: this): void
             setTextRed(this: this): void
@@ -105,8 +106,9 @@ sc.ModListEntry = ig.FocusGui.extend({
 
         this.setSize(modList.hook.size.x - 3 /* 3 for scrollbar */, buttonSquareSize * 3 - 3)
 
-        this.nameText = new sc.TextGui(mod.name)
+        this.nameText = new sc.TextGui('')
         if (InstallQueue.has(mod)) this.setTextGreen()
+        else this.setTextWhite()
 
         const iconOffset = 25 as const
         this.highlight = new sc.ModListEntryHighlight(this.hook.size.x, this.hook.size.y, this.nameText.hook.size.x, buttonSquareSize * 3)
@@ -131,14 +133,17 @@ sc.ModListEntry = ig.FocusGui.extend({
             this.addChildGui(this.starCount)
         }
     },
+    stripModName(name) {
+        return name.replace(/\\c\[\d]/g, '')
+    },
     setTextGreen() {
-        this.nameText.setText(`\\c[2]${this.mod.name}\\c[0]`)
+        this.nameText.setText(`\\c[2]${this.stripModName(this.mod.name)}\\c[0]`)
     },
     setTextRed() {
-        this.nameText.setText(`\\c[1]${this.mod.name}\\c[0]`)
+        this.nameText.setText(`\\c[1]${this.stripModName(this.mod.name)}\\c[0]`)
     },
     setTextWhite() {
-        this.nameText.setText(this.mod.name)
+        this.nameText.setText(this.stripModName(this.mod.name))
     },
     updateDrawables(root) {
         if (this.modList.hook.currentStateName != 'HIDDEN') {

@@ -189,7 +189,7 @@ sc.ModMenuList = sc.ListTabbedPane.extend({
         }
     },
     populateSelected(list, _, sort: sc.MOD_MENU_SORT_ORDER) {
-        const mods = InstallQueue.values()
+        const mods = createFuzzyFilteredModList(this.filters, InstallQueue.values())
         this.sortModEntries(mods, sort)
         for (const mod of mods) {
             const newModEntry = new sc.ModListEntry(mod, this)
@@ -197,7 +197,7 @@ sc.ModMenuList = sc.ListTabbedPane.extend({
         }
     },
     populateEnabled(list, _, sort: sc.MOD_MENU_SORT_ORDER) {
-        const mods = InstalledMods.getActive()
+        const mods = createFuzzyFilteredModList(this.filters, InstalledMods.getActive())
         this.sortModEntries(mods, sort)
         for (const mod of mods) {
             const newModEntry = new sc.ModListEntry(mod, this)
@@ -205,7 +205,7 @@ sc.ModMenuList = sc.ListTabbedPane.extend({
         }
     },
     populateDisabled(list, _, sort: sc.MOD_MENU_SORT_ORDER) {
-        const mods = InstalledMods.getInactive()
+        const mods = createFuzzyFilteredModList(this.filters, InstalledMods.getInactive())
         this.sortModEntries(mods, sort)
         for (const mod of mods) {
             const newModEntry = new sc.ModListEntry(mod, this)
