@@ -1,12 +1,40 @@
-const fs: typeof import('fs') = (0, eval)("require('fs')")
-const path: typeof import('path') = (0, eval)("require('path')")
+// const fs: typeof import('fs') = (0, eval)("require('fs')")
+// const path: typeof import('path') = (0, eval)("require('path')")
 
-import jszip from 'jszip'
-import { ModEntryServer, ModID, NPDatabase } from './types'
+// import jszip from 'jszip'
+import semver from 'semver'
+import { ModEntryLocal, ModEntryServer, ModID, NPDatabase } from './types'
 import { FileCache } from './cache'
 
 export class ModDB {
+    static databases: Record<string, ModDB> = {
+        krypek: new ModDB('krypek', 'https://raw.githubusercontent.com/krypciak/CCModDB/ccmodjson'),
+    }
+
+    static async resolveLocalModOrigin(mod: ModEntryLocal) {
+        const matches: ModEntryServer[] = []
+        for (const dbName in this.databases) {
+            const moddb = this.databases[dbName]
+            let modRecord = moddb.modRecord
+            if (!modRecord) {
+                await moddb.getMods(() => {})
+                modRecord = moddb.modRecord
+            }
+            if (!modRecord) throw new Error('wat?')
+
+            const dbMod = modRecord[mod.id]
+            if (dbMod) matches.push(dbMod)
+        }
+        if (matches.length == 0) return
+        if (matches.length > 1) {
+            // TODO match acual mod version not the highest
+            matches[0] = matches.reduce((highestVerMod, currMod) => (semver.gt(currMod.version, highestVerMod.version) ? currMod : highestVerMod))
+        }
+        mod.database = matches[0].database
+    }
+
     database!: NPDatabase
+    modRecord!: Record<ModID, ModEntryServer>
 
     constructor(
         public name: string,
@@ -16,13 +44,13 @@ export class ModDB {
         FileCache.addDatabase(name, url)
     }
 
-    private createModEntriesFromDatabase(databaseName: string): ModEntryServer[] {
-        const result: ModEntryServer[] = []
+    private createModEntriesFromDatabase(databaseName: string) {
+        this.modRecord = {}
         for (const [name, data] of Object.entries(this.database)) {
             if (typeof data === 'string') continue
             const meta = data.metadata
             const ccmod = data.metadataCCMod
-            result.push({
+            this.modRecord[name] = {
                 database: databaseName,
                 isLocal: false,
                 id: name,
@@ -32,20 +60,20 @@ export class ModDB {
                 isLegacy: !ccmod,
                 hasIcon: ccmod?.icons ? !!ccmod.icons['24'] : false,
                 stars: data.stars,
-            })
+            }
         }
-        return result
     }
 
-    async getMods(databaseName: string, callback: (mods: ModEntryServer[]) => void): Promise<void> {
+    async getMods(callback: (mods: ModEntryServer[]) => void): Promise<void> {
         const create = (database: NPDatabase) => {
             this.database = database
-            const result = this.createModEntriesFromDatabase(databaseName)
-            callback(result)
+            this.createModEntriesFromDatabase(this.name)
+            callback(Object.values(this.modRecord))
         }
-        await FileCache.getDatabase(databaseName, create)
+        await FileCache.getDatabase(this.name, create)
     }
 
+    /*
     async downloadMod(id: ModID) {
         const pkg = await this.getMod(id)
 
@@ -84,7 +112,6 @@ export class ModDB {
                     try {
                         await fs.promises.mkdir(path.dirname(filepath), { recursive: true })
                     } catch {
-                        /* Directory already exists */
                     }
                     await fs.promises.writeFile(filepath, data)
                 })
@@ -99,8 +126,5 @@ export class ModDB {
         if (!newData) throw new Error('Could not find name')
         return newData
     }
-}
-
-export const databases: Record<string, ModDB> = {
-    krypek: new ModDB('krypek', 'https://raw.githubusercontent.com/krypciak/CCModDB/ccmodjson'),
+    */
 }

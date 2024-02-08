@@ -2,7 +2,7 @@ import { ModEntry } from '../types'
 import { FileCache } from '../cache'
 import { InstallQueue } from '../install-queue'
 import './list-entry-highlight'
-import { InstalledMods } from '../installed-mod-manager'
+import { InstalledMods } from '../local-mods'
 import { MOD_MENU_TAB_INDEXES } from './list'
 
 declare global {
@@ -23,7 +23,7 @@ declare global {
             modEntryActionButtons: sc.ButtonGui.Type & { ninepatch: ig.NinePatch }
             iconGui: ig.ImageGui
 
-            stripModName(this: this, name: string): string
+            getModName(this: this): string
             onButtonPress(this: this): void
             setTextGreen(this: this): void
             setTextRed(this: this): void
@@ -133,17 +133,25 @@ sc.ModListEntry = ig.FocusGui.extend({
             this.addChildGui(this.starCount)
         }
     },
-    stripModName(name) {
-        return name.replace(/\\c\[\d]/g, '')
+    getModName() {
+        let name = this.mod.name.replace(/\\c\[\d]/g, '')
+        let icon: string
+        if (this.mod.database == 'LOCAL') {
+            icon = 'lore-others'
+        } else {
+            icon = 'quest'
+        }
+        name = `\\i[${icon}]${name}`
+        return name
     },
     setTextGreen() {
-        this.nameText.setText(`\\c[2]${this.stripModName(this.mod.name)}\\c[0]`)
+        this.nameText.setText(`\\c[2]${this.getModName()}\\c[0]`)
     },
     setTextRed() {
-        this.nameText.setText(`\\c[1]${this.stripModName(this.mod.name)}\\c[0]`)
+        this.nameText.setText(`\\c[1]${this.getModName()}\\c[0]`)
     },
     setTextWhite() {
-        this.nameText.setText(this.stripModName(this.mod.name))
+        this.nameText.setText(this.getModName())
     },
     updateDrawables(root) {
         if (this.modList.hook.currentStateName != 'HIDDEN') {

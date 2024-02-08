@@ -1,9 +1,9 @@
 import { ModEntry } from '../types'
-import { databases } from '../moddb'
+import { ModDB } from '../moddb'
 import { Fliters, createFuzzyFilteredModList } from '../filters'
 import { InstallQueue } from '../install-queue'
 import './list-entry'
-import { InstalledMods } from '../installed-mod-manager'
+import { InstalledMods } from '../local-mods'
 
 declare global {
     namespace sc {
@@ -77,11 +77,11 @@ sc.ModMenuList = sc.ListTabbedPane.extend({
             this.addTab(this.tabz[i].name, i, {})
         }
 
-        for (const dbName in databases) {
-            const db = databases[dbName]
+        for (const dbName in ModDB.databases) {
+            const db = ModDB.databases[dbName]
             if (db.active) {
                 this.mods[dbName] = []
-                db.getMods(dbName, mods => this.setMods(mods, dbName))
+                db.getMods(mods => this.setMods(mods, dbName))
             }
         }
     },

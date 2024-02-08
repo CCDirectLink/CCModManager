@@ -2,6 +2,7 @@ import { Mod } from 'ultimate-crosscode-typedefs/modloader/mod'
 import { FileCache } from './cache'
 import ModManager from './plugin'
 import { ModEntryLocal } from './types'
+import { ModDB } from './moddb'
 
 type CCL2Mod = {
     baseDirectory: string
@@ -26,11 +27,16 @@ export class InstalledMods {
 
     static getAll() {
         if (this.cache) return this.cache
+        let all: ModEntryLocal[]
         if (ModManager.mod.isCCL3) {
-            return [...modloader.installedMods].map(e => this.convertCCL3Mod(e[1]))
+            all = [...modloader.installedMods].map(e => this.convertCCL3Mod(e[1]))
         } else {
-            return (this.cache = [...window.activeMods.map(this.convertCCL2Mod), ...window.inactiveMods.map(this.convertCCL2Mod)])
+            all = this.cache = [...window.activeMods.map(this.convertCCL2Mod), ...window.inactiveMods.map(this.convertCCL2Mod)]
         }
+        for (const mod of all) {
+            ModDB.resolveLocalModOrigin(mod)
+        }
+        return all
     }
 
     static getActive(): ModEntryLocal[] {

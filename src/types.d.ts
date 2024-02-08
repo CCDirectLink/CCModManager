@@ -99,6 +99,7 @@ export type NPDatabasePackageInstallation = {
 )
 
 interface ModEntryBase {
+    database: string
     id: ModID
     name: string
     description?: string
@@ -108,11 +109,9 @@ interface ModEntryBase {
     stars?: number
 }
 export interface ModEntryServer extends ModEntryBase {
-    database: string
     isLocal: false
 }
 export interface ModEntryLocal extends ModEntryBase {
-    database: 'LOCAL'
     isLocal: true
     active: boolean
     iconConfig: ModImageConfig
