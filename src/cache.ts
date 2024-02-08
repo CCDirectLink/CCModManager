@@ -47,6 +47,16 @@ export class FileCache {
     private static cache: Record<string, any> = {}
     private static databases: Record<string /* name */, string /* url */> = {}
 
+    static getDefaultModIconConfig() {
+        return {
+            path: 'media/gui/menu.png',
+            offsetX: 536,
+            offsetY: 160,
+            sizeX: 24,
+            sizeY: 24,
+        }
+    }
+
     static async init() {
         this.cacheDir = './assets/mod-data/CCModManager/cache'
         await fs.promises.mkdir(`${this.cacheDir}`, { recursive: true })
@@ -61,6 +71,7 @@ export class FileCache {
     }
 
     static async getIconConfig(mod: ModEntry): Promise<ModIconConfig> {
+        if (mod.isLocal) return mod.iconConfig
         if (mod.hasIcon)
             return {
                 path: await this.getIcon(mod),
@@ -69,13 +80,7 @@ export class FileCache {
                 sizeX: 24,
                 sizeY: 24,
             }
-        return {
-            path: 'media/gui/menu.png',
-            offsetX: 536,
-            offsetY: 160,
-            sizeX: 24,
-            sizeY: 24,
-        }
+        return this.getDefaultModIconConfig()
     }
 
     private static async getIcon(mod: ModEntry): Promise<string> {

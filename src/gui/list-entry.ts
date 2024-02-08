@@ -1,32 +1,41 @@
-import { ModListEntryHighlight } from './list-entry-highlight'
-import { ModMenuList } from './list'
 import { ModEntry } from '../types'
 import { FileCache } from '../cache'
-import { databases } from '../moddb'
+import { InstallQueue } from '../install-queue'
+import './list-entry-highlight'
+import { InstalledMods } from '../installed-mod-manager'
+import { MOD_MENU_TAB_INDEXES } from './list'
 
-export interface ModListEntry extends ig.FocusGui {
-    ninepatch: ig.NinePatch
-    mod: ModEntry
-    nameText: sc.TextGui
-    description: sc.TextGui
-    versionText: sc.TextGui
-    starCount?: sc.TextGui
-    installRemoveButton: sc.ButtonGui
-    checkForUpdatesButton: sc.ButtonGui
-    openModSettingsButton: sc.ButtonGui
-    modList: ModMenuList
-    highlight: ModListEntryHighlight
-    modEntryActionButtonStart: { height: number; ninepatch: ig.NinePatch; highlight: sc.ButtonGui.Highlight }
-    modEntryActionButtons: sc.ButtonGui.Type & { ninepatch: ig.NinePatch }
-    iconGui: ig.ImageGui
+declare global {
+    namespace sc {
+        export interface ModListEntry extends ig.FocusGui {
+            ninepatch: ig.NinePatch
+            mod: ModEntry
+            nameText: sc.TextGui
+            description: sc.TextGui
+            versionText: sc.TextGui
+            starCount?: sc.TextGui
+            installRemoveButton: sc.ButtonGui
+            checkForUpdatesButton: sc.ButtonGui
+            openModSettingsButton: sc.ButtonGui
+            modList: sc.ModMenuList
+            highlight: ModListEntryHighlight
+            modEntryActionButtonStart: { height: number; ninepatch: ig.NinePatch; highlight: sc.ButtonGui.Highlight }
+            modEntryActionButtons: sc.ButtonGui.Type & { ninepatch: ig.NinePatch }
+            iconGui: ig.ImageGui
 
-    askInstall(this: this): void
+            onButtonPress(this: this): void
+            setTextGreen(this: this): void
+            setTextRed(this: this): void
+            setTextWhite(this: this): void
+        }
+        interface ModListEntryConstructor extends ImpactClass<ModListEntry> {
+            new (mod: ModEntry, modList: sc.ModMenuList): ModListEntry
+        }
+        var ModListEntry: ModListEntryConstructor
+    }
 }
-interface ModListEntryConstructor extends ImpactClass<ModListEntry> {
-    new (mod: ModEntry, modList: ModMenuList): ModListEntry
-}
 
-export const ModListEntry: ModListEntryConstructor = ig.FocusGui.extend({
+sc.ModListEntry = ig.FocusGui.extend({
     ninepatch: new ig.NinePatch('media/gui/CCModManager.png', {
         width: 42,
         height: 26,
@@ -97,9 +106,10 @@ export const ModListEntry: ModListEntryConstructor = ig.FocusGui.extend({
         this.setSize(modList.hook.size.x - 3 /* 3 for scrollbar */, buttonSquareSize * 3 - 3)
 
         this.nameText = new sc.TextGui(mod.name)
+        if (InstallQueue.has(mod)) this.setTextGreen()
 
         const iconOffset = 25 as const
-        this.highlight = new ModListEntryHighlight(this.hook.size.x, this.hook.size.y, this.nameText.hook.size.x, buttonSquareSize * 3)
+        this.highlight = new sc.ModListEntryHighlight(this.hook.size.x, this.hook.size.y, this.nameText.hook.size.x, buttonSquareSize * 3)
         this.highlight.setPos(iconOffset, 0)
         this.addChildGui(this.highlight)
         this.addChildGui(this.nameText)
@@ -117,12 +127,18 @@ export const ModListEntry: ModListEntryConstructor = ig.FocusGui.extend({
 
         if (mod.stars !== undefined) {
             this.starCount = new sc.TextGui(`${mod.stars}\\i[save-star]`)
-            // this.starCount.setAlign(ig.GUI_ALIGN.X_RIGHT, ig.GUI_ALIGN.Y_TOP)
-            this.starCount.setPos(517 - this.starCount.hook.size.x, 0) //this.versionText.hook.size.x + 4, 3)
+            this.starCount.setPos(517 - this.starCount.hook.size.x, 0)
             this.addChildGui(this.starCount)
         }
-
-        this.onButtonPress = () => this.askInstall()
+    },
+    setTextGreen() {
+        this.nameText.setText(`\\c[2]${this.mod.name}\\c[0]`)
+    },
+    setTextRed() {
+        this.nameText.setText(`\\c[1]${this.mod.name}\\c[0]`)
+    },
+    setTextWhite() {
+        this.nameText.setText(this.mod.name)
     },
     updateDrawables(root) {
         if (this.modList.hook.currentStateName != 'HIDDEN') {
@@ -137,29 +153,36 @@ export const ModListEntry: ModListEntryConstructor = ig.FocusGui.extend({
         this.parent()
         this.highlight.focus = this.focus
     },
-    askInstall() {
-        sc.Dialogs.showChoiceDialog(
-            ig.lang.get('sc.gui.menu.ccmodloader.areYouSure').replace(/\[modName\]/, this.mod.name),
-            sc.DIALOG_INFO_ICON.QUESTION,
-            [
-                ig.lang.get('sc.gui.dialogs.no'),
-                ig.LangLabel.getText({
-                    en_US: '[nods]',
-                    de_DE: '[nickt]',
-                    zh_CN: '[\u70b9\u5934]<<A<<[CHANGED 2017/10/10]',
-                    ko_KR: '[\ub044\ub355]<<A<<[CHANGED 2017/10/17]',
-                    ja_JP: '[\u3046\u306a\u305a\u304f]<<A<<[CHANGED 2017/11/04]',
-                    zh_TW: '[\u9ede\u982d]<<A<<[CHANGED 2017/10/10]',
-                    langUid: 13455,
-                }),
-            ],
-            button => {
-                const resp = button?.text
-                if (resp == '[nods]') {
-                    databases[this.mod.database].downloadMod(this.mod.id)
+    onButtonPress() {
+        if (this.mod.isLocal) {
+            if (this.modList.currentTabIndex == MOD_MENU_TAB_INDEXES.ENABLED) {
+                if (this.mod.active) {
+                    this.setTextRed()
+                    InstalledMods.setModActive(this.mod, false)
+                } else {
+                    this.setTextWhite()
+                    InstalledMods.setModActive(this.mod, true)
                 }
+            } else if (this.modList.currentTabIndex == MOD_MENU_TAB_INDEXES.DISABLED) {
+                if (this.mod.active) {
+                    this.setTextWhite()
+                    InstalledMods.setModActive(this.mod, false)
+                } else {
+                    this.setTextGreen()
+                    InstalledMods.setModActive(this.mod, true)
+                }
+            } else throw new Error('wat?')
+        } else {
+            if (InstallQueue.has(this.mod)) {
+                InstallQueue.delete(this.mod)
+                sc.BUTTON_SOUND.toggle_off.play()
+                this.setTextWhite()
+            } else {
+                InstallQueue.add(this.mod)
+                sc.BUTTON_SOUND.toggle_on.play()
+                this.setTextGreen()
             }
-        )
+        }
     },
 })
 

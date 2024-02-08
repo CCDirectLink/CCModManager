@@ -1,21 +1,25 @@
+export {}
 declare global {
-    interface ModListEntryHighlight extends ig.GuiElementBase {
-        gfx: ig.Image
-        ninepatch: ig.NinePatch
-        buttonCover: ig.NinePatch
-        textWidth: number
-        buttonWidth: number
-        highLightOffsetY: number
-        textTag: ig.ImagePattern
-        textTagHighlighted: ig.ImagePattern
-        focus: boolean
-    }
-    interface ModListEntryHighlightConstructor extends ImpactClass<ModListEntryHighlight> {
-        new (width: number, height: number, textWidth: number, buttonWidth: number): ModListEntryHighlight
+    namespace sc {
+        interface ModListEntryHighlight extends ig.GuiElementBase {
+            gfx: ig.Image
+            ninepatch: ig.NinePatch
+            buttonCover: ig.NinePatch
+            textWidth: number
+            buttonWidth: number
+            highLightOffsetY: number
+            textTag: ig.ImagePattern
+            textTagHighlighted: ig.ImagePattern
+            focus: boolean
+        }
+        interface ModListEntryHighlightConstructor extends ImpactClass<ModListEntryHighlight> {
+            new (width: number, height: number, textWidth: number, buttonWidth: number): ModListEntryHighlight
+        }
+        var ModListEntryHighlight: ModListEntryHighlightConstructor
     }
 }
 
-export const ModListEntryHighlight: ModListEntryHighlightConstructor = ig.GuiElementBase.extend({
+sc.ModListEntryHighlight = ig.GuiElementBase.extend({
     gfx: new ig.Image('media/gui/CCModManager.png'),
     ninepatch: new ig.NinePatch('media/gui/CCModManager.png', {
         left: 3,
@@ -56,5 +60,7 @@ export const ModListEntryHighlight: ModListEntryHighlightConstructor = ig.GuiEle
         src.addPattern(this.focus ? this.textTagHighlighted : this.textTag, 3, 3, 90, 0, this.textWidth, 13)
 
         src.addGfx(this.gfx, this.textWidth + 3, 3, 109, this.focus ? 44 : 3, 6, 13)
+
+        // src.addColor('green', 0, 0, this.hook.size.x, this.hook.size.y)
     },
 })

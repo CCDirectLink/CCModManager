@@ -13,7 +13,14 @@
                 }
             },
             "ccmodloader": {
-                "areYouSure": "Are you sure you want to install: \\c[3][modName]\\c[0]?"
+                "areYouSure": "Are you sure you want to install: \\c[3][modName]\\c[0]?",
+                "onlineTab": "Online",
+                "selectedModsTab": "Selected",
+                "enabledTab": "Enabled",
+                "disabledTab": "Disabled",
+                "settingsTab": "Settings",
+                "installButton": "Install \\c[3][modCount]\\c[0] mods",
+                "noModsSelected": "No mods selected"
             }
         }
     }

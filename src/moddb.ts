@@ -2,7 +2,7 @@ const fs: typeof import('fs') = (0, eval)("require('fs')")
 const path: typeof import('path') = (0, eval)("require('path')")
 
 import jszip from 'jszip'
-import { ModEntry, ModID, NPDatabase } from './types'
+import { ModEntryServer, ModID, NPDatabase } from './types'
 import { FileCache } from './cache'
 
 export class ModDB {
@@ -16,14 +16,15 @@ export class ModDB {
         FileCache.addDatabase(name, url)
     }
 
-    private createModEntriesFromDatabase(databaseName: string) {
-        const result = []
+    private createModEntriesFromDatabase(databaseName: string): ModEntryServer[] {
+        const result: ModEntryServer[] = []
         for (const [name, data] of Object.entries(this.database)) {
             if (typeof data === 'string') continue
             const meta = data.metadata
             const ccmod = data.metadataCCMod
             result.push({
                 database: databaseName,
+                isLocal: false,
                 id: name,
                 name: ccmod?.title ? ig.LangLabel.getText(ccmod.title) : meta!.ccmodHumanName || name,
                 description: ccmod?.description ? ig.LangLabel.getText(ccmod.description) : meta!.description,
@@ -36,7 +37,7 @@ export class ModDB {
         return result
     }
 
-    async getMods(databaseName: string, callback: (mods: ModEntry[]) => void): Promise<void> {
+    async getMods(databaseName: string, callback: (mods: ModEntryServer[]) => void): Promise<void> {
         const create = (database: NPDatabase) => {
             this.database = database
             const result = this.createModEntriesFromDatabase(databaseName)
