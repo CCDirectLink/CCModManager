@@ -42,13 +42,9 @@ export class InstalledMods {
     }
 
     static setModActive(mod: ModEntryLocal, value: boolean) {
-        if (ModManager.mod.isCCL3) {
-            sc.options.set(`modEnabled-${mod.id}`, value)
-            mod.active = value
-        } else {
-            sc.options.set(`modEnabled-${mod.id}`, value)
-            mod.active = value
-        }
+        sc.options.set(`modEnabled-${mod.id}`, value)
+        mod.active = value
+        sc.options.persistOptions()
     }
 
     private static convertCCL2Mod(mod: CCL2Mod): ModEntryLocal {
