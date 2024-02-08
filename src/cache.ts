@@ -1,6 +1,9 @@
 import { ModEntry, ModImageConfig as ModIconConfig, NPDatabase } from './types'
 
 const fs: typeof import('fs') = (0, eval)("require('fs')")
+import type { IncomingMessage } from 'http'
+const http: typeof import('http') = (0, eval)("require('http')")
+const https: typeof import('https') = (0, eval)("require('https')")
 
 async function* getFilesRecursive(dir: string): AsyncIterable<string> {
     const dirents = await fs.promises.readdir(dir, { withFileTypes: true })
@@ -12,6 +15,29 @@ async function* getFilesRecursive(dir: string): AsyncIterable<string> {
             yield res
         }
     }
+}
+
+function getTag(head: IncomingMessage): string {
+    switch (typeof head.headers.etag) {
+        case 'string':
+            return head.headers.etag
+        case 'object':
+            return head.headers.etag[0]
+        default:
+            return ''
+    }
+}
+
+async function getETag(url: string): Promise<string> {
+    const uri = new URL(url)
+    const { get } = uri.protocol === 'https:' ? https : http
+
+    const head: IncomingMessage = await new Promise((resolve, reject) =>
+        get(url, { method: 'HEAD' })
+            .on('response', resp => resolve(resp))
+            .on('error', err => reject(err))
+    )
+    return getTag(head)
 }
 
 export class FileCache {
@@ -65,16 +91,36 @@ export class FileCache {
         return ccPath
     }
 
-    static async getDatabase(name: string): Promise<NPDatabase> {
-        const path = `${name}.json`
-        const cached = await this.getCachedFile<NPDatabase>(path, true)
-        if (cached) return cached
-
-        const url = `${this.databases[name]}/npDatabase.json`
+    private static async downloadAndWriteDatabase(path: string, url: string, eTag: string) {
         const data: NPDatabase = (this.cache[path] = await (await fetch(url)).json())
+        data.eTag = eTag
         fs.writeFile(`${this.cacheDir}/${path}`, JSON.stringify(data), () => {})
         this.inCache.add(path)
         return data
+    }
+
+    static async getDatabase(name: string, create: (database: NPDatabase) => void): Promise<void> {
+        const path = `${name}.json`
+        const url = `${this.databases[name]}/npDatabase.json`
+
+        const cachedPromise = this.getCachedFile<NPDatabase>(path, true)
+        let eTag!: string
+        const eTagPromise = getETag(url).then(async newEtag => {
+            eTag = newEtag
+            const cached = await cachedPromise
+            if (cached && cached.eTag != eTag) {
+                const data = await this.downloadAndWriteDatabase(path, url, eTag)
+                create(data)
+            }
+        })
+
+        const cached = await cachedPromise
+        if (cached) return create(cached)
+
+        await eTagPromise
+        if (!eTag) throw new Error('eTag unset somehow')
+        const data = await this.downloadAndWriteDatabase(path, url, eTag)
+        create(data)
     }
 
     private static async getCachedFile<T>(path: string, toJSON: boolean = false): Promise<T | undefined> {

@@ -1,4 +1,4 @@
-import {FileCache} from './cache'
+import { FileCache } from './cache'
 import { Mod1 } from './types'
 
 export default class ModManager {

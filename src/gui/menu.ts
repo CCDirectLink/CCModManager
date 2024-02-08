@@ -1,5 +1,4 @@
 import { ModMenuList } from './list'
-import { ModDB } from '../moddb'
 
 import 'nax-ccuilib/src/headers/nax/input-field.d.ts'
 import 'nax-ccuilib/src/headers/nax/input-field-cursor.d.ts'
@@ -7,7 +6,6 @@ import 'nax-ccuilib/src/headers/nax/input-field-type.d.ts'
 
 export interface ModMenu extends sc.ListInfoMenu {
     list: ModMenuList
-    database: ModDB
     inputField: nax.ccuilib.InputField
 
     onBackButtonPress(this: this): void
@@ -16,11 +14,15 @@ interface ModMenuConstructor extends ImpactClass<ModMenu> {
     new (): ModMenu
 }
 
+export enum SORT_ORDER {
+    NAME,
+    NAME_REVERSE,
+    STARS,
+}
+
 export const ModMenu: ModMenuConstructor = sc.ListInfoMenu.extend({
     init() {
-        // this.database = new ModDB('official', 'https://raw.githubusercontent.com/CCDirectLink/CCModDB/master/npDatabase.json')
-        this.database = new ModDB('official', 'https://raw.githubusercontent.com/krypciak/CCModDB/ccmodjson')
-        this.parent(new ModMenuList(this.database))
+        this.parent(new ModMenuList())
         this.list.setPos(9, 21)
 
         this.inputField = new nax.ccuilib.InputField(232, 20)
@@ -30,6 +32,10 @@ export const ModMenu: ModMenuConstructor = sc.ListInfoMenu.extend({
             this.list.reloadFilters()
         }
         this.addChildGui(this.inputField)
+
+        this.sortMenu.addButton('name', SORT_ORDER.NAME, SORT_ORDER.NAME)
+        this.sortMenu.addButton('nameReverse', SORT_ORDER.NAME_REVERSE, SORT_ORDER.NAME_REVERSE)
+        this.sortMenu.addButton('stars', SORT_ORDER.STARS, SORT_ORDER.STARS)
 
         const legacyCheckbox = new sc.CheckboxGui((this.list.filters.includeLegacy = true))
         legacyCheckbox.setPos(9, 282)

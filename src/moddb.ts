@@ -6,39 +6,49 @@ import { ModEntry, ModID, NPDatabase } from './types'
 import { FileCache } from './cache'
 
 export class ModDB {
-    modList!: NPDatabase
+    database!: NPDatabase
+
     constructor(
         public name: string,
-        public url: string
+        public url: string,
+        public active: boolean = true
     ) {
         FileCache.addDatabase(name, url)
     }
 
-    async getMods(): Promise<ModEntry[]> {
-        const database = 'official'
-        this.modList = await FileCache.getDatabase(database)
-
+    private createModEntriesFromDatabase(databaseName: string) {
         const result = []
-        for (const [name, data] of Object.entries(this.modList)) {
+        for (const [name, data] of Object.entries(this.database)) {
+            if (typeof data === 'string') continue
             const meta = data.metadata
             const ccmod = data.metadataCCMod
             result.push({
-                database,
+                database: databaseName,
                 id: name,
                 name: ccmod?.title ? ig.LangLabel.getText(ccmod.title) : meta!.ccmodHumanName || name,
                 description: ccmod?.description ? ig.LangLabel.getText(ccmod.description) : meta!.description,
                 version: ccmod?.version || meta!.version,
                 isLegacy: !ccmod,
                 hasIcon: ccmod?.icons ? !!ccmod.icons['24'] : false,
+                stars: data.stars,
             })
         }
         return result
     }
 
-    async downloadMod(id: ModID) {
-        const meta = await this.getMod(id)
+    async getMods(databaseName: string, callback: (mods: ModEntry[]) => void): Promise<void> {
+        const create = (database: NPDatabase) => {
+            this.database = database
+            const result = this.createModEntriesFromDatabase(databaseName)
+            callback(result)
+        }
+        await FileCache.getDatabase(databaseName, create)
+    }
 
-        const installation = meta.installation.find(i => i.type === 'ccmod') || meta.installation.find(i => i.type === 'modZip')
+    async downloadMod(id: ModID) {
+        const pkg = await this.getMod(id)
+
+        const installation = pkg.installation.find(i => i.type === 'ccmod') || pkg.installation.find(i => i.type === 'modZip')
         if (!installation) throw new Error(`I don' know how to download this mod`)
 
         const resp = await fetch(installation.url)
@@ -81,11 +91,15 @@ export class ModDB {
     }
 
     private async getMod(id: ModID) {
-        const data = this.modList[id]
+        const data = this.database[id]
         if (data) return data
 
-        const newData = this.modList[id]
+        const newData = this.database[id]
         if (!newData) throw new Error('Could not find name')
         return newData
     }
+}
+
+export const databases: Record<string, ModDB> = {
+    krypek: new ModDB('krypek', 'https://raw.githubusercontent.com/krypciak/CCModDB/ccmodjson'),
 }

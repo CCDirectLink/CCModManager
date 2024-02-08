@@ -3,6 +3,17 @@
         "menu": {
             "menu-titles": {
                 "mods": "Mods"
+            },
+            "sort": {
+                "stars": "Stars",
+                "nameReverse": "Name (desencing)",
+                "dec": {
+                    "stars": "Sorts by GitHub stars.",
+                    "nameReverse": "Sorts by name in reverse."
+                }
+            },
+            "ccmodloader": {
+                "areYouSure": "Are you sure you want to install: \\c[3][modName]\\c[0]?"
             }
         }
     }

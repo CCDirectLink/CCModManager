@@ -2,12 +2,15 @@ import { ModListEntryHighlight } from './list-entry-highlight'
 import { ModMenuList } from './list'
 import { ModEntry } from '../types'
 import { FileCache } from '../cache'
+import { databases } from '../moddb'
 
 export interface ModListEntry extends ig.FocusGui {
     ninepatch: ig.NinePatch
+    mod: ModEntry
     nameText: sc.TextGui
-    description?: sc.TextGui
+    description: sc.TextGui
     versionText: sc.TextGui
+    starCount?: sc.TextGui
     installRemoveButton: sc.ButtonGui
     checkForUpdatesButton: sc.ButtonGui
     openModSettingsButton: sc.ButtonGui
@@ -16,6 +19,8 @@ export interface ModListEntry extends ig.FocusGui {
     modEntryActionButtonStart: { height: number; ninepatch: ig.NinePatch; highlight: sc.ButtonGui.Highlight }
     modEntryActionButtons: sc.ButtonGui.Type & { ninepatch: ig.NinePatch }
     iconGui: ig.ImageGui
+
+    askInstall(this: this): void
 }
 interface ModListEntryConstructor extends ImpactClass<ModListEntry> {
     new (mod: ModEntry, modList: ModMenuList): ModListEntry
@@ -76,25 +81,10 @@ export const ModListEntry: ModListEntryConstructor = ig.FocusGui.extend({
 
     init(mod, modList) {
         this.parent()
+        this.mod = mod
         this.modList = modList
 
-        const buttonSquareSize = 14
-
-        this.setSize(modList.hook.size.x - 3 /* 3 for scrollbar */, 43 /*modList.entrySize*/)
-
-        this.nameText = new sc.TextGui(mod.name)
-
-        this.description = new sc.TextGui(mod.description ?? '', { font: sc.fontsystem.smallFont })
-
-        const iconOffset = 24 + 1
-        this.nameText.setPos(4 + iconOffset, 0)
-        this.description.setPos(4 + iconOffset, 14)
-
-        this.versionText = new sc.TextGui(mod.version, { font: sc.fontsystem.tinyFont })
-
-        this.versionText.setAlign(ig.GUI_ALIGN.X_RIGHT, ig.GUI_ALIGN.Y_TOP)
-        this.versionText.setPos(3, 3)
-
+        /* init icon asap */
         FileCache.getIconConfig(mod).then(config => {
             const image = new ig.Image(config.path)
             this.iconGui = new ig.ImageGui(image, config.offsetX, config.offsetY, config.sizeX, config.sizeY)
@@ -102,12 +92,37 @@ export const ModListEntry: ModListEntryConstructor = ig.FocusGui.extend({
             this.addChildGui(this.iconGui)
         })
 
+        const buttonSquareSize = 14
+
+        this.setSize(modList.hook.size.x - 3 /* 3 for scrollbar */, buttonSquareSize * 3 - 3)
+
+        this.nameText = new sc.TextGui(mod.name)
+
+        const iconOffset = 25 as const
         this.highlight = new ModListEntryHighlight(this.hook.size.x, this.hook.size.y, this.nameText.hook.size.x, buttonSquareSize * 3)
         this.highlight.setPos(iconOffset, 0)
         this.addChildGui(this.highlight)
         this.addChildGui(this.nameText)
+
+        this.description = new sc.TextGui(mod.description ?? '', { font: sc.fontsystem.smallFont })
         this.addChildGui(this.description)
+
+        this.nameText.setPos(4 + iconOffset, 0)
+        this.description.setPos(4 + iconOffset, 14)
+
+        this.versionText = new sc.TextGui(`v${mod.version}`, { font: sc.fontsystem.tinyFont })
+        this.versionText.setAlign(ig.GUI_ALIGN.X_RIGHT, ig.GUI_ALIGN.Y_TOP)
+        this.versionText.setPos(3, 3)
         this.addChildGui(this.versionText)
+
+        if (mod.stars !== undefined) {
+            this.starCount = new sc.TextGui(`${mod.stars}\\i[save-star]`)
+            // this.starCount.setAlign(ig.GUI_ALIGN.X_RIGHT, ig.GUI_ALIGN.Y_TOP)
+            this.starCount.setPos(517 - this.starCount.hook.size.x, 0) //this.versionText.hook.size.x + 4, 3)
+            this.addChildGui(this.starCount)
+        }
+
+        this.onButtonPress = () => this.askInstall()
     },
     updateDrawables(root) {
         if (this.modList.hook.currentStateName != 'HIDDEN') {
@@ -121,6 +136,30 @@ export const ModListEntry: ModListEntryConstructor = ig.FocusGui.extend({
     focusLost() {
         this.parent()
         this.highlight.focus = this.focus
+    },
+    askInstall() {
+        sc.Dialogs.showChoiceDialog(
+            ig.lang.get('sc.gui.menu.ccmodloader.areYouSure').replace(/\[modName\]/, this.mod.name),
+            sc.DIALOG_INFO_ICON.QUESTION,
+            [
+                ig.lang.get('sc.gui.dialogs.no'),
+                ig.LangLabel.getText({
+                    en_US: '[nods]',
+                    de_DE: '[nickt]',
+                    zh_CN: '[\u70b9\u5934]<<A<<[CHANGED 2017/10/10]',
+                    ko_KR: '[\ub044\ub355]<<A<<[CHANGED 2017/10/17]',
+                    ja_JP: '[\u3046\u306a\u305a\u304f]<<A<<[CHANGED 2017/11/04]',
+                    zh_TW: '[\u9ede\u982d]<<A<<[CHANGED 2017/10/10]',
+                    langUid: 13455,
+                }),
+            ],
+            button => {
+                const resp = button?.text
+                if (resp == '[nods]') {
+                    databases[this.mod.database].downloadMod(this.mod.id)
+                }
+            }
+        )
     },
 })
 

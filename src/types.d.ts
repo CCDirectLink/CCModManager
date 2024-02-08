@@ -35,12 +35,13 @@ export type Mod1 = Mod & {
     )
 
 export type ModID = string
-export type NPDatabase = Record<ModID, NPDatabasePackage>
+export type NPDatabase = Record<ModID, NPDatabasePackage> & { eTag: string }
 
 export interface NPDatabasePackage {
     metadata?: NPDatabasePackageMetadata
     metadataCCMod?: NPDatabaseCCMod
     installation: NPDatabasePackageInstallation[]
+    stars?: number
 }
 
 type LocalizedString = Record<string, string> | string
@@ -52,7 +53,6 @@ interface PersonDetails {
     url?: LocalizedString
     comment?: LocalizedString
 }
-
 
 export interface NPDatabaseCCMod {
     id: string
@@ -106,6 +106,7 @@ export type ModEntry = {
     version: string
     isLegacy: boolean
     hasIcon: boolean
+    stars?: number
 }
 
 export type ModImageConfig = {
