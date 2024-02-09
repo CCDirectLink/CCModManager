@@ -75,11 +75,14 @@ export class ModDB {
             if (dbMod) matches.push(dbMod)
         }
         if (matches.length == 0) return
+        let serverMod!: ModEntry
         if (matches.length == 1) {
-            mod.database = matches[0].database
+            serverMod = matches[0]
         } else {
-            mod.database = this.getHighestVersionMod(matches).database
+            serverMod = this.getHighestVersionMod(matches)
         }
+        mod.database = serverMod.database
+        mod.stars = serverMod.stars
     }
 
     name: string

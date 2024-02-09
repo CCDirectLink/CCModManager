@@ -131,9 +131,6 @@ sc.ModMenuList = sc.ListTabbedPane.extend({
         buttonGroup.clear()
         this.tabz[this.currentTabIndex].populateFunc.bind(this)(list, buttonGroup, this.currentSort)
     },
-    onListEntryPressed(_button) {
-        sc.BUTTON_SOUND.submit.play()
-    },
     addObservers() {
         sc.Model.addObserver(sc.menu, this)
     },

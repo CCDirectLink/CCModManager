@@ -24,6 +24,7 @@ declare global {
 /* TODO: Add caching */
 export class InstalledMods {
     private static cache: ModEntryLocal[]
+    private static cacheRecord: Record<string, ModEntryLocal>
 
     static getAll() {
         if (this.cache) return this.cache
@@ -33,10 +34,17 @@ export class InstalledMods {
         } else {
             all = this.cache = [...window.activeMods.map(this.convertCCL2Mod), ...window.inactiveMods.map(this.convertCCL2Mod)]
         }
+        this.cacheRecord = {}
         for (const mod of all) {
             ModDB.resolveLocalModOrigin(mod)
+            this.cacheRecord[mod.id] = mod
         }
         return all
+    }
+
+    static getAllRecord() {
+        if (!this.cacheRecord) this.getAll()
+        return this.cacheRecord
     }
 
     static getActive(): ModEntryLocal[] {

@@ -4,7 +4,6 @@ import { InstallQueue } from '../install-queue'
 import './list-entry-highlight'
 import { InstalledMods } from '../local-mods'
 import { MOD_MENU_TAB_INDEXES } from './list'
-
 declare global {
     namespace sc {
         export interface ModListEntry extends ig.FocusGui {
@@ -110,6 +109,15 @@ sc.ModListEntry = ig.FocusGui.extend({
         this.nameText = new sc.TextGui('')
         if (InstallQueue.has(mod)) this.setTextYellow()
         else this.setTextWhite()
+        if (this.modList.currentTabIndex == MOD_MENU_TAB_INDEXES.DISABLED) this.setTextRed()
+        else if (this.modList.currentTabIndex == MOD_MENU_TAB_INDEXES.ENABLED) this.setTextGreen()
+        else {
+            const serverMod = InstalledMods.getAllRecord()[mod.id]
+            if (serverMod) {
+                if (serverMod.active) this.setTextGreen()
+                else this.setTextRed()
+            }
+        }
 
         const iconOffset = 25 as const
         this.highlight = new sc.ModListEntryHighlight(this.hook.size.x, this.hook.size.y, this.nameText.hook.size.x, buttonSquareSize * 3)
@@ -175,21 +183,25 @@ sc.ModListEntry = ig.FocusGui.extend({
             if (this.modList.currentTabIndex == MOD_MENU_TAB_INDEXES.ENABLED) {
                 if (this.mod.active) {
                     this.setTextRed()
+                    sc.BUTTON_SOUND.toggle_off.play()
                     InstalledMods.setModActive(this.mod, false)
                 } else {
-                    this.setTextWhite()
+                    this.setTextGreen()
+                    sc.BUTTON_SOUND.toggle_on.play()
                     InstalledMods.setModActive(this.mod, true)
                 }
             } else if (this.modList.currentTabIndex == MOD_MENU_TAB_INDEXES.DISABLED) {
                 if (this.mod.active) {
-                    this.setTextWhite()
+                    this.setTextRed()
+                    sc.BUTTON_SOUND.toggle_off.play()
                     InstalledMods.setModActive(this.mod, false)
                 } else {
                     this.setTextGreen()
+                    sc.BUTTON_SOUND.toggle_on.play()
                     InstalledMods.setModActive(this.mod, true)
                 }
             } else throw new Error('wat?')
-        } else {
+        } else if (!InstalledMods.getAllRecord()[this.mod.id]) {
             if (InstallQueue.has(this.mod)) {
                 InstallQueue.delete(this.mod)
                 sc.BUTTON_SOUND.toggle_off.play()
@@ -199,6 +211,8 @@ sc.ModListEntry = ig.FocusGui.extend({
                 sc.BUTTON_SOUND.toggle_on.play()
                 this.setTextYellow()
             }
+        } else {
+            sc.BUTTON_SOUND.denied.play()
         }
     },
 })
