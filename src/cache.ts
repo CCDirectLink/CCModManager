@@ -1,3 +1,4 @@
+import { ModDB } from './moddb'
 import { ModEntry, ModImageConfig as ModIconConfig, NPDatabase } from './types'
 
 const fs: typeof import('fs') = (0, eval)("require('fs')")
@@ -37,6 +38,9 @@ async function getETag(url: string): Promise<string> {
             .on('response', resp => resolve(resp))
             .on('error', err => reject(err))
     )
+    if (head.statusCode == 404) throw new Error(`url not found 404: ${url}`)
+    if (head.statusCode == 400) throw new Error(`url invalid request 400: ${url}`)
+    if (head.statusCode == 301) throw new Error(`url invalid request 301: ${url}`)
     return getTag(head)
 }
 
@@ -45,7 +49,6 @@ export class FileCache {
 
     private static inCache: Set<string>
     private static cache: Record<string, any> = {}
-    private static databases: Record<string /* name */, string /* url */> = {}
 
     static getDefaultModIconConfig() {
         return {
@@ -65,8 +68,7 @@ export class FileCache {
         for await (const path of getFilesRecursive(this.cacheDir)) this.inCache.add(path.substring('./assets/mod-data/CCModManager/cache/'.length))
     }
 
-    static addDatabase(name: string, url: string) {
-        FileCache.databases[name] = url
+    static prepareDatabase(name: string) {
         fs.mkdir(`${this.cacheDir}/${name}/icons`, { recursive: true }, () => {})
     }
 
@@ -89,7 +91,7 @@ export class FileCache {
         const ccPath: string = `${this.cacheDir.substring('./assets/'.length)}/${path}`
         if (this.inCache.has(path)) return ccPath
 
-        const url = `${this.databases[mod.database]}/${urlPath}`
+        const url = `${ModDB.databases[mod.database].url}/${urlPath}`
         const data = Buffer.from(await (await fetch(url)).arrayBuffer())
         await fs.promises.writeFile(`${this.cacheDir}/${path}`, data)
         this.inCache.add(path)
@@ -104,9 +106,19 @@ export class FileCache {
         return data
     }
 
+    static async checkDatabaseUrl(url: string): Promise<boolean> {
+        url = `${url}/npDatabase.json`
+        try {
+            await getETag(url)
+            return true
+        } catch {
+            return false
+        }
+    }
+
     static async getDatabase(name: string, create: (database: NPDatabase) => void): Promise<void> {
-        const path = `${name}.json`
-        const url = `${this.databases[name]}/npDatabase.json`
+        const path = `${name}/db.json`
+        const url = `${ModDB.databases[name].url}/npDatabase.json`
 
         const cachedPromise = this.getCachedFile<NPDatabase>(path, true)
         let eTag!: string

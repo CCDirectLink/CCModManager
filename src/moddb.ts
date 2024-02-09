@@ -3,12 +3,61 @@
 
 // import jszip from 'jszip'
 import semver from 'semver'
-import { ModEntryLocal, ModEntryServer, ModID, NPDatabase } from './types'
+import { ModEntry, ModEntryLocal, ModEntryServer, ModID, NPDatabase } from './types'
 import { FileCache } from './cache'
 
 export class ModDB {
-    static databases: Record<string, ModDB> = {
-        krypek: new ModDB('krypek', 'https://raw.githubusercontent.com/krypciak/CCModDB/ccmodjson'),
+    private static localStorageKey = 'CCModManager-databases'
+    private static databasesLoaded: boolean = false
+
+    static databases: Record<string, ModDB>
+
+    static addDatabase(db: ModDB) {
+        this.databases[db.name] = db
+    }
+
+    static loadDatabases(force: boolean = false) {
+        if (!force && this.databasesLoaded) return
+        this.databasesLoaded = true
+        this.databases = {}
+        const urls: string[] = JSON.parse(localStorage.getItem(this.localStorageKey) || JSON.stringify(['@krypciak']))
+        for (const url of urls) {
+            ModDB.addDatabase(new ModDB(url))
+        }
+        this.saveDatabases()
+    }
+
+    static repoURLToFileName(url: string): string {
+        url = this.minifyRepoURL(url)
+        url.replace(/\//g, '_')
+        return url
+    }
+
+    static minifyRepoURL(url: string): string {
+        if (url.startsWith('https://raw.githubusercontent.com/')) {
+            url = `@${url.substring('https://raw.githubusercontent.com/'.length)}`
+            if (url.endsWith('/master')) url = url.substring(0, url.length - '/master'.length)
+            if (url.endsWith('/CCModDB')) url = url.substring(0, url.length - '/CCModDB'.length)
+        }
+        return url
+    }
+
+    static expandRepoURL(url: string): string {
+        if (url.startsWith('@')) {
+            if (!url.endsWith('/CCModDB') && !url.match(/\//g)) url = `${url}/CCModDB`
+            if (!url.endsWith('/master') && url.match(/\//g)!.length == 1) url = `${url}/master`
+            url = `https://raw.githubusercontent.com/${url.substring(1)}`
+        }
+        return url
+    }
+
+    static saveDatabases() {
+        const urls: string[] = Object.values(this.databases).map(db => this.minifyRepoURL(db.url))
+        localStorage.setItem(this.localStorageKey, JSON.stringify(urls))
+    }
+
+    static getHighestVersionMod(mods: ModEntry[]): ModEntry {
+        return mods.reduce((highestVerMod, currMod) => (semver.gt(currMod.version, highestVerMod.version) ? currMod : highestVerMod))
     }
 
     static async resolveLocalModOrigin(mod: ModEntryLocal) {
@@ -26,22 +75,30 @@ export class ModDB {
             if (dbMod) matches.push(dbMod)
         }
         if (matches.length == 0) return
-        if (matches.length > 1) {
-            // TODO match acual mod version not the highest
-            matches[0] = matches.reduce((highestVerMod, currMod) => (semver.gt(currMod.version, highestVerMod.version) ? currMod : highestVerMod))
+        if (matches.length == 1) {
+            mod.database = matches[0].database
+        } else {
+            mod.database = this.getHighestVersionMod(matches).database
         }
-        mod.database = matches[0].database
     }
 
+    name: string
     database!: NPDatabase
     modRecord!: Record<ModID, ModEntryServer>
 
     constructor(
-        public name: string,
         public url: string,
-        public active: boolean = true
+        public active: boolean = true,
+        prepare: boolean = true
     ) {
-        FileCache.addDatabase(name, url)
+        this.name = ModDB.repoURLToFileName(url)
+        this.url = ModDB.expandRepoURL(this.name)
+        prepare && FileCache.prepareDatabase(this.name)
+    }
+
+    async isUrlValid(): Promise<boolean> {
+        if (this.name.startsWith('http')) return false
+        return FileCache.checkDatabaseUrl(this.url)
     }
 
     private createModEntriesFromDatabase(databaseName: string) {

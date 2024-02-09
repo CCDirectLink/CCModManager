@@ -2,8 +2,9 @@ import { ModEntry } from '../types'
 import { ModDB } from '../moddb'
 import { Fliters, createFuzzyFilteredModList } from '../filters'
 import { InstallQueue } from '../install-queue'
-import './list-entry'
 import { InstalledMods } from '../local-mods'
+import './list-entry'
+import './repo-add'
 
 declare global {
     namespace sc {
@@ -17,10 +18,13 @@ declare global {
                 populateFunc: (list: sc.ButtonListBox, buttonGroup: sc.ButtonGroup, sort: sc.MOD_MENU_SORT_ORDER) => void
             }[]
             currentSort: sc.MOD_MENU_SORT_ORDER
+            reposPopup: sc.ModMenuRepoAddPopup
 
             setMods(this: this, mods: ModEntry[], dbName: string): void
+            reloadDatabases(this: this): void
             reloadFilters(this: this): void
             reloadEntries(this: this): void
+            removeModDuplicates(this: this, mods: Record<string, ModEntry[]>): ModEntry[]
             sortModEntries(this: this, mods: ModEntry[], sort: sc.MOD_MENU_SORT_ORDER): void
             populateOnline(this: this, list: sc.ButtonListBox, buttonGroup: sc.ButtonGroup, sort: sc.MOD_MENU_SORT_ORDER): void
             populateSelected(this: this, list: sc.ButtonListBox, buttonGroup: sc.ButtonGroup, sort: sc.MOD_MENU_SORT_ORDER): void
@@ -76,14 +80,7 @@ sc.ModMenuList = sc.ListTabbedPane.extend({
         for (let i = 0; i < this.tabz.length; i++) {
             this.addTab(this.tabz[i].name, i, {})
         }
-
-        for (const dbName in ModDB.databases) {
-            const db = ModDB.databases[dbName]
-            if (db.active) {
-                this.mods[dbName] = []
-                db.getMods(mods => this.setMods(mods, dbName))
-            }
-        }
+        this.reloadDatabases()
     },
     show() {
         this.parent()
@@ -144,10 +141,14 @@ sc.ModMenuList = sc.ListTabbedPane.extend({
         sc.Model.removeObserver(sc.menu, this)
     },
     modelChanged(model, message, data) {
-        if (model == sc.menu && message == sc.MENU_EVENT.SORT_LIST) {
-            const sort = ((data as sc.ButtonGui).data as any).sortType as sc.MOD_MENU_SORT_ORDER
-            this.currentSort = sort
-            this.reloadEntries()
+        if (model == sc.menu) {
+            if (message == sc.MENU_EVENT.SORT_LIST) {
+                const sort = ((data as sc.ButtonGui).data as any).sortType as sc.MOD_MENU_SORT_ORDER
+                this.currentSort = sort
+                this.reloadEntries()
+            } else if (message == sc.MENU_EVENT.INFO_TEXT_CHANGED) {
+                this.reloadDatabases()
+            }
         }
     },
     setTab(index, ignorePrev, settings) {
@@ -155,10 +156,23 @@ sc.ModMenuList = sc.ListTabbedPane.extend({
         this.modMenu.updateInstallButton()
     },
     /* new stuff */
+    reloadDatabases() {
+        this.mods = {}
+        for (const dbName in ModDB.databases) {
+            const db = ModDB.databases[dbName]
+            if (db.active) {
+                this.mods[dbName] = []
+                db.getMods(mods => this.setMods(mods, dbName))
+            }
+        }
+    },
     populateSettings(list) {
         const repositoriesButton = new sc.ButtonGui('Repositories')
         repositoriesButton.onButtonPress = () => {
-            console.log('press')
+            if (!this.reposPopup) {
+                this.reposPopup = new sc.ModMenuRepoAddPopup()
+            }
+            this.reposPopup.show()
         }
         list.addButton(repositoriesButton)
     },
@@ -174,14 +188,24 @@ sc.ModMenuList = sc.ListTabbedPane.extend({
             }
         }
     },
+    removeModDuplicates(modsRecord) {
+        const uniqueMods: Record<string /*modid */, ModEntry> = {}
+        for (const dbName in modsRecord) {
+            const mods = modsRecord[dbName]
+            for (const mod of mods) {
+                const prevMod = uniqueMods[mod.id]
+                if (prevMod) {
+                    uniqueMods[mod.id] = ModDB.getHighestVersionMod([prevMod, mod])
+                } else {
+                    uniqueMods[mod.id] = mod
+                }
+            }
+        }
+        return Object.values(uniqueMods)
+    },
     populateOnline(list, _, sort: sc.MOD_MENU_SORT_ORDER) {
-        const mods = createFuzzyFilteredModList(
-            this.filters,
-            Object.values(this.mods).reduce((acc, v) => {
-                acc.push(...v)
-                return acc
-            }, [])
-        )
+        let mods = this.removeModDuplicates(this.mods)
+        mods = createFuzzyFilteredModList(this.filters, mods)
         this.sortModEntries(mods, sort)
         for (const mod of mods) {
             const newModEntry = new sc.ModListEntry(mod, this)

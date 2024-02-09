@@ -22,8 +22,8 @@
         "jszip": "^3.10.1",
         "nax-ccuilib": "github:conorlawton/nax-ccuilib",
         "prettier": "3.2.4",
+        "semver": "^7.6.0",
         "typescript": "^5.3.3",
-        "ultimate-crosscode-typedefs": "github:krypciak/ultimate-crosscode-typedefs",
-        "semver": "^7.6.0"
+        "ultimate-crosscode-typedefs": "github:krypciak/ultimate-crosscode-typedefs"
     }
 }

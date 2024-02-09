@@ -3,6 +3,7 @@ import 'nax-ccuilib/src/headers/nax/input-field-cursor.d.ts'
 import 'nax-ccuilib/src/headers/nax/input-field-type.d.ts'
 import { InstallQueue } from '../install-queue'
 import './list'
+import { ModDB } from '../moddb'
 
 declare global {
     namespace sc {
@@ -33,13 +34,14 @@ sc.MOD_MENU_SORT_ORDER = {
 
 sc.ModMenu = sc.ListInfoMenu.extend({
     init() {
+        ModDB.loadDatabases()
         this.parent(new sc.ModMenuList(this))
         this.list.setPos(9, 23)
 
         this.inputField = new nax.ccuilib.InputField(232, 20)
         this.inputField.setPos(124, 2)
-        this.inputField.onCharacterInput = () => {
-            this.list.filters.name = this.inputField.getValueAsString()
+        this.inputField.onCharacterInput = str => {
+            this.list.filters.name = str
             this.list.reloadFilters()
         }
         this.addChildGui(this.inputField)
@@ -62,7 +64,7 @@ sc.ModMenu = sc.ListInfoMenu.extend({
         legacyText.setPos(35, 282)
         this.addChildGui(legacyText)
 
-        const hasIconCheckbox = new sc.CheckboxGui((this.list.filters.hasIcon = true))
+        const hasIconCheckbox = new sc.CheckboxGui((this.list.filters.hasIcon = false))
         hasIconCheckbox.setPos(9, 300)
         hasIconCheckbox.onButtonPress = () => {
             this.list.filters.hasIcon = hasIconCheckbox.pressed
