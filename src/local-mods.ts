@@ -70,7 +70,7 @@ export class LocalMods {
             name: mod.displayName || mod.name,
             description: mod.description,
             version: mod.version || 'Unknown',
-            isLegacy: false /*todo*/,
+            isLegacy: false /*duno how to check*/,
             hasIcon: !!mod.icons?.['24'],
 
             active: !mod.disabled,

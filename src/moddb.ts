@@ -83,6 +83,7 @@ export class ModDB {
         }
         mod.database = serverMod.database
         mod.stars = serverMod.stars
+        mod.isLegacy = serverMod.isLegacy
     }
 
     name: string
