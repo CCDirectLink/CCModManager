@@ -4,6 +4,7 @@ import 'nax-ccuilib/src/headers/nax/input-field-type.d.ts'
 import { InstallQueue } from '../install-queue'
 import './list'
 import { ModDB } from '../moddb'
+import { MOD_MENU_TAB_INDEXES } from './list'
 
 declare global {
     namespace sc {
@@ -16,9 +17,11 @@ declare global {
             list: ModMenuList
             inputField: nax.ccuilib.InputField
             installButton: sc.ButtonGui
+            includeLocalCheckbox: sc.CheckboxGui
+            includeLocalText: sc.TextGui
 
             onBackButtonPress(this: this): void
-            updateInstallButton(this: this): void
+            setTabEvent(this: this): void
         }
         interface ModMenuConstructor extends ImpactClass<ModMenu> {
             new (): ModMenu
@@ -64,41 +67,52 @@ sc.ModMenu = sc.ListInfoMenu.extend({
         legacyText.setPos(35, 282)
         this.addChildGui(legacyText)
 
-        const hasIconCheckbox = new sc.CheckboxGui((this.list.filters.hasIcon = false))
-        hasIconCheckbox.setPos(9, 300)
-        hasIconCheckbox.onButtonPress = () => {
-            this.list.filters.hasIcon = hasIconCheckbox.pressed
+        this.includeLocalCheckbox = new sc.CheckboxGui((this.list.filters.includeLocal = false))
+        this.includeLocalCheckbox.setPos(9, 300)
+        this.includeLocalCheckbox.onButtonPress = () => {
+            this.list.filters.includeLocal = this.includeLocalCheckbox.pressed
             this.list.reloadFilters()
         }
-        this.addChildGui(hasIconCheckbox)
-        sc.menu.buttonInteract.addGlobalButton(hasIconCheckbox, () => false)
-        const hasIconText = new sc.TextGui('Has icon')
-        hasIconText.setPos(35, 300)
-        this.addChildGui(hasIconText)
+        this.addChildGui(this.includeLocalCheckbox)
+        sc.menu.buttonInteract.addGlobalButton(this.includeLocalCheckbox, () => false)
+        this.includeLocalText = new sc.TextGui('Include local')
+        this.includeLocalText.hook.transitions['HIDDEN'] = this.includeLocalCheckbox.hook.transitions['HIDDEN']
+        this.includeLocalText.setPos(35, 300)
+        this.addChildGui(this.includeLocalText)
 
         this.installButton = new sc.ButtonGui('', 128, true, sc.BUTTON_TYPE.SMALL)
-        InstallQueue.changeListeners.push(() => this.updateInstallButton())
-        this.updateInstallButton()
+        InstallQueue.changeListeners.push(() => this.setTabEvent())
+        this.setTabEvent()
         this.installButton.setPos(432, 22)
         this.addChildGui(this.installButton)
         sc.menu.buttonInteract.addGlobalButton(this.installButton, () => false)
     },
-    updateInstallButton() {
-        const count = InstallQueue.values().length
-        if (this.list.currentTabIndex >= 2) {
-            this.installButton.doStateTransition('HIDDEN')
-            return
+    setTabEvent() {
+        /* handle filters */
+        if (this.list.currentTabIndex == MOD_MENU_TAB_INDEXES.ONLINE) {
+            this.includeLocalText.doStateTransition('DEFAULT')
+            this.includeLocalCheckbox.doStateTransition('DEFAULT')
+        } else {
+            this.includeLocalText.doStateTransition('HIDDEN')
+            this.includeLocalCheckbox.doStateTransition('HIDDEN')
         }
-        this.installButton.doStateTransition('DEFAULT')
-        this.installButton.setActive(count > 0)
-        if (count > 0) {
-            // prettier-ignore
-            this.installButton.setText(
+
+        /* handle install button */
+        if (this.list.currentTabIndex > MOD_MENU_TAB_INDEXES.SELECTED) {
+            this.installButton.doStateTransition('HIDDEN')
+        } else {
+            this.installButton.doStateTransition('DEFAULT')
+            const count = InstallQueue.values().length
+            this.installButton.setActive(count > 0)
+            if (count > 0) {
+                // prettier-ignore
+                this.installButton.setText(
             ig.lang.get('sc.gui.menu.ccmodloader.installButton')
             .replace(/\[modCount\]/, count.toString()), true
             )
-        } else {
-            this.installButton.setText(ig.lang.get('sc.gui.menu.ccmodloader.noModsSelected'), true)
+            } else {
+                this.installButton.setText(ig.lang.get('sc.gui.menu.ccmodloader.noModsSelected'), true)
+            }
         }
     },
     showMenu() {

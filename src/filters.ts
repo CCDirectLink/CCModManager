@@ -1,3 +1,4 @@
+import { InstalledMods as LocalMods } from './local-mods'
 import { ModEntry } from './types'
 
 import fuzzysort from 'fuzzysort'
@@ -6,11 +7,13 @@ export interface Fliters {
     name?: string
     includeLegacy?: boolean
     hasIcon?: boolean
+    includeLocal?: boolean
 }
 
 function doesFilterApply(filters: Fliters, mod: ModEntry) {
     if (!filters.includeLegacy && mod.isLegacy) return false
     if (filters.hasIcon && !mod.hasIcon) return false
+    if (!filters.includeLocal && !mod.isLocal /* we only want to exclude server entries of local mods */ && LocalMods.getAllRecord()[mod.id]) return false
     return true
 }
 

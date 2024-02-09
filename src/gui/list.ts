@@ -150,7 +150,7 @@ sc.ModMenuList = sc.ListTabbedPane.extend({
     },
     setTab(index, ignorePrev, settings) {
         this.parent(index, ignorePrev, settings)
-        this.modMenu.updateInstallButton()
+        this.modMenu.setTabEvent()
     },
     /* new stuff */
     reloadDatabases() {
