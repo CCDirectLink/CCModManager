@@ -157,9 +157,9 @@ sc.ModMenu = sc.ListInfoMenu.extend({
                     zh_TW: '[\u9ede\u982d]<<A<<[CHANGED 2017/10/10]',
                 })
                 const deps = InstallQueue.deps
-                const str = `Are you sure you want to install:\n${InstallQueue.values()
+                const str = `${ig.lang.get('sc.gui.menu.ccmodloader.areYouSureYouWantToInstall')}\n${InstallQueue.values()
                     .map(mod => `- \\c[3]${mod.name}\\c[0]\n`)
-                    .join()}${deps.length > 0 ? `Dependencies:\n${deps.map(mod => `- \\c[3]${mod.name}\\c[0]\n`)}` : ''}`
+                    .join()}${deps.length > 0 ? `${ig.lang.get('sc.gui.menu.ccmodloader.dependencies')}\n${deps.map(mod => `- \\c[3]${mod.name}\\c[0]\n`)}` : ''}`
 
                 sc.Dialogs.showChoiceDialog(str, sc.DIALOG_INFO_ICON.QUESTION, [ig.lang.get('sc.gui.dialogs.no'), nod], button => {
                     if (button.text!.toString() == nod) {
@@ -167,21 +167,17 @@ sc.ModMenu = sc.ListInfoMenu.extend({
                         ModInstaller.install(toInstall).then(() => {
                             InstallQueue.deps = []
                             InstallQueue.clear()
-                            sc.Dialogs.showYesNoDialog(
-                                'The installed mods will start working after a restart.\nDo you want to restart?',
-                                sc.DIALOG_INFO_ICON.QUESTION,
-                                button => {
-                                    const text = button.text!.toString()
-                                    if (text == ig.lang.get('sc.gui.dialogs.yes')) {
-                                        if ('chrome' in window) (window.chrome as any).runtime.reload()
-                                        else window.location.reload()
-                                    } else {
-                                        toInstall.forEach(mod => {
-                                            mod.awaitingRestart = true
-                                        })
-                                    }
+                            sc.Dialogs.showYesNoDialog(ig.lang.get('sc.gui.menu.ccmodloader.askRestart'), sc.DIALOG_INFO_ICON.QUESTION, button => {
+                                const text = button.text!.toString()
+                                if (text == ig.lang.get('sc.gui.dialogs.yes')) {
+                                    if ('chrome' in window) (window.chrome as any).runtime.reload()
+                                    else window.location.reload()
+                                } else {
+                                    toInstall.forEach(mod => {
+                                        mod.awaitingRestart = true
+                                    })
                                 }
-                            )
+                            })
                         })
                     }
                 })

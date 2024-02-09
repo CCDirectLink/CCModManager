@@ -20,7 +20,11 @@
                 "disabledTab": "Disabled",
                 "settingsTab": "Settings",
                 "installButton": "Install \\c[3][modCount]\\c[0] mods",
-                "noModsSelected": "No mods selected"
+                "noModsSelected": "No mods selected",
+                "reposButton": "Repositories",
+                "areYouSureYouWantToInstall": "Are you sure you want to install:",
+                "dependencies": "Dependencies:",
+                "askRestart": "The installed mods will start working after a restart.\nDo you want to restart?"
             }
         }
     }

@@ -124,7 +124,7 @@ export class ModInstaller {
     }
 
     static async install(modsToInstall: ModEntryServer[]) {
-        console.log('mods to install:', [...modsToInstall].map(mod => mod.id).join(', '))
+        console.log('mods to install:', modsToInstall.map(mod => mod.id).join(', '))
         const promises: Promise<void>[] = []
         for (const mod of modsToInstall) {
             promises.push(this.downloadAndInstallMod(mod))
