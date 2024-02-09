@@ -17,7 +17,7 @@ function doesFilterApply(filters: Fliters, mod: ModEntry) {
     return true
 }
 
-export function createFuzzyFilteredModList(filters: Fliters, mods: ModEntry[]): ModEntry[] {
+export function createFuzzyFilteredModList<T extends ModEntry>(filters: Fliters, mods: T[]): T[] {
     mods = mods.filter(mod => doesFilterApply(filters, mod))
 
     if (filters.name) {

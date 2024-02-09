@@ -1,7 +1,3 @@
-// const fs: typeof import('fs') = (0, eval)("require('fs')")
-// const path: typeof import('path') = (0, eval)("require('path')")
-
-// import jszip from 'jszip'
 import semver from 'semver'
 import { ModEntry, ModEntryLocal, ModEntryServer, ModID, NPDatabase } from './types'
 import { FileCache } from './cache'
@@ -56,7 +52,7 @@ export class ModDB {
         localStorage.setItem(this.localStorageKey, JSON.stringify(urls))
     }
 
-    static getHighestVersionMod(mods: ModEntry[]): ModEntry {
+    static getHighestVersionMod<T extends ModEntry>(mods: T[]): T {
         return mods.reduce((highestVerMod, currMod) => (semver.gt(currMod.version, highestVerMod.version) ? currMod : highestVerMod))
     }
 
@@ -84,6 +80,22 @@ export class ModDB {
         mod.database = serverMod.database
         mod.stars = serverMod.stars
         mod.isLegacy = serverMod.isLegacy
+    }
+
+    static removeModDuplicates(modsRecord: Record<string, ModEntryServer[]>): Record<string, ModEntryServer> {
+        const uniqueMods: Record<string /*modid */, ModEntryServer> = {}
+        for (const dbName in modsRecord) {
+            const mods = modsRecord[dbName]
+            for (const mod of mods) {
+                const prevMod = uniqueMods[mod.id]
+                if (prevMod) {
+                    uniqueMods[mod.id] = ModDB.getHighestVersionMod([prevMod, mod])
+                } else {
+                    uniqueMods[mod.id] = mod
+                }
+            }
+        }
+        return uniqueMods
     }
 
     name: string
@@ -121,6 +133,8 @@ export class ModDB {
                 isLegacy: !ccmod,
                 hasIcon: ccmod?.icons ? !!ccmod.icons['24'] : false,
                 stars: data.stars,
+                dependencies: ccmod?.dependencies || meta?.ccmodDependencies || {},
+                installation: data.installation,
             }
         }
     }

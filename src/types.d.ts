@@ -83,6 +83,7 @@ export interface NPDatabasePackageMetadata {
     author?: string
     license?: string
     homepage?: string
+    ccmodDependencies?: Record<string, string>
 }
 
 export type NPDatabasePackageInstallation = {
@@ -107,10 +108,17 @@ interface ModEntryBase {
     isLegacy: boolean
     hasIcon: boolean
     stars?: number
+    awaitingRestart?: boolean
 }
+
 export interface ModEntryServer extends ModEntryBase {
     isLocal: false
+    dependencies: Record<string, string>
+    installation: NPDatabasePackageInstallation[]
+
+    dependenciesCached?: Record<string, { mod: ModEntryServer; versionReqRanges: string[] }> /* cached by the installer */
 }
+
 export interface ModEntryLocal extends ModEntryBase {
     isLocal: true
     active: boolean

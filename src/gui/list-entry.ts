@@ -1,9 +1,9 @@
 import { ModEntry } from '../types'
 import { FileCache } from '../cache'
-import { InstallQueue } from '../install-queue'
 import './list-entry-highlight'
 import { LocalMods } from '../local-mods'
 import { MOD_MENU_TAB_INDEXES } from './list'
+import { InstallQueue } from '../mod-installer'
 declare global {
     namespace sc {
         export interface ModListEntry extends ig.FocusGui {
@@ -150,6 +150,9 @@ sc.ModListEntry = ig.FocusGui.extend({
         } else {
             icon = 'quest'
         }
+        if (this.mod.awaitingRestart) {
+            name = `\\i[stats-general]${name}`
+        }
         name = `\\i[${icon}]${name}`
         return name
     },
@@ -181,6 +184,7 @@ sc.ModListEntry = ig.FocusGui.extend({
     onButtonPress() {
         if (this.mod.isLocal) {
             if (this.modList.currentTabIndex == MOD_MENU_TAB_INDEXES.ENABLED) {
+                this.mod.awaitingRestart = !this.mod.awaitingRestart
                 if (this.mod.active) {
                     this.setTextRed()
                     sc.BUTTON_SOUND.toggle_off.play()
@@ -191,6 +195,7 @@ sc.ModListEntry = ig.FocusGui.extend({
                     LocalMods.setModActive(this.mod, true)
                 }
             } else if (this.modList.currentTabIndex == MOD_MENU_TAB_INDEXES.DISABLED) {
+                this.mod.awaitingRestart = !this.mod.awaitingRestart
                 if (this.mod.active) {
                     this.setTextRed()
                     sc.BUTTON_SOUND.toggle_off.play()

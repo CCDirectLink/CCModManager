@@ -178,6 +178,6 @@ sc.ModMenuRepoAddPopup = ig.GuiElementBase.extend({
         }
         ModDB.saveDatabases()
         ModDB.loadDatabases()
-        sc.Model.notifyObserver(sc.menu, sc.MENU_EVENT.INFO_TEXT_CHANGED)
+        sc.Model.notifyObserver(sc.modMenu, sc.MOD_MENU_MESSAGES.REPOSITORY_CHANGED)
     },
 })

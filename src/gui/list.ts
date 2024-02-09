@@ -1,16 +1,15 @@
-import { ModEntry } from '../types'
+import { ModEntry, ModEntryServer } from '../types'
 import { ModDB } from '../moddb'
 import { Fliters, createFuzzyFilteredModList } from '../filters'
-import { InstallQueue } from '../install-queue'
 import { LocalMods } from '../local-mods'
 import './list-entry'
 import './repo-add'
+import { InstallQueue } from '../mod-installer'
 
 declare global {
     namespace sc {
         interface ModMenuList extends sc.ListTabbedPane, sc.Model.Observer {
-            modMenu: sc.ModMenu
-            mods: Record<string, ModEntry[]>
+            mods: Record<string, ModEntryServer[]>
             filters: Fliters
             tabz: {
                 name: string
@@ -20,11 +19,10 @@ declare global {
             currentSort: sc.MOD_MENU_SORT_ORDER
             reposPopup: sc.ModMenuRepoAddPopup
 
-            setMods(this: this, mods: ModEntry[], dbName: string): void
+            setMods(this: this, mods: ModEntryServer[], dbName: string): void
             reloadDatabases(this: this): void
             reloadFilters(this: this): void
             reloadEntries(this: this): void
-            removeModDuplicates(this: this, mods: Record<string, ModEntry[]>): ModEntry[]
             sortModEntries(this: this, mods: ModEntry[], sort: sc.MOD_MENU_SORT_ORDER): void
             populateOnline(this: this, list: sc.ButtonListBox, buttonGroup: sc.ButtonGroup, sort: sc.MOD_MENU_SORT_ORDER): void
             populateSelected(this: this, list: sc.ButtonListBox, buttonGroup: sc.ButtonGroup, sort: sc.MOD_MENU_SORT_ORDER): void
@@ -33,7 +31,7 @@ declare global {
             populateSettings(this: this, list: sc.ButtonListBox, buttonGroup: sc.ButtonGroup): void
         }
         interface ModMenuListConstructor extends ImpactClass<ModMenuList> {
-            new (modMenu: sc.ModMenu): ModMenuList
+            new (): ModMenuList
         }
         var ModMenuList: ModMenuListConstructor
     }
@@ -58,9 +56,8 @@ sc.ModMenuList = sc.ListTabbedPane.extend({
         HIDDEN_EASE: { state: { alpha: 0, offsetX: 218 }, time: 0.2, timeFunction: KEY_SPLINES.EASE },
     },
     /* extends */
-    init(modMenu) {
+    init() {
         this.parent(false)
-        this.modMenu = modMenu
 
         this.tabz = [
             { name: ig.lang.get('sc.gui.menu.ccmodloader.onlineTab'), populateFunc: this.populateOnline, icon: 'quest-all' },
@@ -94,10 +91,12 @@ sc.ModMenuList = sc.ListTabbedPane.extend({
 
         ig.interact.setBlockDelay(0.2)
         this.doStateTransition('DEFAULT')
+        this.addObservers!()
     },
     hide() {
         this.parent()
         this.doStateTransition('HIDDEN')
+        this.removeObservers!()
     },
     onInitSortType() {
         return sc.MOD_MENU_SORT_ORDER.STARS
@@ -133,9 +132,11 @@ sc.ModMenuList = sc.ListTabbedPane.extend({
     },
     addObservers() {
         sc.Model.addObserver(sc.menu, this)
+        sc.Model.addObserver(sc.modMenu, this)
     },
     removeObservers() {
         sc.Model.removeObserver(sc.menu, this)
+        sc.Model.removeObserver(sc.modMenu, this)
     },
     modelChanged(model, message, data) {
         if (model == sc.menu) {
@@ -143,14 +144,18 @@ sc.ModMenuList = sc.ListTabbedPane.extend({
                 const sort = ((data as sc.ButtonGui).data as any).sortType as sc.MOD_MENU_SORT_ORDER
                 this.currentSort = sort
                 this.reloadEntries()
-            } else if (message == sc.MENU_EVENT.INFO_TEXT_CHANGED) {
+            }
+        } else if (model == sc.modMenu) {
+            if (message == sc.MOD_MENU_MESSAGES.REPOSITORY_CHANGED) {
                 this.reloadDatabases()
+            } else if (message == sc.MOD_MENU_MESSAGES.SELECTED_ENTRIES_CHANGED && this.currentTabIndex == MOD_MENU_TAB_INDEXES.SELECTED) {
+                this.reloadEntries()
             }
         }
     },
     setTab(index, ignorePrev, settings) {
         this.parent(index, ignorePrev, settings)
-        this.modMenu.setTabEvent()
+        sc.Model.notifyObserver(sc.modMenu, sc.MOD_MENU_MESSAGES.TAB_CHANGED)
     },
     /* new stuff */
     reloadDatabases() {
@@ -185,23 +190,8 @@ sc.ModMenuList = sc.ListTabbedPane.extend({
             }
         }
     },
-    removeModDuplicates(modsRecord) {
-        const uniqueMods: Record<string /*modid */, ModEntry> = {}
-        for (const dbName in modsRecord) {
-            const mods = modsRecord[dbName]
-            for (const mod of mods) {
-                const prevMod = uniqueMods[mod.id]
-                if (prevMod) {
-                    uniqueMods[mod.id] = ModDB.getHighestVersionMod([prevMod, mod])
-                } else {
-                    uniqueMods[mod.id] = mod
-                }
-            }
-        }
-        return Object.values(uniqueMods)
-    },
     populateOnline(list, _, sort: sc.MOD_MENU_SORT_ORDER) {
-        let mods = this.removeModDuplicates(this.mods)
+        let mods = Object.values(ModDB.removeModDuplicates(this.mods))
         mods = createFuzzyFilteredModList(this.filters, mods)
         this.sortModEntries(mods, sort)
         for (const mod of mods) {

@@ -87,6 +87,7 @@ export class LocalMods {
     }
 
     private static convertCCL3Mod(mod: Mod): ModEntryLocal {
+        const active = sc.options.get(`modEnabled-${mod.id}`) as boolean
         return {
             database: 'LOCAL',
             isLocal: true,
@@ -98,7 +99,7 @@ export class LocalMods {
             isLegacy: mod.legacyMode,
             hasIcon: !!mod.manifest.icons?.['24'],
 
-            active: sc.options.get(`modEnabled-${mod.id}`) as boolean,
+            active,
             iconConfig: mod.manifest.icons?.['24']
                 ? {
                       path: `/${mod.baseDirectory}/${mod.manifest.icons['24']}`,
