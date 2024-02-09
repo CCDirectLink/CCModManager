@@ -28,6 +28,7 @@ declare global {
             setTextGreen(this: this): void
             setTextRed(this: this): void
             setTextWhite(this: this): void
+            setTextYellow(this: this): void
         }
         interface ModListEntryConstructor extends ImpactClass<ModListEntry> {
             new (mod: ModEntry, modList: sc.ModMenuList): ModListEntry
@@ -107,7 +108,7 @@ sc.ModListEntry = ig.FocusGui.extend({
         this.setSize(modList.hook.size.x - 3 /* 3 for scrollbar */, buttonSquareSize * 3 - 3)
 
         this.nameText = new sc.TextGui('')
-        if (InstallQueue.has(mod)) this.setTextGreen()
+        if (InstallQueue.has(mod)) this.setTextYellow()
         else this.setTextWhite()
 
         const iconOffset = 25 as const
@@ -153,6 +154,9 @@ sc.ModListEntry = ig.FocusGui.extend({
     setTextWhite() {
         this.nameText.setText(this.getModName())
     },
+    setTextYellow() {
+        this.nameText.setText(`\\c[3]${this.getModName()}\\c[0]`)
+    },
     updateDrawables(root) {
         if (this.modList.hook.currentStateName != 'HIDDEN') {
             this.ninepatch.draw(root, this.hook.size.x, this.hook.size.y, this.focus ? 'focus' : 'default')
@@ -193,7 +197,7 @@ sc.ModListEntry = ig.FocusGui.extend({
             } else {
                 InstallQueue.add(this.mod)
                 sc.BUTTON_SOUND.toggle_on.play()
-                this.setTextGreen()
+                this.setTextYellow()
             }
         }
     },
