@@ -22,7 +22,7 @@ declare global {
 }
 
 /* TODO: Add caching */
-export class InstalledMods {
+export class LocalMods {
     private static cache: ModEntryLocal[]
     private static cacheRecord: Record<string, ModEntryLocal>
 

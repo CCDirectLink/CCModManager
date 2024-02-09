@@ -2,7 +2,7 @@ import { ModEntry } from '../types'
 import { FileCache } from '../cache'
 import { InstallQueue } from '../install-queue'
 import './list-entry-highlight'
-import { InstalledMods } from '../local-mods'
+import { LocalMods } from '../local-mods'
 import { MOD_MENU_TAB_INDEXES } from './list'
 declare global {
     namespace sc {
@@ -112,7 +112,7 @@ sc.ModListEntry = ig.FocusGui.extend({
         if (this.modList.currentTabIndex == MOD_MENU_TAB_INDEXES.DISABLED) this.setTextRed()
         else if (this.modList.currentTabIndex == MOD_MENU_TAB_INDEXES.ENABLED) this.setTextGreen()
         else {
-            const serverMod = InstalledMods.getAllRecord()[mod.id]
+            const serverMod = LocalMods.getAllRecord()[mod.id]
             if (serverMod) {
                 if (serverMod.active) this.setTextGreen()
                 else this.setTextRed()
@@ -184,24 +184,24 @@ sc.ModListEntry = ig.FocusGui.extend({
                 if (this.mod.active) {
                     this.setTextRed()
                     sc.BUTTON_SOUND.toggle_off.play()
-                    InstalledMods.setModActive(this.mod, false)
+                    LocalMods.setModActive(this.mod, false)
                 } else {
                     this.setTextGreen()
                     sc.BUTTON_SOUND.toggle_on.play()
-                    InstalledMods.setModActive(this.mod, true)
+                    LocalMods.setModActive(this.mod, true)
                 }
             } else if (this.modList.currentTabIndex == MOD_MENU_TAB_INDEXES.DISABLED) {
                 if (this.mod.active) {
                     this.setTextRed()
                     sc.BUTTON_SOUND.toggle_off.play()
-                    InstalledMods.setModActive(this.mod, false)
+                    LocalMods.setModActive(this.mod, false)
                 } else {
                     this.setTextGreen()
                     sc.BUTTON_SOUND.toggle_on.play()
-                    InstalledMods.setModActive(this.mod, true)
+                    LocalMods.setModActive(this.mod, true)
                 }
             } else throw new Error('wat?')
-        } else if (!InstalledMods.getAllRecord()[this.mod.id]) {
+        } else if (!LocalMods.getAllRecord()[this.mod.id]) {
             if (InstallQueue.has(this.mod)) {
                 InstallQueue.delete(this.mod)
                 sc.BUTTON_SOUND.toggle_off.play()

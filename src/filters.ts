@@ -1,4 +1,4 @@
-import { InstalledMods as LocalMods } from './local-mods'
+import { LocalMods } from './local-mods'
 import { ModEntry } from './types'
 
 import fuzzysort from 'fuzzysort'

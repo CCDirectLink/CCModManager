@@ -2,7 +2,7 @@ import { ModEntry } from '../types'
 import { ModDB } from '../moddb'
 import { Fliters, createFuzzyFilteredModList } from '../filters'
 import { InstallQueue } from '../install-queue'
-import { InstalledMods } from '../local-mods'
+import { LocalMods } from '../local-mods'
 import './list-entry'
 import './repo-add'
 
@@ -218,7 +218,7 @@ sc.ModMenuList = sc.ListTabbedPane.extend({
         }
     },
     populateEnabled(list, _, sort: sc.MOD_MENU_SORT_ORDER) {
-        const mods = createFuzzyFilteredModList(this.filters, InstalledMods.getActive())
+        const mods = createFuzzyFilteredModList(this.filters, LocalMods.getActive())
         this.sortModEntries(mods, sort)
         for (const mod of mods) {
             const newModEntry = new sc.ModListEntry(mod, this)
@@ -226,7 +226,7 @@ sc.ModMenuList = sc.ListTabbedPane.extend({
         }
     },
     populateDisabled(list, _, sort: sc.MOD_MENU_SORT_ORDER) {
-        const mods = createFuzzyFilteredModList(this.filters, InstalledMods.getInactive())
+        const mods = createFuzzyFilteredModList(this.filters, LocalMods.getInactive())
         this.sortModEntries(mods, sort)
         for (const mod of mods) {
             const newModEntry = new sc.ModListEntry(mod, this)
