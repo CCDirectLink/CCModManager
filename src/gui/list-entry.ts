@@ -112,9 +112,9 @@ sc.ModListEntry = ig.FocusGui.extend({
         if (this.modList.currentTabIndex == MOD_MENU_TAB_INDEXES.DISABLED) this.setTextRed()
         else if (this.modList.currentTabIndex == MOD_MENU_TAB_INDEXES.ENABLED) this.setTextGreen()
         else {
-            const serverMod = LocalMods.getAllRecord()[mod.id]
-            if (serverMod) {
-                if (serverMod.active) this.setTextGreen()
+            const localMod = mod.isLocal ? mod : mod.localCounterpart
+            if (localMod) {
+                if (localMod.active) this.setTextGreen()
                 else this.setTextRed()
             }
         }
@@ -176,10 +176,12 @@ sc.ModListEntry = ig.FocusGui.extend({
     focusGained() {
         this.parent()
         this.highlight.focus = this.focus
+        sc.Model.notifyObserver(sc.modMenu, sc.MOD_MENU_MESSAGES.ENTRY_FOCUSED, this)
     },
     focusLost() {
         this.parent()
         this.highlight.focus = this.focus
+        sc.Model.notifyObserver(sc.modMenu, sc.MOD_MENU_MESSAGES.ENTRY_UNFOCUSED, this)
     },
     onButtonPress() {
         if (this.mod.isLocal) {
@@ -194,6 +196,7 @@ sc.ModListEntry = ig.FocusGui.extend({
                     sc.BUTTON_SOUND.toggle_on.play()
                     LocalMods.setModActive(this.mod, true)
                 }
+                this.highlight.updateWidth(this.hook.size.x, this.nameText.hook.size.x)
             } else if (this.modList.currentTabIndex == MOD_MENU_TAB_INDEXES.DISABLED) {
                 this.mod.awaitingRestart = !this.mod.awaitingRestart
                 if (this.mod.active) {
@@ -205,8 +208,9 @@ sc.ModListEntry = ig.FocusGui.extend({
                     sc.BUTTON_SOUND.toggle_on.play()
                     LocalMods.setModActive(this.mod, true)
                 }
+                this.highlight.updateWidth(this.hook.size.x, this.nameText.hook.size.x)
             } else throw new Error('wat?')
-        } else if (!LocalMods.getAllRecord()[this.mod.id]) {
+        } else if (!(this.mod.isLocal || this.mod.localCounterpart)) {
             if (InstallQueue.has(this.mod)) {
                 InstallQueue.delete(this.mod)
                 sc.BUTTON_SOUND.toggle_off.play()

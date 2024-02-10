@@ -17,11 +17,12 @@ type CCL2Mod = {
     active?: boolean
 }
 declare global {
+    /* ccl2 types only */
     var activeMods: CCL2Mod[]
     var inactiveMods: CCL2Mod[]
+    var versions: { ccloader: string; crosscode: string }
 }
 
-/* TODO: Add caching */
 export class LocalMods {
     private static cache: ModEntryLocal[]
     private static cacheRecord: Record<string, ModEntryLocal>
@@ -72,6 +73,8 @@ export class LocalMods {
             version: mod.version || 'Unknown',
             isLegacy: false /*duno how to check*/,
             hasIcon: !!mod.icons?.['24'],
+            dependencies: mod.dependencies,
+            path: mod.baseDirectory.substring(0, mod.baseDirectory.length - 1),
 
             active: !mod.disabled,
             iconConfig: mod.icons?.['24']
@@ -98,6 +101,11 @@ export class LocalMods {
             version: mod.version?.toString() || 'Unknown',
             isLegacy: mod.legacyMode,
             hasIcon: !!mod.manifest.icons?.['24'],
+            dependencies: [...mod.dependencies].reduce((acc: Record<string, string>, v) => {
+                acc[v[0]] = v[1].version.raw
+                return acc
+            }, {}),
+            path: mod.baseDirectory.substring(0, mod.baseDirectory.length - 1),
 
             active,
             iconConfig: mod.manifest.icons?.['24']
@@ -110,5 +118,13 @@ export class LocalMods {
                   }
                 : FileCache.getDefaultModIconConfig(),
         }
+    }
+
+    static getCCVersion(): string {
+        return ModManager.mod.isCCL3 ? modloader.gameVersion.raw : versions.crosscode
+    }
+
+    static getCCLoaderVersion(): string {
+        return ModManager.mod.isCCL3 ? modloader.version.raw : versions.ccloader
     }
 }

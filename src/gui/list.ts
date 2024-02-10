@@ -48,6 +48,7 @@ export enum MOD_MENU_TAB_INDEXES {
     SETTINGS = 4,
 }
 
+let modCache: Record<string, ModEntryServer[]> | undefined
 sc.ModMenuList = sc.ListTabbedPane.extend({
     mods: {},
     transitions: {
@@ -77,7 +78,12 @@ sc.ModMenuList = sc.ListTabbedPane.extend({
         for (let i = 0; i < this.tabz.length; i++) {
             this.addTab(this.tabz[i].name, i, {})
         }
-        this.reloadDatabases()
+        if (modCache) {
+            this.mods = modCache
+            this.reloadEntries()
+        } else {
+            this.reloadDatabases()
+        }
     },
     show() {
         this.parent()
@@ -148,7 +154,7 @@ sc.ModMenuList = sc.ListTabbedPane.extend({
         } else if (model == sc.modMenu) {
             if (message == sc.MOD_MENU_MESSAGES.REPOSITORY_CHANGED) {
                 this.reloadDatabases()
-            } else if (message == sc.MOD_MENU_MESSAGES.SELECTED_ENTRIES_CHANGED && this.currentTabIndex == MOD_MENU_TAB_INDEXES.SELECTED) {
+            } else if (message == sc.MOD_MENU_MESSAGES.UPDATE_ENTRIES) {
                 this.reloadEntries()
             }
         }
@@ -159,7 +165,7 @@ sc.ModMenuList = sc.ListTabbedPane.extend({
     },
     /* new stuff */
     reloadDatabases() {
-        this.mods = {}
+        this.mods = modCache = {}
         for (const dbName in ModDB.databases) {
             const db = ModDB.databases[dbName]
             if (db.active) {

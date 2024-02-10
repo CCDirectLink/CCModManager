@@ -22,18 +22,10 @@ sc.TitleScreenButtonGui.inject({
     postInit() {
         this.parent()
 
-        this.modsButton = new sc.ButtonGui('\\i[help2]' + ig.lang.get('sc.gui.menu.menu-titles.mods'), undefined, true, sc.BUTTON_TYPE.EQUIP)
+        this.modsButton = new sc.ButtonGui('\\i[help3]' + ig.lang.get('sc.gui.menu.menu-titles.mods'), undefined, true, sc.BUTTON_TYPE.EQUIP)
         this.modsButton.hook.transitions = {
-            DEFAULT: {
-                state: {},
-                time: 0.2,
-                timeFunction: window.KEY_SPLINES.EASE,
-            },
-            HIDDEN: {
-                state: { offsetY: -(this.changelogButton.hook.size.y + 4) },
-                time: 0.2,
-                timeFunction: window.KEY_SPLINES.LINEAR,
-            },
+            DEFAULT: { state: {}, time: 0.2, timeFunction: window.KEY_SPLINES.EASE },
+            HIDDEN: { state: { offsetY: -(this.changelogButton.hook.size.y + 4) }, time: 0.2, timeFunction: window.KEY_SPLINES.LINEAR },
         }
         this.modsButton.setAlign(ig.GUI_ALIGN.X_RIGHT, ig.GUI_ALIGN.Y_TOP)
         this.modsButton.setHeight(26)
@@ -41,7 +33,7 @@ sc.TitleScreenButtonGui.inject({
         this.modsButton.setPos((ig.extensions.getExtensionList().length > 0 ? this.dlcButton.hook.size.x + 6 : 0) + this.changelogButton.hook.size.x + 6, 2)
         this.modsButton.doStateTransition('HIDDEN', true)
         this.modsButton.onButtonPress = () => this._enterModsMenu()
-        this.buttonInteract.addGlobalButton(this.modsButton, () => sc.control.menuHotkeyHelp2())
+        this.buttonInteract.addGlobalButton(this.modsButton, () => sc.control.menuHotkeyHelp3())
         this.addChildGui(this.modsButton)
     },
     _enterModsMenu() {

@@ -1,12 +1,13 @@
 import { LocalMods } from './local-mods'
 import { ModDB } from './moddb'
-import { ModEntry, ModEntryServer } from './types'
+import { ModEntry, ModEntryLocal, ModEntryServer } from './types'
 
 const fs: typeof import('fs') = (0, eval)("require('fs')")
 const path: typeof import('path') = (0, eval)("require('path')")
 
 import { loadAsync } from 'jszip'
-import semver from 'semver'
+import semver_satisfies from 'semver/functions/satisfies'
+import { rimraf } from '../node_modules/rimraf/dist/commonjs/index.js'
 
 export class InstallQueue {
     private static queue: Set<ModEntryServer> = new Set()
@@ -40,8 +41,22 @@ type DepEntry = { mod: ModEntryServer; versionReqRanges: string[] }
 export class ModInstaller {
     static record: Record<string, ModEntryServer>
     static byNameRecord: Record<string, ModEntryServer>
+    private static virtualMods: Record<string, ModEntryLocal> = {
+        crosscode: {
+            id: 'crosscode',
+            name: 'CrossCode',
+            description: 'The base game.',
+            version: LocalMods.getCCVersion(),
+        } as ModEntryLocal,
+        ccloader: {
+            id: 'ccloader',
+            name: 'CCLoader',
+            description: 'The mod loader.',
+            version: LocalMods.getCCLoaderVersion(),
+        } as ModEntryLocal,
+    }
 
-    static getModByDepName(depName: string): ModEntryServer | undefined {
+    private static getModByDepName(depName: string): ModEntryServer | undefined {
         return this.record[depName] || this.byNameRecord[depName]
     }
 
@@ -58,10 +73,15 @@ export class ModInstaller {
         if (mod.dependenciesCached) return mod.dependenciesCached
         const deps: Record<string, DepEntry> = {}
         for (const depName in mod.dependencies) {
+            const reqVersionRange = mod.dependencies[depName]
+            if (this.virtualMods[depName]) {
+                this.setOrAddNewer(deps, { id: depName } as any, reqVersionRange)
+                continue
+            }
             const dep = this.getModByDepName(depName)
+
             if (!dep) throw new Error(`Mod: ${mod.id} has a dependency missing: ${depName}`)
 
-            const reqVersionRange = mod.dependencies[depName]
             this.setOrAddNewer(deps, dep, reqVersionRange)
 
             const depDeps = this.getModDependencies(dep)
@@ -75,12 +95,12 @@ export class ModInstaller {
 
     private static matchesVersionReqRanges(mod: ModEntry, versionReqRanges: string[]) {
         for (const range of versionReqRanges) {
-            if (!semver.satisfies(mod.version, range)) return false
+            if (!semver_satisfies(mod.version, range)) return false
         }
         return true
     }
 
-    static async findDeps(modRecords: Record<string, ModEntryServer[]>) {
+    static async findDeps(mods: ModEntryServer[], modRecords: Record<string, ModEntryServer[]>) {
         this.record = ModDB.removeModDuplicates(modRecords)
         this.byNameRecord = {}
         for (const modId in this.record) {
@@ -88,7 +108,6 @@ export class ModInstaller {
             this.byNameRecord[mod.name] = mod
         }
 
-        const mods = InstallQueue.values()
         const deps: Record<string, DepEntry> = {}
         for (const mod of mods) {
             const modDeps = this.getModDependencies(mod)
@@ -97,11 +116,12 @@ export class ModInstaller {
                 this.setOrAddNewer(deps, entry.mod, ...entry.versionReqRanges)
             }
         }
+
         /* filter already installed mods */
         const toUpdate = new Set<ModEntryServer>()
         for (const modId in deps) {
             const { mod: serverMod, versionReqRanges } = deps[modId]
-            const localMod = LocalMods.getAllRecord()[modId]
+            const localMod = serverMod.localCounterpart
             if (localMod) {
                 if (this.matchesVersionReqRanges(localMod, versionReqRanges)) {
                     delete deps[modId]
@@ -111,16 +131,25 @@ export class ModInstaller {
             }
         }
         /* check if dependency versions are in the database */
+        for (const virtualModId in this.virtualMods) {
+            const dep = deps[virtualModId]
+            if (!dep) continue
+            const virtualMod = this.virtualMods[virtualModId]
+
+            if (!this.matchesVersionReqRanges(virtualMod, dep.versionReqRanges)) {
+                throw new Error(`${virtualMod.name} version does not meat the requirement: ${dep.versionReqRanges.join(', ')}`)
+            }
+            delete deps[virtualModId]
+        }
         for (const modId in deps) {
             const { mod: serverMod, versionReqRanges } = deps[modId]
             if (!this.matchesVersionReqRanges(serverMod, versionReqRanges))
                 throw new Error(
-                    `Dependency: ${serverMod.id} that cannot be resolved: version range: ${versionReqRanges} was not met. Database has only: ${serverMod.version}`
+                    `Dependency: ${serverMod.name} (${serverMod.id}) that cannot be resolved: version range: ${versionReqRanges.join(', ')} was not met. Database has only: ${serverMod.version}`
                 )
         }
 
         InstallQueue.deps = Object.values(deps).map(e => e.mod)
-        sc.Model.notifyObserver(sc.modMenu, sc.MOD_MENU_MESSAGES.READY_TO_INSTALL)
     }
 
     static async install(modsToInstall: ModEntryServer[]) {
@@ -139,6 +168,7 @@ export class ModInstaller {
         const installation = mod.installation.find(i => i.type === 'ccmod') || mod.installation.find(i => i.type === 'modZip')
         if (!installation) throw new Error(`Mod: ${mod.id} has no known installation methods.`)
 
+        const modId = mod.id.replace(/ /g, '_')
         if (installation.type == 'modZip' || installation.type == 'ccmod') {
             const resp = await fetch(installation.url)
             const data = await resp.arrayBuffer()
@@ -146,9 +176,9 @@ export class ModInstaller {
 
             switch (installation.type) {
                 case 'ccmod':
-                    return await this.installCCMod(data, mod.id)
+                    return await this.installCCMod(data, modId)
                 case 'modZip':
-                    return await this.installModZip(data, mod.id, installation.source)
+                    return await this.installModZip(data, modId, installation.source)
             }
         }
     }
@@ -177,5 +207,24 @@ export class ModInstaller {
                     await fs.promises.writeFile(filepath, data)
                 })
         )
+    }
+
+    static getWhatDependsOnAMod(mod: ModEntryLocal): ModEntryLocal[] {
+        const list: ModEntryLocal[] = []
+        for (const otherMod of LocalMods.getAll()) {
+            const deps = otherMod.dependencies
+            if (deps[mod.id] || deps[mod.name]) list.push(otherMod)
+        }
+        return list
+    }
+
+    static async uninstallMod(mod: ModEntryLocal) {
+        console.log('uninstall', mod.id)
+        return rimraf.rimraf(mod.path)
+    }
+
+    static restartGame() {
+        if ('chrome' in window) (window.chrome as any).runtime.reload()
+        else window.location.reload()
     }
 }

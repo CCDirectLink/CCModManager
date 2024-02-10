@@ -107,13 +107,14 @@ interface ModEntryBase {
     version: string
     isLegacy: boolean
     hasIcon: boolean
+    dependencies: Record<string, string>
     stars?: number
     awaitingRestart?: boolean
 }
 
 export interface ModEntryServer extends ModEntryBase {
     isLocal: false
-    dependencies: Record<string, string>
+    localCounterpart?: ModEntryLocal
     installation: NPDatabasePackageInstallation[]
 
     dependenciesCached?: Record<string, { mod: ModEntryServer; versionReqRanges: string[] }> /* cached by the installer */
@@ -123,6 +124,8 @@ export interface ModEntryLocal extends ModEntryBase {
     isLocal: true
     active: boolean
     iconConfig: ModImageConfig
+    serverCounterpart?: ModEntryServer
+    path: string
 }
 
 export type ModEntry = ModEntryServer | ModEntryLocal

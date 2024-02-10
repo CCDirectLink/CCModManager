@@ -1,6 +1,6 @@
 {
     "name": "ccmodmanager",
-    "version": "0.0.1",
+    "version": "0.7.0",
     "scripts": {
         "start": "npx esbuild --target=es2018 --format=esm --platform=node --bundle --sourcemap=inline --outfile=plugin.js src/plugin.ts",
         "watch": "npx esbuild --target=es2018 --format=esm --platform=node --bundle --sourcemap=inline --watch --outfile=plugin.js src/plugin.ts",
@@ -9,7 +9,7 @@
     },
     "license": "GPLv3",
     "ccmodHumanName": "CCModManager",
-    "description": "mod manager",
+    "description": "Final attempt at making a mod manager",
     "plugin": "plugin.js",
     "devDependencies": {
         "@types/node": "^11.6.0",
@@ -22,6 +22,7 @@
         "jszip": "^3.10.1",
         "nax-ccuilib": "github:conorlawton/nax-ccuilib",
         "prettier": "3.2.4",
+        "rimraf": "^5.0.5",
         "semver": "^7.6.0",
         "typescript": "^5.3.3",
         "ultimate-crosscode-typedefs": "github:krypciak/ultimate-crosscode-typedefs"

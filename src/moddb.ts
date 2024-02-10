@@ -1,4 +1,4 @@
-import semver from 'semver'
+import semver_gt from 'semver/functions/gt'
 import { ModEntry, ModEntryLocal, ModEntryServer, ModID, NPDatabase } from './types'
 import { FileCache } from './cache'
 
@@ -53,7 +53,7 @@ export class ModDB {
     }
 
     static getHighestVersionMod<T extends ModEntry>(mods: T[]): T {
-        return mods.reduce((highestVerMod, currMod) => (semver.gt(currMod.version, highestVerMod.version) ? currMod : highestVerMod))
+        return mods.reduce((highestVerMod, currMod) => (semver_gt(currMod.version, highestVerMod.version) ? currMod : highestVerMod))
     }
 
     static async resolveLocalModOrigin(mod: ModEntryLocal) {
@@ -77,6 +77,8 @@ export class ModDB {
         } else {
             serverMod = this.getHighestVersionMod(matches)
         }
+        serverMod.localCounterpart = mod
+        mod.serverCounterpart = serverMod
         mod.database = serverMod.database
         mod.stars = serverMod.stars
         mod.isLegacy = serverMod.isLegacy

@@ -13,18 +13,21 @@
                 }
             },
             "ccmodloader": {
-                "areYouSure": "Are you sure you want to install: \\c[3][modName]\\c[0]?",
                 "onlineTab": "Online",
                 "selectedModsTab": "Selected",
                 "enabledTab": "Enabled",
                 "disabledTab": "Disabled",
                 "settingsTab": "Settings",
                 "installButton": "Install \\c[3][modCount]\\c[0] mods",
+                "uninstallButton": "Uninstall \\c[3][modCount]\\c[0] mods",
                 "noModsSelected": "No mods selected",
                 "reposButton": "Repositories",
                 "areYouSureYouWantToInstall": "Are you sure you want to install:",
+                "areYouSureYouWantToUninstall": "Are you sure you want to uninstall the mod:\n- \\c[3][modName]\\c[0]",
+                "cannotUninstall": "Cannot uninstall the mod: \\c[3][modName]\\c[0] because other mods depend on it:\n",
                 "dependencies": "Dependencies:",
-                "askRestart": "The installed mods will start working after a restart.\nDo you want to restart?"
+                "askRestartInstall": "The installed mods will start working after a restart.\nDo you want to restart?",
+                "askRestartUninstall": "Uninstalled succesfully.\nThe mod will actually stop working after a restart.\nDo you want to restart?"
             }
         }
     }

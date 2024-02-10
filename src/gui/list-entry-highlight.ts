@@ -11,6 +11,8 @@ declare global {
             textTag: ig.ImagePattern
             textTagHighlighted: ig.ImagePattern
             focus: boolean
+
+            updateWidth(this: this, width: number, textWidth: number): void
         }
         interface ModListEntryHighlightConstructor extends ImpactClass<ModListEntryHighlight> {
             new (width: number, height: number, textWidth: number, buttonWidth: number): ModListEntryHighlight
@@ -51,7 +53,10 @@ sc.ModListEntryHighlight = ig.GuiElementBase.extend({
         this.textWidth = textWidth
         this.buttonWidth = buttonWidth
     },
-
+    updateWidth(width, textWidth) {
+        this.setSize(width, this.hook.size.y)
+        this.textWidth = textWidth
+    },
     updateDrawables(src) {
         this.ninepatch.draw(src, this.hook.size.x - this.buttonWidth - 6, this.hook.size.y + 1, this.focus ? 'focus' : 'default')
 
@@ -60,7 +65,5 @@ sc.ModListEntryHighlight = ig.GuiElementBase.extend({
         src.addPattern(this.focus ? this.textTagHighlighted : this.textTag, 3, 3, 90, 0, this.textWidth, 13)
 
         src.addGfx(this.gfx, this.textWidth + 3, 3, 109, this.focus ? 44 : 3, 6, 13)
-
-        // src.addColor('green', 0, 0, this.hook.size.x, this.hook.size.y)
     },
 })
