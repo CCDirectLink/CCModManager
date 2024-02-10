@@ -6,6 +6,7 @@ import { ModDB } from '../moddb'
 import { MOD_MENU_TAB_INDEXES } from './list'
 import { InstallQueue, ModInstaller } from '../mod-installer'
 import { ModEntry, ModEntryLocal } from '../types'
+import { FileCache } from '../cache'
 
 declare global {
     namespace sc {
@@ -135,13 +136,6 @@ sc.ModMenu = sc.ListInfoMenu.extend({
             const localMod = mod.isLocal ? mod : mod.localCounterpart
             if (localMod /* this should ALWAYS be true but anyways */) {
                 this.showModUninstallDialog(localMod)
-                // ModInstaller.findDeps(
-                //
-                //     this.list.mods,
-                //     false
-                // )
-                //     .catch(err => sc.Dialogs.showErrorDialog(err))
-                //     .then(() => this.showModUninstallDialog())
             }
         }
         this.uninstallButton.keepMouseFocus = true /* prevent the focus jumping all over the place on press */
@@ -199,6 +193,7 @@ sc.ModMenu = sc.ListInfoMenu.extend({
                         InstallQueue.deps = []
                         InstallQueue.clear()
                         sc.Model.notifyObserver(sc.modMenu, sc.MOD_MENU_MESSAGES.UPDATE_ENTRIES)
+                        sc.BUTTON_SOUND.shop_cash.play()
                         sc.Dialogs.showYesNoDialog(ig.lang.get('sc.gui.menu.ccmodloader.askRestartInstall'), sc.DIALOG_INFO_ICON.QUESTION, button => {
                             const text = button.text!.toString()
                             if (text == ig.lang.get('sc.gui.dialogs.yes')) {
@@ -211,7 +206,10 @@ sc.ModMenu = sc.ListInfoMenu.extend({
                         })
                     })
                     .catch(err => {
-                        sc.Dialogs.showErrorDialog(err)
+                        FileCache.isThereInternet(true).then(isThereInternet => {
+                            if (!isThereInternet) err = 'Error: No internet connection'
+                            sc.Dialogs.showErrorDialog(err)
+                        })
                     })
             }
         })
@@ -226,7 +224,7 @@ sc.ModMenu = sc.ListInfoMenu.extend({
                         localMod.awaitingRestart = true
                         localMod.active = false
                         sc.Model.notifyObserver(sc.modMenu, sc.MOD_MENU_MESSAGES.UPDATE_ENTRIES)
-
+                        sc.BUTTON_SOUND.shop_cash.play()
                         sc.Dialogs.showYesNoDialog(ig.lang.get('sc.gui.menu.ccmodloader.askRestartUninstall'), sc.DIALOG_INFO_ICON.QUESTION, button => {
                             const text = button.text!.toString()
                             if (text == ig.lang.get('sc.gui.dialogs.yes')) {

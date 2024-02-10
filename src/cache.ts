@@ -5,6 +5,7 @@ const fs: typeof import('fs') = (0, eval)("require('fs')")
 import type { IncomingMessage } from 'http'
 const http: typeof import('http') = (0, eval)("require('http')")
 const https: typeof import('https') = (0, eval)("require('https')")
+const dns: typeof import('dns') = (0, eval)("require('dns')")
 
 async function* getFilesRecursive(dir: string): AsyncIterable<string> {
     const dirents = await fs.promises.readdir(dir, { withFileTypes: true })
@@ -30,6 +31,7 @@ function getTag(head: IncomingMessage): string {
 }
 
 async function getETag(url: string): Promise<string> {
+    if (!(await FileCache.isThereInternet())) return 'nointernet'
     const uri = new URL(url)
     const { get } = uri.protocol === 'https:' ? https : http
 
@@ -49,6 +51,12 @@ export class FileCache {
 
     private static inCache: Set<string>
     private static cache: Record<string, any> = {}
+
+    static _isThereInternet: boolean | undefined
+    static async isThereInternet(force: boolean = false): Promise<boolean> {
+        if (force) FileCache._isThereInternet = undefined
+        return (FileCache._isThereInternet ??= await new Promise(resolve => dns.resolve('www.gnu.org', (err: any) => resolve(!err)))) as boolean
+    }
 
     static getDefaultModIconConfig() {
         return {
@@ -125,7 +133,7 @@ export class FileCache {
         const eTagPromise = getETag(url).then(async newEtag => {
             eTag = newEtag
             const cached = await cachedPromise
-            if (cached && cached.eTag != eTag) {
+            if (eTag != 'nointernet' && cached && cached.eTag != eTag) {
                 const data = await this.downloadAndWriteDatabase(path, url, eTag)
                 create(data)
             }
@@ -136,6 +144,7 @@ export class FileCache {
 
         await eTagPromise
         if (!eTag) throw new Error('eTag unset somehow')
+        if (eTag == 'nointernet') return
         const data = await this.downloadAndWriteDatabase(path, url, eTag)
         create(data)
     }
