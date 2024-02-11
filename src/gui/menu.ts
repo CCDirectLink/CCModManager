@@ -6,7 +6,7 @@ import { ModDB } from '../moddb'
 import { MOD_MENU_TAB_INDEXES } from './list'
 import { InstallQueue, ModInstaller } from '../mod-installer'
 import { ModEntry, ModEntryLocal } from '../types'
-import { FileCache } from '../cache'
+import { ModInstallDialogs } from './install-dialogs'
 
 declare global {
     namespace sc {
@@ -30,6 +30,7 @@ declare global {
             includeLocalCheckbox: sc.CheckboxGui
             includeLocalText: sc.TextGui
             uninstallButton: sc.ButtonGui
+            checkUpdatesButton: sc.ButtonGui
 
             updateInstallButtonText(this: this): void
             onBackButtonPress(this: this): void
@@ -56,17 +57,6 @@ sc.MOD_MENU_MESSAGES = {
     UPDATE_ENTRIES: 3,
     ENTRY_FOCUSED: 4,
     ENTRY_UNFOCUSED: 5,
-}
-
-function getNod() {
-    return ig.LangLabel.getText({
-        en_US: '[nods]',
-        de_DE: '[nickt]',
-        zh_CN: '[\u70b9\u5934]<<A<<[CHANGED 2017/10/10]',
-        ko_KR: '[\ub044\ub355]<<A<<[CHANGED 2017/10/17]',
-        ja_JP: '[\u3046\u306a\u305a\u304f]<<A<<[CHANGED 2017/11/04]',
-        zh_TW: '[\u9ede\u982d]<<A<<[CHANGED 2017/10/10]',
-    })
 }
 
 sc.ModMenu = sc.ListInfoMenu.extend({
@@ -121,7 +111,7 @@ sc.ModMenu = sc.ListInfoMenu.extend({
         this.installButton.setPos(340, 22)
         this.installButton.onButtonPress = () => {
             if (this.list.currentTabIndex == MOD_MENU_TAB_INDEXES.SELECTED) sc.BUTTON_SOUND.submit.play()
-            ModInstaller.findDeps(InstallQueue.values(), this.list.mods)
+            ModInstaller.findDeps(InstallQueue.values(), ModDB.modRecord)
                 .catch(err => sc.Dialogs.showErrorDialog(err))
                 .then(() => this.showModInstallDialog())
         }
@@ -142,7 +132,23 @@ sc.ModMenu = sc.ListInfoMenu.extend({
         this.addChildGui(this.uninstallButton)
         sc.menu.buttonInteract.addGlobalButton(this.uninstallButton, () => sc.control.menuHotkeyHelp2())
 
+        this.checkUpdatesButton = new sc.ButtonGui('Check updates', 100, true, sc.BUTTON_TYPE.SMALL)
+        this.checkUpdatesButton.setPos(235, 22)
+        this.checkUpdatesButton.onButtonPress = () => {
+            ModInstaller.checkAllLocalModsForUpdate(true)
+        }
+        this.checkUpdatesButton.keepMouseFocus = true /* prevent the focus jumping all over the place on press */
+        this.addChildGui(this.checkUpdatesButton)
+        sc.menu.buttonInteract.addGlobalButton(this.checkUpdatesButton, () => false)
+
         this.setTabEvent()
+    },
+    showModInstallDialog() {
+        this.list.tabGroup._invokePressCallbacks(this.list.tabs[ig.lang.get('sc.gui.menu.ccmodloader.selectedModsTab')], true)
+        ModInstallDialogs.showModInstallDialog()
+    },
+    showModUninstallDialog(localMod) {
+        ModInstallDialogs.showModUninstallDialog(localMod)
     },
     updateInstallButtonText() {
         const count = InstallQueue.values().length
@@ -166,8 +172,10 @@ sc.ModMenu = sc.ListInfoMenu.extend({
         /* handle install button */
         if (this.list.currentTabIndex > MOD_MENU_TAB_INDEXES.SELECTED) {
             this.installButton.doStateTransition('HIDDEN')
+            this.checkUpdatesButton.doStateTransition('HIDDEN')
         } else {
             this.installButton.doStateTransition('DEFAULT')
+            this.checkUpdatesButton.doStateTransition('DEFAULT')
         }
     },
     addObservers() {
@@ -175,71 +183,6 @@ sc.ModMenu = sc.ListInfoMenu.extend({
     },
     removeObservers() {
         sc.Model.addObserver(sc.modMenu, this)
-    },
-    showModInstallDialog() {
-        this.list.tabGroup._invokePressCallbacks(this.list.tabs[ig.lang.get('sc.gui.menu.ccmodloader.selectedModsTab')], true)
-        const deps = InstallQueue.deps
-        const str = `${ig.lang.get('sc.gui.menu.ccmodloader.areYouSureYouWantToInstall')}\n${InstallQueue.values()
-            .map(mod => `- \\c[3]${mod.name.replace(/\\c\[\d]/g, '')}\\c[0]\n`)
-            .join(
-                ''
-            )}${deps.length > 0 ? `${ig.lang.get('sc.gui.menu.ccmodloader.dependencies')}\n${deps.map(mod => `- \\c[3]${mod.name.replace(/\\c\[\d]/g, '')}\\c[0]\n`)}` : ''}`
-
-        sc.Dialogs.showChoiceDialog(str, sc.DIALOG_INFO_ICON.QUESTION, [getNod(), ig.lang.get('sc.gui.dialogs.no')], button => {
-            if (button.text!.toString() == getNod()) {
-                const toInstall = InstallQueue.deps.concat(InstallQueue.values())
-                ModInstaller.install(toInstall)
-                    .then(() => {
-                        InstallQueue.deps = []
-                        InstallQueue.clear()
-                        sc.Model.notifyObserver(sc.modMenu, sc.MOD_MENU_MESSAGES.UPDATE_ENTRIES)
-                        sc.BUTTON_SOUND.shop_cash.play()
-                        sc.Dialogs.showYesNoDialog(ig.lang.get('sc.gui.menu.ccmodloader.askRestartInstall'), sc.DIALOG_INFO_ICON.QUESTION, button => {
-                            const text = button.text!.toString()
-                            if (text == ig.lang.get('sc.gui.dialogs.yes')) {
-                                ModInstaller.restartGame()
-                            } else {
-                                toInstall.forEach(mod => {
-                                    mod.awaitingRestart = true
-                                })
-                            }
-                        })
-                    })
-                    .catch(err => {
-                        FileCache.isThereInternet(true).then(isThereInternet => {
-                            if (!isThereInternet) err = 'Error: No internet connection'
-                            sc.Dialogs.showErrorDialog(err)
-                        })
-                    })
-            }
-        })
-    },
-    showModUninstallDialog(localMod) {
-        const deps = ModInstaller.getWhatDependsOnAMod(localMod)
-        if (deps.length == 0) {
-            const str = ig.lang.get('sc.gui.menu.ccmodloader.areYouSureYouWantToUninstall').replace(/\[modName\]/, localMod.name.replace(/\\c\[\d]/g, ''))
-            sc.Dialogs.showChoiceDialog(str, sc.DIALOG_INFO_ICON.QUESTION, [getNod(), ig.lang.get('sc.gui.dialogs.no')], button => {
-                if (button.text!.toString() == getNod()) {
-                    ModInstaller.uninstallMod(localMod).then(() => {
-                        localMod.awaitingRestart = true
-                        localMod.active = false
-                        sc.Model.notifyObserver(sc.modMenu, sc.MOD_MENU_MESSAGES.UPDATE_ENTRIES)
-                        sc.BUTTON_SOUND.shop_cash.play()
-                        sc.Dialogs.showYesNoDialog(ig.lang.get('sc.gui.menu.ccmodloader.askRestartUninstall'), sc.DIALOG_INFO_ICON.QUESTION, button => {
-                            const text = button.text!.toString()
-                            if (text == ig.lang.get('sc.gui.dialogs.yes')) {
-                                ModInstaller.restartGame()
-                            }
-                        })
-                    })
-                }
-            })
-        } else {
-            sc.Dialogs.showErrorDialog(
-                ig.lang.get('sc.gui.menu.ccmodloader.cannotUninstall').replace(/\[modName\]/, localMod.name) +
-                    deps.map(mod => `- \\c[3]${mod.name.replace(/\\c\[\d]/g, '')}\\c[0]\n`).join('')
-            )
-        }
     },
     modelChanged(model, message, data) {
         this.parent(model, message, data)

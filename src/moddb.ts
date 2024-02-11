@@ -1,5 +1,5 @@
 import semver_gt from 'semver/functions/gt'
-import { ModEntry, ModEntryLocal, ModEntryServer, ModID, NPDatabase } from './types'
+import { ModEntry, ModEntryLocal, ModEntryServer, NPDatabase } from './types'
 import { FileCache } from './cache'
 
 export class ModDB {
@@ -7,6 +7,8 @@ export class ModDB {
     private static databasesLoaded: boolean = false
 
     static databases: Record<string, ModDB>
+
+    static modRecord: Record<string, ModEntryServer[]>
 
     static addDatabase(db: ModDB) {
         this.databases[db.name] = db
@@ -50,6 +52,31 @@ export class ModDB {
     static saveDatabases() {
         const urls: string[] = Object.values(this.databases).map(db => this.minifyRepoURL(db.url))
         localStorage.setItem(this.localStorageKey, JSON.stringify(urls))
+    }
+
+    static async loadAllMods(callback: () => void = () => {}, prefferCache: boolean = false): Promise<void> {
+        if (prefferCache && this.modRecord) {
+            callback()
+            return
+        }
+        this.modRecord = {}
+        const promises: Promise<void>[] = []
+        for (const dbName in ModDB.databases) {
+            const db = ModDB.databases[dbName]
+            if (db.active) {
+                this.modRecord[dbName] = []
+                promises.push(
+                    new Promise(resolve => {
+                        db.getMods(mods => {
+                            ModDB.modRecord[dbName] = mods
+                            callback()
+                            resolve()
+                        })
+                    })
+                )
+            }
+        }
+        await Promise.all(promises)
     }
 
     static getHighestVersionMod<T extends ModEntry>(mods: T[]): T {
@@ -102,7 +129,7 @@ export class ModDB {
 
     name: string
     database!: NPDatabase
-    modRecord!: Record<ModID, ModEntryServer>
+    modRecord!: Record<string, ModEntryServer>
 
     constructor(
         public url: string,
@@ -149,59 +176,4 @@ export class ModDB {
         }
         await FileCache.getDatabase(this.name, create)
     }
-
-    /*
-    async downloadMod(id: ModID) {
-        const pkg = await this.getMod(id)
-
-        const installation = pkg.installation.find(i => i.type === 'ccmod') || pkg.installation.find(i => i.type === 'modZip')
-        if (!installation) throw new Error(`I don' know how to download this mod`)
-
-        const resp = await fetch(installation.url)
-        const data = await resp.arrayBuffer()
-
-        switch (installation.type) {
-            case 'ccmod':
-                return await this.installCCMod(data, id)
-            case 'modZip':
-                return await this.installModZip(data, id, installation.source)
-        }
-    }
-
-    private async installCCMod(data: ArrayBuffer, id: ModID) {
-        await fs.promises.writeFile(`assets/mods/${id}.ccmod`, new Uint8Array(data))
-    }
-
-    private async installModZip(data: ArrayBuffer, id: ModID, source: string) {
-        const zip = await jszip.loadAsync(data)
-
-        await Promise.all(
-            Object.values(zip.files)
-                .filter(file => !file.dir)
-                .map(async file => {
-                    const data = await file.async('uint8array')
-                    const relative = path.relative(source, file.name)
-                    if (relative.startsWith('..' + path.sep)) {
-                        return
-                    }
-
-                    const filepath = path.join('assets/mods/', id, relative)
-                    try {
-                        await fs.promises.mkdir(path.dirname(filepath), { recursive: true })
-                    } catch {
-                    }
-                    await fs.promises.writeFile(filepath, data)
-                })
-        )
-    }
-
-    private async getMod(id: ModID) {
-        const data = this.database[id]
-        if (data) return data
-
-        const newData = this.database[id]
-        if (!newData) throw new Error('Could not find name')
-        return newData
-    }
-    */
 }

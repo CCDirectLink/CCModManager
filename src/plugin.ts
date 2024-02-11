@@ -1,4 +1,6 @@
 import { FileCache } from './cache'
+import { ModInstaller } from './mod-installer'
+import { ModDB } from './moddb'
 import { Mod1 } from './types'
 
 export default class ModManager {
@@ -14,7 +16,19 @@ export default class ModManager {
 
     async prestart() {
         FileCache.init()
+        ModInstaller.init()
         await import('./gui/gui.js')
+
+        sc.TitleScreenButtonGui.inject({
+            show() {
+                this.parent()
+                const autoUpdate = true
+                if (autoUpdate) {
+                    ModDB.loadDatabases()
+                    ModInstaller.checkAllLocalModsForUpdate(false)
+                }
+            },
+        })
     }
 
     async poststart() {}

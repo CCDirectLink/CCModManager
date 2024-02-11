@@ -34,8 +34,7 @@ export type Mod1 = Mod & {
           }
     )
 
-export type ModID = string
-export type NPDatabase = Record<ModID, NPDatabasePackage> & { eTag: string }
+export type NPDatabase = Record<string, NPDatabasePackage> & { eTag: string }
 
 export interface NPDatabasePackage {
     metadata?: NPDatabasePackageMetadata
@@ -67,7 +66,7 @@ export interface NPDatabaseCCMod {
     icons?: Record<string, string>
     type?: 'mod' | 'library'
 
-    dependencies?: Record<ModID, string>
+    dependencies?: Record<string, string>
 
     assetsDir?: string
     modPrefix?: string
@@ -101,7 +100,7 @@ export type NPDatabasePackageInstallation = {
 
 interface ModEntryBase {
     database: string
-    id: ModID
+    id: string
     name: string
     description?: string
     version: string
@@ -136,4 +135,9 @@ export type ModImageConfig = {
     offsetY: number
     sizeX: number
     sizeY: number
+}
+
+declare global {
+    /* hack to mute a random rimraf error :) */
+    type StringDecoder = {}
 }

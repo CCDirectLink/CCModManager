@@ -7,14 +7,17 @@ const path: typeof import('path') = (0, eval)("require('path')")
 
 import { loadAsync } from 'jszip'
 import semver_satisfies from 'semver/functions/satisfies'
+import semver_gt from 'semver/functions/gt'
 import { rimraf } from '../node_modules/rimraf/dist/commonjs/index.js'
+import { ModInstallDialogs } from './gui/install-dialogs'
 
 export class InstallQueue {
     private static queue: Set<ModEntryServer> = new Set()
     static deps: ModEntryServer[]
+    static depsToUpdate: ModEntryServer[]
 
     private static changeUpdate() {
-        sc.Model.notifyObserver(sc.modMenu, sc.MOD_MENU_MESSAGES.SELECTED_ENTRIES_CHANGED)
+        sc.modMenu && sc.Model.notifyObserver(sc.modMenu, sc.MOD_MENU_MESSAGES.SELECTED_ENTRIES_CHANGED)
     }
     static add(...mods: ModEntryServer[]) {
         for (const mod of mods) this.queue.add(mod)
@@ -41,19 +44,23 @@ type DepEntry = { mod: ModEntryServer; versionReqRanges: string[] }
 export class ModInstaller {
     static record: Record<string, ModEntryServer>
     static byNameRecord: Record<string, ModEntryServer>
-    private static virtualMods: Record<string, ModEntryLocal> = {
-        crosscode: {
-            id: 'crosscode',
-            name: 'CrossCode',
-            description: 'The base game.',
-            version: LocalMods.getCCVersion(),
-        } as ModEntryLocal,
-        ccloader: {
-            id: 'ccloader',
-            name: 'CCLoader',
-            description: 'The mod loader.',
-            version: LocalMods.getCCLoaderVersion(),
-        } as ModEntryLocal,
+    private static virtualMods: Record<string, ModEntryLocal>
+
+    static init() {
+        this.virtualMods = {
+            crosscode: {
+                id: 'crosscode',
+                name: 'CrossCode',
+                description: 'The base game.',
+                version: LocalMods.getCCVersion(),
+            } as ModEntryLocal,
+            ccloader: {
+                id: 'ccloader',
+                name: 'CCLoader',
+                description: 'The mod loader.',
+                version: LocalMods.getCCLoaderVersion(),
+            } as ModEntryLocal,
+        }
     }
 
     private static getModByDepName(depName: string): ModEntryServer | undefined {
@@ -69,7 +76,7 @@ export class ModInstaller {
         }
     }
 
-    static getModDependencies(mod: ModEntryServer): Record<string, DepEntry> {
+    private static getModDependencies(mod: ModEntryServer): Record<string, DepEntry> {
         if (mod.dependenciesCached) return mod.dependenciesCached
         const deps: Record<string, DepEntry> = {}
         for (const depName in mod.dependencies) {
@@ -101,6 +108,9 @@ export class ModInstaller {
     }
 
     static async findDeps(mods: ModEntryServer[], modRecords: Record<string, ModEntryServer[]>) {
+        /* resolve local mod origin */
+        LocalMods.getAll(true)
+
         this.record = ModDB.removeModDuplicates(modRecords)
         this.byNameRecord = {}
         for (const modId in this.record) {
@@ -118,7 +128,7 @@ export class ModInstaller {
         }
 
         /* filter already installed mods */
-        const toUpdate = new Set<ModEntryServer>()
+        const toUpdate: ModEntryServer[] = []
         for (const modId in deps) {
             const { mod: serverMod, versionReqRanges } = deps[modId]
             const localMod = serverMod.localCounterpart
@@ -126,7 +136,7 @@ export class ModInstaller {
                 if (this.matchesVersionReqRanges(localMod, versionReqRanges)) {
                     delete deps[modId]
                 } else {
-                    toUpdate.add(serverMod)
+                    toUpdate.push(serverMod)
                 }
             }
         }
@@ -149,17 +159,28 @@ export class ModInstaller {
                 )
         }
 
+        InstallQueue.depsToUpdate = toUpdate
         InstallQueue.deps = Object.values(deps).map(e => e.mod)
     }
 
-    static async install(modsToInstall: ModEntryServer[]) {
+    static async install(modsToInstall: ModEntryServer[], modsToUpdate: ModEntryServer[]) {
         console.log('mods to install:', modsToInstall.map(mod => mod.id).join(', '))
         const promises: Promise<void>[] = []
         for (const mod of modsToInstall) {
             promises.push(this.downloadAndInstallMod(mod))
         }
+        for (const mod of modsToUpdate) {
+            promises.push(this.updateMod(mod))
+        }
         await Promise.all(promises)
         console.log('done')
+    }
+
+    private static async updateMod(mod: ModEntryServer) {
+        const local = mod.localCounterpart
+        if (!local) throw new Error('wat')
+        this.uninstallMod(local)
+        this.downloadAndInstallMod(mod)
     }
 
     private static async downloadAndInstallMod(mod: ModEntryServer) {
@@ -226,5 +247,25 @@ export class ModInstaller {
     static restartGame() {
         if ('chrome' in window) (window.chrome as any).runtime.reload()
         else window.location.reload()
+    }
+
+    private static checkLocalModForUpdate(mod: ModEntryLocal): boolean {
+        const serverMod = mod.serverCounterpart
+        if (!serverMod) return false
+        return semver_gt(serverMod.version, mod.version)
+    }
+
+    static async checkAllLocalModsForUpdate(showUpToDateDialog: boolean) {
+        await ModDB.loadAllMods()
+
+        const mods: ModEntryLocal[] = []
+        for (const mod of LocalMods.getAll()) {
+            if (this.checkLocalModForUpdate(mod)) mods.push(mod)
+        }
+        const serverMods = mods.map(mod => mod.serverCounterpart!)
+        await this.findDeps(serverMods, ModDB.modRecord)
+        InstallQueue.clear()
+        InstallQueue.depsToUpdate.push(...serverMods)
+        ModInstallDialogs.showAutoUpdateDialog(showUpToDateDialog)
     }
 }

@@ -27,8 +27,8 @@ export class LocalMods {
     private static cache: ModEntryLocal[]
     private static cacheRecord: Record<string, ModEntryLocal>
 
-    static getAll() {
-        if (this.cache) return this.cache
+    static getAll(force: boolean = false) {
+        if (!force && this.cache) return this.cache
         let all: ModEntryLocal[]
         if (ModManager.mod.isCCL3) {
             all = [...modloader.installedMods].map(e => this.convertCCL3Mod(e[1]))

@@ -22,10 +22,15 @@
                 "uninstallButton": "Uninstall \\c[3][modCount]\\c[0] mods",
                 "noModsSelected": "No mods selected",
                 "reposButton": "Repositories",
-                "areYouSureYouWantToInstall": "Are you sure you want to install:",
+                "areYouSureYouWantTo": "Are you sure you want to:",
                 "areYouSureYouWantToUninstall": "Are you sure you want to uninstall the mod:\n- \\c[3][modName]\\c[0]",
                 "cannotUninstall": "Cannot uninstall the mod: \\c[3][modName]\\c[0] because other mods depend on it:\n",
                 "dependencies": "Dependencies:",
+                "toUpdate": "Update:",
+                "toInstall": "Install:",
+                "updatesDetected": "Some mods have a new version. Do you want to update now?",
+                "upToDate": "Up to date.",
+                "disableAutoupdate": "Disable autoupdate",
                 "askRestartInstall": "Installed succesfully.\nThe installed mods will start working after a restart.\nDo you want to restart?",
                 "askRestartUninstall": "Uninstalled succesfully.\nThe mod will actually stop working after a restart.\nDo you want to restart?"
             }

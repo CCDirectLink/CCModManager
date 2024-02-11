@@ -1,4 +1,4 @@
-import { ModEntry, ModEntryServer } from '../types'
+import { ModEntry } from '../types'
 import { ModDB } from '../moddb'
 import { Fliters, createFuzzyFilteredModList } from '../filters'
 import { LocalMods } from '../local-mods'
@@ -9,7 +9,6 @@ import { InstallQueue } from '../mod-installer'
 declare global {
     namespace sc {
         interface ModMenuList extends sc.ListTabbedPane, sc.Model.Observer {
-            mods: Record<string, ModEntryServer[]>
             filters: Fliters
             tabz: {
                 name: string
@@ -19,8 +18,6 @@ declare global {
             currentSort: sc.MOD_MENU_SORT_ORDER
             reposPopup: sc.ModMenuRepoAddPopup
 
-            setMods(this: this, mods: ModEntryServer[], dbName: string): void
-            reloadDatabases(this: this): void
             reloadFilters(this: this): void
             reloadEntries(this: this): void
             sortModEntries(this: this, mods: ModEntry[], sort: sc.MOD_MENU_SORT_ORDER): void
@@ -48,9 +45,7 @@ export enum MOD_MENU_TAB_INDEXES {
     SETTINGS = 4,
 }
 
-let modCache: Record<string, ModEntryServer[]> | undefined
 sc.ModMenuList = sc.ListTabbedPane.extend({
-    mods: {},
     transitions: {
         DEFAULT: { state: {}, time: 0.2, timeFunction: KEY_SPLINES.LINEAR },
         HIDDEN: { state: { alpha: 0, offsetX: 218 }, time: 0.2, timeFunction: KEY_SPLINES.LINEAR },
@@ -78,12 +73,8 @@ sc.ModMenuList = sc.ListTabbedPane.extend({
         for (let i = 0; i < this.tabz.length; i++) {
             this.addTab(this.tabz[i].name, i, {})
         }
-        if (modCache) {
-            this.mods = modCache
-            this.reloadEntries()
-        } else {
-            this.reloadDatabases()
-        }
+
+        ModDB.loadAllMods(() => this.reloadEntries(), true)
     },
     show() {
         this.parent()
@@ -153,7 +144,7 @@ sc.ModMenuList = sc.ListTabbedPane.extend({
             }
         } else if (model == sc.modMenu) {
             if (message == sc.MOD_MENU_MESSAGES.REPOSITORY_CHANGED) {
-                this.reloadDatabases()
+                ModDB.loadAllMods(() => this.reloadEntries())
             } else if (message == sc.MOD_MENU_MESSAGES.UPDATE_ENTRIES) {
                 this.reloadEntries()
             }
@@ -164,16 +155,6 @@ sc.ModMenuList = sc.ListTabbedPane.extend({
         sc.Model.notifyObserver(sc.modMenu, sc.MOD_MENU_MESSAGES.TAB_CHANGED)
     },
     /* new stuff */
-    reloadDatabases() {
-        this.mods = modCache = {}
-        for (const dbName in ModDB.databases) {
-            const db = ModDB.databases[dbName]
-            if (db.active) {
-                this.mods[dbName] = []
-                db.getMods(mods => this.setMods(mods, dbName))
-            }
-        }
-    },
     populateSettings(list) {
         const repositoriesButton = new sc.ButtonGui(ig.lang.get('sc.gui.menu.ccmodloader.reposButton'))
         repositoriesButton.onButtonPress = () => {
@@ -197,7 +178,7 @@ sc.ModMenuList = sc.ListTabbedPane.extend({
         }
     },
     populateOnline(list, _, sort: sc.MOD_MENU_SORT_ORDER) {
-        let mods = Object.values(ModDB.removeModDuplicates(this.mods))
+        let mods = Object.values(ModDB.removeModDuplicates(ModDB.modRecord))
         mods = createFuzzyFilteredModList(this.filters, mods)
         this.sortModEntries(mods, sort)
         for (const mod of mods) {
@@ -234,9 +215,5 @@ sc.ModMenuList = sc.ListTabbedPane.extend({
     },
     reloadEntries() {
         this.setTab(this.currentTabIndex, true, { skipSounds: true })
-    },
-    setMods(mods, dbName) {
-        this.mods[dbName] = mods
-        this.reloadEntries()
     },
 })
