@@ -96,7 +96,7 @@ sc.ModMenuList = sc.ListTabbedPane.extend({
         this.removeObservers!()
     },
     onInitSortType() {
-        return sc.MOD_MENU_SORT_ORDER.STARS
+        return sc.MOD_MENU_SORT_ORDER.LAST_UPDATED
     },
     onTabButtonCreation(key: string, _index: number, settings) {
         const icon = this.tabz.find(tab => tab.name == key)!.icon
@@ -174,6 +174,13 @@ sc.ModMenuList = sc.ListTabbedPane.extend({
             } else if (sort == sc.MOD_MENU_SORT_ORDER.STARS) {
                 mods.sort((a, b) => a.name.localeCompare(b.name))
                 mods.sort((a, b) => (b.stars ?? -100) - (a.stars ?? -100))
+            } else if (sort == sc.MOD_MENU_SORT_ORDER.LAST_UPDATED) {
+                mods.sort((a, b) => a.name.localeCompare(b.name))
+                mods.sort((a, b) => {
+                    const ta = ('lastUpdateTimestamp' in a && a.lastUpdateTimestamp) || -100
+                    const tb = ('lastUpdateTimestamp' in b && b.lastUpdateTimestamp) || -100
+                    return tb - ta
+                })
             }
         }
     },

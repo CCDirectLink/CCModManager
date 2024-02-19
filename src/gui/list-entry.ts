@@ -13,9 +13,7 @@ declare global {
             description: sc.TextGui
             versionText: sc.TextGui
             starCount?: sc.TextGui
-            installRemoveButton: sc.ButtonGui
-            checkForUpdatesButton: sc.ButtonGui
-            openModSettingsButton: sc.ButtonGui
+            lastUpdated?: sc.TextGui
             modList: sc.ModMenuList
             highlight: ModListEntryHighlight
             modEntryActionButtonStart: { height: number; ninepatch: ig.NinePatch; highlight: sc.ButtonGui.Highlight }
@@ -136,9 +134,22 @@ sc.ModListEntry = ig.FocusGui.extend({
         this.versionText.setPos(3, 3)
         this.addChildGui(this.versionText)
 
+        if ('lastUpdateTimestamp' in mod && mod.lastUpdateTimestamp) {
+            const date = new Date(mod.lastUpdateTimestamp)
+            const dateStr = date.toLocaleDateString('pl-PL', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+            })
+            this.lastUpdated = new sc.TextGui(dateStr, { font: sc.fontsystem.tinyFont })
+            this.lastUpdated.setAlign(ig.GUI_ALIGN.X_RIGHT, ig.GUI_ALIGN.Y_TOP)
+            this.lastUpdated.setPos(3, 10)
+            this.addChildGui(this.lastUpdated)
+        }
+
         if (mod.stars !== undefined) {
             this.starCount = new sc.TextGui(`${mod.stars}\\i[save-star]`)
-            this.starCount.setPos(517 - this.starCount.hook.size.x, 0)
+            this.starCount.setPos(496 - this.starCount.hook.size.x, 0)
             this.addChildGui(this.starCount)
         }
     },

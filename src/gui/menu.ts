@@ -14,6 +14,7 @@ declare global {
             NAME,
             NAME_REVERSE,
             STARS,
+            LAST_UPDATED,
         }
         enum MOD_MENU_MESSAGES {
             SELECTED_ENTRIES_CHANGED,
@@ -49,6 +50,7 @@ sc.MOD_MENU_SORT_ORDER = {
     NAME: 0,
     NAME_REVERSE: 1,
     STARS: 2,
+    LAST_UPDATED: 3,
 }
 sc.MOD_MENU_MESSAGES = {
     SELECTED_ENTRIES_CHANGED: 0,
@@ -80,6 +82,7 @@ sc.ModMenu = sc.ListInfoMenu.extend({
         this.sortMenu.addButton('name', sc.MOD_MENU_SORT_ORDER.NAME, sc.MOD_MENU_SORT_ORDER.NAME)
         this.sortMenu.addButton('nameReverse', sc.MOD_MENU_SORT_ORDER.NAME_REVERSE, sc.MOD_MENU_SORT_ORDER.NAME_REVERSE)
         this.sortMenu.addButton('stars', sc.MOD_MENU_SORT_ORDER.STARS, sc.MOD_MENU_SORT_ORDER.STARS)
+        this.sortMenu.addButton('lastUpdated', sc.MOD_MENU_SORT_ORDER.LAST_UPDATED, sc.MOD_MENU_SORT_ORDER.LAST_UPDATED)
 
         const legacyCheckbox = new sc.CheckboxGui((this.list.filters.includeLegacy = true))
         legacyCheckbox.setPos(9, 282)
@@ -112,8 +115,8 @@ sc.ModMenu = sc.ListInfoMenu.extend({
         this.installButton.onButtonPress = () => {
             if (this.list.currentTabIndex == MOD_MENU_TAB_INDEXES.SELECTED) sc.BUTTON_SOUND.submit.play()
             ModInstaller.findDeps(InstallQueue.values(), ModDB.modRecord)
-                .catch(err => sc.Dialogs.showErrorDialog(err))
                 .then(() => this.showModInstallDialog())
+                .catch(err => sc.Dialogs.showErrorDialog(err))
         }
         this.installButton.submitSound = undefined
         this.addChildGui(this.installButton)
@@ -203,11 +206,17 @@ sc.ModMenu = sc.ListInfoMenu.extend({
         this.parent()
         sc.menu.pushBackCallback(() => this.onBackButtonPress())
         sc.menu.moveLeaSprite(0, 0, sc.MENU_LEA_STATE.HIDDEN)
+        this.installButton.doStateTransition('DEFAULT')
+        this.uninstallButton.doStateTransition('DEFAULT')
+        this.checkUpdatesButton.doStateTransition('DEFAULT')
     },
     hideMenu() {
         this.parent()
         sc.menu.moveLeaSprite(0, 0, sc.MENU_LEA_STATE.LARGE)
         this.exitMenu()
+        this.installButton.doStateTransition('HIDDEN')
+        this.uninstallButton.doStateTransition('HIDDEN')
+        this.checkUpdatesButton.doStateTransition('HIDDEN')
     },
     exitMenu() {
         this.parent()

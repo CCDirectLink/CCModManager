@@ -164,6 +164,7 @@ export class ModDB {
                 stars: data.stars,
                 dependencies: ccmod?.dependencies || meta?.ccmodDependencies || {},
                 installation: data.installation,
+                lastUpdateTimestamp: data.lastUpdateTimestamp,
             }
         }
     }

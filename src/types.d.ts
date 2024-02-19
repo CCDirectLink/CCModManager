@@ -41,6 +41,7 @@ export interface NPDatabasePackage {
     metadataCCMod?: NPDatabaseCCMod
     installation: NPDatabasePackageInstallation[]
     stars?: number
+    lastUpdateTimestamp?: number
 }
 
 type LocalizedString = Record<string, string> | string
@@ -61,10 +62,9 @@ export interface NPDatabaseCCMod {
     description?: LocalizedString
     license?: string
     homepage?: string
-    keywords?: string[]
+    tags?: string[]
     authors?: Person[]
     icons?: Record<string, string>
-    type?: 'mod' | 'library'
 
     dependencies?: Record<string, string>
 
@@ -115,6 +115,7 @@ export interface ModEntryServer extends ModEntryBase {
     isLocal: false
     localCounterpart?: ModEntryLocal
     installation: NPDatabasePackageInstallation[]
+    lastUpdateTimestamp?: number
 
     dependenciesCached?: Record<string, { mod: ModEntryServer; versionReqRanges: string[] }> /* cached by the installer */
 }

@@ -54,6 +54,12 @@ export class ModInstaller {
                 description: 'The base game.',
                 version: LocalMods.getCCVersion(),
             } as ModEntryLocal,
+            'post-game': {
+                id: 'post-game',
+                name: 'DLC',
+                description: 'CrossCode DLC.',
+                version: LocalMods.getCCVersion(),
+            } as ModEntryLocal,
             ccloader: {
                 id: 'ccloader',
                 name: 'CCLoader',
