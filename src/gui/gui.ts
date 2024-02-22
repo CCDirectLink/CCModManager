@@ -18,37 +18,49 @@ sc.SUB_MENU_INFO[sc.MENU_SUBMENU.MODS] = {
     name: 'mods',
 }
 
-sc.TitleScreenButtonGui.inject({
-    postInit() {
-        this.parent()
-
-        this.modsButton = new sc.ButtonGui('\\i[help3]' + ig.lang.get('sc.gui.menu.menu-titles.mods'), undefined, true, sc.BUTTON_TYPE.EQUIP)
-        this.modsButton.hook.transitions = {
-            DEFAULT: { state: {}, time: 0.2, timeFunction: window.KEY_SPLINES.EASE },
-            HIDDEN: { state: { offsetY: -(this.changelogButton.hook.size.y + 4) }, time: 0.2, timeFunction: window.KEY_SPLINES.LINEAR },
-        }
-        this.modsButton.setAlign(ig.GUI_ALIGN.X_RIGHT, ig.GUI_ALIGN.Y_TOP)
-        this.modsButton.setHeight(26)
-        this.modsButton.textChild.setPos(0, -1)
-        this.modsButton.setPos((ig.extensions.getExtensionList().length > 0 ? this.dlcButton.hook.size.x + 6 : 0) + this.changelogButton.hook.size.x + 6, 2)
-        this.modsButton.doStateTransition('HIDDEN', true)
-        this.modsButton.onButtonPress = () => this._enterModsMenu()
-        this.buttonInteract.addGlobalButton(this.modsButton, () => sc.control.menuHotkeyHelp3())
-        this.addChildGui(this.modsButton)
-    },
-    _enterModsMenu() {
+function enterModsMenu(direct: boolean) {
+    if (direct) {
         sc.menu.setDirectMode(true, sc.MENU_SUBMENU.MODS)
         sc.model.enterMenu(true)
-        const main = ig.gui.guiHooks.find(h => h.gui instanceof sc.MainMenu)?.gui as sc.MainMenu | undefined
-        if (main?.info) main.info.doStateTransition('HIDDEN')
-        if (main?.topBar) main.topBar.doStateTransition('HIDDEN')
-    },
-    show() {
+    } else {
+        sc.menu.pushMenu(sc.MENU_SUBMENU.MODS)
+    }
+}
+
+sc.OptionsMenu.inject({
+    init() {
         this.parent()
-        this.modsButton && this.modsButton.doStateTransition('DEFAULT')
+
+        this.modsButton = new sc.ButtonGui('\\i[help3]' + ig.lang.get('sc.gui.menu.menu-titles.mods'), undefined, true, sc.BUTTON_TYPE.SMALL)
+        this.modsButton.keepMouseFocus = true
+        this.modsButton.hook.transitions = {
+            DEFAULT: { state: {}, time: 0.2, timeFunction: KEY_SPLINES.EASE },
+            HIDDEN: { state: { offsetY: -this.modsButton.hook.size.y }, time: 0.2, timeFunction: KEY_SPLINES.LINEAR },
+        }
+        this.modsButton.onButtonPress = () => {
+            enterModsMenu(false)
+        }
     },
-    hide(skipTrantsition?: boolean) {
-        this.parent(skipTrantsition)
-        this.modsButton && this.modsButton.doStateTransition('HIDDEN')
+    showMenu() {
+        this.parent()
+        if (sc.menu.backCallbackStack.length >= 2) {
+            sc.menu.popBackCallback()
+            sc.menu.popBackCallback()
+        }
+    },
+    hideMenu() {
+        this.parent()
+        console.log('hide')
+        sc.menu.buttonInteract.removeGlobalButton(this.modsButton)
+        sc.menu.buttonInteract.removeGlobalButton(this.hotkeyHelp)
+        sc.menu.buttonInteract.removeGlobalButton(this.hotkeyDefault)
+    },
+    commitHotKeysToTopBar() {
+        sc.menu.addHotkey(() => this.modsButton)
+        this.parent()
+    },
+    onAddHotkeys() {
+        sc.menu.buttonInteract.addGlobalButton(this.modsButton, () => sc.control.menuHotkeyHelp3())
+        this.parent()
     },
 })

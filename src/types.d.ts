@@ -6,10 +6,8 @@ declare global {
         enum MENU_SUBMENU {
             MODS,
         }
-        interface TitleScreenButtonGui {
+        interface OptionsMenu {
             modsButton: sc.ButtonGui
-
-            _enterModsMenu(this: this): void
         }
     }
 }
