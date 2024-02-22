@@ -57,7 +57,7 @@ export class LocalMods {
     }
 
     static setModActive(mod: ModEntryLocal, value: boolean) {
-        sc.options.set(`modEnabled-${mod.id}`, value)
+        sc.options.set(`modEnabled-${mod.id.toLowerCase()}`, value)
         mod.active = value
         sc.options.persistOptions()
     }
