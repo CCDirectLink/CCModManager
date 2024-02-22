@@ -123,7 +123,11 @@ sc.ModListEntry = ig.FocusGui.extend({
         this.addChildGui(this.highlight)
         this.addChildGui(this.nameText)
 
-        this.description = new sc.TextGui(mod.description ?? '', { font: sc.fontsystem.smallFont })
+        this.description = new sc.TextGui(mod.description ?? '', {
+            font: sc.fontsystem.smallFont,
+            maxWidth: this.hook.size.x - 110,
+            linePadding: -4
+        })
         this.addChildGui(this.description)
 
         this.nameText.setPos(4 + iconOffset, 0)
