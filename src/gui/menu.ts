@@ -84,19 +84,19 @@ sc.ModMenu = sc.ListInfoMenu.extend({
         this.sortMenu.addButton('stars', sc.MOD_MENU_SORT_ORDER.STARS, sc.MOD_MENU_SORT_ORDER.STARS)
         this.sortMenu.addButton('lastUpdated', sc.MOD_MENU_SORT_ORDER.LAST_UPDATED, sc.MOD_MENU_SORT_ORDER.LAST_UPDATED)
 
-        const legacyCheckbox = new sc.CheckboxGui((this.list.filters.includeLegacy = true))
-        legacyCheckbox.setPos(9, 282)
-        legacyCheckbox.onButtonPress = () => {
-            this.list.filters.includeLegacy = legacyCheckbox.pressed
-            this.list.reloadFilters()
-        }
-        this.addChildGui(legacyCheckbox)
-        sc.menu.buttonInteract.addGlobalButton(legacyCheckbox, () => false)
-        const legacyText = new sc.TextGui('Include legacy mods')
-        legacyText.setPos(35, 282)
-        this.addChildGui(legacyText)
+        // const legacyCheckbox = new sc.CheckboxGui((this.list.filters.includeLegacy = true))
+        // legacyCheckbox.setPos(9, 282)
+        // legacyCheckbox.onButtonPress = () => {
+        //     this.list.filters.includeLegacy = legacyCheckbox.pressed
+        //     this.list.reloadFilters()
+        // }
+        // this.addChildGui(legacyCheckbox)
+        // sc.menu.buttonInteract.addGlobalButton(legacyCheckbox, () => false)
+        // const legacyText = new sc.TextGui('Include legacy mods')
+        // legacyText.setPos(35, 282)
+        // this.addChildGui(legacyText)
 
-        this.includeLocalCheckbox = new sc.CheckboxGui((this.list.filters.includeLocal = false))
+        this.includeLocalCheckbox = new sc.CheckboxGui((this.list.filters.includeLocal = true))
         this.includeLocalCheckbox.setPos(9, 300)
         this.includeLocalCheckbox.onButtonPress = () => {
             this.list.filters.includeLocal = this.includeLocalCheckbox.pressed
