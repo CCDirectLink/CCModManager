@@ -102,6 +102,7 @@ export interface ModEntryServer extends ModEntryBase {
     installation: NPDatabasePackageInstallation[]
     lastUpdateTimestamp?: number
     authors: string[]
+    tags: string[]
 
     dependenciesCached?: Record<string, { mod: ModEntryServer; versionReqRanges: string[] }> /* cached by the installer */
     installStatus?: 'new' | 'dependency' | 'update'

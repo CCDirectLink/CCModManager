@@ -167,6 +167,7 @@ export class ModDB {
                 installation: data.installation,
                 lastUpdateTimestamp: data.lastUpdateTimestamp,
                 authors: authors ? (typeof authors === 'string' ? [authors] : authors) : ['unknown'],
+                tags: ccmod?.tags ?? [],
             }
         }
     }
