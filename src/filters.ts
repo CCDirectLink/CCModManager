@@ -31,10 +31,9 @@ export function createFuzzyFilteredModList<T extends ModEntry>(filters: Fliters,
                 let mod: ModEntryServer | undefined = origMod.isLocal ? origMod.serverCounterpart : origMod
                 let author: number = 0
                 if (mod) {
-                    const res = fuzzysort.go(filters.name!, typeof mod.authors == 'string' ? [mod.authors] : mod.authors)
-                    author = res[0]?.score.map(-1000000, 0, 0, 700) || 0
+                    const res = fuzzysort.go(filters.name!, mod.authors)
+                    author = res[0]?.score.map(-1000000, 0, 0, 1000) || 0
                 }
-                console.log(mod?.id, author)
                 return Math.max(id, name, description, version, author, author)
             },
             limit: 100 /* don't return more results than you need! */,

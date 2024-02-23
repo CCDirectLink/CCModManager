@@ -101,7 +101,7 @@ export interface ModEntryServer extends ModEntryBase {
     localCounterpart?: ModEntryLocal
     installation: NPDatabasePackageInstallation[]
     lastUpdateTimestamp?: number
-    authors: string[] | string
+    authors: string[]
 
     dependenciesCached?: Record<string, { mod: ModEntryServer; versionReqRanges: string[] }> /* cached by the installer */
     installStatus?: 'new' | 'dependency' | 'update'

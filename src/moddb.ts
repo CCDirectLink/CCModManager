@@ -152,6 +152,7 @@ export class ModDB {
             if (typeof data === 'string') continue
             const meta = data.metadata
             const ccmod = data.metadataCCMod
+            const authors = ccmod?.authors
             this.modRecord[name] = {
                 database: databaseName,
                 isLocal: false,
@@ -165,7 +166,7 @@ export class ModDB {
                 dependencies: ccmod?.dependencies || meta?.ccmodDependencies || {},
                 installation: data.installation,
                 lastUpdateTimestamp: data.lastUpdateTimestamp,
-                authors: ccmod?.authors || 'unknown'
+                authors: authors ? (typeof authors === 'string' ? [authors] : authors) : ['unknown'],
             }
         }
     }

@@ -14,6 +14,7 @@ declare global {
             versionText: sc.TextGui
             starCount?: sc.TextGui
             lastUpdated?: sc.TextGui
+            authors?: sc.TextGui
             modList: sc.ModMenuList
             highlight: ModListEntryHighlight
             modEntryActionButtonStart: { height: number; ninepatch: ig.NinePatch; highlight: sc.ButtonGui.Highlight }
@@ -26,6 +27,7 @@ declare global {
             setTextRed(this: this): void
             setTextWhite(this: this): void
             setTextYellow(this: this): void
+            updateHighlightWidth(this: this): void
         }
         interface ModListEntryConstructor extends ImpactClass<ModListEntry> {
             new (mod: ModEntry, modList: sc.ModMenuList): ModListEntry
@@ -104,12 +106,14 @@ sc.ModListEntry = ig.FocusGui.extend({
 
         this.setSize(modList.hook.size.x - 3 /* 3 for scrollbar */, buttonSquareSize * 3 - 3)
 
+        const localMod = mod.isLocal ? mod : mod.localCounterpart
+        const serverMod = mod.isLocal ? mod.serverCounterpart : mod
+
         this.nameText = new sc.TextGui('')
         this.setTextWhite()
         if (this.modList.currentTabIndex == MOD_MENU_TAB_INDEXES.DISABLED) this.setTextRed()
         else if (this.modList.currentTabIndex == MOD_MENU_TAB_INDEXES.ENABLED) this.setTextGreen()
         else {
-            const localMod = mod.isLocal ? mod : mod.localCounterpart
             if (localMod) {
                 if (localMod.active) this.setTextGreen()
                 else this.setTextRed()
@@ -132,6 +136,14 @@ sc.ModListEntry = ig.FocusGui.extend({
 
         this.nameText.setPos(4 + iconOffset, 0)
         this.description.setPos(4 + iconOffset, 14)
+
+        if (serverMod?.authors) {
+            const authors = serverMod.authors
+            const str = `by ${authors.map(a => `\\c[3]${a}\\c[0]`).join(', ')}`
+            this.authors = new sc.TextGui(str, { font: sc.fontsystem.smallFont })
+            this.addChildGui(this.authors)
+        }
+        this.updateHighlightWidth()
 
         this.versionText = new sc.TextGui(`v${mod.version}`, { font: sc.fontsystem.tinyFont })
         this.versionText.setAlign(ig.GUI_ALIGN.X_RIGHT, ig.GUI_ALIGN.Y_TOP)
@@ -186,6 +198,11 @@ sc.ModListEntry = ig.FocusGui.extend({
     setTextYellow() {
         this.nameText.setText(`\\c[3]${this.getModName()}\\c[0]`)
     },
+    updateHighlightWidth() {
+        const authorsW = this.authors?.hook.size.x
+        this.highlight.updateWidth(this.hook.size.x, this.nameText.hook.size.x + (authorsW ? authorsW + 5 : 0))
+        this.authors?.setPos(this.nameText.hook.size.x + 33, 2)
+    },
     updateDrawables(root) {
         if (this.modList.hook.currentStateName != 'HIDDEN') {
             this.ninepatch.draw(root, this.hook.size.x, this.hook.size.y, this.focus ? 'focus' : 'default')
@@ -215,7 +232,7 @@ sc.ModListEntry = ig.FocusGui.extend({
                     sc.BUTTON_SOUND.toggle_on.play()
                     LocalMods.setModActive(mod, true)
                 }
-                this.highlight.updateWidth(this.hook.size.x, this.nameText.hook.size.x)
+                this.updateHighlightWidth()
             } else if (this.modList.currentTabIndex == MOD_MENU_TAB_INDEXES.DISABLED) {
                 mod.awaitingRestart = !mod.awaitingRestart
                 if (mod.active) {
@@ -227,7 +244,7 @@ sc.ModListEntry = ig.FocusGui.extend({
                     sc.BUTTON_SOUND.toggle_on.play()
                     LocalMods.setModActive(mod, true)
                 }
-                this.highlight.updateWidth(this.hook.size.x, this.nameText.hook.size.x)
+                this.updateHighlightWidth()
             } else throw new Error('wat?')
         } else if (mod.localCounterpart) {
             const localMod = mod.localCounterpart
@@ -242,7 +259,7 @@ sc.ModListEntry = ig.FocusGui.extend({
                     sc.BUTTON_SOUND.toggle_on.play()
                     InstallQueue.add(mod)
                 }
-                this.highlight.updateWidth(this.hook.size.x, this.nameText.hook.size.x)
+                this.updateHighlightWidth()
             } else sc.BUTTON_SOUND.denied.play()
         } else {
             if (InstallQueue.has(mod)) {
