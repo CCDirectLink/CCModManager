@@ -3,6 +3,7 @@ import { FileCache } from './cache'
 import ModManager from './plugin'
 import { ModEntryLocal } from './types'
 import { ModDB } from './moddb'
+import { ModInstaller } from './mod-installer'
 
 type CCL2Mod = {
     baseDirectory: string
@@ -38,6 +39,7 @@ export class LocalMods {
         this.cacheRecord = {}
         for (const mod of all) {
             ModDB.resolveLocalModOrigin(mod)
+            mod.hasUpdate = ModInstaller.checkLocalModForUpdate(mod)
             this.cacheRecord[mod.id] = mod
         }
         return all
@@ -86,6 +88,7 @@ export class LocalMods {
                       sizeY: 24,
                   }
                 : FileCache.getDefaultModIconConfig(),
+            hasUpdate: false,
         }
     }
 
@@ -117,6 +120,7 @@ export class LocalMods {
                       sizeY: 24,
                   }
                 : FileCache.getDefaultModIconConfig(),
+            hasUpdate: false,
         }
     }
 

@@ -139,8 +139,18 @@ sc.ModMenu = sc.ListInfoMenu.extend({
         this.checkUpdatesButton = new sc.ButtonGui('Check updates', 100, true, sc.BUTTON_TYPE.SMALL)
         this.checkUpdatesButton.setPos(235, 22)
         this.checkUpdatesButton.onButtonPress = () => {
-            ModInstaller.checkAllLocalModsForUpdate(true)
+            if (this.list.currentTabIndex == MOD_MENU_TAB_INDEXES.SELECTED) sc.BUTTON_SOUND.submit.play()
+            ModInstaller.appendToUpdateModsToQueue().then(hasUpdated => {
+                if (hasUpdated) {
+                    sc.Model.notifyObserver(sc.modMenu, sc.MOD_MENU_MESSAGES.UPDATE_ENTRIES)
+                    this.list.tabGroup._invokePressCallbacks(this.list.tabs[ig.lang.get('sc.gui.menu.ccmodloader.selectedModsTab')], true)
+                    sc.Dialogs.showInfoDialog(ig.lang.get('sc.gui.menu.ccmodloader.updatesFound'))
+                } else {
+                    sc.Dialogs.showInfoDialog(ig.lang.get('sc.gui.menu.ccmodloader.upToDate'))
+                }
+            })
         }
+        this.checkUpdatesButton.submitSound = undefined
         this.checkUpdatesButton.keepMouseFocus = true /* prevent the focus jumping all over the place on press */
         this.addChildGui(this.checkUpdatesButton)
         sc.menu.buttonInteract.addGlobalButton(this.checkUpdatesButton, () => false)

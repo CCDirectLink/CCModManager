@@ -25,7 +25,7 @@ export default class ModManager {
                 const autoUpdate = true
                 if (autoUpdate) {
                     ModDB.loadDatabases()
-                    ModInstaller.checkAllLocalModsForUpdate(false)
+                    ModInstaller.checkAllLocalModsForUpdate()
                 }
             },
         })

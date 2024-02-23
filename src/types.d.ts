@@ -86,15 +86,10 @@ export interface NPDatabasePackageMetadata {
 export type NPDatabasePackageInstallation = {
     url: string
     hash: { sha256: string }
-} & (
-    | {
-          type: 'modZip'
-          source: string
-      }
-    | {
-          type: 'ccmod'
-      }
-)
+} & {
+    type: 'zip'
+    source: string
+}
 
 interface ModEntryBase {
     database: string
@@ -116,6 +111,7 @@ export interface ModEntryServer extends ModEntryBase {
     lastUpdateTimestamp?: number
 
     dependenciesCached?: Record<string, { mod: ModEntryServer; versionReqRanges: string[] }> /* cached by the installer */
+    installStatus?: 'new' | 'dependency' | 'update'
 }
 
 export interface ModEntryLocal extends ModEntryBase {
@@ -124,6 +120,7 @@ export interface ModEntryLocal extends ModEntryBase {
     iconConfig: ModImageConfig
     serverCounterpart?: ModEntryServer
     path: string
+    hasUpdate: boolean
 }
 
 export type ModEntry = ModEntryServer | ModEntryLocal

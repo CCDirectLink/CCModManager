@@ -15,9 +15,9 @@ function getNod() {
 
 export class ModInstallDialogs {
     static showModInstallDialog() {
-        const deps = InstallQueue.deps
-        const toInstall = InstallQueue.values()
-        const toUpdate = InstallQueue.depsToUpdate
+        const deps = InstallQueue.values().filter(mod => mod.installStatus == 'dependency')
+        const toInstall = InstallQueue.values().filter(mod => mod.installStatus == 'new')
+        const toUpdate = InstallQueue.values().filter(mod => mod.installStatus == 'update')
         if (deps.length == 0 && toInstall.length == 0 && toUpdate.length == 0) return
 
         function modsToStr(mods: ModEntry[]) {
@@ -31,10 +31,9 @@ export class ModInstallDialogs {
         const str = `${header}${toInstallStr}${toUpdateStr}${depsStr}`
         sc.Dialogs.showChoiceDialog(str, sc.DIALOG_INFO_ICON.QUESTION, [getNod(), ig.lang.get('sc.gui.dialogs.no')], button => {
             if (button.text!.toString() == getNod()) {
-                const toInstall = InstallQueue.deps.concat(InstallQueue.values())
-                ModInstaller.install(toInstall, InstallQueue.depsToUpdate)
+                const toInstall = InstallQueue.values()
+                ModInstaller.install(toInstall)
                     .then(() => {
-                        InstallQueue.deps = []
                         InstallQueue.clear()
                         sc.modMenu && sc.Model.notifyObserver(sc.modMenu, sc.MOD_MENU_MESSAGES.UPDATE_ENTRIES)
                         sc.BUTTON_SOUND.shop_cash.play()
@@ -59,14 +58,11 @@ export class ModInstallDialogs {
         })
     }
 
-    static showAutoUpdateDialog(showUpToDateDialog: boolean) {
-        const deps = InstallQueue.deps
-        const toInstall = InstallQueue.values()
-        const toUpdate = InstallQueue.depsToUpdate
-        if (deps.length == 0 && toInstall.length == 0 && toUpdate.length == 0) {
-            if (showUpToDateDialog) sc.Dialogs.showInfoDialog(ig.lang.get('sc.gui.menu.ccmodloader.upToDate'))
-            return
-        }
+    static showAutoUpdateDialog() {
+        const deps = InstallQueue.values().filter(mod => mod.installStatus == 'dependency')
+        const toInstall = InstallQueue.values().filter(mod => mod.installStatus == 'new')
+        const toUpdate = InstallQueue.values().filter(mod => mod.installStatus == 'update')
+        if (deps.length == 0 && toInstall.length == 0 && toUpdate.length == 0) return
 
         const yes = ig.lang.get('sc.gui.dialogs.yes')
         const no = ig.lang.get('sc.gui.dialogs.no')
@@ -74,6 +70,8 @@ export class ModInstallDialogs {
             const text = button.text!.toString()
             if (text == yes) {
                 this.showModInstallDialog()
+            } else {
+                InstallQueue.clear()
             }
         })
     }

@@ -105,8 +105,7 @@ sc.ModListEntry = ig.FocusGui.extend({
         this.setSize(modList.hook.size.x - 3 /* 3 for scrollbar */, buttonSquareSize * 3 - 3)
 
         this.nameText = new sc.TextGui('')
-        if (InstallQueue.has(mod)) this.setTextYellow()
-        else this.setTextWhite()
+        this.setTextWhite()
         if (this.modList.currentTabIndex == MOD_MENU_TAB_INDEXES.DISABLED) this.setTextRed()
         else if (this.modList.currentTabIndex == MOD_MENU_TAB_INDEXES.ENABLED) this.setTextGreen()
         else {
@@ -116,6 +115,7 @@ sc.ModListEntry = ig.FocusGui.extend({
                 else this.setTextRed()
             }
         }
+        if (InstallQueue.has(mod)) this.setTextYellow()
 
         const iconOffset = 25 as const
         this.highlight = new sc.ModListEntryHighlight(this.hook.size.x, this.hook.size.y, this.nameText.hook.size.x, buttonSquareSize * 3)
@@ -126,7 +126,7 @@ sc.ModListEntry = ig.FocusGui.extend({
         this.description = new sc.TextGui(mod.description ?? '', {
             font: sc.fontsystem.smallFont,
             maxWidth: this.hook.size.x - 110,
-            linePadding: -4
+            linePadding: -4,
         })
         this.addChildGui(this.description)
 
@@ -168,6 +168,9 @@ sc.ModListEntry = ig.FocusGui.extend({
         if (this.mod.awaitingRestart) {
             name = `\\i[stats-general]${name}`
         }
+        if ((this.mod.isLocal && this.mod.hasUpdate) || (!this.mod.isLocal && this.mod.localCounterpart?.hasUpdate)) {
+            name = `\\i[item-news]${name}`
+        }
         name = `\\i[${icon}]${name}`
         return name
     },
@@ -199,44 +202,58 @@ sc.ModListEntry = ig.FocusGui.extend({
         sc.Model.notifyObserver(sc.modMenu, sc.MOD_MENU_MESSAGES.ENTRY_UNFOCUSED, this)
     },
     onButtonPress() {
-        if (this.mod.isLocal) {
+        let mod = this.mod
+        if (mod.isLocal) {
             if (this.modList.currentTabIndex == MOD_MENU_TAB_INDEXES.ENABLED) {
-                this.mod.awaitingRestart = !this.mod.awaitingRestart
-                if (this.mod.active) {
+                mod.awaitingRestart = !mod.awaitingRestart
+                if (mod.active) {
                     this.setTextRed()
                     sc.BUTTON_SOUND.toggle_off.play()
-                    LocalMods.setModActive(this.mod, false)
+                    LocalMods.setModActive(mod, false)
                 } else {
                     this.setTextGreen()
                     sc.BUTTON_SOUND.toggle_on.play()
-                    LocalMods.setModActive(this.mod, true)
+                    LocalMods.setModActive(mod, true)
                 }
                 this.highlight.updateWidth(this.hook.size.x, this.nameText.hook.size.x)
             } else if (this.modList.currentTabIndex == MOD_MENU_TAB_INDEXES.DISABLED) {
-                this.mod.awaitingRestart = !this.mod.awaitingRestart
-                if (this.mod.active) {
+                mod.awaitingRestart = !mod.awaitingRestart
+                if (mod.active) {
                     this.setTextRed()
                     sc.BUTTON_SOUND.toggle_off.play()
-                    LocalMods.setModActive(this.mod, false)
+                    LocalMods.setModActive(mod, false)
                 } else {
                     this.setTextGreen()
                     sc.BUTTON_SOUND.toggle_on.play()
-                    LocalMods.setModActive(this.mod, true)
+                    LocalMods.setModActive(mod, true)
                 }
                 this.highlight.updateWidth(this.hook.size.x, this.nameText.hook.size.x)
             } else throw new Error('wat?')
-        } else if (!(this.mod.isLocal || this.mod.localCounterpart)) {
-            if (InstallQueue.has(this.mod)) {
-                InstallQueue.delete(this.mod)
+        } else if (mod.localCounterpart) {
+            const localMod = mod.localCounterpart
+            if (localMod.hasUpdate) {
+                if (InstallQueue.has(mod)) {
+                    if (localMod.active) this.setTextGreen()
+                    else this.setTextRed()
+                    sc.BUTTON_SOUND.toggle_off.play()
+                    InstallQueue.delete(mod)
+                } else {
+                    this.setTextYellow()
+                    sc.BUTTON_SOUND.toggle_on.play()
+                    InstallQueue.add(mod)
+                }
+                this.highlight.updateWidth(this.hook.size.x, this.nameText.hook.size.x)
+            } else sc.BUTTON_SOUND.denied.play()
+        } else {
+            if (InstallQueue.has(mod)) {
+                InstallQueue.delete(mod)
                 sc.BUTTON_SOUND.toggle_off.play()
                 this.setTextWhite()
             } else {
-                InstallQueue.add(this.mod)
+                InstallQueue.add(mod)
                 sc.BUTTON_SOUND.toggle_on.play()
                 this.setTextYellow()
             }
-        } else {
-            sc.BUTTON_SOUND.denied.play()
         }
     },
 })

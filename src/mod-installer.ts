@@ -12,27 +12,27 @@ import { rimraf } from '../node_modules/rimraf/dist/commonjs/index.js'
 import { ModInstallDialogs } from './gui/install-dialogs'
 
 export class InstallQueue {
-    private static queue: Set<ModEntryServer> = new Set()
-    static deps: ModEntryServer[]
-    static depsToUpdate: ModEntryServer[]
+    private static queue: ModEntryServer[] = []
 
-    private static changeUpdate() {
+    static changeUpdate() {
         sc.modMenu && sc.Model.notifyObserver(sc.modMenu, sc.MOD_MENU_MESSAGES.SELECTED_ENTRIES_CHANGED)
     }
     static add(...mods: ModEntryServer[]) {
-        for (const mod of mods) this.queue.add(mod)
+        for (const mod of mods) {
+            if (!this.has(mod)) this.queue.push(mod)
+        }
         this.changeUpdate()
     }
     static delete(mod: ModEntryServer) {
-        this.queue.delete(mod)
+        this.queue.erase(mod)
         this.changeUpdate()
     }
     static clear() {
-        this.queue.clear()
+        this.queue.splice(0, 1000000)
         this.changeUpdate()
     }
     static has(mod: ModEntry) {
-        return this.queue.has(mod as ModEntryServer)
+        return this.queue.find(m => m.id == mod.id)
     }
     static values(): ModEntryServer[] {
         return [...this.queue]
@@ -126,15 +126,20 @@ export class ModInstaller {
 
         const deps: Record<string, DepEntry> = {}
         for (const mod of mods) {
-            const modDeps = this.getModDependencies(mod)
-            for (const modId in modDeps) {
-                const entry = modDeps[modId]
-                this.setOrAddNewer(deps, entry.mod, ...entry.versionReqRanges)
+            mod.installStatus = 'new' /* set default */
+            try {
+                const modDeps = this.getModDependencies(mod)
+                for (const modId in modDeps) {
+                    const entry = modDeps[modId]
+                    this.setOrAddNewer(deps, entry.mod, ...entry.versionReqRanges)
+                    entry.mod.installStatus = 'dependency'
+                }
+            } catch (err) {
+                console.warn(`Mod Manager: ${(err as Error).message}`)
             }
         }
 
         /* filter already installed mods */
-        const toUpdate: ModEntryServer[] = []
         for (const modId in deps) {
             const { mod: serverMod, versionReqRanges } = deps[modId]
             const localMod = serverMod.localCounterpart
@@ -142,7 +147,7 @@ export class ModInstaller {
                 if (this.matchesVersionReqRanges(localMod, versionReqRanges)) {
                     delete deps[modId]
                 } else {
-                    toUpdate.push(serverMod)
+                    serverMod.installStatus = 'update'
                 }
             }
         }
@@ -164,17 +169,17 @@ export class ModInstaller {
                     `Dependency: ${serverMod.name} (${serverMod.id}) that cannot be resolved: version range: ${versionReqRanges.join(', ')} was not met. Database has only: ${serverMod.version}`
                 )
         }
-
-        InstallQueue.depsToUpdate = toUpdate
-        InstallQueue.deps = Object.values(deps).map(e => e.mod)
+        InstallQueue.add(...Object.values(deps).map(dep => dep.mod))
     }
 
-    static async install(modsToInstall: ModEntryServer[], modsToUpdate: ModEntryServer[]) {
-        console.log('mods to install:', modsToInstall.map(mod => mod.id).join(', '))
+    static async install(mods: ModEntryServer[]) {
+        console.log('mods to install:', mods.map(mod => mod.id).join(', '))
+        const modsToInstall: ModEntryServer[] = mods.filter(mod => mod.installStatus == 'new' || mod.installStatus == 'dependency')
         const promises: Promise<void>[] = []
         for (const mod of modsToInstall) {
             promises.push(this.downloadAndInstallMod(mod))
         }
+        const modsToUpdate: ModEntryServer[] = mods.filter(mod => mod.installStatus == 'update')
         for (const mod of modsToUpdate) {
             promises.push(this.updateMod(mod))
         }
@@ -192,20 +197,19 @@ export class ModInstaller {
     private static async downloadAndInstallMod(mod: ModEntryServer) {
         console.log('installing mod:', mod.id)
 
-        const installation = mod.installation.find(i => i.type === 'ccmod') || mod.installation.find(i => i.type === 'modZip')
+        const installation = mod.installation.find(i => i.type === 'zip')
         if (!installation) throw new Error(`Mod: ${mod.id} has no known installation methods.`)
 
         const modId = mod.id.replace(/ /g, '_')
-        if (installation.type == 'modZip' || installation.type == 'ccmod') {
+        if (installation.type == 'zip') {
             const resp = await fetch(installation.url)
             const data = await resp.arrayBuffer()
             /* todo: add sha256 verfication */
 
-            switch (installation.type) {
-                case 'ccmod':
-                    return await this.installCCMod(data, modId)
-                case 'modZip':
-                    return await this.installModZip(data, modId, installation.source)
+            if (installation.url.endsWith('.ccmod')) {
+                return await this.installCCMod(data, modId)
+            } else {
+                return await this.installModZip(data, modId, installation.source)
             }
         }
     }
@@ -255,23 +259,25 @@ export class ModInstaller {
         else window.location.reload()
     }
 
-    private static checkLocalModForUpdate(mod: ModEntryLocal): boolean {
+    static checkLocalModForUpdate(mod: ModEntryLocal): boolean {
         const serverMod = mod.serverCounterpart
         if (!serverMod) return false
         return semver_gt(serverMod.version, mod.version)
     }
 
-    static async checkAllLocalModsForUpdate(showUpToDateDialog: boolean) {
+    static async appendToUpdateModsToQueue(): Promise<boolean> {
         await ModDB.loadAllMods()
 
-        const mods: ModEntryLocal[] = []
-        for (const mod of LocalMods.getAll()) {
-            if (this.checkLocalModForUpdate(mod)) mods.push(mod)
-        }
+        const mods: ModEntryLocal[] = LocalMods.getAll().filter(mod => mod.hasUpdate)
         const serverMods = mods.map(mod => mod.serverCounterpart!)
+        InstallQueue.add(...serverMods)
         await this.findDeps(serverMods, ModDB.modRecord)
-        InstallQueue.clear()
-        InstallQueue.depsToUpdate.push(...serverMods)
-        ModInstallDialogs.showAutoUpdateDialog(showUpToDateDialog)
+
+        return mods.length > 0
+    }
+
+    static async checkAllLocalModsForUpdate() {
+        await this.appendToUpdateModsToQueue()
+        ModInstallDialogs.showAutoUpdateDialog()
     }
 }
