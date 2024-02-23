@@ -165,6 +165,7 @@ export class ModDB {
                 dependencies: ccmod?.dependencies || meta?.ccmodDependencies || {},
                 installation: data.installation,
                 lastUpdateTimestamp: data.lastUpdateTimestamp,
+                authors: ccmod?.authors || 'unknown'
             }
         }
     }

@@ -44,14 +44,6 @@ export interface NPDatabasePackage {
 
 type LocalizedString = Record<string, string> | string
 
-type Person = PersonDetails | string
-interface PersonDetails {
-    name: LocalizedString
-    email?: LocalizedString
-    url?: LocalizedString
-    comment?: LocalizedString
-}
-
 export interface NPDatabaseCCMod {
     id: string
     version?: string
@@ -61,7 +53,7 @@ export interface NPDatabaseCCMod {
     license?: string
     homepage?: string
     tags?: string[]
-    authors?: Person[]
+    authors?: string[] | string
     icons?: Record<string, string>
 
     dependencies?: Record<string, string>
@@ -109,6 +101,7 @@ export interface ModEntryServer extends ModEntryBase {
     localCounterpart?: ModEntryLocal
     installation: NPDatabasePackageInstallation[]
     lastUpdateTimestamp?: number
+    authors: string[] | string
 
     dependenciesCached?: Record<string, { mod: ModEntryServer; versionReqRanges: string[] }> /* cached by the installer */
     installStatus?: 'new' | 'dependency' | 'update'
