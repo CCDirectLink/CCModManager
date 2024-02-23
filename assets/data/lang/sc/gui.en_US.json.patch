@@ -64,7 +64,7 @@
                         {
                             "title": "\\c[3]Mod Manager - Disabled\\c[0]",
                             "content": [
-                                "The \\c[3]Enabled\\c[0] tab contains all installed and disabled mods.\nDisabled mods have red names.\nUninstall mods by pressing \\i[help2].\nTo enable a mod, focus a mod and press \\i[key-throw] or \\i[gamepad-a]."
+                                "The \\c[3]Disabled\\c[0] tab contains all installed and disabled mods.\nDisabled mods have red names.\nUninstall mods by pressing \\i[help2].\nTo enable a mod, focus a mod and press \\i[key-throw] or \\i[gamepad-a]."
                             ]
                         }
                     ]
