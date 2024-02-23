@@ -57,13 +57,13 @@ sc.ModListEntryHighlight = ig.GuiElementBase.extend({
         this.setSize(width, this.hook.size.y)
         this.textWidth = textWidth
     },
-    updateDrawables(src) {
-        this.ninepatch.draw(src, this.hook.size.x - this.buttonWidth - 6, this.hook.size.y + 1, this.focus ? 'focus' : 'default')
+    updateDrawables(renderer) {
+        this.ninepatch.draw(renderer, this.hook.size.x - this.buttonWidth - 6, this.hook.size.y + 1, this.focus ? 'focus' : 'default')
 
-        this.buttonCover.draw(src, this.buttonWidth + 4, this.hook.size.y + 1, this.focus ? 'focus' : 'default', this.hook.size.x - this.buttonWidth - 6)
+        this.buttonCover.draw(renderer, this.buttonWidth + 4, this.hook.size.y + 1, this.focus ? 'focus' : 'default', this.hook.size.x - this.buttonWidth - 30)
 
-        src.addPattern(this.focus ? this.textTagHighlighted : this.textTag, 3, 3, 90, 0, this.textWidth, 13)
+        renderer.addPattern(this.focus ? this.textTagHighlighted : this.textTag, 3, 3, 90, 0, this.textWidth, 13)
 
-        src.addGfx(this.gfx, this.textWidth + 3, 3, 109, this.focus ? 44 : 3, 6, 13)
+        renderer.addGfx(this.gfx, this.textWidth + 3, 3, 109, this.focus ? 44 : 3, 6, 13)
     },
 })

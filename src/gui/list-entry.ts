@@ -46,48 +46,6 @@ sc.ModListEntry = ig.FocusGui.extend({
         bottom: 0,
         offsets: { default: { x: 0, y: 0 }, focus: { x: 0, y: 41 } },
     }),
-    modEntryActionButtonStart: {
-        height: 14,
-        ninepatch: new ig.NinePatch('media/gui/CCModManager.png', {
-            left: 5,
-            width: 8,
-            right: 1,
-            top: 11,
-            height: 2,
-            bottom: 1,
-            offsets: { default: { x: 42, y: 82 }, focus: { x: 56, y: 82 }, pressed: { x: 56, y: 82 } },
-        }),
-        highlight: {
-            startX: 70,
-            endX: 84,
-            leftWidth: 3,
-            rightWidth: 1,
-            offsetY: 82,
-            gfx: new ig.Image('media/gui/CCModManager.png'),
-            pattern: new ig.ImagePattern('media/gui/CCModManager.png', 74, 82, 9, 14),
-        },
-    },
-    modEntryActionButtons: {
-        height: 14,
-        ninepatch: new ig.NinePatch('media/gui/CCModManager.png', {
-            left: 1,
-            width: 12,
-            right: 1,
-            top: 1,
-            height: 12,
-            bottom: 1,
-            offsets: { default: { x: 0, y: 82 }, focus: { x: 14, y: 82 }, pressed: { x: 14, y: 82 } },
-        }),
-        highlight: {
-            startX: 28,
-            endX: 42,
-            leftWidth: 2,
-            rightWidth: 2,
-            offsetY: 82,
-            gfx: new ig.Image('media/gui/CCModManager.png'),
-            pattern: new ig.ImagePattern('media/gui/CCModManager.png', 30, 82, 10, 14, ig.ImagePattern.OPT.REPEAT_X),
-        },
-    },
 
     init(mod, modList) {
         this.parent()
@@ -203,9 +161,9 @@ sc.ModListEntry = ig.FocusGui.extend({
         this.highlight.updateWidth(this.hook.size.x, this.nameText.hook.size.x + (authorsW ? authorsW + 5 : 0))
         this.authors?.setPos(this.nameText.hook.size.x + 33, 2)
     },
-    updateDrawables(root) {
+    updateDrawables(renderer) {
         if (this.modList.hook.currentStateName != 'HIDDEN') {
-            this.ninepatch.draw(root, this.hook.size.x, this.hook.size.y, this.focus ? 'focus' : 'default')
+            this.ninepatch.draw(renderer, this.hook.size.x, this.hook.size.y, this.focus ? 'focus' : 'default')
         }
     },
     focusGained() {
