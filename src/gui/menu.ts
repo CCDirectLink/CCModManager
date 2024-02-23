@@ -12,7 +12,6 @@ declare global {
     namespace sc {
         enum MOD_MENU_SORT_ORDER {
             NAME,
-            NAME_REVERSE,
             STARS,
             LAST_UPDATED,
         }
@@ -49,9 +48,8 @@ declare global {
 }
 sc.MOD_MENU_SORT_ORDER = {
     NAME: 0,
-    NAME_REVERSE: 1,
-    STARS: 2,
-    LAST_UPDATED: 3,
+    STARS: 1,
+    LAST_UPDATED: 2,
 }
 sc.MOD_MENU_MESSAGES = {
     SELECTED_ENTRIES_CHANGED: 0,
@@ -81,7 +79,6 @@ sc.ModMenu = sc.ListInfoMenu.extend({
         sc.menu.buttonInteract.addGlobalButton(this.inputField as any, () => false)
 
         this.sortMenu.addButton('name', sc.MOD_MENU_SORT_ORDER.NAME, sc.MOD_MENU_SORT_ORDER.NAME)
-        this.sortMenu.addButton('nameReverse', sc.MOD_MENU_SORT_ORDER.NAME_REVERSE, sc.MOD_MENU_SORT_ORDER.NAME_REVERSE)
         this.sortMenu.addButton('stars', sc.MOD_MENU_SORT_ORDER.STARS, sc.MOD_MENU_SORT_ORDER.STARS)
         this.sortMenu.addButton('lastUpdated', sc.MOD_MENU_SORT_ORDER.LAST_UPDATED, sc.MOD_MENU_SORT_ORDER.LAST_UPDATED)
 

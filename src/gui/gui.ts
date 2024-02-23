@@ -50,7 +50,6 @@ sc.OptionsMenu.inject({
     },
     hideMenu() {
         this.parent()
-        console.log('hide')
         sc.menu.buttonInteract.removeGlobalButton(this.modsButton)
         sc.menu.buttonInteract.removeGlobalButton(this.hotkeyHelp)
         sc.menu.buttonInteract.removeGlobalButton(this.hotkeyDefault)

@@ -169,8 +169,6 @@ sc.ModMenuList = sc.ListTabbedPane.extend({
         if (!this.filters.name) {
             if (sort == sc.MOD_MENU_SORT_ORDER.NAME) {
                 mods.sort((a, b) => a.name.localeCompare(b.name))
-            } else if (sort == sc.MOD_MENU_SORT_ORDER.NAME_REVERSE) {
-                mods.sort((a, b) => a.name.localeCompare(b.name) * -1)
             } else if (sort == sc.MOD_MENU_SORT_ORDER.STARS) {
                 mods.sort((a, b) => a.name.localeCompare(b.name))
                 mods.sort((a, b) => (b.stars ?? -100) - (a.stars ?? -100))

@@ -6,11 +6,9 @@
             },
             "sort": {
                 "stars": "Stars",
-                "nameReverse": "Name (desencing)",
                 "lastUpdated": "Last updated",
                 "dec": {
-                    "stars": "Sorts by GitHub stars.",
-                    "nameReverse": "Sorts by name in reverse."
+                    "stars": "Sorts by GitHub stars."
                 }
             },
             "ccmodloader": {
