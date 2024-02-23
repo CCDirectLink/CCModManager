@@ -33,6 +33,7 @@ declare global {
             checkUpdatesButton: sc.ButtonGui
 
             setBlackBarVisibility(this: this, visible: boolean): void
+            setAllVisibility(this: this, visible: boolean): void
             updateInstallButtonText(this: this): void
             onBackButtonPress(this: this): void
             setTabEvent(this: this): void
@@ -208,27 +209,33 @@ sc.ModMenu = sc.ListInfoMenu.extend({
         if (main?.info) main.info.doStateTransition(state)
         if (main?.topBar) main.topBar.doStateTransition(state)
     },
+    setAllVisibility(visible) {
+        const state = visible ? 'DEFAULT' : 'HIDDEN'
+
+        this.installButton.doStateTransition(state)
+        this.uninstallButton.doStateTransition(state)
+        this.checkUpdatesButton.doStateTransition(state)
+        this.inputField.doStateTransition(state)
+        this.includeLocalText.doStateTransition(state)
+        this.includeLocalCheckbox.doStateTransition(state)
+
+        const main = ig.gui.guiHooks.find(h => h.gui instanceof sc.MainMenu)?.gui as sc.MainMenu | undefined
+        if (main?.info) main.info.doStateTransition(state)
+        if (main?.topBar) main.topBar.doStateTransition(state)
+    },
     showMenu() {
         this.parent()
         sc.menu.pushBackCallback(() => this.onBackButtonPress())
         sc.menu.moveLeaSprite(0, 0, sc.MENU_LEA_STATE.HIDDEN)
-        this.installButton.doStateTransition('DEFAULT')
-        this.uninstallButton.doStateTransition('DEFAULT')
-        this.checkUpdatesButton.doStateTransition('DEFAULT')
 
+        this.setAllVisibility(true)
         this.setBlackBarVisibility(false)
     },
     hideMenu() {
         this.parent()
         sc.menu.moveLeaSprite(0, 0, sc.MENU_LEA_STATE.LARGE)
         this.exitMenu()
-        this.installButton.doStateTransition('HIDDEN')
-        this.uninstallButton.doStateTransition('HIDDEN')
-        this.checkUpdatesButton.doStateTransition('HIDDEN')
-        this.inputField.doStateTransition('HIDDEN')
-        this.includeLocalText.doStateTransition('HIDDEN')
-        this.includeLocalCheckbox.doStateTransition('HIDDEN')
-
+        this.setAllVisibility(false)
         this.setBlackBarVisibility(true)
     },
     exitMenu() {
