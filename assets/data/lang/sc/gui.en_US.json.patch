@@ -32,6 +32,42 @@
                 "disableAutoupdate": "Disable autoupdate",
                 "askRestartInstall": "Installed succesfully.\nThe installed mods will start working after a restart.\nDo you want to restart?",
                 "askRestartUninstall": "Uninstalled succesfully.\nThe mod will actually stop working after a restart.\nDo you want to restart?"
+            },
+            "help-texts": {
+                "mods": {
+                    "title": "\\c[3]Mod Manager\\c[0]",
+                    "pages": [
+                        {
+                            "content": [
+                                "Welcome to the mod manager!\nThere are 4 tabs:\n- \\c[3]Online\\c[0] - Search through all availible mods\n- \\c[3]Selected\\c[0] - Mods you selected to install\n- \\c[3]Enabled\\c[0] - Mods that are installed and enabled\n- \\c[3]Disabled\\c[0] - Mods that are installed and disabled\nSelect the mod sort method by pressing \\i[help3].\nIf a mod title has a list icon (\\i[quest]) before it, that means it's availible in the online repositories, and if it has a question mark (\\i[lore-others]), that means that it's not.\nIf a mod title has a clock (\\i[stats-general]) before it, that means it's awaiting a restart.\nSee the next pages for explanation of seperate tabs."
+                            ]
+                        },
+                        {
+                            "title": "\\c[3]Mod Manager - Online\\c[0]",
+                            "content": [
+                                "The \\c[3]Online\\c[0] tab contains all availible mods you can install.\nTo select or deselect a mod for installation, focus a mod and press \\i[key-throw] or \\i[gamepad-a].\nInstall mods by pressing \\i[help4].\n"
+                            ]
+                        },
+                        {
+                            "title": "\\c[3]Mod Manager - Selected\\c[0]",
+                            "content": [
+                                "The \\c[3]Selected\\c[0] tab contains all mods selected for installation.\nSelected mods have yellow names.\nTo select or deselect a mod for installation, focus a mod and press \\i[key-throw] or \\i[gamepad-a].\nInstall mods by pressing \\i[help4].\n"
+                            ]
+                        },
+                        {
+                            "title": "\\c[3]Mod Manager - Enabled\\c[0]",
+                            "content": [
+                                "The \\c[3]Enabled\\c[0] tab contains all installed and enabled mods.\nEnabled mods have green names.\nUninstall mods by pressing \\i[help2].\nTo disable a mod, focus a mod and press \\i[key-throw] or \\i[gamepad-a]."
+                            ]
+                        },
+                        {
+                            "title": "\\c[3]Mod Manager - Disabled\\c[0]",
+                            "content": [
+                                "The \\c[3]Enabled\\c[0] tab contains all installed and disabled mods.\nDisabled mods have red names.\nUninstall mods by pressing \\i[help2].\nTo enable a mod, focus a mod and press \\i[key-throw] or \\i[gamepad-a]."
+                            ]
+                        }
+                    ]
+                }
             }
         }
     }

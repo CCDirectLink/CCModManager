@@ -2,4 +2,3 @@ remove ccloader from the list
 big mod install list scary
 
 grid view
-add help menu

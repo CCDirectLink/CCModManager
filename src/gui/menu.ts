@@ -245,4 +245,21 @@ sc.ModMenu = sc.ListInfoMenu.extend({
         sc.menu.popBackCallback()
         sc.menu.popMenu()
     },
+    createHelpGui() {
+        if (!this.helpGui) {
+            this.helpGui = new sc.HelpScreen(
+                this,
+                ig.lang.get('sc.gui.menu.help-texts.mods.title'),
+                ig.lang.get('sc.gui.menu.help-texts.mods.pages'),
+                () => {
+                    this.showMenu()
+                    sc.menu.popBackCallback()
+                    sc.menu.popBackCallback()
+                },
+                true
+            )
+            this.helpGui.hook.zIndex = 15e4
+            this.helpGui.hook.pauseGui = true
+        }
+    },
 })
