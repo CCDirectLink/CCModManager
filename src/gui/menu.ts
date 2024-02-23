@@ -2,6 +2,7 @@ import 'nax-ccuilib/src/headers/nax/input-field.d.ts'
 import 'nax-ccuilib/src/headers/nax/input-field-cursor.d.ts'
 import 'nax-ccuilib/src/headers/nax/input-field-type.d.ts'
 import './list'
+import './filters'
 import { ModDB } from '../moddb'
 import { MOD_MENU_TAB_INDEXES } from './list'
 import { InstallQueue, ModInstaller } from '../mod-installer'
@@ -27,10 +28,10 @@ declare global {
             list: ModMenuList
             inputField: nax.ccuilib.InputField
             installButton: sc.ButtonGui
-            includeLocalCheckbox: sc.CheckboxGui
-            includeLocalText: sc.TextGui
             uninstallButton: sc.ButtonGui
             checkUpdatesButton: sc.ButtonGui
+            filtersButton: sc.ButtonGui
+            filtersPopup: sc.FiltersPopup
 
             setBlackBarVisibility(this: this, visible: boolean): void
             setAllVisibility(this: this, visible: boolean): void
@@ -61,6 +62,13 @@ sc.MOD_MENU_MESSAGES = {
     ENTRY_UNFOCUSED: 5,
 }
 
+sc.GlobalInput.inject({
+    onPostUpdate() {
+        if (sc.menu.currentMenu == sc.MENU_SUBMENU.MODS && sc.control.menu()) return
+        this.parent()
+    },
+})
+
 sc.ModMenu = sc.ListInfoMenu.extend({
     observers: [],
     init() {
@@ -76,43 +84,17 @@ sc.ModMenu = sc.ListInfoMenu.extend({
             this.list.reloadFilters()
         }
         this.addChildGui(this.inputField)
-        /* i dont think this is how it's supposed to work but it works so */
+        /* this NOT is how it's supposed to work but it works so */
         sc.menu.buttonInteract.addGlobalButton(this.inputField as any, () => false)
 
         this.sortMenu.addButton('name', sc.MOD_MENU_SORT_ORDER.NAME, sc.MOD_MENU_SORT_ORDER.NAME)
         this.sortMenu.addButton('stars', sc.MOD_MENU_SORT_ORDER.STARS, sc.MOD_MENU_SORT_ORDER.STARS)
         this.sortMenu.addButton('lastUpdated', sc.MOD_MENU_SORT_ORDER.LAST_UPDATED, sc.MOD_MENU_SORT_ORDER.LAST_UPDATED)
 
-        // const legacyCheckbox = new sc.CheckboxGui((this.list.filters.includeLegacy = true))
-        // legacyCheckbox.setPos(9, 282)
-        // legacyCheckbox.onButtonPress = () => {
-        //     this.list.filters.includeLegacy = legacyCheckbox.pressed
-        //     this.list.reloadFilters()
-        // }
-        // this.addChildGui(legacyCheckbox)
-        // sc.menu.buttonInteract.addGlobalButton(legacyCheckbox, () => false)
-        // const legacyText = new sc.TextGui('Include legacy mods')
-        // legacyText.setPos(35, 282)
-        // this.addChildGui(legacyText)
-
-        this.includeLocalCheckbox = new sc.CheckboxGui((this.list.filters.includeLocal = true))
-        this.includeLocalCheckbox.setPos(9, 300)
-        this.includeLocalCheckbox.onButtonPress = () => {
-            this.list.filters.includeLocal = this.includeLocalCheckbox.pressed
-            this.list.reloadFilters()
-        }
-        this.addChildGui(this.includeLocalCheckbox)
-        sc.menu.buttonInteract.addGlobalButton(this.includeLocalCheckbox, () => false)
-        this.includeLocalText = new sc.TextGui('Include local')
-        this.includeLocalText.hook.transitions['HIDDEN'] = this.includeLocalCheckbox.hook.transitions['HIDDEN']
-        this.includeLocalText.setPos(35, 300)
-        this.addChildGui(this.includeLocalText)
-
-        this.inputField.hook.transitions['HIDDEN'] = this.includeLocalCheckbox.hook.transitions['HIDDEN']
-
+        const bottomY = 285
         this.installButton = new sc.ButtonGui('', 128, true, sc.BUTTON_TYPE.SMALL)
         this.updateInstallButtonText()
-        this.installButton.setPos(340, 22)
+        this.installButton.setPos(152, bottomY)
         this.installButton.onButtonPress = () => {
             if (this.list.currentTabIndex == MOD_MENU_TAB_INDEXES.SELECTED) sc.BUTTON_SOUND.submit.play()
             ModInstaller.findDeps(InstallQueue.values(), ModDB.modRecord)
@@ -123,8 +105,10 @@ sc.ModMenu = sc.ListInfoMenu.extend({
         this.addChildGui(this.installButton)
         sc.menu.buttonInteract.addGlobalButton(this.installButton, () => sc.control.menuHotkeyHelp4())
 
+        this.inputField.hook.transitions['HIDDEN'] = this.installButton.hook.transitions['HIDDEN']
+
         this.uninstallButton = new sc.ButtonGui('\\i[help2]Uninstall', 85, true, sc.BUTTON_TYPE.SMALL)
-        this.uninstallButton.setPos(475, 22)
+        this.uninstallButton.setPos(390, bottomY)
         this.uninstallButton.onButtonPress = () => {
             const mod: ModEntry = (this.list.currentList.buttonGroup.elements[0].find((b: ig.FocusGui) => b.focus) as sc.ModListEntry).mod
             const localMod = mod.isLocal ? mod : mod.localCounterpart
@@ -137,7 +121,7 @@ sc.ModMenu = sc.ListInfoMenu.extend({
         sc.menu.buttonInteract.addGlobalButton(this.uninstallButton, () => sc.control.menuHotkeyHelp2())
 
         this.checkUpdatesButton = new sc.ButtonGui('Check updates', 100, true, sc.BUTTON_TYPE.SMALL)
-        this.checkUpdatesButton.setPos(235, 22)
+        this.checkUpdatesButton.setPos(285, bottomY)
         this.checkUpdatesButton.onButtonPress = () => {
             if (this.list.currentTabIndex == MOD_MENU_TAB_INDEXES.SELECTED) sc.BUTTON_SOUND.submit.play()
             ModInstaller.appendToUpdateModsToQueue().then(hasUpdated => {
@@ -154,6 +138,16 @@ sc.ModMenu = sc.ListInfoMenu.extend({
         this.checkUpdatesButton.keepMouseFocus = true /* prevent the focus jumping all over the place on press */
         this.addChildGui(this.checkUpdatesButton)
         sc.menu.buttonInteract.addGlobalButton(this.checkUpdatesButton, () => false)
+
+        this.filtersPopup = new sc.FiltersPopup()
+        this.filtersButton = new sc.ButtonGui('\\i[menu]Filters', 80, true, sc.BUTTON_TYPE.SMALL)
+        this.filtersButton.setPos(480, bottomY)
+        this.filtersButton.onButtonPress = () => {
+            this.filtersPopup.show()
+        }
+        this.filtersButton.keepMouseFocus = true /* prevent the focus jumping all over the place on press */
+        this.addChildGui(this.filtersButton)
+        sc.menu.buttonInteract.addGlobalButton(this.filtersButton, () => sc.control.menu())
 
         this.setTabEvent()
     },
@@ -174,15 +168,6 @@ sc.ModMenu = sc.ListInfoMenu.extend({
         this.installButton.setActive(count > 0)
     },
     setTabEvent() {
-        /* handle filters */
-        if (this.list.currentTabIndex == MOD_MENU_TAB_INDEXES.ONLINE) {
-            this.includeLocalText.doStateTransition('DEFAULT')
-            this.includeLocalCheckbox.doStateTransition('DEFAULT')
-        } else {
-            this.includeLocalText.doStateTransition('HIDDEN')
-            this.includeLocalCheckbox.doStateTransition('HIDDEN')
-        }
-
         /* handle install button */
         if (this.list.currentTabIndex > MOD_MENU_TAB_INDEXES.SELECTED) {
             this.installButton.doStateTransition('HIDDEN')
@@ -226,8 +211,6 @@ sc.ModMenu = sc.ListInfoMenu.extend({
         this.uninstallButton.doStateTransition(state)
         this.checkUpdatesButton.doStateTransition(state)
         this.inputField.doStateTransition(state)
-        this.includeLocalText.doStateTransition(state)
-        this.includeLocalCheckbox.doStateTransition(state)
 
         const main = ig.gui.guiHooks.find(h => h.gui instanceof sc.MainMenu)?.gui as sc.MainMenu | undefined
         if (main?.info) main.info.doStateTransition(state)

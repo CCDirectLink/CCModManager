@@ -158,9 +158,7 @@ sc.ModMenuList = sc.ListTabbedPane.extend({
     populateSettings(list) {
         const repositoriesButton = new sc.ButtonGui(ig.lang.get('sc.gui.menu.ccmodloader.reposButton'))
         repositoriesButton.onButtonPress = () => {
-            if (!this.reposPopup) {
-                this.reposPopup = new sc.ModMenuRepoAddPopup()
-            }
+            if (!this.reposPopup) this.reposPopup = new sc.ModMenuRepoAddPopup()
             this.reposPopup.show()
         }
         list.addButton(repositoriesButton)

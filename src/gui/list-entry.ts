@@ -15,6 +15,7 @@ declare global {
             starCount?: sc.TextGui
             lastUpdated?: sc.TextGui
             authors?: sc.TextGui
+            tags?: sc.TextGui
             modList: sc.ModMenuList
             highlight: ModListEntryHighlight
             modEntryActionButtonStart: { height: number; ninepatch: ig.NinePatch; highlight: sc.ButtonGui.Highlight }
@@ -102,6 +103,15 @@ sc.ModListEntry = ig.FocusGui.extend({
             this.addChildGui(this.authors)
         }
         this.updateHighlightWidth()
+
+        if (serverMod?.tags) {
+            const tags = serverMod.tags
+            const str = tags.map(a => `\\c[0]${a}\\c[0]`).join(', ')
+            this.tags = new sc.TextGui(str, { font: sc.fontsystem.smallFont })
+            this.tags.setAlign(ig.GUI_ALIGN.X_RIGHT, ig.GUI_ALIGN.Y_TOP)
+            this.tags.setPos(4, 15)
+            this.addChildGui(this.tags)
+        }
 
         this.versionText = new sc.TextGui(`v${mod.version}`, { font: sc.fontsystem.tinyFont })
         this.versionText.setAlign(ig.GUI_ALIGN.X_RIGHT, ig.GUI_ALIGN.Y_TOP)

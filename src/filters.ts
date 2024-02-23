@@ -7,11 +7,21 @@ export interface Fliters {
     name?: string
     hasIcon?: boolean
     includeLocal?: boolean
+    hideLibraryMods?: boolean
+    tags?: string[]
 }
 
-function doesFilterApply(filters: Fliters, mod: ModEntry) {
+function doesFilterApply(filters: Fliters, mod: ModEntry): boolean {
     if (filters.hasIcon && !mod.hasIcon) return false
     if (!filters.includeLocal && !mod.isLocal /* we only want to exclude server entries of local mods */ && LocalMods.getAllRecord()[mod.id]) return false
+    const tags = (mod.isLocal ? mod.serverCounterpart : mod)?.tags
+    if (tags) {
+        if (filters.hideLibraryMods && tags.includes('library')) return false
+
+        for (const hasToHaveTag of filters.tags ?? []) {
+            if (!tags.includes(hasToHaveTag)) return false
+        }
+    }
     return true
 }
 
@@ -29,7 +39,7 @@ export function createFuzzyFilteredModList<T extends ModEntry>(filters: Fliters,
 
                 const origMod = (a as any).obj as ModEntry
                 let mod: ModEntryServer | undefined = origMod.isLocal ? origMod.serverCounterpart : origMod
-                
+
                 let author: number = 0
                 if (mod) {
                     const res = fuzzysort.go(filters.name!, mod.authors)
