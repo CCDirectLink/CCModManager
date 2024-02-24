@@ -16,7 +16,7 @@ function doesFilterApply(filters: Fliters, mod: ModEntry): boolean {
     if (!filters.includeLocal && !mod.isLocal /* we only want to exclude server entries of local mods */ && LocalMods.getAllRecord()[mod.id]) return false
     const tags = (mod.isLocal ? mod.serverCounterpart : mod)?.tags
     if (tags) {
-        if (filters.hideLibraryMods && tags.includes('library')) return false
+        if (filters.hideLibraryMods && tags[0] == 'library') return false
 
         for (const hasToHaveTag of filters.tags ?? []) {
             if (!tags.includes(hasToHaveTag)) return false
