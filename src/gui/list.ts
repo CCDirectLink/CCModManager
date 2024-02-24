@@ -5,6 +5,7 @@ import { LocalMods } from '../local-mods'
 import './list-entry'
 import './repo-add'
 import { InstallQueue } from '../mod-installer'
+import { isGridLocalStorageId } from './filters'
 
 declare global {
     namespace sc {
@@ -17,6 +18,8 @@ declare global {
             }[]
             currentSort: sc.MOD_MENU_SORT_ORDER
             reposPopup: sc.ModMenuRepoAddPopup
+            gridColumns: number
+            isGrid: boolean
 
             reloadFilters(this: this): void
             reloadEntries(this: this): void
@@ -26,6 +29,7 @@ declare global {
             populateEnabled(this: this, list: sc.ButtonListBox, buttonGroup: sc.ButtonGroup, sort: sc.MOD_MENU_SORT_ORDER): void
             populateDisabled(this: this, list: sc.ButtonListBox, buttonGroup: sc.ButtonGroup, sort: sc.MOD_MENU_SORT_ORDER): void
             populateSettings(this: this, list: sc.ButtonListBox, buttonGroup: sc.ButtonGroup): void
+            populateListFromMods(this: this, mods: ModEntry[], list: sc.ButtonListBox): void
         }
         interface ModMenuListConstructor extends ImpactClass<ModMenuList> {
             new (): ModMenuList
@@ -54,6 +58,8 @@ sc.ModMenuList = sc.ListTabbedPane.extend({
     /* extends */
     init() {
         this.parent(false)
+        Object.defineProperty(this, 'isGrid', { get: () => localStorage.getItem(isGridLocalStorageId) == 'true' })
+        this.gridColumns = 3
 
         this.tabz = [
             { name: ig.lang.get('sc.gui.menu.ccmodloader.onlineTab'), populateFunc: this.populateOnline, icon: 'quest-all' },
@@ -120,9 +126,20 @@ sc.ModMenuList = sc.ListTabbedPane.extend({
     onContentCreation(index, settings) {
         this.currentList && this.currentList.clear()
         this.currentGroup && this.currentGroup.clear()
-        this.parent(index, settings)
+        return this.parent(index, settings)
     },
     onCreateListEntries(list, buttonGroup) {
+        this.currentList.columns = this.gridColumns
+        this.currentList.buttonGroup.selectionType = ig.BUTTON_GROUP_SELECT_TYPE.ALL
+
+        /* apparently rfg cannot make a 3+ column pane display propely so here it is */
+        this.currentList._getContentHeight = function (this: sc.ButtonListBox, _idontneedthis: boolean) {
+            const elements = this.contentPane.hook.children
+            const elementBelow = elements[elements.length - this.columns]
+            if (elementBelow) return elementBelow.pos.y + elementBelow.size.y
+            return this.paddingTop
+        }
+
         list.clear()
         buttonGroup.clear()
         this.tabz[this.currentTabIndex].populateFunc.bind(this)(list, buttonGroup, this.currentSort)
@@ -184,33 +201,30 @@ sc.ModMenuList = sc.ListTabbedPane.extend({
         let mods = Object.values(ModDB.removeModDuplicates(ModDB.modRecord))
         mods = createFuzzyFilteredModList(this.filters, mods)
         this.sortModEntries(mods, sort)
-        for (const mod of mods) {
-            const newModEntry = new sc.ModListEntry(mod, this)
-            list.addButton(newModEntry)
-        }
+        this.populateListFromMods(mods, list)
     },
     populateSelected(list, _, sort: sc.MOD_MENU_SORT_ORDER) {
         const mods = createFuzzyFilteredModList(this.filters, InstallQueue.values())
         this.sortModEntries(mods, sort)
-        for (const mod of mods) {
-            const newModEntry = new sc.ModListEntry(mod, this)
-            list.addButton(newModEntry)
-        }
+        this.populateListFromMods(mods, list)
     },
     populateEnabled(list, _, sort: sc.MOD_MENU_SORT_ORDER) {
         const mods = createFuzzyFilteredModList(this.filters, LocalMods.getActive())
         this.sortModEntries(mods, sort)
-        for (const mod of mods) {
-            const newModEntry = new sc.ModListEntry(mod, this)
-            list.addButton(newModEntry)
-        }
+        this.populateListFromMods(mods, list)
     },
     populateDisabled(list, _, sort: sc.MOD_MENU_SORT_ORDER) {
         const mods = createFuzzyFilteredModList(this.filters, LocalMods.getInactive())
         this.sortModEntries(mods, sort)
-        for (const mod of mods) {
+        this.populateListFromMods(mods, list)
+    },
+    populateListFromMods(mods, list) {
+        const totalWidth = this.hook.size.x
+        for (let i = 0; i < mods.length; i++) {
+            const mod = mods[i]
             const newModEntry = new sc.ModListEntry(mod, this)
-            list.addButton(newModEntry)
+            const x = this.isGrid ? (i % this.gridColumns) * (totalWidth / this.gridColumns - 1) : 0
+            list.addButton(newModEntry, undefined, x)
         }
     },
     reloadFilters() {

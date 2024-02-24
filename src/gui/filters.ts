@@ -27,9 +27,11 @@ declare global {
     }
 }
 
-type CheckboxConfig = { name: string; description: string; filterKey?: keyof Fliters; default?: boolean }
+export const isGridLocalStorageId = 'CCModManager-grid'
+type CheckboxConfig = { name: string; description: string; default?: boolean } & ({ filterKey?: keyof Fliters } | { localStorageKey: string })
 
 const checkboxes: CheckboxConfig[] = [
+    { name: 'Grid view', description: 'Makes the mod list a grid', localStorageKey: isGridLocalStorageId, default: false },
     { name: 'Include local', description: 'Includes installed mods', filterKey: 'includeLocal', default: true },
     { name: 'Hide library mods', description: "Hides mods that don't add any new content themselvs", filterKey: 'hideLibraryMods', default: true },
     { name: 'QoL', description: 'stands for "Quality of Life". Makes the playing experience smoother' },
@@ -78,8 +80,10 @@ sc.FiltersPopup = ig.GuiElementBase.extend({
     },
     setFilterValue(config, state) {
         const filters = sc.modMenu.list.filters
-        if (config.filterKey) {
+        if ('filterKey' in config && config.filterKey) {
             filters[config.filterKey] = state as any
+        } else if ('localStorageKey' in config) {
+            localStorage.setItem(config.localStorageKey, state.toString())
         } else {
             filters.tags ??= []
             if (state) filters.tags.push(config.name)
@@ -93,7 +97,13 @@ sc.FiltersPopup = ig.GuiElementBase.extend({
     },
     getFilterValue(config) {
         const filters = sc.modMenu.list.filters
-        return config.filterKey ? (filters[config.filterKey] as boolean | undefined) : filters.tags?.includes(config.name)
+        if ('filterKey' in config && config.filterKey) {
+            return filters[config.filterKey] as boolean | undefined
+        } else if ('localStorageKey' in config) {
+            const item = localStorage.getItem(config.localStorageKey)
+            if (item === null) return !!config.default
+            return item == 'true'
+        } else return filters.tags?.includes(config.name)
     },
     init() {
         this.parent()
@@ -107,7 +117,6 @@ sc.FiltersPopup = ig.GuiElementBase.extend({
         this.infoBar = new sc.InfoBar()
         this.infoBar.setAlign(ig.GUI_ALIGN.X_LEFT, ig.GUI_ALIGN.Y_BOTTOM)
         this.infoBar.hook.zIndex = 1e100
-        this.infoBar.setText('aaaaaaatest')
         this.infoBar.doStateTransition('HIDDEN')
         this.addChildGui(this.infoBar)
 
@@ -130,7 +139,7 @@ sc.FiltersPopup = ig.GuiElementBase.extend({
             const checkbox = new sc.ModMenuFilterCheckboxGui()
             checkbox.setPos(x * (textW + spacingW) + offset.x, y * (textH + spacingH))
             checkbox.data = config.description
-            if (config.default !== undefined) {
+            if (config.default !== undefined && !('localStorageKey' in config)) {
                 checkbox.setPressed(config.default)
                 this.setFilterValue(config, config.default)
             }

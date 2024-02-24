@@ -4,11 +4,13 @@ import './list-entry-highlight'
 import { LocalMods } from '../local-mods'
 import { MOD_MENU_TAB_INDEXES } from './list'
 import { InstallQueue } from '../mod-installer'
+
 declare global {
     namespace sc {
         export interface ModListEntry extends ig.FocusGui {
             ninepatch: ig.NinePatch
             mod: ModEntry
+            iconOffset: number
             nameText: sc.TextGui
             description: sc.TextGui
             versionText: sc.TextGui
@@ -24,6 +26,7 @@ declare global {
 
             getModName(this: this): string
             onButtonPress(this: this): void
+            setNameText(this: this, text: string): void
             setTextGreen(this: this): void
             setTextRed(this: this): void
             setTextWhite(this: this): void
@@ -53,17 +56,25 @@ sc.ModListEntry = ig.FocusGui.extend({
         this.mod = mod
         this.modList = modList
 
+        const isGrid = modList.isGrid
         /* init icon asap */
         FileCache.getIconConfig(mod).then(config => {
             const image = new ig.Image(config.path)
             this.iconGui = new ig.ImageGui(image, config.offsetX, config.offsetY, config.sizeX, config.sizeY)
-            this.iconGui.setPos(2, 8)
+            if (isGrid) this.iconGui.setPos(2, 2)
+            else this.iconGui.setPos(2, 8)
             this.addChildGui(this.iconGui)
         })
 
-        const buttonSquareSize = 14
+        const height = 42
+        this.iconOffset = 25
 
-        this.setSize(modList.hook.size.x - 3 /* 3 for scrollbar */, buttonSquareSize * 3 - 3)
+        const regularWidth = modList.hook.size.x - (isGrid ? Math.ceil(3 / modList.gridColumns) : 3)
+        if (isGrid) {
+            this.setSize(regularWidth / modList.gridColumns, 26)
+        } else {
+            this.setSize(regularWidth, height - 3)
+        }
 
         const localMod = mod.isLocal ? mod : mod.localCounterpart
         const serverMod = mod.isLocal ? mod.serverCounterpart : mod
@@ -80,23 +91,22 @@ sc.ModListEntry = ig.FocusGui.extend({
         }
         if (InstallQueue.has(mod)) this.setTextYellow()
 
-        const iconOffset = 25 as const
-        this.highlight = new sc.ModListEntryHighlight(this.hook.size.x, this.hook.size.y, this.nameText.hook.size.x, buttonSquareSize * 3)
-        this.highlight.setPos(iconOffset, 0)
+        this.highlight = new sc.ModListEntryHighlight(this.hook.size.x, this.hook.size.y, this.nameText.hook.size.x, height)
+        this.highlight.setPos(this.iconOffset, 0)
         this.addChildGui(this.highlight)
         this.addChildGui(this.nameText)
 
-        this.description = new sc.TextGui(mod.description ?? '', {
-            font: sc.fontsystem.smallFont,
-            maxWidth: this.hook.size.x - 110,
-            linePadding: -4,
-        })
-        this.addChildGui(this.description)
+        if (!isGrid) {
+            this.description = new sc.TextGui(mod.description ?? '', {
+                font: sc.fontsystem.smallFont,
+                maxWidth: this.hook.size.x - 110,
+                linePadding: -4,
+            })
+            this.description.setPos(4 + this.iconOffset, 14)
+            this.addChildGui(this.description)
+        }
 
-        this.nameText.setPos(4 + iconOffset, 0)
-        this.description.setPos(4 + iconOffset, 14)
-
-        if (serverMod?.authors) {
+        if (!isGrid && serverMod?.authors) {
             const authors = serverMod.authors
             const str = `by ${authors.map(a => `\\c[3]${a}\\c[0]`).join(', ')}`
             this.authors = new sc.TextGui(str, { font: sc.fontsystem.smallFont })
@@ -104,37 +114,39 @@ sc.ModListEntry = ig.FocusGui.extend({
         }
         this.updateHighlightWidth()
 
-        if (serverMod?.tags) {
-            const tags = serverMod.tags
-            const str = tags.map(a => `\\c[0]${a}\\c[0]`).join(', ')
-            this.tags = new sc.TextGui(str, { font: sc.fontsystem.smallFont })
-            this.tags.setAlign(ig.GUI_ALIGN.X_RIGHT, ig.GUI_ALIGN.Y_TOP)
-            this.tags.setPos(4, 15)
-            this.addChildGui(this.tags)
-        }
+        if (!isGrid) {
+            if (serverMod?.tags) {
+                const tags = serverMod.tags
+                const str = tags.map(a => `\\c[0]${a}\\c[0]`).join(', ')
+                this.tags = new sc.TextGui(str, { font: sc.fontsystem.smallFont })
+                this.tags.setAlign(ig.GUI_ALIGN.X_RIGHT, ig.GUI_ALIGN.Y_TOP)
+                this.tags.setPos(4, 15)
+                this.addChildGui(this.tags)
+            }
 
-        this.versionText = new sc.TextGui(`v${mod.version}`, { font: sc.fontsystem.tinyFont })
-        this.versionText.setAlign(ig.GUI_ALIGN.X_RIGHT, ig.GUI_ALIGN.Y_TOP)
-        this.versionText.setPos(3, 3)
-        this.addChildGui(this.versionText)
+            this.versionText = new sc.TextGui(`v${mod.version}`, { font: sc.fontsystem.tinyFont })
+            this.versionText.setAlign(ig.GUI_ALIGN.X_RIGHT, ig.GUI_ALIGN.Y_TOP)
+            this.versionText.setPos(3, 3)
+            this.addChildGui(this.versionText)
 
-        if ('lastUpdateTimestamp' in mod && mod.lastUpdateTimestamp) {
-            const date = new Date(mod.lastUpdateTimestamp)
-            const dateStr = date.toLocaleDateString('pl-PL', {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit',
-            })
-            this.lastUpdated = new sc.TextGui(dateStr, { font: sc.fontsystem.tinyFont })
-            this.lastUpdated.setAlign(ig.GUI_ALIGN.X_RIGHT, ig.GUI_ALIGN.Y_TOP)
-            this.lastUpdated.setPos(3, 10)
-            this.addChildGui(this.lastUpdated)
-        }
+            if ('lastUpdateTimestamp' in mod && mod.lastUpdateTimestamp) {
+                const date = new Date(mod.lastUpdateTimestamp)
+                const dateStr = date.toLocaleDateString('pl-PL', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                })
+                this.lastUpdated = new sc.TextGui(dateStr, { font: sc.fontsystem.tinyFont })
+                this.lastUpdated.setAlign(ig.GUI_ALIGN.X_RIGHT, ig.GUI_ALIGN.Y_TOP)
+                this.lastUpdated.setPos(3, 10)
+                this.addChildGui(this.lastUpdated)
+            }
 
-        if (mod.stars !== undefined) {
-            this.starCount = new sc.TextGui(`${mod.stars}\\i[save-star]`)
-            this.starCount.setPos(496 - this.starCount.hook.size.x, 0)
-            this.addChildGui(this.starCount)
+            if (mod.stars !== undefined) {
+                this.starCount = new sc.TextGui(`${mod.stars}\\i[save-star]`)
+                this.starCount.setPos(496 - this.starCount.hook.size.x, 0)
+                this.addChildGui(this.starCount)
+            }
         }
     },
     getModName() {
@@ -154,21 +166,34 @@ sc.ModListEntry = ig.FocusGui.extend({
         name = `\\i[${icon}]${name}`
         return name
     },
+    setNameText(text: string) {
+        this.nameText.setFont(sc.fontsystem.font)
+        this.nameText.setText(text)
+        this.nameText.setPos(4 + this.iconOffset, 0)
+
+        if (this.nameText.hook.size.x + 3 >= this.hook.size.x - this.nameText.hook.pos.x) {
+            this.nameText.setFont(sc.fontsystem.smallFont)
+            this.nameText.hook.pos.y = 2
+        } else {
+            this.nameText.hook.pos.y = 0
+        }
+        this.updateHighlightWidth()
+    },
     setTextGreen() {
-        this.nameText.setText(`\\c[2]${this.getModName()}\\c[0]`)
+        this.setNameText(`\\c[2]${this.getModName()}\\c[0]`)
     },
     setTextRed() {
-        this.nameText.setText(`\\c[1]${this.getModName()}\\c[0]`)
+        this.setNameText(`\\c[1]${this.getModName()}\\c[0]`)
     },
     setTextWhite() {
-        this.nameText.setText(this.getModName())
+        this.setNameText(this.getModName())
     },
     setTextYellow() {
-        this.nameText.setText(`\\c[3]${this.getModName()}\\c[0]`)
+        this.setNameText(`\\c[3]${this.getModName()}\\c[0]`)
     },
     updateHighlightWidth() {
         const authorsW = this.authors?.hook.size.x
-        this.highlight.updateWidth(this.hook.size.x, this.nameText.hook.size.x + (authorsW ? authorsW + 5 : 0))
+        this.highlight?.updateWidth(this.hook.size.x, this.nameText.hook.size.x + (authorsW ? authorsW + 5 : 0))
         this.authors?.setPos(this.nameText.hook.size.x + 33, 2)
     },
     updateDrawables(renderer) {
@@ -242,32 +267,3 @@ sc.ModListEntry = ig.FocusGui.extend({
         }
     },
 })
-
-// this.openModSettingsButton = new sc.ButtonGui('\\i[mod-config]', buttonSquareSize - 1, true, this.modEntryActionButtons)
-// this.openModSettingsButton.setPos(2, 1)
-// this.openModSettingsButton.setAlign(ig.GUI_ALIGN.X_RIGHT, ig.GUI_ALIGN.Y_BOTTOM)
-
-// this.checkForUpdatesButton = new sc.ButtonGui('\\i[mod-refresh]', buttonSquareSize - 1, true, this.modEntryActionButtons)
-// this.checkForUpdatesButton.setPos(this.openModSettingsButton.hook.pos.x + this.openModSettingsButton.hook.size.x + 1, 1)
-// this.checkForUpdatesButton.setAlign(ig.GUI_ALIGN.X_RIGHT, ig.GUI_ALIGN.Y_BOTTOM)
-
-// this.installRemoveButton = new sc.ButtonGui('\\i[mod-download]', buttonSquareSize - 1, true, this.modEntryActionButtonStart)
-// this.installRemoveButton.setPos(this.checkForUpdatesButton.hook.pos.x + this.checkForUpdatesButton.hook.size.x + 1, 1)
-// this.installRemoveButton.setAlign(ig.GUI_ALIGN.X_RIGHT, ig.GUI_ALIGN.Y_BOTTOM)
-// this.installRemoveButton.onButtonPress = () => {
-//     database
-//         .downloadMod(id)
-//         .then(() => sc.Dialogs.showDialog(`${name} installed.`))
-//         .catch(err => sc.Dialogs.showErrorDialog(err.message))
-// }
-// ;[this.installRemoveButton, this.checkForUpdatesButton, this.openModSettingsButton].forEach(button => {
-//     this.addChildGui(button)
-//     this.modList.buttonGroup.addFocusGui(button)
-//     button.focusGained = () => {
-//         this.focusGained()
-//     }
-//     button.focusLost = () => {
-//         this.focusLost()
-//     }
-//     button.textChild.setPos(1, 3)
-// })
