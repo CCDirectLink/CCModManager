@@ -211,6 +211,7 @@ sc.ModMenu = sc.ListInfoMenu.extend({
         this.uninstallButton.doStateTransition(state)
         this.checkUpdatesButton.doStateTransition(state)
         this.inputField.doStateTransition(state)
+        this.filtersButton.doStateTransition(state)
 
         const main = ig.gui.guiHooks.find(h => h.gui instanceof sc.MainMenu)?.gui as sc.MainMenu | undefined
         if (main?.info) main.info.doStateTransition(state)
