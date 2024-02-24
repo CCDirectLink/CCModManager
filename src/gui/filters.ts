@@ -6,7 +6,8 @@ declare global {
             gfx: ig.Image
             buttonGroup: sc.ButtonGroup
             backButton: sc.ButtonGui
-            checkboxesGuis: { text: sc.TextGui; checkbox: sc.CheckboxGui }[]
+            checkboxesGuis: { text: sc.TextGui; checkbox: sc.FilterCheckox }[]
+            infoBar: sc.InfoBar
 
             setFilterValue(this: this, config: CheckboxConfig, state: boolean): void
             getFilterValue(this: this, config: CheckboxConfig): boolean | undefined
@@ -17,36 +18,57 @@ declare global {
             new (): FiltersPopup
         }
         var FiltersPopup: FiltersPopupConstructor
+
+        interface FilterCheckox extends sc.CheckboxGui {}
+        interface FilterCheckoxConstructor extends ImpactClass<FilterCheckox> {
+            new (): FilterCheckox
+        }
+        var ModMenuFilterCheckboxGui: FilterCheckoxConstructor
     }
 }
 
 type CheckboxConfig = { name: string; description: string; filterKey?: keyof Fliters; default?: boolean }
 
 const checkboxes: CheckboxConfig[] = [
-    { name: 'Include local', description: '', filterKey: 'includeLocal', default: true },
-    { name: 'Hide library mods', description: '', filterKey: 'hideLibraryMods', default: true },
-    { name: 'QoL', description: '' },
-    { name: 'player character', description: '' },
-    { name: 'party member', description: '' },
-    { name: 'combat arts', description: '' },
-    { name: 'pvp duel', description: '' },
-    { name: 'arena', description: '' },
-    { name: 'dungeon', description: '' },
-    { name: 'quests', description: '' },
-    { name: 'maps', description: '' },
-    { name: 'boss', description: '' },
-    { name: 'puzzle', description: '' },
-    { name: 'ng+', description: '' },
-    { name: 'cosmetic', description: '' },
-    { name: 'fun', description: '' },
-    { name: 'cheats', description: '' },
-    { name: 'speedrun', description: '' },
-    { name: 'widget', description: '' },
-    { name: 'language', description: '' },
-    { name: 'accessibility', description: '' },
-    { name: 'dev', description: '' },
-    { name: 'library', description: '' },
+    { name: 'Include local', description: 'Includes installed mods', filterKey: 'includeLocal', default: true },
+    { name: 'Hide library mods', description: "Hides mods that don't add any new content themselvs", filterKey: 'hideLibraryMods', default: true },
+    { name: 'QoL', description: 'stands for "Quality of Life". Makes the playing experience smoother' },
+    { name: 'player character', description: 'adds new playable characters and/or classes' },
+    { name: 'party member', description: 'adds new playable characters and/or classes' },
+    { name: 'combat arts', description: 'adds new combat arts' },
+    { name: 'pvp duel', description: 'adds a pvp duel' },
+    { name: 'arena', description: 'adds new arena cups' },
+    { name: 'dungeon', description: 'adds a new dungeon' },
+    { name: 'quests', description: 'adds new quests' },
+    { name: 'maps', description: 'adds new content maps' },
+    { name: 'boss', description: 'adds new bosses' },
+    { name: 'puzzle', description: 'adds new puzzles or something puzzle related' },
+    { name: 'ng+', description: 'adds additional ng+ options' },
+    { name: 'cosmetic', description: 'adds any kind of cosmetic things like skins, pets or menu skins' },
+    { name: 'fun', description: 'fun things not necessarily useful' },
+    { name: 'cheats', description: "do things you're not supposed to do like spawn items or infinite gold" },
+    { name: 'speedrun', description: 'helps speedrunners with speedruns or practise' },
+    { name: 'widget', description: 'adds a CCUILib quick menu widget' },
+    { name: 'language', description: 'adds a new language' },
+    { name: 'accessibility', description: 'makes the game more accessible' },
+    { name: 'dev', description: 'helps mod developers create mods' },
+    { name: 'library', description: 'used by other mods' },
 ]
+
+sc.ModMenuFilterCheckboxGui = sc.CheckboxGui.extend({
+    init() {
+        this.parent(false)
+    },
+    focusGained() {
+        this.parent()
+        sc.modMenu.filtersPopup.infoBar.setText(this.data as string)
+        sc.modMenu.filtersPopup.infoBar.doStateTransition('DEFAULT')
+    },
+    focusLost() {
+        this.parent()
+        sc.modMenu.filtersPopup.infoBar.doStateTransition('HIDDEN')
+    },
+})
 
 sc.FiltersPopup = ig.GuiElementBase.extend({
     gfx: new ig.Image('media/gui/menu.png'),
@@ -82,6 +104,13 @@ sc.FiltersPopup = ig.GuiElementBase.extend({
         this.hook.size.x = ig.system.width
         this.hook.size.y = ig.system.height
 
+        this.infoBar = new sc.InfoBar()
+        this.infoBar.setAlign(ig.GUI_ALIGN.X_LEFT, ig.GUI_ALIGN.Y_BOTTOM)
+        this.infoBar.hook.zIndex = 1e100
+        this.infoBar.setText('aaaaaaatest')
+        this.infoBar.doStateTransition('HIDDEN')
+        this.addChildGui(this.infoBar)
+
         this.buttonGroup = new sc.ButtonGroup()
 
         const box = new ig.GuiElementBase()
@@ -98,7 +127,7 @@ sc.FiltersPopup = ig.GuiElementBase.extend({
             const config = checkboxes[i]
             const x = i % tagsW
             const y = (i / tagsW).floor()
-            const checkbox = new sc.CheckboxGui(false)
+            const checkbox = new sc.ModMenuFilterCheckboxGui()
             checkbox.setPos(x * (textW + spacingW) + offset.x, y * (textH + spacingH))
             checkbox.data = config.description
             if (config.default !== undefined) {
@@ -124,7 +153,6 @@ sc.FiltersPopup = ig.GuiElementBase.extend({
         this.backButton.setPos(0, 0)
         this.backButton.submitSound = sc.BUTTON_SOUND.back
         this.backButton.onButtonPress = () => {
-            console.log('press')
             this.hide()
         }
         this.addChildGui(this.backButton)
@@ -156,6 +184,7 @@ sc.FiltersPopup = ig.GuiElementBase.extend({
     },
     hide() {
         this.doStateTransition('HIDDEN', undefined, true)
+        this.infoBar.doStateTransition('HIDDEN')
         sc.menu.buttonInteract.removeButtonGroup(this.buttonGroup)
         sc.menu.buttonInteract.removeGlobalButton(this.backButton)
         ig.interact.setBlockDelay(0.2)
