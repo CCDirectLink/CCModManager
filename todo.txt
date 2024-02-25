@@ -1,4 +1,6 @@
 remove ccloader from the list
 big mod install list scary
 
-grid view
+move ALL text to the lang file
+rename filters button
+enable/disable popup on exit

@@ -28,10 +28,16 @@ declare global {
 }
 
 export const isGridLocalStorageId = 'CCModManager-grid'
-type CheckboxConfig = { name: string; description: string; default?: boolean } & ({ filterKey?: keyof Fliters } | { localStorageKey: string })
+type CheckboxConfig = { name: string; description: string; default?: boolean } & ({ filterKey?: keyof Fliters } | { localStorageKey: string; callback: () => void })
 
 const checkboxes: CheckboxConfig[] = [
-    { name: 'Grid view', description: 'Makes the mod list a grid', localStorageKey: isGridLocalStorageId, default: false },
+    {
+        name: 'Grid view',
+        description: 'Makes the mod list a grid',
+        localStorageKey: isGridLocalStorageId,
+        default: false,
+        callback: () => sc.modMenu.list.updateColumnCount(),
+    },
     { name: 'Include local', description: 'Includes installed mods', filterKey: 'includeLocal', default: true },
     { name: 'Hide library mods', description: "Hides mods that don't add any new content themselvs", filterKey: 'hideLibraryMods', default: true },
     { name: 'QoL', description: 'stands for "Quality of Life". Makes the playing experience smoother' },
@@ -84,6 +90,7 @@ sc.FiltersPopup = ig.GuiElementBase.extend({
             filters[config.filterKey] = state as any
         } else if ('localStorageKey' in config) {
             localStorage.setItem(config.localStorageKey, state.toString())
+            config.callback()
         } else {
             filters.tags ??= []
             if (state) filters.tags.push(config.name)

@@ -21,6 +21,7 @@ declare global {
             gridColumns: number
             isGrid: boolean
 
+            updateColumnCount(this: this): void
             reloadFilters(this: this): void
             reloadEntries(this: this): void
             sortModEntries(this: this, mods: ModEntry[], sort: sc.MOD_MENU_SORT_ORDER): void
@@ -129,15 +130,17 @@ sc.ModMenuList = sc.ListTabbedPane.extend({
         return this.parent(index, settings)
     },
     onCreateListEntries(list, buttonGroup) {
-        this.currentList.columns = this.gridColumns
-        this.currentList.buttonGroup.selectionType = ig.BUTTON_GROUP_SELECT_TYPE.ALL
+        if (this.isGrid) {
+            this.currentList.columns = this.gridColumns
+            this.currentList.buttonGroup.selectionType = ig.BUTTON_GROUP_SELECT_TYPE.ALL
 
-        /* apparently rfg cannot make a 3+ column pane display propely so here it is */
-        this.currentList._getContentHeight = function (this: sc.ButtonListBox, _idontneedthis: boolean) {
-            const elements = this.contentPane.hook.children
-            const elementBelow = elements[elements.length - this.columns]
-            if (elementBelow) return elementBelow.pos.y + elementBelow.size.y
-            return this.paddingTop
+            /* apparently rfg cannot make a 3+ column pane display propely so here it is */
+            this.currentList._getContentHeight = function (this: sc.ButtonListBox, _idontneedthis: boolean) {
+                const elements = this.contentPane.hook.children
+                const elementBelow = elements[elements.length - this.columns]
+                if (elementBelow) return elementBelow.pos.y + elementBelow.size.y
+                return this.paddingTop
+            }
         }
 
         list.clear()
@@ -232,5 +235,14 @@ sc.ModMenuList = sc.ListTabbedPane.extend({
     },
     reloadEntries() {
         this.setTab(this.currentTabIndex, true, { skipSounds: true })
+    },
+    updateColumnCount() {
+        if (this.isGrid) {
+            this.currentList.columns = this.gridColumns
+            this.currentList.buttonGroup.selectionType = ig.BUTTON_GROUP_SELECT_TYPE.ALL
+        } else {
+            this.currentList.columns = 1
+            this.currentList.buttonGroup.selectionType = ig.BUTTON_GROUP_SELECT_TYPE.HORIZONTAL
+        }
     },
 })
