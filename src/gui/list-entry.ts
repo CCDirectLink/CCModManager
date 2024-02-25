@@ -111,21 +111,18 @@ sc.ModListEntry = ig.FocusGui.extend({
             })
             this.description.setPos(4 + this.iconOffset, 14)
             this.addChildGui(this.description)
-        }
 
-        if (!isGrid && serverMod?.authors) {
-            const authors = serverMod.authors
-            const str = `by ${authors.map(a => `\\c[3]${a}\\c[0]`).join(', ')}`
-            this.authors = new sc.TextGui(str, { font: sc.fontsystem.smallFont })
-            this.addChildGui(this.authors)
-        }
-        this.updateHighlightWidth()
+            if (serverMod?.authors) {
+                const authors = serverMod.authors
+                const str = `by ${authors.map(a => `\\c[3]${a}\\c[0]`).join(', ')}`
+                this.authors = new sc.TextGui(str, { font: sc.fontsystem.smallFont, linePadding: -1 })
+                this.addChildGui(this.authors)
+            }
 
-        if (!isGrid) {
             if (serverMod?.tags) {
                 const tags = serverMod.tags
                 const str = tags.map(a => `\\c[0]${a}\\c[0]`).join(', ')
-                this.tags = new sc.TextGui(str, { font: sc.fontsystem.smallFont })
+                this.tags = new sc.TextGui(str, { font: sc.fontsystem.smallFont, maxWidth: 130, linePadding: -4 })
                 this.tags.setAlign(ig.GUI_ALIGN.X_RIGHT, ig.GUI_ALIGN.Y_TOP)
                 this.tags.setPos(4, 15)
                 this.addChildGui(this.tags)
@@ -155,6 +152,7 @@ sc.ModListEntry = ig.FocusGui.extend({
                 this.addChildGui(this.starCount)
             }
         }
+        this.updateHighlightWidth()
     },
     getModName() {
         let icon: string = ''
@@ -178,7 +176,7 @@ sc.ModListEntry = ig.FocusGui.extend({
         this.nameText.setText(`\\c[${color}]${text}\\c[0]`)
         this.nameText.setPos(4 + this.iconOffset + this.nameIconPrefixesText.hook.size.x, 0)
 
-        if (this.nameText.hook.size.x + this.nameIconPrefixesText.hook.size.x + 5 >= this.hook.size.x - this.nameText.hook.pos.x) {
+        if (this.nameText.hook.size.x + this.nameIconPrefixesText.hook.size.x - 17 >= this.hook.size.x - this.nameText.hook.pos.x) {
             this.nameText.setFont(sc.fontsystem.smallFont)
             this.nameText.hook.pos.y = 2
         } else {
@@ -187,9 +185,19 @@ sc.ModListEntry = ig.FocusGui.extend({
         this.updateHighlightWidth()
     },
     updateHighlightWidth() {
+        if (this.authors) {
+            this.authors.setPos(this.nameText.hook.pos.x + this.nameText.hook.size.x + 4, 2)
+            if (this.authors.font !== sc.fontsystem.tinyFont) {
+                const spaceLeft = this.hook.size.x - this.authors.hook.pos.x - (this.hook.size.x - (this.starCount?.hook.pos.x ?? this.versionText.hook.pos.x))
+                const freeSpace = spaceLeft - this.authors.hook.size.x
+                if (freeSpace <= 0) {
+                    this.authors.setFont(sc.fontsystem.tinyFont)
+                    this.authors.setMaxWidth(spaceLeft)
+                }
+            }
+        }
         const authorsW = this.authors?.hook.size.x
         this.highlight?.updateWidth(this.hook.size.x, this.nameIconPrefixesText.hook.size.x + this.nameText.hook.size.x + (authorsW ? authorsW + 6 : 0))
-        this.authors?.setPos(this.nameText.hook.pos.x + this.nameText.hook.size.x + 4, 2)
     },
     updateDrawables(renderer) {
         if (this.modList.hook.currentStateName != 'HIDDEN') {
