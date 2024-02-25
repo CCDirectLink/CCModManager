@@ -11,6 +11,7 @@ declare global {
             ninepatch: ig.NinePatch
             mod: ModEntry
             iconOffset: number
+            nameIconPrefixesText: sc.TextGui
             nameText: sc.TextGui
             description: sc.TextGui
             versionText: sc.TextGui
@@ -24,13 +25,9 @@ declare global {
             modEntryActionButtons: sc.ButtonGui.Type & { ninepatch: ig.NinePatch }
             iconGui: ig.ImageGui
 
-            getModName(this: this): string
+            getModName(this: this): { icon: string; text: string }
             onButtonPress(this: this): void
-            setNameText(this: this, text: string): void
-            setTextGreen(this: this): void
-            setTextRed(this: this): void
-            setTextWhite(this: this): void
-            setTextYellow(this: this): void
+            setNameText(this: this, color: COLORS): void
             updateHighlightWidth(this: this): void
         }
         interface ModListEntryConstructor extends ImpactClass<ModListEntry> {
@@ -38,6 +35,13 @@ declare global {
         }
         var ModListEntry: ModListEntryConstructor
     }
+}
+
+enum COLORS {
+    WHITE = 0,
+    RED = 1,
+    GREEN = 2,
+    YELLOW = 3,
 }
 
 sc.ModListEntry = ig.FocusGui.extend({
@@ -80,21 +84,24 @@ sc.ModListEntry = ig.FocusGui.extend({
         const serverMod = mod.isLocal ? mod.serverCounterpart : mod
 
         this.nameText = new sc.TextGui('')
-        this.setTextWhite()
-        if (this.modList.currentTabIndex == MOD_MENU_TAB_INDEXES.DISABLED) this.setTextRed()
-        else if (this.modList.currentTabIndex == MOD_MENU_TAB_INDEXES.ENABLED) this.setTextGreen()
+        this.nameIconPrefixesText = new sc.TextGui('')
+        this.setNameText(COLORS.WHITE)
+
+        if (this.modList.currentTabIndex == MOD_MENU_TAB_INDEXES.DISABLED) this.setNameText(COLORS.RED)
+        else if (this.modList.currentTabIndex == MOD_MENU_TAB_INDEXES.ENABLED) this.setNameText(COLORS.GREEN)
         else {
             if (localMod) {
-                if (localMod.active) this.setTextGreen()
-                else this.setTextRed()
+                if (localMod.active) this.setNameText(COLORS.GREEN)
+                else this.setNameText(COLORS.RED)
             }
         }
-        if (InstallQueue.has(mod)) this.setTextYellow()
+        if (InstallQueue.has(mod)) this.setNameText(COLORS.YELLOW)
 
         this.highlight = new sc.ModListEntryHighlight(this.hook.size.x, this.hook.size.y, this.nameText.hook.size.x, height)
         this.highlight.setPos(this.iconOffset, 0)
         this.addChildGui(this.highlight)
         this.addChildGui(this.nameText)
+        this.addChildGui(this.nameIconPrefixesText)
 
         if (!isGrid) {
             this.description = new sc.TextGui(mod.description ?? '', {
@@ -150,28 +157,28 @@ sc.ModListEntry = ig.FocusGui.extend({
         }
     },
     getModName() {
-        let name = this.mod.name.replace(/\\c\[\d]/g, '')
-        let icon: string
-        if (this.mod.database == 'LOCAL') {
-            icon = 'lore-others'
-        } else {
-            icon = 'quest'
-        }
-        if (this.mod.awaitingRestart) {
-            name = `\\i[stats-general]${name}`
-        }
-        if ((this.mod.isLocal && this.mod.hasUpdate) || (!this.mod.isLocal && this.mod.localCounterpart?.hasUpdate)) {
-            name = `\\i[item-news]${name}`
-        }
-        name = `\\i[${icon}]${name}`
-        return name
-    },
-    setNameText(text: string) {
-        this.nameText.setFont(sc.fontsystem.font)
-        this.nameText.setText(text)
-        this.nameText.setPos(4 + this.iconOffset, 0)
+        let icon: string = ''
 
-        if (this.nameText.hook.size.x + 3 >= this.hook.size.x - this.nameText.hook.pos.x) {
+        icon += this.mod.database == 'LOCAL' ? '\\i[lore-others]' : '\\i[quest]'
+
+        if (this.mod.awaitingRestart) icon += `\\i[stats-general]`
+
+        if ((this.mod.isLocal && this.mod.hasUpdate) || (!this.mod.isLocal && this.mod.localCounterpart?.hasUpdate)) {
+            icon += `\\i[item-news]`
+        }
+
+        return { icon, text: this.mod.name.replace(/\\c\[\d]/g, '') }
+    },
+    setNameText(color: COLORS) {
+        const { text, icon } = this.getModName()
+        this.nameIconPrefixesText.setText(icon)
+        this.nameIconPrefixesText.setPos(4 + this.iconOffset, 0)
+
+        this.nameText.setFont(sc.fontsystem.font)
+        this.nameText.setText(`\\c[${color}]${text}\\c[0]`)
+        this.nameText.setPos(4 + this.iconOffset + this.nameIconPrefixesText.hook.size.x, 0)
+
+        if (this.nameText.hook.size.x + this.nameIconPrefixesText.hook.size.x + 5 >= this.hook.size.x - this.nameText.hook.pos.x) {
             this.nameText.setFont(sc.fontsystem.smallFont)
             this.nameText.hook.pos.y = 2
         } else {
@@ -179,22 +186,10 @@ sc.ModListEntry = ig.FocusGui.extend({
         }
         this.updateHighlightWidth()
     },
-    setTextGreen() {
-        this.setNameText(`\\c[2]${this.getModName()}\\c[0]`)
-    },
-    setTextRed() {
-        this.setNameText(`\\c[1]${this.getModName()}\\c[0]`)
-    },
-    setTextWhite() {
-        this.setNameText(this.getModName())
-    },
-    setTextYellow() {
-        this.setNameText(`\\c[3]${this.getModName()}\\c[0]`)
-    },
     updateHighlightWidth() {
         const authorsW = this.authors?.hook.size.x
-        this.highlight?.updateWidth(this.hook.size.x, this.nameText.hook.size.x + (authorsW ? authorsW + 5 : 0))
-        this.authors?.setPos(this.nameText.hook.size.x + 33, 2)
+        this.highlight?.updateWidth(this.hook.size.x, this.nameIconPrefixesText.hook.size.x + this.nameText.hook.size.x + (authorsW ? authorsW + 6 : 0))
+        this.authors?.setPos(this.nameText.hook.pos.x + this.nameText.hook.size.x + 4, 2)
     },
     updateDrawables(renderer) {
         if (this.modList.hook.currentStateName != 'HIDDEN') {
@@ -217,11 +212,11 @@ sc.ModListEntry = ig.FocusGui.extend({
             if (this.modList.currentTabIndex == MOD_MENU_TAB_INDEXES.ENABLED) {
                 mod.awaitingRestart = !mod.awaitingRestart
                 if (mod.active) {
-                    this.setTextRed()
+                    this.setNameText(COLORS.RED)
                     sc.BUTTON_SOUND.toggle_off.play()
                     LocalMods.setModActive(mod, false)
                 } else {
-                    this.setTextGreen()
+                    this.setNameText(COLORS.GREEN)
                     sc.BUTTON_SOUND.toggle_on.play()
                     LocalMods.setModActive(mod, true)
                 }
@@ -229,11 +224,11 @@ sc.ModListEntry = ig.FocusGui.extend({
             } else if (this.modList.currentTabIndex == MOD_MENU_TAB_INDEXES.DISABLED) {
                 mod.awaitingRestart = !mod.awaitingRestart
                 if (mod.active) {
-                    this.setTextRed()
+                    this.setNameText(COLORS.RED)
                     sc.BUTTON_SOUND.toggle_off.play()
                     LocalMods.setModActive(mod, false)
                 } else {
-                    this.setTextGreen()
+                    this.setNameText(COLORS.GREEN)
                     sc.BUTTON_SOUND.toggle_on.play()
                     LocalMods.setModActive(mod, true)
                 }
@@ -243,12 +238,12 @@ sc.ModListEntry = ig.FocusGui.extend({
             const localMod = mod.localCounterpart
             if (localMod.hasUpdate) {
                 if (InstallQueue.has(mod)) {
-                    if (localMod.active) this.setTextGreen()
-                    else this.setTextRed()
+                    if (localMod.active) this.setNameText(COLORS.GREEN)
+                    else this.setNameText(COLORS.RED)
                     sc.BUTTON_SOUND.toggle_off.play()
                     InstallQueue.delete(mod)
                 } else {
-                    this.setTextYellow()
+                    this.setNameText(COLORS.YELLOW)
                     sc.BUTTON_SOUND.toggle_on.play()
                     InstallQueue.add(mod)
                 }
@@ -258,11 +253,11 @@ sc.ModListEntry = ig.FocusGui.extend({
             if (InstallQueue.has(mod)) {
                 InstallQueue.delete(mod)
                 sc.BUTTON_SOUND.toggle_off.play()
-                this.setTextWhite()
+                this.setNameText(COLORS.WHITE)
             } else {
                 InstallQueue.add(mod)
                 sc.BUTTON_SOUND.toggle_on.play()
-                this.setTextYellow()
+                this.setNameText(COLORS.YELLOW)
             }
         }
     },

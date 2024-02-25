@@ -1,4 +1,2 @@
 remove ccloader from the list
 big mod install list scary
-
-rename filters button
