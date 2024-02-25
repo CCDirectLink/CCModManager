@@ -1,5 +1,4 @@
 remove ccloader from the list
 big mod install list scary
 
-move ALL text to the lang file
 rename filters button

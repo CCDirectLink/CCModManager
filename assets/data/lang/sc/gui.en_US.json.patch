@@ -11,14 +11,16 @@
                     "stars": "Sorts by GitHub stars."
                 }
             },
-            "ccmodloader": {
+            "ccmodmanager": {
                 "onlineTab": "Online",
                 "selectedModsTab": "Selected",
                 "enabledTab": "Enabled",
                 "disabledTab": "Disabled",
                 "settingsTab": "Settings",
                 "installButton": "Install \\c[3][modCount]\\c[0] mods",
-                "uninstallButton": "Uninstall \\c[3][modCount]\\c[0] mods",
+                "uninstall": "Uninstall",
+                "checkUpdates": "Check updates",
+                "filtersButton": "Filters",
                 "noModsSelected": "No mods selected",
                 "reposButton": "Repositories",
                 "areYouSureYouWantTo": "Are you sure you want to:",
@@ -32,7 +34,35 @@
                 "updatesFound": "Updated were found.",
                 "disableAutoupdate": "Disable autoupdate",
                 "askRestartInstall": "Installed succesfully.\nThe installed mods will start working after a restart.\nDo you want to restart?",
-                "askRestartUninstall": "Uninstalled succesfully.\nThe mod will actually stop working after a restart.\nDo you want to restart?"
+                "askRestartUninstall": "Uninstalled succesfully.\nThe mod will actually stop working after a restart.\nDo you want to restart?",
+                "modStatesChanged": "Mod states have been changed, they will take effect after a game restart.\nDo you want to restart now?",
+                "noInternet": "Error: No internet connection",
+                "filters": {
+                    "gridView": { "name": "Grid view", "description": "Makes the mod list a grid" },
+                    "local": { "name": "Include local", "description": "Includes installed mods" },
+                    "hideLibrary": { "name": "Hide library mods", "description": "Hides mods that don't add any new content themselvs" },
+                    "tagQol": { "name": "QoL", "description": "stands for \"Quality of Life\". Makes the playing experience smoother" },
+                    "tagPlayerCharacter": { "name": "player character", "description": "adds new playable characters and/or classes" },
+                    "tagPartyMember": { "name": "party member", "description": "adds new playable characters and/or classes" },
+                    "tagCombatArts": { "name": "combat arts", "description": "adds new combat arts" },
+                    "tagPvpDuel": { "name": "pvp duel", "description": "adds a pvp duel" },
+                    "tagArena": { "name": "arena", "description": "adds new arena cups" },
+                    "tagDungeon": { "name": "dungeon", "description": "adds a new dungeon" },
+                    "tagQuests": { "name": "quests", "description": "adds new quests" },
+                    "tagMaps": { "name": "maps", "description": "adds new content maps" },
+                    "tagBoss": { "name": "boss", "description": "adds new bosses" },
+                    "tagPuzzle": { "name": "puzzle", "description": "adds new puzzles or something puzzle related" },
+                    "tagNg+": { "name": "ng+", "description": "adds additional ng+ options" },
+                    "tagCosmetic": { "name": "cosmetic", "description": "adds any kind of cosmetic things like skins, pets or menu skins" },
+                    "tagFun": { "name": "fun", "description": "fun things not necessarily useful" },
+                    "tagCheats": { "name": "cheats", "description": "do things you\"re not supposed to do like spawn items or infinite gold" },
+                    "tagSpeedrun": { "name": "speedrun", "description": "helps speedrunners with speedruns or practise" },
+                    "tagWidget": { "name": "widget", "description": "adds a CCUILib quick menu widget" },
+                    "tagLanguage": { "name": "language", "description": "adds a new language" },
+                    "tagAccessibility": { "name": "accessibility", "description": "makes the game more accessible" },
+                    "tagDev": { "name": "dev", "description": "helps mod developers create mods" },
+                    "tagLibrary": { "name": "library", "description": "used by other mods" }
+                }
             },
             "help-texts": {
                 "mods": {

@@ -63,11 +63,11 @@ sc.ModMenuList = sc.ListTabbedPane.extend({
         this.gridColumns = 3
 
         this.tabz = [
-            { name: ig.lang.get('sc.gui.menu.ccmodloader.onlineTab'), populateFunc: this.populateOnline, icon: 'quest-all' },
-            { name: ig.lang.get('sc.gui.menu.ccmodloader.selectedModsTab'), populateFunc: this.populateSelected, icon: 'quest-fav' },
-            { name: ig.lang.get('sc.gui.menu.ccmodloader.enabledTab'), populateFunc: this.populateEnabled, icon: 'quest-solve' },
-            { name: ig.lang.get('sc.gui.menu.ccmodloader.disabledTab'), populateFunc: this.populateDisabled, icon: 'quest-elite' },
-            { name: ig.lang.get('sc.gui.menu.ccmodloader.settingsTab'), populateFunc: this.populateSettings, icon: 'stats-log' },
+            { name: ig.lang.get('sc.gui.menu.ccmodmanager.onlineTab'), populateFunc: this.populateOnline, icon: 'quest-all' },
+            { name: ig.lang.get('sc.gui.menu.ccmodmanager.selectedModsTab'), populateFunc: this.populateSelected, icon: 'quest-fav' },
+            { name: ig.lang.get('sc.gui.menu.ccmodmanager.enabledTab'), populateFunc: this.populateEnabled, icon: 'quest-solve' },
+            { name: ig.lang.get('sc.gui.menu.ccmodmanager.disabledTab'), populateFunc: this.populateDisabled, icon: 'quest-elite' },
+            { name: ig.lang.get('sc.gui.menu.ccmodmanager.settingsTab'), populateFunc: this.populateSettings, icon: 'stats-log' },
         ]
         this.filters = {}
         this.currentSort = this.onInitSortType()
@@ -176,7 +176,7 @@ sc.ModMenuList = sc.ListTabbedPane.extend({
     },
     /* new stuff */
     populateSettings(list) {
-        const repositoriesButton = new sc.ButtonGui(ig.lang.get('sc.gui.menu.ccmodloader.reposButton'))
+        const repositoriesButton = new sc.ButtonGui(ig.lang.get('sc.gui.menu.ccmodmanager.reposButton'))
         repositoriesButton.onButtonPress = () => {
             if (!this.reposPopup) this.reposPopup = new sc.ModMenuRepoAddPopup()
             this.reposPopup.show()

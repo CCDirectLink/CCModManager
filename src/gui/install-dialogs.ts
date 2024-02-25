@@ -23,10 +23,10 @@ export class ModInstallDialogs {
         function modsToStr(mods: ModEntry[]) {
             return mods.map(mod => `- \\c[3]${mod.name.replace(/\\c\[\d]/g, '')}\\c[0]\n`).join('')
         }
-        const header = ig.lang.get('sc.gui.menu.ccmodloader.areYouSureYouWantTo') + '\n'
-        const toInstallStr = toInstall.length > 0 ? `${ig.lang.get('sc.gui.menu.ccmodloader.toInstall')}\n${modsToStr(toInstall)}` : ''
-        const toUpdateStr = toUpdate.length > 0 ? `${ig.lang.get('sc.gui.menu.ccmodloader.toUpdate')}\n${modsToStr(toUpdate)}` : ''
-        const depsStr = deps.length > 0 ? `${ig.lang.get('sc.gui.menu.ccmodloader.dependencies')}\n${modsToStr(deps)}` : ''
+        const header = ig.lang.get('sc.gui.menu.ccmodmanager.areYouSureYouWantTo') + '\n'
+        const toInstallStr = toInstall.length > 0 ? `${ig.lang.get('sc.gui.menu.ccmodmanager.toInstall')}\n${modsToStr(toInstall)}` : ''
+        const toUpdateStr = toUpdate.length > 0 ? `${ig.lang.get('sc.gui.menu.ccmodmanager.toUpdate')}\n${modsToStr(toUpdate)}` : ''
+        const depsStr = deps.length > 0 ? `${ig.lang.get('sc.gui.menu.ccmodmanager.dependencies')}\n${modsToStr(deps)}` : ''
 
         const str = `${header}${toInstallStr}${toUpdateStr}${depsStr}`
         sc.Dialogs.showChoiceDialog(str, sc.DIALOG_INFO_ICON.QUESTION, [getNod(), ig.lang.get('sc.gui.dialogs.no')], button => {
@@ -37,7 +37,7 @@ export class ModInstallDialogs {
                         InstallQueue.clear()
                         sc.modMenu && sc.Model.notifyObserver(sc.modMenu, sc.MOD_MENU_MESSAGES.UPDATE_ENTRIES)
                         sc.BUTTON_SOUND.shop_cash.play()
-                        sc.Dialogs.showYesNoDialog(ig.lang.get('sc.gui.menu.ccmodloader.askRestartInstall'), sc.DIALOG_INFO_ICON.QUESTION, button => {
+                        sc.Dialogs.showYesNoDialog(ig.lang.get('sc.gui.menu.ccmodmanager.askRestartInstall'), sc.DIALOG_INFO_ICON.QUESTION, button => {
                             const text = button.text!.toString()
                             if (text == ig.lang.get('sc.gui.dialogs.yes')) {
                                 ModInstaller.restartGame()
@@ -50,7 +50,7 @@ export class ModInstallDialogs {
                     })
                     .catch(err => {
                         FileCache.isThereInternet(true).then(isThereInternet => {
-                            if (!isThereInternet) err = 'Error: No internet connection'
+                            if (!isThereInternet) err = ig.lang.get('sc.gui.menu.ccmodmanager.noInternet')
                             sc.Dialogs.showErrorDialog(err)
                         })
                     })
@@ -66,7 +66,7 @@ export class ModInstallDialogs {
 
         const yes = ig.lang.get('sc.gui.dialogs.yes')
         const no = ig.lang.get('sc.gui.dialogs.no')
-        sc.Dialogs.showChoiceDialog(ig.lang.get('sc.gui.menu.ccmodloader.updatesDetected'), sc.DIALOG_INFO_ICON.QUESTION, [yes, no], button => {
+        sc.Dialogs.showChoiceDialog(ig.lang.get('sc.gui.menu.ccmodmanager.updatesDetected'), sc.DIALOG_INFO_ICON.QUESTION, [yes, no], button => {
             const text = button.text!.toString()
             if (text == yes) {
                 this.showModInstallDialog()
@@ -79,7 +79,7 @@ export class ModInstallDialogs {
     static showModUninstallDialog(localMod: ModEntryLocal) {
         const deps = ModInstaller.getWhatDependsOnAMod(localMod)
         if (deps.length == 0) {
-            const str = ig.lang.get('sc.gui.menu.ccmodloader.areYouSureYouWantToUninstall').replace(/\[modName\]/, localMod.name.replace(/\\c\[\d]/g, ''))
+            const str = ig.lang.get('sc.gui.menu.ccmodmanager.areYouSureYouWantToUninstall').replace(/\[modName\]/, localMod.name.replace(/\\c\[\d]/g, ''))
             sc.Dialogs.showChoiceDialog(str, sc.DIALOG_INFO_ICON.QUESTION, [getNod(), ig.lang.get('sc.gui.dialogs.no')], button => {
                 if (button.text!.toString() == getNod()) {
                     ModInstaller.uninstallMod(localMod).then(() => {
@@ -87,7 +87,7 @@ export class ModInstallDialogs {
                         localMod.active = false
                         sc.Model.notifyObserver(sc.modMenu, sc.MOD_MENU_MESSAGES.UPDATE_ENTRIES)
                         sc.BUTTON_SOUND.shop_cash.play()
-                        sc.Dialogs.showYesNoDialog(ig.lang.get('sc.gui.menu.ccmodloader.askRestartUninstall'), sc.DIALOG_INFO_ICON.QUESTION, button => {
+                        sc.Dialogs.showYesNoDialog(ig.lang.get('sc.gui.menu.ccmodmanager.askRestartUninstall'), sc.DIALOG_INFO_ICON.QUESTION, button => {
                             const text = button.text!.toString()
                             if (text == ig.lang.get('sc.gui.dialogs.yes')) {
                                 ModInstaller.restartGame()
@@ -98,7 +98,7 @@ export class ModInstallDialogs {
             })
         } else {
             sc.Dialogs.showErrorDialog(
-                ig.lang.get('sc.gui.menu.ccmodloader.cannotUninstall').replace(/\[modName\]/, localMod.name) +
+                ig.lang.get('sc.gui.menu.ccmodmanager.cannotUninstall').replace(/\[modName\]/, localMod.name) +
                     deps.map(mod => `- \\c[3]${mod.name.replace(/\\c\[\d]/g, '')}\\c[0]\n`).join('')
             )
         }

@@ -1,15 +1,5 @@
 import './menu.js'
 
-const icons = new ig.Font('media/font/CCModManagerIcons.png', 12, ig.MultiFont.ICON_START)
-const newFontIndex = sc.fontsystem.font.iconSets.length
-sc.fontsystem.font.pushIconSet(icons)
-sc.fontsystem.font.setMapping({
-    'mod-download': [newFontIndex, 0],
-    'mod-config': [newFontIndex, 1],
-    'mod-refresh': [newFontIndex, 2],
-    'mod-delete': [newFontIndex, 3],
-})
-
 // @ts-expect-error
 sc.MENU_SUBMENU.MODS = Math.max(...Object.values(sc.MENU_SUBMENU)) + 1
 

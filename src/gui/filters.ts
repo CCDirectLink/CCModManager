@@ -9,6 +9,7 @@ declare global {
             checkboxesGuis: { text: sc.TextGui; checkbox: sc.FilterCheckox }[]
             infoBar: sc.InfoBar
 
+            getLangData(this: this, key: string): { name: string; description: string }
             setFilterValue(this: this, config: CheckboxConfig, state: boolean): void
             getFilterValue(this: this, config: CheckboxConfig): boolean | undefined
             show(this: this): void
@@ -28,39 +29,38 @@ declare global {
 }
 
 export const isGridLocalStorageId = 'CCModManager-grid'
-type CheckboxConfig = { name: string; description: string; default?: boolean } & ({ filterKey?: keyof Fliters } | { localStorageKey: string; callback: () => void })
+type CheckboxConfig = { key: string; default?: boolean } & ({ filterKey?: keyof Fliters } | { localStorageKey: string; callback: () => void })
 
 const checkboxes: CheckboxConfig[] = [
     {
-        name: 'Grid view',
-        description: 'Makes the mod list a grid',
+        key: 'gridView',
         localStorageKey: isGridLocalStorageId,
         default: false,
         callback: () => sc.modMenu.list.updateColumnCount(),
     },
-    { name: 'Include local', description: 'Includes installed mods', filterKey: 'includeLocal', default: true },
-    { name: 'Hide library mods', description: "Hides mods that don't add any new content themselvs", filterKey: 'hideLibraryMods', default: true },
-    { name: 'QoL', description: 'stands for "Quality of Life". Makes the playing experience smoother' },
-    { name: 'player character', description: 'adds new playable characters and/or classes' },
-    { name: 'party member', description: 'adds new playable characters and/or classes' },
-    { name: 'combat arts', description: 'adds new combat arts' },
-    { name: 'pvp duel', description: 'adds a pvp duel' },
-    { name: 'arena', description: 'adds new arena cups' },
-    { name: 'dungeon', description: 'adds a new dungeon' },
-    { name: 'quests', description: 'adds new quests' },
-    { name: 'maps', description: 'adds new content maps' },
-    { name: 'boss', description: 'adds new bosses' },
-    { name: 'puzzle', description: 'adds new puzzles or something puzzle related' },
-    { name: 'ng+', description: 'adds additional ng+ options' },
-    { name: 'cosmetic', description: 'adds any kind of cosmetic things like skins, pets or menu skins' },
-    { name: 'fun', description: 'fun things not necessarily useful' },
-    { name: 'cheats', description: "do things you're not supposed to do like spawn items or infinite gold" },
-    { name: 'speedrun', description: 'helps speedrunners with speedruns or practise' },
-    { name: 'widget', description: 'adds a CCUILib quick menu widget' },
-    { name: 'language', description: 'adds a new language' },
-    { name: 'accessibility', description: 'makes the game more accessible' },
-    { name: 'dev', description: 'helps mod developers create mods' },
-    { name: 'library', description: 'used by other mods' },
+    { key: 'tagLibrary', filterKey: 'includeLocal', default: true },
+    { key: 'hideLibrary', filterKey: 'hideLibraryMods', default: true },
+    { key: 'tagQol' },
+    { key: 'tagPlayerCharacter' },
+    { key: 'tagPartyMember' },
+    { key: 'tagCombatArts' },
+    { key: 'tagPvpDuel' },
+    { key: 'tagArena' },
+    { key: 'tagDungeon' },
+    { key: 'tagQuests' },
+    { key: 'tagMaps' },
+    { key: 'tagBoss' },
+    { key: 'tagPuzzle' },
+    { key: 'tagNg+' },
+    { key: 'tagCosmetic' },
+    { key: 'tagFun' },
+    { key: 'tagCheats' },
+    { key: 'tagSpeedrun' },
+    { key: 'tagWidget' },
+    { key: 'tagLanguage' },
+    { key: 'tagAccessibility' },
+    { key: 'tagDev' },
+    { key: 'tagLibrary' },
 ]
 
 sc.ModMenuFilterCheckboxGui = sc.CheckboxGui.extend({
@@ -84,6 +84,9 @@ sc.FiltersPopup = ig.GuiElementBase.extend({
         DEFAULT: { state: { alpha: 1 }, time: 0.2, timeFunction: KEY_SPLINES.EASE_OUT },
         HIDDEN: { state: { alpha: 0 }, time: 0.3, timeFunction: KEY_SPLINES.EASE_IN },
     },
+    getLangData(key) {
+        return ig.lang.get(`sc.gui.menu.ccmodmanager.filters.${key}`)
+    },
     setFilterValue(config, state) {
         const filters = sc.modMenu.list.filters
         if ('filterKey' in config && config.filterKey) {
@@ -93,8 +96,9 @@ sc.FiltersPopup = ig.GuiElementBase.extend({
             config.callback()
         } else {
             filters.tags ??= []
-            if (state) filters.tags.push(config.name)
-            else filters.tags.erase(config.name)
+            const name = this.getLangData(config.key).name
+            if (state) filters.tags.push(name)
+            else filters.tags.erase(name)
         }
         sc.modMenu.list.reloadFilters()
         /* hack to get the popup button group on top again, because the main mod menu button group got pushed on top when sc.modMenu.list.reloadFilters() is called */
@@ -110,7 +114,7 @@ sc.FiltersPopup = ig.GuiElementBase.extend({
             const item = localStorage.getItem(config.localStorageKey)
             if (item === null) return !!config.default
             return item == 'true'
-        } else return filters.tags?.includes(config.name)
+        } else return filters.tags?.includes(this.getLangData(config.key).name)
     },
     init() {
         this.parent()
@@ -141,11 +145,13 @@ sc.FiltersPopup = ig.GuiElementBase.extend({
         const textH = 20
         for (let i = 0; i < checkboxes.length; i++) {
             const config = checkboxes[i]
+            const lang = this.getLangData(config.key)
+
             const x = i % tagsW
             const y = (i / tagsW).floor()
             const checkbox = new sc.ModMenuFilterCheckboxGui()
             checkbox.setPos(x * (textW + spacingW) + offset.x, y * (textH + spacingH))
-            checkbox.data = config.description
+            checkbox.data = lang.description
             if (config.default !== undefined && !('localStorageKey' in config)) {
                 checkbox.setPressed(config.default)
                 this.setFilterValue(config, config.default)
@@ -153,7 +159,7 @@ sc.FiltersPopup = ig.GuiElementBase.extend({
             checkbox.onButtonPress = () => {
                 this.setFilterValue(config, checkbox.pressed)
             }
-            const text = new sc.TextGui(config.name)
+            const text = new sc.TextGui(lang.name)
             text.setPos(checkbox.hook.pos.x + checkbox.hook.size.x + spacingW, checkbox.hook.pos.y)
             text.setSize(textW, textH)
             this.checkboxesGuis.push({ text, checkbox })

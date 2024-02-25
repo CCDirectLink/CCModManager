@@ -108,7 +108,7 @@ sc.ModMenu = sc.ListInfoMenu.extend({
 
         this.inputField.hook.transitions['HIDDEN'] = this.installButton.hook.transitions['HIDDEN']
 
-        this.uninstallButton = new sc.ButtonGui('\\i[help2]Uninstall', 85, true, sc.BUTTON_TYPE.SMALL)
+        this.uninstallButton = new sc.ButtonGui('\\i[help2]' + ig.lang.get('sc.gui.menu.ccmodmanager.uninstall'), 85, true, sc.BUTTON_TYPE.SMALL)
         this.uninstallButton.setPos(390, bottomY)
         this.uninstallButton.onButtonPress = () => {
             const mod: ModEntry = (this.list.currentList.buttonGroup.elements[0].find((b: ig.FocusGui) => b.focus) as sc.ModListEntry).mod
@@ -121,17 +121,17 @@ sc.ModMenu = sc.ListInfoMenu.extend({
         this.addChildGui(this.uninstallButton)
         sc.menu.buttonInteract.addGlobalButton(this.uninstallButton, () => sc.control.menuHotkeyHelp2())
 
-        this.checkUpdatesButton = new sc.ButtonGui('Check updates', 100, true, sc.BUTTON_TYPE.SMALL)
+        this.checkUpdatesButton = new sc.ButtonGui(ig.lang.get('sc.gui.menu.ccmodmanager.checkUpdates'), 100, true, sc.BUTTON_TYPE.SMALL)
         this.checkUpdatesButton.setPos(285, bottomY)
         this.checkUpdatesButton.onButtonPress = () => {
             if (this.list.currentTabIndex == MOD_MENU_TAB_INDEXES.SELECTED) sc.BUTTON_SOUND.submit.play()
             ModInstaller.appendToUpdateModsToQueue().then(hasUpdated => {
                 if (hasUpdated) {
                     sc.Model.notifyObserver(sc.modMenu, sc.MOD_MENU_MESSAGES.UPDATE_ENTRIES)
-                    this.list.tabGroup._invokePressCallbacks(this.list.tabs[ig.lang.get('sc.gui.menu.ccmodloader.selectedModsTab')], true)
-                    sc.Dialogs.showInfoDialog(ig.lang.get('sc.gui.menu.ccmodloader.updatesFound'))
+                    this.list.tabGroup._invokePressCallbacks(this.list.tabs[ig.lang.get('sc.gui.menu.ccmodmanager.selectedModsTab')], true)
+                    sc.Dialogs.showInfoDialog(ig.lang.get('sc.gui.menu.ccmodmanager.updatesFound'))
                 } else {
-                    sc.Dialogs.showInfoDialog(ig.lang.get('sc.gui.menu.ccmodloader.upToDate'))
+                    sc.Dialogs.showInfoDialog(ig.lang.get('sc.gui.menu.ccmodmanager.upToDate'))
                 }
             })
         }
@@ -141,7 +141,7 @@ sc.ModMenu = sc.ListInfoMenu.extend({
         sc.menu.buttonInteract.addGlobalButton(this.checkUpdatesButton, () => false)
 
         this.filtersPopup = new sc.FiltersPopup()
-        this.filtersButton = new sc.ButtonGui('\\i[menu]Filters', 80, true, sc.BUTTON_TYPE.SMALL)
+        this.filtersButton = new sc.ButtonGui('\\i[menu]' + ig.lang.get('sc.gui.menu.ccmodmanager.filtersButton'), 80, true, sc.BUTTON_TYPE.SMALL)
         this.filtersButton.setPos(480, bottomY)
         this.filtersButton.onButtonPress = () => {
             this.filtersPopup.show()
@@ -153,7 +153,7 @@ sc.ModMenu = sc.ListInfoMenu.extend({
         this.setTabEvent()
     },
     showModInstallDialog() {
-        this.list.tabGroup._invokePressCallbacks(this.list.tabs[ig.lang.get('sc.gui.menu.ccmodloader.selectedModsTab')], true)
+        this.list.tabGroup._invokePressCallbacks(this.list.tabs[ig.lang.get('sc.gui.menu.ccmodmanager.selectedModsTab')], true)
         ModInstallDialogs.showModInstallDialog()
     },
     showModUninstallDialog(localMod) {
@@ -162,9 +162,9 @@ sc.ModMenu = sc.ListInfoMenu.extend({
     updateInstallButtonText() {
         const count = InstallQueue.values().length
         if (count > 0) {
-            this.installButton.setText('\\i[help4]' + ig.lang.get('sc.gui.menu.ccmodloader.installButton').replace(/\[modCount\]/, count.toString()), true)
+            this.installButton.setText('\\i[help4]' + ig.lang.get('sc.gui.menu.ccmodmanager.installButton').replace(/\[modCount\]/, count.toString()), true)
         } else {
-            this.installButton.setText(ig.lang.get('sc.gui.menu.ccmodloader.noModsSelected'), true)
+            this.installButton.setText(ig.lang.get('sc.gui.menu.ccmodmanager.noModsSelected'), true)
         }
         this.installButton.setActive(count > 0)
     },
@@ -237,16 +237,12 @@ sc.ModMenu = sc.ListInfoMenu.extend({
             LocalMods.getAll().some(mod => mod.awaitingRestart) ||
             Object.values(ModDB.databases).some(db => db.active && Object.values(db.modRecord).some(mod => mod.awaitingRestart))
         ) {
-            sc.Dialogs.showYesNoDialog(
-                'Mod states have been changed, they will take effect after a game restart.\nDo you want to restart now?',
-                sc.DIALOG_INFO_ICON.QUESTION,
-                button => {
-                    if (button.text!.toString() == ig.lang.get('sc.gui.dialogs.yes')) {
-                        ModInstaller.restartGame()
-                    } else {
-                    }
+            sc.Dialogs.showYesNoDialog(ig.lang.get('sc.gui.menu.ccmodmanager.modStatesChanged'), sc.DIALOG_INFO_ICON.QUESTION, button => {
+                if (button.text!.toString() == ig.lang.get('sc.gui.dialogs.yes')) {
+                    ModInstaller.restartGame()
+                } else {
                 }
-            )
+            })
         }
     },
     onBackButtonPress() {
