@@ -8,6 +8,7 @@ import { MOD_MENU_TAB_INDEXES } from './list'
 import { InstallQueue, ModInstaller } from '../mod-installer'
 import { ModEntry, ModEntryLocal } from '../types'
 import { ModInstallDialogs } from './install-dialogs'
+import { LocalMods } from '../local-mods'
 
 declare global {
     namespace sc {
@@ -231,9 +232,22 @@ sc.ModMenu = sc.ListInfoMenu.extend({
         this.exitMenu()
         this.setAllVisibility(false)
         this.setBlackBarVisibility(true)
-    },
-    exitMenu() {
-        this.parent()
+
+        if (
+            LocalMods.getAll().some(mod => mod.awaitingRestart) ||
+            Object.values(ModDB.databases).some(db => db.active && Object.values(db.modRecord).some(mod => mod.awaitingRestart))
+        ) {
+            sc.Dialogs.showYesNoDialog(
+                'Mod states have been changed, they will take effect after a game restart.\nDo you want to restart now?',
+                sc.DIALOG_INFO_ICON.QUESTION,
+                button => {
+                    if (button.text!.toString() == ig.lang.get('sc.gui.dialogs.yes')) {
+                        ModInstaller.restartGame()
+                    } else {
+                    }
+                }
+            )
+        }
     },
     onBackButtonPress() {
         sc.menu.popBackCallback()

@@ -3,4 +3,3 @@ big mod install list scary
 
 move ALL text to the lang file
 rename filters button
-enable/disable popup on exit
