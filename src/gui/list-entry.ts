@@ -26,12 +26,13 @@ declare global {
             modEntryActionButtons: sc.ButtonGui.Type & { ninepatch: ig.NinePatch }
             iconGui: ig.ImageGui
 
-            tryDisableMod(this: this, mod: ModEntryLocal): void
-            tryEnableMod(this: this, mod: ModEntryLocal): void
+            tryDisableMod(this: this, mod: ModEntryLocal): string | undefined
+            tryEnableMod(this: this, mod: ModEntryLocal): string | undefined
             getModName(this: this): { icon: string; text: string }
             onButtonPress(this: this): void
             setNameText(this: this, color: COLORS): void
             updateHighlightWidth(this: this): void
+            onButtonPress(this: this): string | undefined
         }
         interface ModListEntryConstructor extends ImpactClass<ModListEntry> {
             new (mod: ModEntry, modList: sc.ModMenuList): ModListEntry
@@ -227,8 +228,10 @@ sc.ModListEntry = ig.FocusGui.extend({
                 sc.Model.notifyObserver(sc.modMenu, sc.MOD_MENU_MESSAGES.ENTRY_UPDATE_COLOR, { mod, color: COLORS.GREEN })
                 sc.BUTTON_SOUND.toggle_on.play()
                 LocalMods.setModActive(mod, true)
+                this.updateHighlightWidth()
             }
         })
+        return 'Enabled'
     },
     tryDisableMod(mod: ModEntryLocal) {
         if (!ModInstallDialogs.checkCanDisableMod(mod)) return
@@ -236,6 +239,8 @@ sc.ModListEntry = ig.FocusGui.extend({
         this.setNameText(COLORS.RED)
         sc.BUTTON_SOUND.toggle_off.play()
         LocalMods.setModActive(mod, false)
+        this.updateHighlightWidth()
+        return 'Disabled'
     },
     modelChanged(model, message: sc.MOD_MENU_MESSAGES, data) {
         const d = data as { mod: ModEntryLocal; color: COLORS }
@@ -247,10 +252,8 @@ sc.ModListEntry = ig.FocusGui.extend({
         let mod = this.mod
         if (mod.isLocal) {
             if (this.modList.currentTabIndex == MOD_MENU_TAB_INDEXES.ENABLED || this.modList.currentTabIndex == MOD_MENU_TAB_INDEXES.DISABLED) {
-                if (mod.active) this.tryDisableMod(mod)
-                else this.tryEnableMod(mod)
-
-                this.updateHighlightWidth()
+                if (mod.active) return this.tryDisableMod(mod)
+                else return this.tryEnableMod(mod)
             } else throw new Error('wat?')
         } else if (mod.localCounterpart) {
             const localMod = mod.localCounterpart
@@ -260,22 +263,27 @@ sc.ModListEntry = ig.FocusGui.extend({
                     else this.setNameText(COLORS.RED)
                     sc.BUTTON_SOUND.toggle_off.play()
                     InstallQueue.delete(mod)
+                    this.updateHighlightWidth()
+                    return 'Un-selected'
                 } else {
                     this.setNameText(COLORS.YELLOW)
                     sc.BUTTON_SOUND.toggle_on.play()
                     InstallQueue.add(mod)
+                    this.updateHighlightWidth()
+                    return 'Selected'
                 }
-                this.updateHighlightWidth()
             } else sc.BUTTON_SOUND.denied.play()
         } else {
             if (InstallQueue.has(mod)) {
                 InstallQueue.delete(mod)
                 sc.BUTTON_SOUND.toggle_off.play()
                 this.setNameText(COLORS.WHITE)
+                return 'Un-Selected'
             } else {
                 InstallQueue.add(mod)
                 sc.BUTTON_SOUND.toggle_on.play()
                 this.setNameText(COLORS.YELLOW)
+                return 'Selected'
             }
         }
     },
