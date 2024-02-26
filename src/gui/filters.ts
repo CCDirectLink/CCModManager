@@ -38,7 +38,7 @@ const checkboxes: CheckboxConfig[] = [
         default: false,
         callback: () => sc.modMenu.list.updateColumnCount(),
     },
-    { key: 'tagLibrary', filterKey: 'includeLocal', default: true },
+    { key: 'local', filterKey: 'includeLocal', default: true },
     { key: 'hideLibrary', filterKey: 'hideLibraryMods', default: true },
     { key: 'tagQol' },
     { key: 'tagPlayerCharacter' },

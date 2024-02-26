@@ -1,13 +1,14 @@
-import { ModEntry } from '../types'
+import { ModEntry, ModEntryLocal } from '../types'
 import { FileCache } from '../cache'
 import './list-entry-highlight'
 import { LocalMods } from '../local-mods'
 import { MOD_MENU_TAB_INDEXES } from './list'
 import { InstallQueue } from '../mod-installer'
+import { ModInstallDialogs, prepareModName } from './install-dialogs'
 
 declare global {
     namespace sc {
-        export interface ModListEntry extends ig.FocusGui {
+        export interface ModListEntry extends ig.FocusGui, sc.Model.Observer {
             ninepatch: ig.NinePatch
             mod: ModEntry
             iconOffset: number
@@ -25,6 +26,8 @@ declare global {
             modEntryActionButtons: sc.ButtonGui.Type & { ninepatch: ig.NinePatch }
             iconGui: ig.ImageGui
 
+            tryDisableMod(this: this, mod: ModEntryLocal): void
+            tryEnableMod(this: this, mod: ModEntryLocal): void
             getModName(this: this): { icon: string; text: string }
             onButtonPress(this: this): void
             setNameText(this: this, color: COLORS): void
@@ -60,6 +63,7 @@ sc.ModListEntry = ig.FocusGui.extend({
         this.mod = mod
         this.modList = modList
 
+        sc.Model.addObserver(sc.modMenu, this)
         const isGrid = modList.isGrid
         /* init icon asap */
         FileCache.getIconConfig(mod).then(config => {
@@ -165,7 +169,7 @@ sc.ModListEntry = ig.FocusGui.extend({
             icon += `\\i[item-news]`
         }
 
-        return { icon, text: this.mod.name.replace(/\\c\[\d]/g, '') }
+        return { icon, text: prepareModName(this.mod.name) }
     },
     setNameText(color: COLORS) {
         const { text, icon } = this.getModName()
@@ -214,32 +218,38 @@ sc.ModListEntry = ig.FocusGui.extend({
         this.highlight.focus = this.focus
         sc.Model.notifyObserver(sc.modMenu, sc.MOD_MENU_MESSAGES.ENTRY_UNFOCUSED, this)
     },
+    tryEnableMod(mod: ModEntryLocal) {
+        ModInstallDialogs.checkCanEnableMod(mod).then(deps => {
+            if (deps === undefined) return
+            deps.push(mod)
+            for (const mod of deps) {
+                mod.awaitingRestart = !mod.awaitingRestart
+                sc.Model.notifyObserver(sc.modMenu, sc.MOD_MENU_MESSAGES.ENTRY_UPDATE_COLOR, { mod, color: COLORS.GREEN })
+                sc.BUTTON_SOUND.toggle_on.play()
+                LocalMods.setModActive(mod, true)
+            }
+        })
+    },
+    tryDisableMod(mod: ModEntryLocal) {
+        if (!ModInstallDialogs.checkCanDisableMod(mod)) return
+        mod.awaitingRestart = !mod.awaitingRestart
+        this.setNameText(COLORS.RED)
+        sc.BUTTON_SOUND.toggle_off.play()
+        LocalMods.setModActive(mod, false)
+    },
+    modelChanged(model, message: sc.MOD_MENU_MESSAGES, data) {
+        const d = data as { mod: ModEntryLocal; color: COLORS }
+        if (model == sc.modMenu && message == sc.MOD_MENU_MESSAGES.ENTRY_UPDATE_COLOR && d.mod == this.mod) {
+            this.setNameText(d.color)
+        }
+    },
     onButtonPress() {
         let mod = this.mod
         if (mod.isLocal) {
-            if (this.modList.currentTabIndex == MOD_MENU_TAB_INDEXES.ENABLED) {
-                mod.awaitingRestart = !mod.awaitingRestart
-                if (mod.active) {
-                    this.setNameText(COLORS.RED)
-                    sc.BUTTON_SOUND.toggle_off.play()
-                    LocalMods.setModActive(mod, false)
-                } else {
-                    this.setNameText(COLORS.GREEN)
-                    sc.BUTTON_SOUND.toggle_on.play()
-                    LocalMods.setModActive(mod, true)
-                }
-                this.updateHighlightWidth()
-            } else if (this.modList.currentTabIndex == MOD_MENU_TAB_INDEXES.DISABLED) {
-                mod.awaitingRestart = !mod.awaitingRestart
-                if (mod.active) {
-                    this.setNameText(COLORS.RED)
-                    sc.BUTTON_SOUND.toggle_off.play()
-                    LocalMods.setModActive(mod, false)
-                } else {
-                    this.setNameText(COLORS.GREEN)
-                    sc.BUTTON_SOUND.toggle_on.play()
-                    LocalMods.setModActive(mod, true)
-                }
+            if (this.modList.currentTabIndex == MOD_MENU_TAB_INDEXES.ENABLED || this.modList.currentTabIndex == MOD_MENU_TAB_INDEXES.DISABLED) {
+                if (mod.active) this.tryDisableMod(mod)
+                else this.tryEnableMod(mod)
+
                 this.updateHighlightWidth()
             } else throw new Error('wat?')
         } else if (mod.localCounterpart) {

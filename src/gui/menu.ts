@@ -6,7 +6,7 @@ import './filters'
 import { ModDB } from '../moddb'
 import { MOD_MENU_TAB_INDEXES } from './list'
 import { InstallQueue, ModInstaller } from '../mod-installer'
-import { ModEntry, ModEntryLocal } from '../types'
+import { ModEntry } from '../types'
 import { ModInstallDialogs } from './install-dialogs'
 import { LocalMods } from '../local-mods'
 
@@ -24,6 +24,7 @@ declare global {
             UPDATE_ENTRIES,
             ENTRY_FOCUSED,
             ENTRY_UNFOCUSED,
+            ENTRY_UPDATE_COLOR,
         }
         interface ModMenu extends sc.ListInfoMenu, sc.Model {
             list: ModMenuList
@@ -40,7 +41,6 @@ declare global {
             onBackButtonPress(this: this): void
             setTabEvent(this: this): void
             showModInstallDialog(this: this): void
-            showModUninstallDialog(this: this, localMod: ModEntryLocal): void
         }
         interface ModMenuConstructor extends ImpactClass<ModMenu> {
             new (): ModMenu
@@ -61,6 +61,7 @@ sc.MOD_MENU_MESSAGES = {
     UPDATE_ENTRIES: 3,
     ENTRY_FOCUSED: 4,
     ENTRY_UNFOCUSED: 5,
+    ENTRY_UPDATE_COLOR: 6,
 }
 
 sc.GlobalInput.inject({
@@ -98,8 +99,11 @@ sc.ModMenu = sc.ListInfoMenu.extend({
         this.installButton.setPos(152, bottomY)
         this.installButton.onButtonPress = () => {
             if (this.list.currentTabIndex == MOD_MENU_TAB_INDEXES.SELECTED) sc.BUTTON_SOUND.submit.play()
-            ModInstaller.findDeps(InstallQueue.values(), ModDB.modRecord)
-                .then(() => this.showModInstallDialog())
+            ModInstaller.findDepsDatabase(InstallQueue.values(), ModDB.modRecord)
+                .then(mods => {
+                    InstallQueue.add(...mods)
+                    this.showModInstallDialog()
+                })
                 .catch(err => sc.Dialogs.showErrorDialog(err))
         }
         this.installButton.submitSound = undefined
@@ -114,7 +118,7 @@ sc.ModMenu = sc.ListInfoMenu.extend({
             const mod: ModEntry = (this.list.currentList.buttonGroup.elements[0].find((b: ig.FocusGui) => b.focus) as sc.ModListEntry).mod
             const localMod = mod.isLocal ? mod : mod.localCounterpart
             if (localMod /* this should ALWAYS be true but anyways */) {
-                this.showModUninstallDialog(localMod)
+                ModInstallDialogs.showModUninstallDialog(localMod)
             }
         }
         this.uninstallButton.keepMouseFocus = true /* prevent the focus jumping all over the place on press */
@@ -155,9 +159,6 @@ sc.ModMenu = sc.ListInfoMenu.extend({
     showModInstallDialog() {
         this.list.tabGroup._invokePressCallbacks(this.list.tabs[ig.lang.get('sc.gui.menu.ccmodmanager.selectedModsTab')], true)
         ModInstallDialogs.showModInstallDialog()
-    },
-    showModUninstallDialog(localMod) {
-        ModInstallDialogs.showModUninstallDialog(localMod)
     },
     updateInstallButtonText() {
         const count = InstallQueue.values().length
@@ -238,9 +239,8 @@ sc.ModMenu = sc.ListInfoMenu.extend({
             Object.values(ModDB.databases).some(db => db.active && Object.values(db.modRecord).some(mod => mod.awaitingRestart))
         ) {
             sc.Dialogs.showYesNoDialog(ig.lang.get('sc.gui.menu.ccmodmanager.modStatesChanged'), sc.DIALOG_INFO_ICON.QUESTION, button => {
-                if (button.text!.toString() == ig.lang.get('sc.gui.dialogs.yes')) {
+                if (button.data == 0) {
                     ModInstaller.restartGame()
-                } else {
                 }
             })
         }

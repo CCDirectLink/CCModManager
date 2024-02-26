@@ -37,6 +37,8 @@
                 "askRestartUninstall": "Uninstalled succesfully.\nThe mod will actually stop working after a restart.\nDo you want to restart?",
                 "modStatesChanged": "Mod states have been changed, they will take effect after a game restart.\nDo you want to restart now?",
                 "noInternet": "Error: No internet connection",
+                "cannotDisable": "Cannot disable the mod: \\c[3][modName]\\c[0] because other mods depend on it:\n",
+                "doYouWantToEnable": "The mod: \\c[3][modName]\\c[0] depends on these disabled mods:\n[mods]Do you also want to enable them?",
                 "filters": {
                     "gridView": { "name": "Grid view", "description": "Makes the mod list a grid" },
                     "local": { "name": "Include local", "description": "Includes installed mods" },

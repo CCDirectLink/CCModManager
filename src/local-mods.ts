@@ -7,7 +7,7 @@ import { ModInstaller } from './mod-installer'
 
 type CCL2Mod = {
     baseDirectory: string
-    dependencies: Record<string, string>
+    dependencies?: Record<string, string>
     disabled: boolean
     name: string
     displayName?: string
@@ -75,7 +75,7 @@ export class LocalMods {
             version: mod.version || 'Unknown',
             isLegacy: false /*duno how to check*/,
             hasIcon: !!mod.icons?.['24'],
-            dependencies: mod.dependencies,
+            dependencies: mod.dependencies ?? {},
             path: mod.baseDirectory.substring(0, mod.baseDirectory.length - 1),
 
             active: !mod.disabled,
@@ -130,5 +130,28 @@ export class LocalMods {
 
     static getCCLoaderVersion(): string {
         return ModManager.mod.isCCL3 ? modloader.version.raw : versions.ccloader
+    }
+
+    static findDeps(mod: ModEntryLocal): ModEntryLocal[] {
+        const localModsByName = LocalMods.getAll().reduce(
+            (acc, v) => {
+                acc[v.name] = v
+                return acc
+            },
+            {} as Record<string, ModEntryLocal>
+        )
+        const localMods = LocalMods.cacheRecord
+        function getModDep(str: string) {
+            return localMods[str] ?? localModsByName[str]
+        }
+
+        const deps: Set<ModEntryLocal> = new Set()
+        for (const depModName in mod.dependencies) {
+            if (ModInstaller.virtualMods[depModName]) continue
+            const depMod = getModDep(depModName)
+            deps.add(depMod)
+            for (const m of this.findDeps(depMod)) deps.add(m)
+        }
+        return [...deps]
     }
 }

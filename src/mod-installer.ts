@@ -44,7 +44,7 @@ type DepEntry = { mod: ModEntryServer; versionReqRanges: string[] }
 export class ModInstaller {
     static record: Record<string, ModEntryServer>
     static byNameRecord: Record<string, ModEntryServer>
-    private static virtualMods: Record<string, ModEntryLocal>
+    static virtualMods: Record<string, ModEntryLocal>
 
     static init() {
         this.virtualMods = {
@@ -113,7 +113,7 @@ export class ModInstaller {
         return true
     }
 
-    static async findDeps(mods: ModEntryServer[], modRecords: Record<string, ModEntryServer[]>) {
+    static async findDepsDatabase(mods: ModEntryServer[], modRecords: Record<string, ModEntryServer[]>, includeInstalled: boolean = false): Promise<ModEntryServer[]> {
         /* resolve local mod origin */
         LocalMods.getAll(true)
 
@@ -138,20 +138,21 @@ export class ModInstaller {
                 console.warn(`Mod Manager: ${(err as Error).message}`)
             }
         }
-
-        /* filter already installed mods */
-        for (const modId in deps) {
-            const { mod: serverMod, versionReqRanges } = deps[modId]
-            const localMod = serverMod.localCounterpart
-            if (localMod) {
-                if (this.matchesVersionReqRanges(localMod, versionReqRanges)) {
-                    delete deps[modId]
-                } else {
-                    serverMod.installStatus = 'update'
+        if (!includeInstalled) {
+            /* filter already installed mods */
+            for (const modId in deps) {
+                const { mod: serverMod, versionReqRanges } = deps[modId]
+                const localMod = serverMod.localCounterpart
+                if (localMod) {
+                    if (this.matchesVersionReqRanges(localMod, versionReqRanges)) {
+                        delete deps[modId]
+                    } else {
+                        serverMod.installStatus = 'update'
+                    }
                 }
             }
         }
-        /* check if dependency versions are in the database */
+        /* check virtual mod versions and remove them */
         for (const virtualModId in this.virtualMods) {
             const dep = deps[virtualModId]
             if (!dep) continue
@@ -162,14 +163,17 @@ export class ModInstaller {
             }
             delete deps[virtualModId]
         }
-        for (const modId in deps) {
-            const { mod: serverMod, versionReqRanges } = deps[modId]
-            if (!this.matchesVersionReqRanges(serverMod, versionReqRanges))
-                throw new Error(
-                    `Dependency: ${serverMod.name} (${serverMod.id}) that cannot be resolved: version range: ${versionReqRanges.join(', ')} was not met. Database has only: ${serverMod.version}`
-                )
+        if (!includeInstalled) {
+            /* check if dependency versions are in the database */
+            for (const modId in deps) {
+                const { mod: serverMod, versionReqRanges } = deps[modId]
+                if (!this.matchesVersionReqRanges(serverMod, versionReqRanges))
+                    throw new Error(
+                        `Dependency: ${serverMod.name} (${serverMod.id}) that cannot be resolved: version range: ${versionReqRanges.join(', ')} was not met. Database has only: ${serverMod.version}`
+                    )
+            }
         }
-        InstallQueue.add(...Object.values(deps).map(dep => dep.mod))
+        return Object.values(deps).map(dep => dep.mod)
     }
 
     static async install(mods: ModEntryServer[]) {
@@ -240,9 +244,9 @@ export class ModInstaller {
         )
     }
 
-    static getWhatDependsOnAMod(mod: ModEntryLocal): ModEntryLocal[] {
+    static getWhatDependsOnAMod(mod: ModEntryLocal, on = false): ModEntryLocal[] {
         const list: ModEntryLocal[] = []
-        for (const otherMod of LocalMods.getAll()) {
+        for (const otherMod of on ? LocalMods.getActive() : LocalMods.getAll()) {
             const deps = otherMod.dependencies
             if (deps[mod.id] || deps[mod.name]) list.push(otherMod)
         }
@@ -271,7 +275,7 @@ export class ModInstaller {
         const mods: ModEntryLocal[] = LocalMods.getAll().filter(mod => mod.hasUpdate)
         const serverMods = mods.map(mod => mod.serverCounterpart!)
         InstallQueue.add(...serverMods)
-        await this.findDeps(serverMods, ModDB.modRecord)
+        InstallQueue.add(...(await this.findDepsDatabase(serverMods, ModDB.modRecord)))
 
         return mods.length > 0
     }
