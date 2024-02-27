@@ -30,13 +30,13 @@ declare global {
             new (): ModMenuList;
         }
         var ModMenuList: ModMenuListConstructor;
+        enum MOD_MENU_TAB_INDEXES {
+            ONLINE,
+            SELECTED,
+            ENABLED,
+            DISABLED,
+            SETTINGS
+        }
     }
 }
 export declare const modMenuListWidth = 552;
-export declare enum MOD_MENU_TAB_INDEXES {
-    ONLINE = 0,
-    SELECTED = 1,
-    ENABLED = 2,
-    DISABLED = 3,
-    SETTINGS = 4
-}
