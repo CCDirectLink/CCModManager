@@ -115,7 +115,14 @@ sc.ModMenu = sc.ListInfoMenu.extend({
         this.uninstallButton = new sc.ButtonGui('\\i[help2]' + ig.lang.get('sc.gui.menu.ccmodmanager.uninstall'), 85, true, sc.BUTTON_TYPE.SMALL)
         this.uninstallButton.setPos(390, bottomY)
         this.uninstallButton.onButtonPress = () => {
-            const mod: ModEntry = (this.list.currentList.buttonGroup.elements[0].find((b: ig.FocusGui) => b.focus) as sc.ModListEntry).mod
+            const mod: ModEntry = (
+                this.list.currentList.buttonGroup.elements
+                    .reduce((acc, v) => {
+                        acc.push(...v)
+                        return acc
+                    }, [])
+                    .find((b: ig.FocusGui) => b.focus) as sc.ModListEntry
+            ).mod
             const localMod = mod.isLocal ? mod : mod.localCounterpart
             if (localMod /* this should ALWAYS be true but anyways */) {
                 ModInstallDialogs.showModUninstallDialog(localMod)
