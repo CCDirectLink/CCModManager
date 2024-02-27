@@ -3,17 +3,6 @@ import { LocalMods } from '../local-mods'
 import { InstallQueue, ModInstaller } from '../mod-installer'
 import { ModEntry, ModEntryLocal } from '../types'
 
-function getNod() {
-    return ig.LangLabel.getText({
-        en_US: '[nods]',
-        de_DE: '[nickt]',
-        zh_CN: '[\u70b9\u5934]<<A<<[CHANGED 2017/10/10]',
-        ko_KR: '[\ub044\ub355]<<A<<[CHANGED 2017/10/17]',
-        ja_JP: '[\u3046\u306a\u305a\u304f]<<A<<[CHANGED 2017/11/04]',
-        zh_TW: '[\u9ede\u982d]<<A<<[CHANGED 2017/10/10]',
-    })
-}
-
 export function prepareModName(name: string) {
     return name.replace(/\\c\[\d]/g, '')
 }
@@ -34,7 +23,7 @@ export class ModInstallDialogs {
         const depsStr = deps.length > 0 ? `${ig.lang.get('sc.gui.menu.ccmodmanager.dependencies')}\n${modsToStr(deps)}` : ''
 
         const str = `${header}${toInstallStr}${toUpdateStr}${depsStr}`
-        sc.Dialogs.showChoiceDialog(str, sc.DIALOG_INFO_ICON.QUESTION, [getNod(), ig.lang.get('sc.gui.dialogs.no')], button => {
+        sc.Dialogs.showChoiceDialog(str, sc.DIALOG_INFO_ICON.QUESTION, [ig.lang.get('sc.gui.dialogs.yes'), ig.lang.get('sc.gui.dialogs.no')], button => {
             if (button.data != 0) return
             const toInstall = InstallQueue.values()
             ModInstaller.install(toInstall)
@@ -85,7 +74,7 @@ export class ModInstallDialogs {
         const deps = ModInstaller.getWhatDependsOnAMod(localMod)
         if (deps.length == 0) {
             const str = ig.lang.get('sc.gui.menu.ccmodmanager.areYouSureYouWantToUninstall').replace(/\[modName\]/, prepareModName(localMod.name))
-            sc.Dialogs.showChoiceDialog(str, sc.DIALOG_INFO_ICON.QUESTION, [getNod(), ig.lang.get('sc.gui.dialogs.no')], button => {
+            sc.Dialogs.showChoiceDialog(str, sc.DIALOG_INFO_ICON.QUESTION, [ig.lang.get('sc.gui.dialogs.yes'), ig.lang.get('sc.gui.dialogs.no')], button => {
                 if (button.data == 0) {
                     ModInstaller.uninstallMod(localMod).then(() => {
                         localMod.awaitingRestart = true
