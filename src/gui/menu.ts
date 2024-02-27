@@ -4,7 +4,6 @@ import 'nax-ccuilib/src/headers/nax/input-field-type.d.ts'
 import './list'
 import './filters'
 import { ModDB } from '../moddb'
-import { MOD_MENU_TAB_INDEXES } from './list'
 import { InstallQueue, ModInstaller } from '../mod-installer'
 import { ModEntry } from '../types'
 import { ModInstallDialogs } from './install-dialogs'
@@ -98,7 +97,7 @@ sc.ModMenu = sc.ListInfoMenu.extend({
         this.updateInstallButtonText()
         this.installButton.setPos(152, bottomY)
         this.installButton.onButtonPress = () => {
-            if (this.list.currentTabIndex == MOD_MENU_TAB_INDEXES.SELECTED) sc.BUTTON_SOUND.submit.play()
+            if (this.list.currentTabIndex == sc.MOD_MENU_TAB_INDEXES.SELECTED) sc.BUTTON_SOUND.submit.play()
             ModInstaller.findDepsDatabase(InstallQueue.values(), ModDB.modRecord)
                 .then(mods => {
                     InstallQueue.add(...mods)
@@ -135,7 +134,7 @@ sc.ModMenu = sc.ListInfoMenu.extend({
         this.checkUpdatesButton = new sc.ButtonGui(ig.lang.get('sc.gui.menu.ccmodmanager.checkUpdates'), 100, true, sc.BUTTON_TYPE.SMALL)
         this.checkUpdatesButton.setPos(285, bottomY)
         this.checkUpdatesButton.onButtonPress = () => {
-            if (this.list.currentTabIndex == MOD_MENU_TAB_INDEXES.SELECTED) sc.BUTTON_SOUND.submit.play()
+            if (this.list.currentTabIndex == sc.MOD_MENU_TAB_INDEXES.SELECTED) sc.BUTTON_SOUND.submit.play()
             ModInstaller.appendToUpdateModsToQueue().then(hasUpdated => {
                 if (hasUpdated) {
                     sc.Model.notifyObserver(sc.modMenu, sc.MOD_MENU_MESSAGES.UPDATE_ENTRIES)
@@ -178,7 +177,7 @@ sc.ModMenu = sc.ListInfoMenu.extend({
     },
     setTabEvent() {
         /* handle install button */
-        if (this.list.currentTabIndex > MOD_MENU_TAB_INDEXES.SELECTED) {
+        if (this.list.currentTabIndex > sc.MOD_MENU_TAB_INDEXES.SELECTED) {
             this.installButton.doStateTransition('HIDDEN')
             this.checkUpdatesButton.doStateTransition('HIDDEN')
         } else {

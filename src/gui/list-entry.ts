@@ -2,7 +2,6 @@ import { ModEntry, ModEntryLocal } from '../types'
 import { FileCache } from '../cache'
 import './list-entry-highlight'
 import { LocalMods } from '../local-mods'
-import { MOD_MENU_TAB_INDEXES } from './list'
 import { InstallQueue } from '../mod-installer'
 import { ModInstallDialogs, prepareModName } from './install-dialogs'
 
@@ -92,8 +91,8 @@ sc.ModListEntry = ig.FocusGui.extend({
         this.nameIconPrefixesText = new sc.TextGui('')
         this.setNameText(COLORS.WHITE)
 
-        if (this.modList.currentTabIndex == MOD_MENU_TAB_INDEXES.DISABLED) this.setNameText(COLORS.RED)
-        else if (this.modList.currentTabIndex == MOD_MENU_TAB_INDEXES.ENABLED) this.setNameText(COLORS.GREEN)
+        if (this.modList.currentTabIndex == sc.MOD_MENU_TAB_INDEXES.DISABLED) this.setNameText(COLORS.RED)
+        else if (this.modList.currentTabIndex == sc.MOD_MENU_TAB_INDEXES.ENABLED) this.setNameText(COLORS.GREEN)
         else {
             if (localMod) {
                 if (localMod.active) this.setNameText(COLORS.GREEN)
@@ -251,7 +250,7 @@ sc.ModListEntry = ig.FocusGui.extend({
     onButtonPress() {
         let mod = this.mod
         if (mod.isLocal) {
-            if (this.modList.currentTabIndex == MOD_MENU_TAB_INDEXES.ENABLED || this.modList.currentTabIndex == MOD_MENU_TAB_INDEXES.DISABLED) {
+            if (this.modList.currentTabIndex == sc.MOD_MENU_TAB_INDEXES.ENABLED || this.modList.currentTabIndex == sc.MOD_MENU_TAB_INDEXES.DISABLED) {
                 if (mod.active) return this.tryDisableMod(mod)
                 else return this.tryEnableMod(mod)
             } else throw new Error('wat?')
