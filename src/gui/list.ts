@@ -6,6 +6,7 @@ import './list-entry'
 import './repo-add'
 import { InstallQueue } from '../mod-installer'
 import { isGridLocalStorageId } from './filters'
+import { Lang } from '../lang-manager'
 
 declare global {
     namespace sc {
@@ -71,11 +72,11 @@ sc.ModMenuList = sc.ListTabbedPane.extend({
         this.gridColumns = 3
 
         this.tabz = [
-            { name: ig.lang.get('sc.gui.menu.ccmodmanager.onlineTab'), populateFunc: this.populateOnline, icon: 'quest-all' },
-            { name: ig.lang.get('sc.gui.menu.ccmodmanager.selectedModsTab'), populateFunc: this.populateSelected, icon: 'quest-fav' },
-            { name: ig.lang.get('sc.gui.menu.ccmodmanager.enabledTab'), populateFunc: this.populateEnabled, icon: 'quest-solve' },
-            { name: ig.lang.get('sc.gui.menu.ccmodmanager.disabledTab'), populateFunc: this.populateDisabled, icon: 'quest-elite' },
-            { name: ig.lang.get('sc.gui.menu.ccmodmanager.settingsTab'), populateFunc: this.populateSettings, icon: 'stats-log' },
+            { name: Lang.onlineTab, populateFunc: this.populateOnline, icon: 'quest-all' },
+            { name: Lang.selectedModsTab, populateFunc: this.populateSelected, icon: 'quest-fav' },
+            { name: Lang.enabledTab, populateFunc: this.populateEnabled, icon: 'quest-solve' },
+            { name: Lang.disabledTab, populateFunc: this.populateDisabled, icon: 'quest-elite' },
+            { name: Lang.settingsTab, populateFunc: this.populateSettings, icon: 'stats-log' },
         ]
         this.filters = {}
         this.currentSort = this.onInitSortType()
@@ -184,7 +185,7 @@ sc.ModMenuList = sc.ListTabbedPane.extend({
     },
     /* new stuff */
     populateSettings(list) {
-        const repositoriesButton = new sc.ButtonGui(ig.lang.get('sc.gui.menu.ccmodmanager.reposButton'))
+        const repositoriesButton = new sc.ButtonGui(Lang.reposButton)
         repositoriesButton.onButtonPress = () => {
             if (!this.reposPopup) this.reposPopup = new sc.ModMenuRepoAddPopup()
             this.reposPopup.show()

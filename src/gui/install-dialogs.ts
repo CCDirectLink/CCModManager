@@ -1,4 +1,5 @@
 import { FileCache } from '../cache'
+import { Lang } from '../lang-manager'
 import { LocalMods } from '../local-mods'
 import { InstallQueue, ModInstaller } from '../mod-installer'
 import { ModEntry, ModEntryLocal } from '../types'
@@ -17,10 +18,10 @@ export class ModInstallDialogs {
         function modsToStr(mods: ModEntry[]) {
             return mods.map(mod => `- \\c[3]${prepareModName(mod.name)}\\c[0]\n`).join('')
         }
-        const header = ig.lang.get('sc.gui.menu.ccmodmanager.areYouSureYouWantTo') + '\n'
-        const toInstallStr = toInstall.length > 0 ? `${ig.lang.get('sc.gui.menu.ccmodmanager.toInstall')}\n${modsToStr(toInstall)}` : ''
-        const toUpdateStr = toUpdate.length > 0 ? `${ig.lang.get('sc.gui.menu.ccmodmanager.toUpdate')}\n${modsToStr(toUpdate)}` : ''
-        const depsStr = deps.length > 0 ? `${ig.lang.get('sc.gui.menu.ccmodmanager.dependencies')}\n${modsToStr(deps)}` : ''
+        const header = Lang.areYouSureYouWantTo + '\n'
+        const toInstallStr = toInstall.length > 0 ? `${Lang.toInstall}\n${modsToStr(toInstall)}` : ''
+        const toUpdateStr = toUpdate.length > 0 ? `${Lang.toUpdate}\n${modsToStr(toUpdate)}` : ''
+        const depsStr = deps.length > 0 ? `${Lang.dependencies}\n${modsToStr(deps)}` : ''
 
         const str = `${header}${toInstallStr}${toUpdateStr}${depsStr}`
         sc.Dialogs.showChoiceDialog(str, sc.DIALOG_INFO_ICON.QUESTION, [ig.lang.get('sc.gui.dialogs.yes'), ig.lang.get('sc.gui.dialogs.no')], button => {
@@ -31,7 +32,7 @@ export class ModInstallDialogs {
                     InstallQueue.clear()
                     sc.modMenu && sc.Model.notifyObserver(sc.modMenu, sc.MOD_MENU_MESSAGES.UPDATE_ENTRIES)
                     sc.BUTTON_SOUND.shop_cash.play()
-                    sc.Dialogs.showYesNoDialog(ig.lang.get('sc.gui.menu.ccmodmanager.askRestartInstall'), sc.DIALOG_INFO_ICON.QUESTION, button => {
+                    sc.Dialogs.showYesNoDialog(Lang.askRestartInstall, sc.DIALOG_INFO_ICON.QUESTION, button => {
                         if (button.data == 0) {
                             ModInstaller.restartGame()
                         } else {
@@ -43,7 +44,7 @@ export class ModInstallDialogs {
                 })
                 .catch(err => {
                     FileCache.isThereInternet(true).then(isThereInternet => {
-                        if (!isThereInternet) err = ig.lang.get('sc.gui.menu.ccmodmanager.noInternet')
+                        if (!isThereInternet) err = Lang.noInternet
                         sc.Dialogs.showErrorDialog(err)
                     })
                 })
@@ -56,24 +57,19 @@ export class ModInstallDialogs {
         const toUpdate = InstallQueue.values().filter(mod => mod.installStatus == 'update')
         if (deps.length == 0 && toInstall.length == 0 && toUpdate.length == 0) return
 
-        sc.Dialogs.showChoiceDialog(
-            ig.lang.get('sc.gui.menu.ccmodmanager.updatesDetected'),
-            sc.DIALOG_INFO_ICON.QUESTION,
-            [ig.lang.get('sc.gui.dialogs.yes'), ig.lang.get('sc.gui.dialogs.no')],
-            button => {
-                if (button.data == 0) {
-                    this.showModInstallDialog()
-                } else {
-                    InstallQueue.clear()
-                }
+        sc.Dialogs.showChoiceDialog(Lang.updatesDetected, sc.DIALOG_INFO_ICON.QUESTION, [ig.lang.get('sc.gui.dialogs.yes'), ig.lang.get('sc.gui.dialogs.no')], button => {
+            if (button.data == 0) {
+                this.showModInstallDialog()
+            } else {
+                InstallQueue.clear()
             }
-        )
+        })
     }
 
     static showModUninstallDialog(localMod: ModEntryLocal) {
         const deps = ModInstaller.getWhatDependsOnAMod(localMod)
         if (deps.length == 0) {
-            const str = ig.lang.get('sc.gui.menu.ccmodmanager.areYouSureYouWantToUninstall').replace(/\[modName\]/, prepareModName(localMod.name))
+            const str = Lang.areYouSureYouWantToUninstall.replace(/\[modName\]/, prepareModName(localMod.name))
             sc.Dialogs.showChoiceDialog(str, sc.DIALOG_INFO_ICON.QUESTION, [ig.lang.get('sc.gui.dialogs.yes'), ig.lang.get('sc.gui.dialogs.no')], button => {
                 if (button.data == 0) {
                     ModInstaller.uninstallMod(localMod).then(() => {
@@ -81,7 +77,7 @@ export class ModInstallDialogs {
                         localMod.active = false
                         sc.Model.notifyObserver(sc.modMenu, sc.MOD_MENU_MESSAGES.UPDATE_ENTRIES)
                         sc.BUTTON_SOUND.shop_cash.play()
-                        sc.Dialogs.showYesNoDialog(ig.lang.get('sc.gui.menu.ccmodmanager.askRestartUninstall'), sc.DIALOG_INFO_ICON.QUESTION, button => {
+                        sc.Dialogs.showYesNoDialog(Lang.askRestartUninstall, sc.DIALOG_INFO_ICON.QUESTION, button => {
                             if (button.data == 0) {
                                 ModInstaller.restartGame()
                             }
@@ -91,8 +87,7 @@ export class ModInstallDialogs {
             })
         } else {
             sc.Dialogs.showErrorDialog(
-                ig.lang.get('sc.gui.menu.ccmodmanager.cannotUninstall').replace(/\[modName\]/, prepareModName(localMod.name)) +
-                    deps.map(mod => `- \\c[3]${prepareModName(mod.name)}\\c[0]\n`).join('')
+                Lang.cannotUninstall.replace(/\[modName\]/, prepareModName(localMod.name)) + deps.map(mod => `- \\c[3]${prepareModName(mod.name)}\\c[0]\n`).join('')
             )
         }
     }
@@ -101,8 +96,7 @@ export class ModInstallDialogs {
         const deps = ModInstaller.getWhatDependsOnAMod(mod, true)
         if (deps.length == 0) return true
         sc.Dialogs.showErrorDialog(
-            ig.lang.get('sc.gui.menu.ccmodmanager.cannotDisable').replace(/\[modName\]/, prepareModName(mod.name)) +
-                deps.map(mod => `- \\c[3]${prepareModName(mod.name)}\\c[0]\n`).join('')
+            Lang.cannotDisable.replace(/\[modName\]/, prepareModName(mod.name)) + deps.map(mod => `- \\c[3]${prepareModName(mod.name)}\\c[0]\n`).join('')
         )
         return false
     }

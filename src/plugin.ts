@@ -1,4 +1,5 @@
 import { FileCache } from './cache'
+import { LangManager } from './lang-manager'
 import { ModInstaller } from './mod-installer'
 import { ModDB } from './moddb'
 import { Mod1 } from './types'
@@ -6,6 +7,7 @@ import { Mod1 } from './types'
 export default class ModManager {
     static dir: string
     static mod: Mod1
+    private lang!: LangManager
 
     constructor(mod: Mod1) {
         ModManager.dir = mod.baseDirectory
@@ -17,6 +19,8 @@ export default class ModManager {
     async prestart() {
         FileCache.init()
         ModInstaller.init()
+        this.lang = new LangManager()
+
         await import('./gui/gui.js')
 
         sc.TitleScreenButtonGui.inject({
@@ -31,5 +35,7 @@ export default class ModManager {
         })
     }
 
-    async poststart() {}
+    async poststart() {
+        this.lang.poststart()
+    }
 }

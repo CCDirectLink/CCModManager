@@ -1,4 +1,5 @@
 import { Fliters } from '../filters'
+import { Lang } from '../lang-manager'
 
 declare global {
     namespace sc {
@@ -9,7 +10,7 @@ declare global {
             checkboxesGuis: { text: sc.TextGui; checkbox: sc.FilterCheckox }[]
             infoBar: sc.InfoBar
 
-            getLangData(this: this, key: string): { name: string; description: string }
+            getLangData(this: this, key: keyof typeof Lang.filters): { name: string; description: string }
             setFilterValue(this: this, config: CheckboxConfig, state: boolean): void
             getFilterValue(this: this, config: CheckboxConfig): boolean | undefined
             show(this: this): void
@@ -29,7 +30,7 @@ declare global {
 }
 
 export const isGridLocalStorageId = 'CCModManager-grid'
-type CheckboxConfig = { key: string; default?: boolean } & ({ filterKey?: keyof Fliters } | { localStorageKey: string; callback: () => void })
+type CheckboxConfig = { key: keyof typeof Lang.filters; default?: boolean } & ({ filterKey?: keyof Fliters } | { localStorageKey: string; callback: () => void })
 
 const checkboxes: CheckboxConfig[] = [
     {
@@ -85,7 +86,7 @@ sc.FiltersPopup = ig.GuiElementBase.extend({
         HIDDEN: { state: { alpha: 0 }, time: 0.3, timeFunction: KEY_SPLINES.EASE_IN },
     },
     getLangData(key) {
-        return ig.lang.get(`sc.gui.menu.ccmodmanager.filters.${key}`)
+        return Lang.filters[key]
     },
     setFilterValue(config, state) {
         const filters = sc.modMenu.list.filters

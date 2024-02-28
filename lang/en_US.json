@@ -1,0 +1,97 @@
+{
+    "mods": "Mods",
+    "sort": {
+        "stars": "Stars",
+        "lastUpdated": "Last updated",
+        "dec": {
+            "stars": "Sorts by GitHub stars."
+        }
+    },
+    "help": {
+        "title": "\\c[3]Mod Manager\\c[0]",
+        "pages": [
+            {
+                "content": [
+                    "Welcome to the mod manager!\nThere are 4 tabs:\n- \\c[3]Online\\c[0] - Search through all availible mods.\n- \\c[3]Selected\\c[0] - Mods you selected to install.\n- \\c[3]Enabled\\c[0] - Mods that are installed and enabled.\n- \\c[3]Disabled\\c[0] - Mods that are installed and disabled.\nSelect the mod sort method by pressing \\i[help3].\nIf a mod title has a list icon (\\i[quest]) before it, that means it has availible in the online repositories, and if it has a question mark (\\i[lore-others]), that means that it's not.\nIf a mod title has a clock (\\i[stats-general]) before it, that means it's awaiting a restart.\nIf a mod title has a news icon (\\i[item-news]) before it, that means it has an update availible.\nPress \\i[menu] to open the filters menu.\nSee the next pages for explanation of seperate tabs."
+                ]
+            },
+            {
+                "title": "\\c[3]Mod Manager - Online\\c[0]",
+                "content": [
+                    "The \\c[3]Online\\c[0] tab contains all availible mods you can install.\nTo select or deselect a mod for installation, focus a mod and press \\i[key-throw] or \\i[gamepad-a].\nInstall mods by pressing \\i[help4].\n"
+                ]
+            },
+            {
+                "title": "\\c[3]Mod Manager - Selected\\c[0]",
+                "content": [
+                    "The \\c[3]Selected\\c[0] tab contains all mods selected for installation.\nSelected mods have yellow names.\nTo select or deselect a mod for installation, focus a mod and press \\i[key-throw] or \\i[gamepad-a].\nInstall mods by pressing \\i[help4].\n"
+                ]
+            },
+            {
+                "title": "\\c[3]Mod Manager - Enabled\\c[0]",
+                "content": [
+                    "The \\c[3]Enabled\\c[0] tab contains all installed and enabled mods.\nEnabled mods have green names.\nUninstall mods by pressing \\i[help2].\nTo disable a mod, focus a mod and press \\i[key-throw] or \\i[gamepad-a]."
+                ]
+            },
+            {
+                "title": "\\c[3]Mod Manager - Disabled\\c[0]",
+                "content": [
+                    "The \\c[3]Disabled\\c[0] tab contains all installed and disabled mods.\nDisabled mods have red names.\nUninstall mods by pressing \\i[help2].\nTo enable a mod, focus a mod and press \\i[key-throw] or \\i[gamepad-a]."
+                ]
+            }
+        ]
+    },
+    "onlineTab": "Online",
+    "selectedModsTab": "Selected",
+    "enabledTab": "Enabled",
+    "disabledTab": "Disabled",
+    "settingsTab": "Settings",
+    "installButton": "Install \\c[3][modCount]\\c[0] mods",
+    "uninstall": "Uninstall",
+    "checkUpdates": "Check updates",
+    "filtersButton": "Filters",
+    "noModsSelected": "No mods selected",
+    "reposButton": "Repositories",
+    "areYouSureYouWantTo": "Are you sure you want to:",
+    "areYouSureYouWantToUninstall": "Are you sure you want to uninstall the mod:\n- \\c[3][modName]\\c[0]",
+    "cannotUninstall": "Cannot uninstall the mod: \\c[3][modName]\\c[0] because other mods depend on it:\n",
+    "dependencies": "Dependencies:",
+    "toUpdate": "Update:",
+    "toInstall": "Install:",
+    "updatesDetected": "Some mods have a new version. Do you want to update now?",
+    "upToDate": "Up to date.",
+    "updatesFound": "Updated were found.",
+    "disableAutoupdate": "Disable autoupdate",
+    "askRestartInstall": "Installed succesfully.\nThe installed mods will start working after a restart.\nDo you want to restart?",
+    "askRestartUninstall": "Uninstalled succesfully.\nThe mod will actually stop working after a restart.\nDo you want to restart?",
+    "modStatesChanged": "Mod states have been changed, they will take effect after a game restart.\nDo you want to restart now?",
+    "noInternet": "Error: No internet connection",
+    "cannotDisable": "Cannot disable the mod: \\c[3][modName]\\c[0] because other mods depend on it:\n",
+    "doYouWantToEnable": "The mod: \\c[3][modName]\\c[0] depends on these disabled mods:\n[mods]Do you also want to enable them?",
+    "filters": {
+        "gridView": { "name": "Grid view", "description": "Makes the mod list a grid" },
+        "local": { "name": "Include local", "description": "Includes installed mods" },
+        "hideLibrary": { "name": "Hide library mods", "description": "Hides mods that don't add any new content themselvs" },
+        "tagQol": { "name": "QoL", "description": "stands for \"Quality of Life\". Makes the playing experience smoother" },
+        "tagPlayerCharacter": { "name": "player character", "description": "adds new playable characters and/or classes" },
+        "tagPartyMember": { "name": "party member", "description": "adds new playable characters and/or classes" },
+        "tagCombatArts": { "name": "combat arts", "description": "adds new combat arts" },
+        "tagPvpDuel": { "name": "pvp duel", "description": "adds a pvp duel" },
+        "tagArena": { "name": "arena", "description": "adds new arena cups" },
+        "tagDungeon": { "name": "dungeon", "description": "adds a new dungeon" },
+        "tagQuests": { "name": "quests", "description": "adds new quests" },
+        "tagMaps": { "name": "maps", "description": "adds new content maps" },
+        "tagBoss": { "name": "boss", "description": "adds new bosses" },
+        "tagPuzzle": { "name": "puzzle", "description": "adds new puzzles or something puzzle related" },
+        "tagNg+": { "name": "ng+", "description": "adds additional ng+ options" },
+        "tagCosmetic": { "name": "cosmetic", "description": "adds any kind of cosmetic things like skins, pets or menu skins" },
+        "tagFun": { "name": "fun", "description": "fun things not necessarily useful" },
+        "tagCheats": { "name": "cheats", "description": "do things you\"re not supposed to do like spawn items or infinite gold" },
+        "tagSpeedrun": { "name": "speedrun", "description": "helps speedrunners with speedruns or practise" },
+        "tagWidget": { "name": "widget", "description": "adds a CCUILib quick menu widget" },
+        "tagLanguage": { "name": "language", "description": "adds a new language" },
+        "tagAccessibility": { "name": "accessibility", "description": "makes the game more accessible" },
+        "tagDev": { "name": "dev", "description": "helps mod developers create mods" },
+        "tagLibrary": { "name": "library", "description": "used by other mods" }
+    }
+}
