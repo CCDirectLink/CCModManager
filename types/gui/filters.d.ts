@@ -1,4 +1,5 @@
 import { Fliters } from '../filters';
+import { Lang } from '../lang-manager';
 declare global {
     namespace sc {
         interface FiltersPopup extends ig.GuiElementBase {
@@ -10,7 +11,7 @@ declare global {
                 checkbox: sc.FilterCheckox;
             }[];
             infoBar: sc.InfoBar;
-            getLangData(this: this, key: string): {
+            getLangData(this: this, key: keyof typeof Lang.filters): {
                 name: string;
                 description: string;
             };
@@ -33,7 +34,7 @@ declare global {
 }
 export declare const isGridLocalStorageId = "CCModManager-grid";
 type CheckboxConfig = {
-    key: string;
+    key: keyof typeof Lang.filters;
     default?: boolean;
 } & ({
     filterKey?: keyof Fliters;
