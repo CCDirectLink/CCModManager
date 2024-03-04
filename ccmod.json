@@ -1,6 +1,6 @@
 {
     "id": "ccmodmanager",
-    "version": "0.9.0",
+    "version": "0.9.1",
     "title": "CCModManager",
     "description": "mod manager",
     "plugin": "plugin.js",
