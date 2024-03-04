@@ -54,3 +54,14 @@ sc.OptionsMenu.inject({
         this.parent()
     },
 })
+
+if (!window.nax?.ccuilib?.InputField) {
+    // @ts-expect-error
+    window.nax ??= {}
+    // @ts-expect-error
+    window.nax.ccuilib ??= {}
+    // @ts-expect-error
+    import('nax-ccuilib/src/ui/input-field-cursor.js')
+    // @ts-expect-error
+    import('nax-ccuilib/src/ui/input-field.js')
+}

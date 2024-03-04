@@ -6,8 +6,5 @@
     "plugin": "plugin.js",
     "icons": {
         "24": "icon/icon.png"
-    },
-    "dependencies": {
-        "nax-ccuilib": ">=1.2.2"
     }
 }
