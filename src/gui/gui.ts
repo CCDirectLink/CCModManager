@@ -1,3 +1,4 @@
+import { Lang } from '../lang-manager.js'
 import './menu.js'
 
 // @ts-expect-error
@@ -21,7 +22,7 @@ sc.OptionsMenu.inject({
     init() {
         this.parent()
 
-        this.modsButton = new sc.ButtonGui('\\i[help3]' + ig.lang.get('sc.gui.menu.menu-titles.mods'), undefined, true, sc.BUTTON_TYPE.SMALL)
+        this.modsButton = new sc.ButtonGui('\\i[help3]' + Lang.mods, undefined, true, sc.BUTTON_TYPE.SMALL)
         this.modsButton.keepMouseFocus = true
         this.modsButton.hook.transitions = {
             DEFAULT: { state: {}, time: 0.2, timeFunction: KEY_SPLINES.EASE },

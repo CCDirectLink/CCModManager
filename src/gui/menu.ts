@@ -260,8 +260,8 @@ sc.ModMenu = sc.ListInfoMenu.extend({
         if (!this.helpGui) {
             this.helpGui = new sc.HelpScreen(
                 this,
-                ig.lang.get('sc.gui.menu.help-texts.mods.title'),
-                ig.lang.get('sc.gui.menu.help-texts.mods.pages'),
+                Lang.help.title,
+                Lang.help.pages,
                 () => {
                     this.showMenu()
                     sc.menu.popBackCallback()

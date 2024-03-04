@@ -18,6 +18,5 @@ export class LangManager {
     async poststart() {
         ig.lang.labels.sc.gui.menu['menu-titles'].mods = Lang.mods
         ig.merge(ig.lang.labels.sc.gui.menu.sort, Lang.sort)
-        ig.lang.labels.sc.gui.menu['help-texts'].mods = Lang.help
     }
 }

@@ -107,8 +107,7 @@ export class ModInstallDialogs {
 
         return new Promise(resolve => {
             sc.Dialogs.showYesNoDialog(
-                ig.lang
-                    .get('sc.gui.menu.ccmodmanager.doYouWantToEnable')
+                Lang.doYouWantToEnable
                     .replace(/\[modName\]/, prepareModName(mod.name))
                     .replace(/\[mods\]/, deps.map(mod => `- \\c[3]${prepareModName(mod.name)}\\c[0]\n`).join('')),
                 sc.DIALOG_INFO_ICON.QUESTION,
