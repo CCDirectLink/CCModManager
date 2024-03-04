@@ -2,9 +2,12 @@
     "id": "ccmodmanager",
     "version": "0.9.1",
     "title": "CCModManager",
-    "description": "mod manager",
-    "plugin": "plugin.js",
+    "description": "Mod manager for CrossCode!",
+    "repository": "https://github.com/CCDirectLink/CCModManager",
+    "tags": ["QoL"],
+    "authors": ["krypek", "dmitmel", "2767mr"],
     "icons": {
         "24": "icon/icon.png"
-    }
+    },
+    "plugin": "plugin.js"
 }
