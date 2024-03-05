@@ -1,6 +1,7 @@
 import { LocalMods } from './local-mods'
 import { ModDB } from './moddb'
 import { ModEntry, ModEntryLocal, ModEntryServer } from './types'
+import { ModInstallDialogs } from './gui/install-dialogs'
 
 const fs: typeof import('fs') = (0, eval)("require('fs')")
 const path: typeof import('path') = (0, eval)("require('path')")
@@ -8,8 +9,8 @@ const path: typeof import('path') = (0, eval)("require('path')")
 import { loadAsync } from 'jszip'
 import semver_satisfies from 'semver/functions/satisfies'
 import semver_gt from 'semver/functions/gt'
-import { rimraf } from '../node_modules/rimraf/dist/commonjs/index.js'
-import { ModInstallDialogs } from './gui/install-dialogs'
+// @ts-expect-error
+import rimraf from 'rimraf'
 
 export class InstallQueue {
     private static queue: ModEntryServer[] = []
@@ -255,7 +256,12 @@ export class ModInstaller {
 
     static async uninstallMod(mod: ModEntryLocal) {
         console.log('uninstall', mod.id)
-        return rimraf.rimraf(mod.path)
+        return new Promise<void>(resolve =>
+            rimraf(mod.path, fs, (...args: any[]) => {
+                console.log(args)
+                resolve()
+            })
+        )
     }
 
     static restartGame() {
