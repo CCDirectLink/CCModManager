@@ -1,7 +1,7 @@
 import { Mod } from 'ultimate-crosscode-typedefs/modloader/mod'
 import { FileCache } from './cache'
 import ModManager from './plugin'
-import { ModEntryLocal } from './types'
+import { ModEntryLocal, ModEntryServer } from './types'
 import { ModDB } from './moddb'
 import { ModInstaller } from './mod-installer'
 
@@ -28,21 +28,82 @@ export class LocalMods {
     private static cache: ModEntryLocal[]
     private static cacheRecord: Record<string, ModEntryLocal>
 
-    static getAll(force: boolean = false) {
-        if (!force && this.cache) return this.cache
+    private static localModFlags: Record<string, { disableUninstall?: boolean; disableDisabling?: boolean; disableUpdate?: boolean }> = {
+        ccloader: {
+            disableDisabling: true,
+            disableUninstall: true,
+        },
+        Simplify: {
+            disableDisabling: true,
+            disableUninstall: true,
+            disableUpdate: true,
+        },
+        'CCLoader display version': {
+            disableUninstall: true,
+            disableUpdate: true,
+        },
+    }
+
+    static async initAll() {
         let all: ModEntryLocal[]
         if (ModManager.mod.isCCL3) {
             all = [...modloader.installedMods].map(e => this.convertCCL3Mod(e[1]))
         } else {
             all = this.cache = [...window.activeMods.map(this.convertCCL2Mod), ...window.inactiveMods.map(this.convertCCL2Mod)]
         }
+
+        all.push(...(await this.createVirtualLocalMods()))
+
         this.cacheRecord = {}
         for (const mod of all) {
-            ModDB.resolveLocalModOrigin(mod)
-            mod.hasUpdate = ModInstaller.checkLocalModForUpdate(mod)
             this.cacheRecord[mod.id] = mod
         }
-        return all
+        for (const id in this.localModFlags) {
+            const mod = this.cacheRecord[id]
+            if (mod) ig.merge(mod, this.localModFlags[id])
+        }
+
+        await Promise.all(all.map(mod => ModDB.resolveLocalModOrigin(mod)))
+
+        for (const mod of all) {
+            if (!mod.disableUpdate) mod.hasUpdate = ModInstaller.checkLocalModForUpdate(mod)
+        }
+    }
+
+    static getAll() {
+        if (!this.cache) throw new Error('Local mods accessed before cached!')
+        return this.cache
+    }
+
+    private static async createVirtualLocalMods(): Promise<ModEntryLocal[]> {
+        const mods: ModEntryLocal[] = []
+        const ccloader = await ModDB.getLocalModOrigin('ccloader')
+        if (ccloader) mods.push(this.convertServerToLocal(ccloader, this.getCCLoaderVersion(), '', true))
+        return mods
+    }
+
+    private static convertServerToLocal(
+        server: ModEntryServer,
+        version: string,
+        path: string,
+        active: boolean,
+        iconConfig = FileCache.getDefaultModIconConfig()
+    ): ModEntryLocal {
+        return {
+            database: 'LOCAL',
+            isLocal: true,
+            id: server.id,
+            name: server.name,
+            description: server.description,
+            version,
+            isLegacy: server.isLegacy,
+            hasIcon: server.hasIcon,
+            dependencies: server.dependencies,
+            path,
+            active,
+            iconConfig,
+            hasUpdate: false,
+        }
     }
 
     static getAllRecord() {

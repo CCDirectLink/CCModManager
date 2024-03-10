@@ -115,6 +115,9 @@ export interface ModEntryLocal extends ModEntryBase {
     serverCounterpart?: ModEntryServer
     path: string
     hasUpdate: boolean
+    disableUninstall?: boolean
+    disableDisabling?: boolean
+    disableUpdate?: boolean
 }
 
 export type ModEntry = ModEntryServer | ModEntryLocal

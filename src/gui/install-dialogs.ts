@@ -66,13 +66,23 @@ export class ModInstallDialogs {
         })
     }
 
-    static showModUninstallDialog(localMod: ModEntryLocal) {
+    static showModUninstallDialog(localMod: ModEntryLocal): boolean {
+        if (localMod.disableUninstall) {
+            sc.Dialogs.showErrorDialog(Lang.cannotUninstallDisabled.replace(/\[modName\]/, prepareModName(localMod.name)))
+            return false
+        }
         const deps = ModInstaller.getWhatDependsOnAMod(localMod)
-        if (deps.length == 0) {
-            const str = Lang.areYouSureYouWantToUninstall.replace(/\[modName\]/, prepareModName(localMod.name))
-            sc.Dialogs.showChoiceDialog(str, sc.DIALOG_INFO_ICON.QUESTION, [ig.lang.get('sc.gui.dialogs.yes'), ig.lang.get('sc.gui.dialogs.no')], button => {
-                if (button.data == 0) {
-                    ModInstaller.uninstallMod(localMod).then(() => {
+        if (deps.length > 0) {
+            sc.Dialogs.showErrorDialog(
+                Lang.cannotUninstall.replace(/\[modName\]/, prepareModName(localMod.name)) + deps.map(mod => `- \\c[3]${prepareModName(mod.name)}\\c[0]\n`).join('')
+            )
+            return false
+        }
+        const str = Lang.areYouSureYouWantToUninstall.replace(/\[modName\]/, prepareModName(localMod.name))
+        sc.Dialogs.showChoiceDialog(str, sc.DIALOG_INFO_ICON.QUESTION, [ig.lang.get('sc.gui.dialogs.no'), ig.lang.get('sc.gui.dialogs.yes')], button => {
+            if (button.data == 1) {
+                ModInstaller.uninstallMod(localMod)
+                    .then(() => {
                         localMod.awaitingRestart = true
                         localMod.active = false
                         sc.Model.notifyObserver(sc.modMenu, sc.MOD_MENU_MESSAGES.UPDATE_ENTRIES)
@@ -83,16 +93,19 @@ export class ModInstallDialogs {
                             }
                         })
                     })
-                }
-            })
-        } else {
-            sc.Dialogs.showErrorDialog(
-                Lang.cannotUninstall.replace(/\[modName\]/, prepareModName(localMod.name)) + deps.map(mod => `- \\c[3]${prepareModName(mod.name)}\\c[0]\n`).join('')
-            )
-        }
+                    .catch(err => {
+                        sc.Dialogs.showErrorDialog(err)
+                    })
+            }
+        })
+        return true
     }
 
     static checkCanDisableMod(mod: ModEntryLocal): boolean {
+        if (mod.disableDisabling) {
+            sc.Dialogs.showErrorDialog(Lang.cannotDisableDisabled.replace(/\[modName\]/, prepareModName(mod.name)))
+            return false
+        }
         const deps = ModInstaller.getWhatDependsOnAMod(mod, true)
         if (deps.length == 0) return true
         sc.Dialogs.showErrorDialog(

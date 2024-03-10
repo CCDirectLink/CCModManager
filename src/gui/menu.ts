@@ -125,9 +125,14 @@ sc.ModMenu = sc.ListInfoMenu.extend({
             ).mod
             const localMod = mod.isLocal ? mod : mod.localCounterpart
             if (localMod /* this should ALWAYS be true but anyways */) {
-                ModInstallDialogs.showModUninstallDialog(localMod)
+                if (ModInstallDialogs.showModUninstallDialog(localMod)) {
+                    sc.BUTTON_SOUND.submit.play()
+                } else {
+                    sc.BUTTON_SOUND.denied.play()
+                }
             }
         }
+        this.uninstallButton.submitSound = undefined
         this.uninstallButton.keepMouseFocus = true /* prevent the focus jumping all over the place on press */
         this.addChildGui(this.uninstallButton)
         sc.menu.buttonInteract.addGlobalButton(this.uninstallButton, () => sc.control.menuHotkeyHelp2())

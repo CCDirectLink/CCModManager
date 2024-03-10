@@ -83,7 +83,7 @@ export class ModDB {
         return mods.reduce((highestVerMod, currMod) => (semver_gt(currMod.version, highestVerMod.version) ? currMod : highestVerMod))
     }
 
-    static async resolveLocalModOrigin(mod: ModEntryLocal) {
+    static async getLocalModOrigin(id: string): Promise<ModEntryServer | undefined> {
         const matches: ModEntryServer[] = []
         for (const dbName in this.databases) {
             const moddb = this.databases[dbName]
@@ -94,16 +94,22 @@ export class ModDB {
             }
             if (!modRecord) throw new Error('wat?')
 
-            const dbMod = modRecord[mod.id]
+            const dbMod = modRecord[id]
             if (dbMod) matches.push(dbMod)
         }
         if (matches.length == 0) return
-        let serverMod!: ModEntry
+        let serverMod!: ModEntryServer
         if (matches.length == 1) {
             serverMod = matches[0]
         } else {
             serverMod = this.getHighestVersionMod(matches)
         }
+        return serverMod
+    }
+
+    static async resolveLocalModOrigin(mod: ModEntryLocal) {
+        const serverMod = await this.getLocalModOrigin(mod.id)
+        if (!serverMod) return
         serverMod.localCounterpart = mod
         mod.serverCounterpart = serverMod
         mod.database = serverMod.database

@@ -233,7 +233,10 @@ sc.ModListEntry = ig.FocusGui.extend({
         return 'Enabled'
     },
     tryDisableMod(mod: ModEntryLocal) {
-        if (!ModInstallDialogs.checkCanDisableMod(mod)) return
+        if (!ModInstallDialogs.checkCanDisableMod(mod)) {
+            sc.BUTTON_SOUND.denied.play()
+            return
+        }
         mod.awaitingRestart = !mod.awaitingRestart
         this.setNameText(COLORS.RED)
         sc.BUTTON_SOUND.toggle_off.play()

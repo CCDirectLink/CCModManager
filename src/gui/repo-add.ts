@@ -81,7 +81,7 @@ sc.ModMenuRepoAddPopup = ig.GuiElementBase.extend({
         backButton.onButtonPress = () => {
             this.hide()
         }
-        this.buttonGroup.addFocusGui(backButton, undefined, undefined, true)
+        this.buttonGroup.addFocusGui(backButton, 100, 100, true)
         this.addChildGui(backButton)
 
         this.urlFields = []
@@ -121,7 +121,7 @@ sc.ModMenuRepoAddPopup = ig.GuiElementBase.extend({
             }
 
             this.urlFields.push(urlField)
-            this.buttonGroup.addFocusGui(urlField)
+            this.buttonGroup.addFocusGui(urlField, 100, 101)
             box.addChildGui(urlField)
         }
 

@@ -9,6 +9,7 @@ const path: typeof import('path') = (0, eval)("require('path')")
 import { loadAsync } from 'jszip'
 import semver_satisfies from 'semver/functions/satisfies'
 import semver_gt from 'semver/functions/gt'
+
 // @ts-expect-error
 import rimraf from 'rimraf'
 
@@ -61,12 +62,6 @@ export class ModInstaller {
                 description: 'CrossCode DLC.',
                 version: LocalMods.getCCVersion(),
             } as ModEntryLocal,
-            ccloader: {
-                id: 'ccloader',
-                name: 'CCLoader',
-                description: 'The mod loader.',
-                version: LocalMods.getCCLoaderVersion(),
-            } as ModEntryLocal,
         }
     }
 
@@ -116,7 +111,7 @@ export class ModInstaller {
 
     static async findDepsDatabase(mods: ModEntryServer[], modRecords: Record<string, ModEntryServer[]>, includeInstalled: boolean = false): Promise<ModEntryServer[]> {
         /* resolve local mod origin */
-        LocalMods.getAll(true)
+        LocalMods.initAll()
 
         this.record = ModDB.removeModDuplicates(modRecords)
         this.byNameRecord = {}
@@ -174,17 +169,24 @@ export class ModInstaller {
                     )
             }
         }
-        return Object.values(deps).map(dep => dep.mod)
+
+        const depMods = Object.values(deps).map(e => e.mod)
+        for (const mod of [...depMods, ...mods]) {
+            if (mod.localCounterpart?.hasUpdate) mod.installStatus = 'update'
+        }
+        return depMods
     }
 
     static async install(mods: ModEntryServer[]) {
         console.log('mods to install:', mods.map(mod => mod.id).join(', '))
+
         const modsToInstall: ModEntryServer[] = mods.filter(mod => mod.installStatus == 'new' || mod.installStatus == 'dependency')
         const promises: Promise<void>[] = []
         for (const mod of modsToInstall) {
             promises.push(this.downloadAndInstallMod(mod))
         }
         const modsToUpdate: ModEntryServer[] = mods.filter(mod => mod.installStatus == 'update')
+
         for (const mod of modsToUpdate) {
             promises.push(this.updateMod(mod))
         }
@@ -195,6 +197,11 @@ export class ModInstaller {
     private static async updateMod(mod: ModEntryServer) {
         const local = mod.localCounterpart
         if (!local) throw new Error('wat')
+
+        if (local.id == 'ccloader') {
+            this.installCCLoader(mod)
+            return
+        }
         this.uninstallMod(local)
         this.downloadAndInstallMod(mod)
     }
@@ -223,7 +230,7 @@ export class ModInstaller {
         return fs.promises.writeFile(`assets/mods/${id}.ccmod`, new Uint8Array(data))
     }
 
-    private static async installModZip(data: ArrayBuffer, id: string, source: string) {
+    private static async installModZip(data: ArrayBuffer, id: string, source: string, prefixPath: string = 'assets/mods') {
         const zip = await loadAsync(data)
 
         await Promise.all(
@@ -236,13 +243,23 @@ export class ModInstaller {
                         return
                     }
 
-                    const filepath = path.join('assets/mods/', id, relative)
+                    const filepath = path.join(prefixPath, id, relative)
+                    console.log(filepath)
                     try {
                         await fs.promises.mkdir(path.dirname(filepath), { recursive: true })
                     } catch {}
                     await fs.promises.writeFile(filepath, data)
                 })
         )
+    }
+
+    private static async installCCLoader(mod: ModEntryServer) {
+        const installation = mod.installation.find(i => i.type === 'zip')
+        if (!installation) throw new Error(`ccloader installation missing how???`)
+        const resp = await fetch(installation.url)
+        const data = await resp.arrayBuffer()
+        this.installModZip(data, '', installation.source, '')
+        console.log(mod)
     }
 
     static getWhatDependsOnAMod(mod: ModEntryLocal, on = false): ModEntryLocal[] {
@@ -255,13 +272,9 @@ export class ModInstaller {
     }
 
     static async uninstallMod(mod: ModEntryLocal) {
+        if (mod.disableUninstall) throw new Error('Attempted to uninstall mod that has uninstalling disabled!')
         console.log('uninstall', mod.id)
-        return new Promise<void>(resolve =>
-            rimraf(mod.path, fs, (...args: any[]) => {
-                console.log(args)
-                resolve()
-            })
-        )
+        return new Promise<void>(resolve => rimraf(mod.path, fs, () => resolve()))
     }
 
     static restartGame() {
@@ -277,11 +290,13 @@ export class ModInstaller {
 
     static async appendToUpdateModsToQueue(): Promise<boolean> {
         await ModDB.loadAllMods()
+        await LocalMods.initAll()
 
         const mods: ModEntryLocal[] = LocalMods.getAll().filter(mod => mod.hasUpdate)
         const serverMods = mods.map(mod => mod.serverCounterpart!)
         InstallQueue.add(...serverMods)
         InstallQueue.add(...(await this.findDepsDatabase(serverMods, ModDB.modRecord)))
+        for (const mod of serverMods) mod.installStatus = 'update'
 
         return mods.length > 0
     }
