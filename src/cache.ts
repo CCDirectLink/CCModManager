@@ -1,4 +1,3 @@
-import type { Dirent } from 'fs'
 import { ModDB } from './moddb'
 import { ModEntry, ModImageConfig as ModIconConfig, NPDatabase } from './types'
 
@@ -9,12 +8,7 @@ const https: typeof import('https') = (0, eval)("require('https')")
 const dns: typeof import('dns') = (0, eval)("require('dns')")
 
 async function* getFilesRecursive(dir: string): AsyncIterable<string> {
-    const dirents = await new Promise<Dirent[]>(resolve =>
-        fs.readdir(dir, { withFileTypes: true }, (err, files) => {
-            if (err) console.log(err)
-            resolve(files)
-        })
-    )
+    const dirents = await fs.promises.readdir(dir, { withFileTypes: true })
     for (const dirent of dirents) {
         const res = `${dir}/${dirent.name}`
         if (dirent.isDirectory()) {
@@ -76,7 +70,7 @@ export class FileCache {
 
     static async init() {
         this.cacheDir = './assets/mod-data/CCModManager/cache'
-        await new Promise<void>(resolve => fs.mkdir(`${this.cacheDir}`, { recursive: true }, () => resolve()))
+        await fs.promises.mkdir(`${this.cacheDir}`, { recursive: true })
 
         this.inCache = new Set()
         for await (const path of getFilesRecursive(this.cacheDir)) this.inCache.add(path.substring('./assets/mod-data/CCModManager/cache/'.length))
@@ -107,7 +101,7 @@ export class FileCache {
 
         const url = `${ModDB.databases[mod.database].url}/${urlPath}`
         const data = Buffer.from(await (await fetch(url)).arrayBuffer())
-        await new Promise<void>(resolve => fs.writeFile(`${this.cacheDir}/${path}`, data, () => resolve()))
+        await fs.promises.writeFile(`${this.cacheDir}/${path}`, data)
         this.inCache.add(path)
         return ccPath
     }
@@ -160,12 +154,7 @@ export class FileCache {
         const cached = this.cache[path]
         if (cached) return cached
         this.inCache.add(path)
-        let data: Buffer = await new Promise(resolve =>
-            fs.readFile(`${this.cacheDir}/${path}`, (err, data) => {
-                if (err) console.log(err)
-                resolve(data)
-            })
-        )
+        let data = await fs.promises.readFile(`${this.cacheDir}/${path}`)
         if (toJSON) data = JSON.parse(data.toString())
         this.cache[path] = data
         return data as T

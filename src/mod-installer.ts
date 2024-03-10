@@ -220,7 +220,7 @@ export class ModInstaller {
     }
 
     private static async installCCMod(data: ArrayBuffer, id: string) {
-        return new Promise<void>(resolve => fs.writeFile(`assets/mods/${id}.ccmod`, new Uint8Array(data), () => resolve()))
+        return fs.promises.writeFile(`assets/mods/${id}.ccmod`, new Uint8Array(data))
     }
 
     private static async installModZip(data: ArrayBuffer, id: string, source: string) {
@@ -238,9 +238,9 @@ export class ModInstaller {
 
                     const filepath = path.join('assets/mods/', id, relative)
                     try {
-                        await new Promise<void>(resolve => fs.mkdir(path.dirname(filepath), { recursive: true }, () => resolve()))
+                        await fs.promises.mkdir(path.dirname(filepath), { recursive: true })
                     } catch {}
-                    await new Promise<void>(resolve => fs.writeFile(filepath, data, () => resolve()))
+                    await fs.promises.writeFile(filepath, data)
                 })
         )
     }
