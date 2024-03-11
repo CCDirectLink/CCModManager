@@ -12,11 +12,9 @@ jobs:
         runs-on: ubuntu-latest
 
         steps:
-            # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-            - uses: actions/checkout@v2
+            - uses: actions/checkout@v4
             
-            - name: Install dependencies
-              run: sudo apt update; sudo apt install npm
+            - uses: actions/setup-node@v4
 
             - name: Compile
               run: npm install; npm run start

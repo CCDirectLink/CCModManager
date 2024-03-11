@@ -11,8 +11,7 @@ jobs:
         runs-on: ubuntu-latest
 
         steps:
-            # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-            - uses: actions/checkout@v2
+            - uses: actions/checkout@v4
 
             - name: Check commit message
               id: check_commit_message
@@ -30,8 +29,7 @@ jobs:
                   exit 1
                 fi
 
-            - name: Install dependencies
-              run: sudo apt update; sudo apt install npm
+            - uses: actions/setup-node@v4
 
             - name: Update package.json and ccmod.json
               run: | 
