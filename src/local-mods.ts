@@ -63,7 +63,14 @@ export class LocalMods {
             if (mod) ig.merge(mod, this.localModFlags[id])
         }
 
-        await Promise.all(all.map(mod => ModDB.resolveLocalModOrigin(mod)))
+        await Promise.all([
+            ...all.map(mod => ModDB.resolveLocalModOrigin(mod)),
+            ...all.map(mod =>
+                ModInstaller.isDirGit(mod.path).then(isGit => {
+                    mod.isGit = isGit
+                })
+            ),
+        ])
 
         for (const mod of all) {
             if (!mod.disableUpdate) mod.hasUpdate = ModInstaller.checkLocalModForUpdate(mod)

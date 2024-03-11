@@ -259,7 +259,22 @@ export class ModInstaller {
         const resp = await fetch(installation.url)
         const data = await resp.arrayBuffer()
         this.installModZip(data, '', installation.source, '')
-        console.log(mod)
+    }
+
+    private static async fileExists(filePath: string) {
+        try {
+            await fs.promises.access(filePath, fs.constants.F_OK)
+            return true
+        } catch (_) {
+            return false
+        }
+    }
+
+    static async isDirGit(dirPath: string): Promise<boolean> {
+        if (!dirPath.trim()) return false
+        const stat = await fs.promises.stat(dirPath)
+        if (!stat.isDirectory()) return false
+        return await this.fileExists(path.join(dirPath, '.git'))
     }
 
     static getWhatDependsOnAMod(mod: ModEntryLocal, on = false): ModEntryLocal[] {
@@ -273,6 +288,7 @@ export class ModInstaller {
 
     static async uninstallMod(mod: ModEntryLocal) {
         if (mod.disableUninstall) throw new Error('Attempted to uninstall mod that has uninstalling disabled!')
+        if (mod.isGit) throw new Error('Attempted to uninstall mod that is git!')
         console.log('uninstall', mod.id)
         return new Promise<void>(resolve => rimraf(mod.path, fs, () => resolve()))
     }

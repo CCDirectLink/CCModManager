@@ -165,8 +165,12 @@ sc.ModListEntry = ig.FocusGui.extend({
 
         if (this.mod.awaitingRestart) icon += `\\i[stats-general]`
 
-        if ((this.mod.isLocal && this.mod.hasUpdate) || (!this.mod.isLocal && this.mod.localCounterpart?.hasUpdate)) {
+        const local = this.mod.isLocal ? this.mod : this.mod.localCounterpart
+        if (local && local.hasUpdate) {
             icon += `\\i[item-news]`
+        }
+        if (local?.isGit) {
+            icon += '\\i[ccmodmanager-git]'
         }
 
         return { icon, text: prepareModName(this.mod.name) }

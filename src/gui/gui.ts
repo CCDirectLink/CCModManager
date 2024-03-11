@@ -1,6 +1,14 @@
 import { Lang } from '../lang-manager.js'
 import './menu.js'
 
+const iconsFont = new ig.Font('media/ccmodmanager-icons.png', 16, 16)
+const page = sc.fontsystem.font.iconSets.push(iconsFont) - 1
+const icons = ['ccmodmanager-git'] as const
+for (const iconName of icons) {
+    sc.fontsystem.font.mapping[iconName] = [page, 0]
+    sc.fontsystem.font.indexMapping.push(iconName)
+}
+
 // @ts-expect-error
 sc.MENU_SUBMENU.MODS = Math.max(...Object.values(sc.MENU_SUBMENU)) + 1
 

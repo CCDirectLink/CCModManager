@@ -71,6 +71,10 @@ export class ModInstallDialogs {
             sc.Dialogs.showErrorDialog(Lang.cannotUninstallDisabled.replace(/\[modName\]/, prepareModName(localMod.name)))
             return false
         }
+        if (localMod.isGit) {
+            sc.Dialogs.showErrorDialog(Lang.cannotUninstallGit.replace(/\[modName\]/, prepareModName(localMod.name)))
+            return false
+        }
         const deps = ModInstaller.getWhatDependsOnAMod(localMod)
         if (deps.length > 0) {
             sc.Dialogs.showErrorDialog(
