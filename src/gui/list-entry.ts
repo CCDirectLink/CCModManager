@@ -161,7 +161,7 @@ sc.ModListEntry = ig.FocusGui.extend({
     getModName() {
         let icon: string = ''
 
-        icon += this.mod.database == 'LOCAL' ? '\\i[lore-others]' : '\\i[quest]'
+        icon += this.mod.database == 'LOCAL' ? '\\i[lore-others]' : '\\i[mod-icon]'
 
         if (this.mod.awaitingRestart) icon += `\\i[stats-general]`
 
