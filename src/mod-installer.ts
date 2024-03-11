@@ -308,7 +308,7 @@ export class ModInstaller {
         await ModDB.loadAllMods()
         await LocalMods.initAll()
 
-        const mods: ModEntryLocal[] = LocalMods.getAll().filter(mod => mod.hasUpdate)
+        const mods: ModEntryLocal[] = LocalMods.getAll().filter(mod => mod.hasUpdate && !mod.isGit)
         const serverMods = mods.map(mod => mod.serverCounterpart!)
         InstallQueue.add(...serverMods)
         InstallQueue.add(...(await this.findDepsDatabase(serverMods, ModDB.modRecord)))

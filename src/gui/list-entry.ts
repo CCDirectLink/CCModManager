@@ -263,7 +263,7 @@ sc.ModListEntry = ig.FocusGui.extend({
             } else throw new Error('wat?')
         } else if (mod.localCounterpart) {
             const localMod = mod.localCounterpart
-            if (localMod.hasUpdate) {
+            if (localMod.hasUpdate && !localMod.isGit) {
                 if (InstallQueue.has(mod)) {
                     if (localMod.active) this.setNameText(COLORS.GREEN)
                     else this.setNameText(COLORS.RED)
