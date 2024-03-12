@@ -5,7 +5,7 @@ on:
         branches:
             - master
 
-jobs: 
+jobs:
     release:
         if: startsWith(github.event.head_commit.message, 'vv')
         runs-on: ubuntu-latest
@@ -16,53 +16,74 @@ jobs:
             - name: Check commit message
               id: check_commit_message
               run: |
-                version=$(git log --format=%B -n 1 ${{ github.sha }})
-                version=${version:1}
-                version_numeric=${version:1}
-                echo "VERSION=$version" >> $GITHUB_ENV
-                echo "VERSION_NUMERIC=$version_numeric" >> $GITHUB_ENV
-                echo "$VERSION" "$version"
-                if [[ "$version" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-                  echo "Commit name matches"
-                else
-                  echo "Commit name doesnt match"
-                  exit 1
-                fi
+                  version=$(git log --format=%B -n 1 ${{ github.sha }})
+                  version=${version:1}
+                  version_numeric=${version:1}
+                  echo "VERSION=$version" >> $GITHUB_ENV
+                  echo "VERSION_NUMERIC=$version_numeric" >> $GITHUB_ENV
+                  echo "$VERSION" "$version"
+                  if [[ "$version" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+                    echo "Commit name matches"
+                  else
+                    echo "Commit name doesnt match"
+                    exit 1
+                  fi
 
-            - uses: actions/setup-node@v4
+            - name: Install Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 20
+
+            - uses: pnpm/action-setup@v3
+              name: Install pnpm
+              with:
+                  version: 8
+                  run_install: false
+
+            - name: Get pnpm store directory
+              shell: bash
+              run: |
+                  echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+            - uses: actions/cache@v3
+              name: Setup pnpm cache
+              with:
+                  path: ${{ env.STORE_PATH }}
+                  key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+                  restore-keys: |
+                      ${{ runner.os }}-pnpm-store-
 
             - name: Update package.json and ccmod.json
-              run: | 
-                sed -i "s/\"version\": \".*\"/\"version\": \"${VERSION_NUMERIC}\"/" package.json ccmod.json
-                git add package.json ccmod.json
+              run: |
+                  sed -i "s/\"version\": \".*\"/\"version\": \"${VERSION_NUMERIC}\"/" package.json ccmod.json
+                  git add package.json ccmod.json
 
             - name: Update CHANGELOG.md
               run: |
-                sed -i "/\[Unreleased\]/a ## [$VERSION_NUMERIC] newDateHere" ./CHANGELOG.md
-                sed -i "s/newDateHere/$(date '+%Y-%m-%d')/g" ./CHANGELOG.md
-                git add ./CHANGELOG.md
+                  sed -i "/\[Unreleased\]/a ## [$VERSION_NUMERIC] newDateHere" ./CHANGELOG.md
+                  sed -i "s/newDateHere/$(date '+%Y-%m-%d')/g" ./CHANGELOG.md
+                  git add ./CHANGELOG.md
 
             - name: Commit changes
               run: |
-                git config --global user.email "${GITHUB_ACTOR_EMAIL}"
-                git config --global user.name "${GITHUB_ACTOR}"
-                git config --global --add safe.directory /github/workspaces
-                git commit -m "$VERSION"
-                git push origin HEAD:master
+                  git config --global user.email "${GITHUB_ACTOR_EMAIL}"
+                  git config --global user.name "${GITHUB_ACTOR}"
+                  git config --global --add safe.directory /github/workspaces
+                  git commit -m "$VERSION"
+                  git push origin HEAD:master
 
             - name: Get Changelog Entry
               id: changelog_reader
               uses: mindsers/changelog-reader-action@v2
               with:
-                validation_depth: 10
-                version: ${{ steps.tag_name.outputs.current_version }}
-                path: ./CHANGELOG.md
+                  validation_depth: 10
+                  version: ${{ steps.tag_name.outputs.current_version }}
+                  path: ./CHANGELOG.md
 
             - name: Create and push a new tag
               run: |
-                git tag -a "$VERSION" -m "Version $VERSION"
-                git push origin "$VERSION"
-
+                  git tag -a "$VERSION" -m "Version $VERSION"
+                  git push origin "$VERSION"
 
             - name: Run pack.sh
               run: ./pack.sh
@@ -71,8 +92,8 @@ jobs:
               id: create_release
               uses: softprops/action-gh-release@v1
               with:
-                files: |
-                  *.ccmod
-                name: ${{ env.VERSION }}
-                tag_name: ${{ env.VERSION }}
-                body: ${{ steps.changelog_reader.outputs.changes }}
+                  files: |
+                      *.ccmod
+                  name: ${{ env.VERSION }}
+                  tag_name: ${{ env.VERSION }}
+                  body: ${{ steps.changelog_reader.outputs.changes }}
