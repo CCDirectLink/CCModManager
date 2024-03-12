@@ -2,8 +2,8 @@
 BASE_NAME="$(jq '.id' ccmod.json | sed 's/^"//;s/"$//')"
 NAME="${BASE_NAME}-$(jq '.version' ccmod.json | sed 's/^"//;s/"$//').ccmod"
 rm -rf "$BASE_NAME"*
-npm install
-npm run build
+pnpm install
+pnpm run build
 mkdir -p pack
 cp -r assets lang icon LICENSE plugin.js ./pack
 cd ./pack

@@ -6,8 +6,8 @@
 ```bash
 git clone https://github.com/CCDirectLink/CCModManager
 cd CCModManager
-npm install
-npm run start
+pnpm install
+pnpm run start
 # this should return no errors (hopefully)
 npx tsc
 ```
