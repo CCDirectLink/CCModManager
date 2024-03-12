@@ -152,6 +152,7 @@ sc.FiltersPopup = ig.GuiElementBase.extend({
             const y = (i / tagsW).floor()
             const checkbox = new sc.ModMenuFilterCheckboxGui()
             checkbox.setPos(x * (textW + spacingW) + offset.x, y * (textH + spacingH))
+            checkbox.crossedeyesLabel = (config.key.startsWith('tag') ? `${Lang.tag}: ` : '') + lang.name
             checkbox.data = lang.description
             if (config.default !== undefined && !('localStorageKey' in config)) {
                 checkbox.setPressed(config.default)

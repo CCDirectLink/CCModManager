@@ -71,6 +71,8 @@
     "cannotDisableDisabled": "Disabling the mod: \\c[3][modName]\\c[0] is not allowed.",
     "cannotUninstallDisabled": "Uninstalling the mod: \\c[3][modName]\\c[0] is not allowed.",
     "cannotUninstallGit": "Uninstalling the mod: \\c[3][modName]\\c[0] is not allowed because it is a git repository.",
+    "enableAutoUpdatePrompt": "Enable auto update prompt on startup",
+    "tag": "Tag",
     "filters": {
         "gridView": { "name": "Grid view", "description": "Makes the mod list a grid" },
         "local": { "name": "Include local", "description": "Includes installed mods" },

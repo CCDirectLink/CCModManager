@@ -18,7 +18,6 @@ declare global {
                 populateFunc: (list: sc.ButtonListBox, buttonGroup: sc.ButtonGroup, sort: sc.MOD_MENU_SORT_ORDER) => void
             }[]
             currentSort: sc.MOD_MENU_SORT_ORDER
-            reposPopup: sc.ModMenuRepoAddPopup
             gridColumns: number
             isGrid: boolean
 
@@ -90,7 +89,9 @@ sc.ModMenuList = sc.ListTabbedPane.extend({
             this.addTab(this.tabz[i].name, i, {})
         }
 
-        ModDB.loadAllMods(() => this.reloadEntries(), true)
+        ModDB.loadAllMods(() => {
+            LocalMods.refreshOrigin().then(() => this.reloadEntries())
+        }, true)
     },
     show() {
         this.parent()
@@ -184,14 +185,7 @@ sc.ModMenuList = sc.ListTabbedPane.extend({
         sc.Model.notifyObserver(sc.modMenu, sc.MOD_MENU_MESSAGES.TAB_CHANGED)
     },
     /* new stuff */
-    populateSettings(list) {
-        const repositoriesButton = new sc.ButtonGui(Lang.reposButton)
-        repositoriesButton.onButtonPress = () => {
-            if (!this.reposPopup) this.reposPopup = new sc.ModMenuRepoAddPopup()
-            this.reposPopup.show()
-        }
-        list.addButton(repositoriesButton)
-    },
+    populateSettings() {},
     sortModEntries(mods, sort) {
         if (!this.filters.name) {
             if (sort == sc.MOD_MENU_SORT_ORDER.NAME) {

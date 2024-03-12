@@ -44,13 +44,18 @@ export class LocalMods {
         },
     }
 
+    static isInited() {
+        return !!this.cache
+    }
+
     static async initAll() {
         let all: ModEntryLocal[]
         if (ModManager.mod.isCCL3) {
             all = [...modloader.installedMods].map(e => this.convertCCL3Mod(e[1]))
         } else {
-            all = this.cache = [...window.activeMods.map(this.convertCCL2Mod), ...window.inactiveMods.map(this.convertCCL2Mod)]
+            all = [...window.activeMods.map(this.convertCCL2Mod), ...window.inactiveMods.map(this.convertCCL2Mod)]
         }
+        this.cache = all
 
         all.push(...(await this.createVirtualLocalMods()))
 
@@ -75,6 +80,11 @@ export class LocalMods {
         for (const mod of all) {
             if (!mod.disableUpdate) mod.hasUpdate = ModInstaller.checkLocalModForUpdate(mod)
         }
+    }
+
+    static async refreshOrigin() {
+        if (!this.isInited()) await this.initAll()
+        return Promise.all(this.cache.map(mod => ModDB.resolveLocalModOrigin(mod)))
     }
 
     static getAll() {

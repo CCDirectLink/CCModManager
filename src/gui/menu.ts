@@ -34,6 +34,12 @@ declare global {
             checkUpdatesButton: sc.ButtonGui
             filtersButton: sc.ButtonGui
             filtersPopup: sc.FiltersPopup
+            /* settings */
+            settingButtonGroup: sc.ButtonGroup
+            repositoriesButton: sc.ButtonGui
+            autoupdateLabel: sc.TextGui
+            autoupdateCheckbox: sc.CheckboxGui
+            reposPopup: sc.ModMenuRepoAddPopup
 
             setBlackBarVisibility(this: this, visible: boolean): void
             setAllVisibility(this: this, visible: boolean): void
@@ -41,6 +47,7 @@ declare global {
             onBackButtonPress(this: this): void
             setTabEvent(this: this): void
             showModInstallDialog(this: this): void
+            setSettingTabVisibility(this: this, visible: boolean): void
         }
         interface ModMenuConstructor extends ImpactClass<ModMenu> {
             new (): ModMenu
@@ -190,6 +197,52 @@ sc.ModMenu = sc.ListInfoMenu.extend({
             this.installButton.doStateTransition('DEFAULT')
             this.checkUpdatesButton.doStateTransition('DEFAULT')
         }
+        if (this.list.currentTabIndex == sc.MOD_MENU_TAB_INDEXES.SETTINGS) {
+            if (!this.settingButtonGroup) {
+                this.settingButtonGroup = new sc.ButtonGroup()
+                /* fix tab switching not working */
+                this.settingButtonGroup.onButtonTraversal = this.list.onButtonTraversal.bind(this.list)
+
+                this.autoupdateCheckbox = new sc.CheckboxGui(sc.modManagerAutoUpdate)
+                this.autoupdateCheckbox.onButtonPress = () => {
+                    sc.modManagerAutoUpdate = this.autoupdateCheckbox.pressed
+                }
+                this.autoupdateCheckbox.setPos(15, 65)
+                this.autoupdateCheckbox.crossedeyesLabel = Lang.enableAutoUpdatePrompt
+
+                this.settingButtonGroup.addFocusGui(this.autoupdateCheckbox, 0, 0)
+                this.addChildGui(this.autoupdateCheckbox)
+
+                this.autoupdateLabel = new sc.TextGui(Lang.enableAutoUpdatePrompt)
+                this.autoupdateLabel.setPos(43, 65)
+                this.addChildGui(this.autoupdateLabel)
+
+                this.repositoriesButton = new sc.ButtonGui(Lang.reposButton)
+                this.repositoriesButton.onButtonPress = () => {
+                    if (!this.reposPopup) this.reposPopup = new sc.ModMenuRepoAddPopup()
+                    this.reposPopup.show()
+                }
+                this.repositoriesButton.setPos(15, 90)
+                this.settingButtonGroup.addFocusGui(this.repositoriesButton, 0, 1)
+                this.addChildGui(this.repositoriesButton)
+
+                this.autoupdateLabel.hook.transitions['HIDDEN'] = this.repositoriesButton.hook.transitions['HIDDEN']
+            }
+            this.setSettingTabVisibility(true)
+        } else if (this.settingButtonGroup) {
+            this.setSettingTabVisibility(false)
+        }
+    },
+    setSettingTabVisibility(visible) {
+        if (!this.settingButtonGroup) return
+        // prettier-ignore
+        ;
+        ;[this.autoupdateCheckbox, this.repositoriesButton, this.autoupdateLabel].forEach(g =>
+            (g as ig.GuiElementBase).doStateTransition(visible ? 'DEFAULT' : 'HIDDEN', true)
+        )
+
+        if (visible) sc.menu.buttonInteract.pushButtonGroup(this.settingButtonGroup)
+        else sc.menu.buttonInteract.removeButtonGroup(this.settingButtonGroup)
     },
     addObservers() {
         sc.Model.addObserver(sc.modMenu, this)
@@ -245,6 +298,7 @@ sc.ModMenu = sc.ListInfoMenu.extend({
         this.exitMenu()
         this.setAllVisibility(false)
         this.setBlackBarVisibility(true)
+        this.setSettingTabVisibility(false)
 
         if (
             LocalMods.getAll().some(mod => mod.awaitingRestart) ||

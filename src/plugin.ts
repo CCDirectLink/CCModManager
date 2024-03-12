@@ -4,6 +4,8 @@ import { ModInstaller } from './mod-installer'
 import { ModDB } from './moddb'
 import { Mod1 } from './types'
 
+const autoupdateLocalStorageId = 'ccmodmanager-autoupdate'
+
 export default class ModManager {
     static dir: string
     static mod: Mod1
@@ -14,6 +16,18 @@ export default class ModManager {
         ModManager.mod = mod
         ModManager.mod.isCCL3 = mod.findAllAssets ? true : false
         ModManager.mod.isCCModPacked = mod.baseDirectory.endsWith('.ccmod/')
+
+        Object.defineProperty(sc, 'modManagerAutoUpdate', {
+            set(v) {
+                localStorage.setItem(autoupdateLocalStorageId, v.toString())
+            },
+            get() {
+                return localStorage.getItem(autoupdateLocalStorageId) == 'true'
+            },
+        })
+        if (localStorage.getItem(autoupdateLocalStorageId) === null) {
+            sc.modManagerAutoUpdate = true
+        }
     }
 
     async prestart() {
@@ -26,8 +40,7 @@ export default class ModManager {
         sc.TitleScreenButtonGui.inject({
             show() {
                 this.parent()
-                const autoUpdate = true
-                if (autoUpdate) {
+                if (sc.modManagerAutoUpdate) {
                     ModDB.loadDatabases()
                     ModInstaller.checkAllLocalModsForUpdate()
                 }
