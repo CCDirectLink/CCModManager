@@ -72,10 +72,10 @@ sc.ModMenuList = sc.ListTabbedPane.extend({
         this.gridColumns = 3
 
         this.tabz = [
-            { name: Lang.onlineTab, populateFunc: this.populateOnline, icon: 'quest-all' },
-            { name: Lang.selectedModsTab, populateFunc: this.populateSelected, icon: 'quest-fav' },
-            { name: Lang.enabledTab, populateFunc: this.populateEnabled, icon: 'quest-solve' },
-            { name: Lang.disabledTab, populateFunc: this.populateDisabled, icon: 'quest-elite' },
+            { name: Lang.onlineTab, populateFunc: this.populateOnline, icon: 'mod-icon-online' },
+            { name: Lang.selectedModsTab, populateFunc: this.populateSelected, icon: 'mod-icon-selected' },
+            { name: Lang.enabledTab, populateFunc: this.populateEnabled, icon: 'mod-icon-enabled' },
+            { name: Lang.disabledTab, populateFunc: this.populateDisabled, icon: 'mod-icon-disabled' },
             { name: Lang.settingsTab, populateFunc: this.populateSettings, icon: 'stats-log' },
         ]
         this.filters = {}

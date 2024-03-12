@@ -1,13 +1,22 @@
 import { Lang } from '../lang-manager.js'
 import './menu.js'
 
-const iconsFont = new ig.Font('media/ccmodmanager-icons.png', 16, 16)
-const page = sc.fontsystem.font.iconSets.push(iconsFont) - 1
-const icons = ['ccmodmanager-git'] as const
-for (const iconName of icons) {
-    sc.fontsystem.font.mapping[iconName] = [page, 0]
-    sc.fontsystem.font.indexMapping.push(iconName)
+const iconsFont = new ig.Font('media/font/ccmodmanager-icons.png', 16, 16)
+const page = sc.fontsystem.font.iconSets.length;
+sc.fontsystem.font.pushIconSet(iconsFont);
+const icons = [
+    'ccmodmanager-git',
+    'mod-icon',
+    'mod-icon-online',
+    'mod-icon-selected',
+    'mod-icon-enabled',
+    'mod-icon-disabled'
+] as const
+let mapping: Record<string, [number, number]> = {};
+for (let i = 0; i < icons.length; i++) {
+    mapping[icons[i]] = [page, i];
 }
+sc.fontsystem.font.setMapping(mapping);
 
 // @ts-expect-error
 sc.MENU_SUBMENU.MODS = Math.max(...Object.values(sc.MENU_SUBMENU)) + 1

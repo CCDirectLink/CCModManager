@@ -5,7 +5,7 @@
     "description": "Mod manager for CrossCode!",
     "repository": "https://github.com/CCDirectLink/CCModManager",
     "tags": ["QoL"],
-    "authors": ["krypek", "dmitmel", "2767mr"],
+    "authors": ["krypek", "dmitmel", "2767mr", "elluminance"],
     "icons": {
         "24": "icon/icon.png"
     },
