@@ -22,6 +22,7 @@ jobs:
               name: Install pnpm
               with:
                   version: 8
+                  run_install: false
 
             - name: Compile
-              run: pnpm run start
+              run: pnpm install; pnpm run start
