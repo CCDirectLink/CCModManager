@@ -241,8 +241,11 @@ sc.ModMenu = sc.ListInfoMenu.extend({
             (g as ig.GuiElementBase).doStateTransition(visible ? 'DEFAULT' : 'HIDDEN', true)
         )
 
-        if (visible) sc.menu.buttonInteract.pushButtonGroup(this.settingButtonGroup)
-        else sc.menu.buttonInteract.removeButtonGroup(this.settingButtonGroup)
+        if (visible) {
+            this.autoupdateCheckbox.focus = true
+            this.settingButtonGroup.setCurrentFocus(0, 0)
+            sc.menu.buttonInteract.pushButtonGroup(this.settingButtonGroup)
+        } else sc.menu.buttonInteract.removeButtonGroup(this.settingButtonGroup)
     },
     addObservers() {
         sc.Model.addObserver(sc.modMenu, this)
