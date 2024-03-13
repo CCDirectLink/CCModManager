@@ -40,7 +40,7 @@ export default class ModManager {
         sc.TitleScreenButtonGui.inject({
             show() {
                 this.parent()
-                if (sc.modManagerAutoUpdate) {
+                if (!ig.isdemo && sc.modManagerAutoUpdate) {
                     ModDB.loadDatabases()
                     ModInstaller.checkAllLocalModsForUpdate()
                 }

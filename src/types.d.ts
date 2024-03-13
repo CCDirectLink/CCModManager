@@ -14,6 +14,9 @@ declare global {
         }
         var modManagerAutoUpdate: boolean
     }
+    namespace ig {
+        var isdemo: boolean | undefined /* https://github.com/krypciak/crosscode-demonizer */
+    }
 }
 
 export type Mod1 = Mod & {

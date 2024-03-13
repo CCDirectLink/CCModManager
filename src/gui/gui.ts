@@ -27,11 +27,13 @@ function enterModsMenu(direct: boolean) {
         sc.menu.pushMenu(sc.MENU_SUBMENU.MODS)
     }
 }
+const isEnabled = !ig.isdemo
 
 sc.OptionsMenu.inject({
     init() {
         this.parent()
 
+        if (!isEnabled) return
         this.modsButton = new sc.ButtonGui('\\i[help3]' + Lang.mods, undefined, true, sc.BUTTON_TYPE.SMALL)
         this.modsButton.keepMouseFocus = true
         this.modsButton.hook.transitions = {
@@ -44,6 +46,7 @@ sc.OptionsMenu.inject({
     },
     showMenu() {
         this.parent()
+        if (!isEnabled) return
         if (sc.menu.backCallbackStack.length >= 2) {
             sc.menu.popBackCallback()
             sc.menu.popBackCallback()
@@ -51,16 +54,17 @@ sc.OptionsMenu.inject({
     },
     hideMenu() {
         this.parent()
+        if (!isEnabled) return
         sc.menu.buttonInteract.removeGlobalButton(this.modsButton)
         sc.menu.buttonInteract.removeGlobalButton(this.hotkeyHelp)
         sc.menu.buttonInteract.removeGlobalButton(this.hotkeyDefault)
     },
     commitHotKeysToTopBar() {
-        sc.menu.addHotkey(() => this.modsButton)
+        if (isEnabled) sc.menu.addHotkey(() => this.modsButton)
         this.parent()
     },
     onAddHotkeys() {
-        sc.menu.buttonInteract.addGlobalButton(this.modsButton, () => sc.control.menuHotkeyHelp3())
+        if (isEnabled) sc.menu.buttonInteract.addGlobalButton(this.modsButton, () => sc.control.menuHotkeyHelp3())
         this.parent()
     },
 })
