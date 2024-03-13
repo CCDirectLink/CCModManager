@@ -17,6 +17,9 @@ export default class ModManager {
         ModManager.mod.isCCL3 = mod.findAllAssets ? true : false
         ModManager.mod.isCCModPacked = mod.baseDirectory.endsWith('.ccmod/')
 
+        // @ts-expect-error
+        window.sc ??= {}
+
         Object.defineProperty(sc, 'modManagerAutoUpdate', {
             set(v) {
                 localStorage.setItem(autoupdateLocalStorageId, v.toString())
