@@ -188,14 +188,19 @@ sc.ModMenuList = sc.ListTabbedPane.extend({
     populateSettings() {},
     sortModEntries(mods, sort) {
         if (!this.filters.name) {
+            function gm(m: ModEntry) {
+                return m.isLocal && m.serverCounterpart ? m.serverCounterpart : m
+            }
             if (sort == sc.MOD_MENU_SORT_ORDER.NAME) {
                 mods.sort((a, b) => a.name.localeCompare(b.name))
             } else if (sort == sc.MOD_MENU_SORT_ORDER.STARS) {
                 mods.sort((a, b) => a.name.localeCompare(b.name))
-                mods.sort((a, b) => (b.stars ?? -100) - (a.stars ?? -100))
+                mods.sort((a, b) => (gm(b).stars ?? -100) - (gm(a).stars ?? -100))
             } else if (sort == sc.MOD_MENU_SORT_ORDER.LAST_UPDATED) {
                 mods.sort((a, b) => a.name.localeCompare(b.name))
-                mods.sort((a, b) => {
+                mods.sort((a1, b1) => {
+                    const a = gm(a1)
+                    const b = gm(b1)
                     const ta = ('lastUpdateTimestamp' in a && a.lastUpdateTimestamp) || -100
                     const tb = ('lastUpdateTimestamp' in b && b.lastUpdateTimestamp) || -100
                     return tb - ta
