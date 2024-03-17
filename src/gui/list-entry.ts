@@ -137,8 +137,8 @@ sc.ModListEntry = ig.FocusGui.extend({
             this.versionText.setPos(3, 3)
             this.addChildGui(this.versionText)
 
-            if ('lastUpdateTimestamp' in mod && mod.lastUpdateTimestamp) {
-                const date = new Date(mod.lastUpdateTimestamp)
+            if (serverMod?.lastUpdateTimestamp) {
+                const date = new Date(serverMod.lastUpdateTimestamp)
                 const dateStr = date.toLocaleDateString('pl-PL', {
                     year: 'numeric',
                     month: '2-digit',

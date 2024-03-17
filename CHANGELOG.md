@@ -11,6 +11,7 @@
 ### Fixed
 
 - Fixed mod list sorting on enabled and disabled tabs
+- Fixed mod last update date not showing on local mods
 
 ## [0.9.8] 2024-03-13
 
