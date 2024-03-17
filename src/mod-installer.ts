@@ -294,8 +294,7 @@ export class ModInstaller {
     }
 
     static restartGame() {
-        if ('chrome' in window) (window.chrome as any).runtime.reload()
-        else window.location.reload()
+        sc.options?.get('crashmsg-reload') || !('chrome' in window) ? window.location.reload() : (window.chrome as any).runtime.reload()
     }
 
     static checkLocalModForUpdate(mod: ModEntryLocal): boolean {
