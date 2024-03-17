@@ -184,7 +184,7 @@ sc.ModListEntry = ig.FocusGui.extend({
         this.nameText.setText(`\\c[${color}]${text}\\c[0]`)
         this.nameText.setPos(4 + this.iconOffset + this.nameIconPrefixesText.hook.size.x, 0)
 
-        if (this.nameText.hook.size.x + this.nameIconPrefixesText.hook.size.x - 17 >= this.hook.size.x - this.nameText.hook.pos.x) {
+        if (this.modList.isGrid || this.nameText.hook.size.x + this.nameIconPrefixesText.hook.size.x - 17 >= this.hook.size.x - this.nameText.hook.pos.x) {
             this.nameText.setFont(sc.fontsystem.smallFont)
             this.nameText.hook.pos.y = 2
         } else {

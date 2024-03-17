@@ -4,6 +4,10 @@
 
 ## [Unreleased]
 
+### Changed
+
+- Always use small font for the grid view
+
 ### Fixed
 
 - Fixed mod list sorting on enabled and disabled tabs
