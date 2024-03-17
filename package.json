@@ -1,6 +1,6 @@
 {
     "name": "ccmodmanager",
-    "version": "0.9.8",
+    "version": "0.9.9",
     "scripts": {
         "start": "npx esbuild --target=es2018 --format=esm --platform=node --bundle --sourcemap=inline --outfile=plugin.js src/plugin.ts",
         "watch": "npx esbuild --target=es2018 --format=esm --platform=node --bundle --sourcemap=inline --watch --outfile=plugin.js src/plugin.ts",
