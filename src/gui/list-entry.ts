@@ -126,7 +126,6 @@ sc.ModListEntry = ig.FocusGui.extend({
             if (serverMod?.tags) {
                 const tags = serverMod.tags
                 const str = tags.map(a => `\\c[0]${a}\\c[0]`).join(', ')
-                console.log(serverMod.id, str.length)
                 const addSpace = str.length > 100 ? 60 : 0
                 this.tags = new sc.TextGui(str, { font: sc.fontsystem.smallFont, maxWidth: 130 + addSpace, linePadding: -4 })
                 this.tags.setAlign(ig.GUI_ALIGN.X_RIGHT, ig.GUI_ALIGN.Y_TOP)
