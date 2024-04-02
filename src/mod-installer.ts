@@ -1,6 +1,6 @@
 import { LocalMods } from './local-mods'
 import { ModDB } from './moddb'
-import { ModEntry, ModEntryLocal, ModEntryServer } from './types'
+import { ModEntry, ModEntryBaseBase, ModEntryLocal, ModEntryLocalVirtual, ModEntryServer } from './types'
 import { ModInstallDialogs } from './gui/install-dialogs'
 
 const fs: typeof import('fs') = (0, eval)("require('fs')")
@@ -47,7 +47,7 @@ type DepEntry = { mod: ModEntryServer; versionReqRanges: string[] }
 export class ModInstaller {
     static record: Record<string, ModEntryServer>
     static byNameRecord: Record<string, ModEntryServer>
-    static virtualMods: Record<string, ModEntryLocal>
+    static virtualMods: Record<string, ModEntryLocalVirtual>
 
     static init() {
         this.virtualMods = {
@@ -56,13 +56,56 @@ export class ModInstaller {
                 name: 'CrossCode',
                 description: 'The base game.',
                 version: LocalMods.getCCVersion(),
-            } as ModEntryLocal,
+            },
             'post-game': {
                 id: 'post-game',
-                name: 'DLC',
-                description: 'CrossCode DLC.',
+                name: 'Post Game DLC',
+                description: 'The postgame DLC.',
                 version: LocalMods.getCCVersion(),
-            } as ModEntryLocal,
+                isExtension: true,
+            },
+            manlea: {
+                id: 'manlea',
+                name: 'Manlea',
+                description: 'The Manlea skin DLC.',
+                version: LocalMods.getCCVersion(),
+                isExtension: true,
+            },
+            'ninja-skin': {
+                id: 'ninja-skin',
+                name: 'Ninja Skin',
+                description: 'The ninja skin DLC.',
+                version: LocalMods.getCCVersion(),
+                isExtension: true,
+            },
+            'scorpion-robo': {
+                id: 'scorpion-robo',
+                name: 'PC Exclusive Extension',
+                description: 'The formerly exclusive PC content.',
+                version: LocalMods.getCCVersion(),
+                isExtension: true,
+            },
+            'snowman-tank': {
+                id: 'snowman-tank',
+                name: 'Xbox Exclusive Extension',
+                description: 'The formerly exclusive Xbox One content.',
+                version: LocalMods.getCCVersion(),
+                isExtension: true,
+            },
+            'fish-gear': {
+                id: 'fish-gear',
+                name: 'PS4 Exclusive Extension',
+                description: 'The formerly exclusive PS4 content.',
+                version: LocalMods.getCCVersion(),
+                isExtension: true,
+            },
+            'flying-hedgehag': {
+                id: 'flying-hedgehag',
+                name: 'Switch Exclusive Extension',
+                description: 'The formerly exclusive Nintendo Switch content.',
+                version: LocalMods.getCCVersion(),
+                isExtension: true,
+            },
         }
     }
 
@@ -85,6 +128,9 @@ export class ModInstaller {
         for (const depName in mod.dependencies) {
             const reqVersionRange = mod.dependencies[depName]
             if (this.virtualMods[depName]) {
+                if (this.virtualMods[depName].isExtension && !ig.extensions.hasExtension(depName)) {
+                    throw new Error(`Mod: ${mod.id} has a dependant extension missing: ${depName}`)
+                }
                 this.setOrAddNewer(deps, { id: depName } as any, reqVersionRange)
                 continue
             }
@@ -103,7 +149,7 @@ export class ModInstaller {
         return deps
     }
 
-    private static matchesVersionReqRanges(mod: ModEntry, versionReqRanges: string[]) {
+    private static matchesVersionReqRanges(mod: ModEntryBaseBase, versionReqRanges: string[]) {
         for (const range of versionReqRanges) {
             if (!semver_satisfies(mod.version, range)) return false
         }
