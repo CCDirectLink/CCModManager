@@ -58,9 +58,52 @@ export class ModInstaller {
             } as ModEntryLocal,
             'post-game': {
                 id: 'post-game',
-                name: 'DLC',
-                description: 'CrossCode DLC.',
+                name: 'Post Game DLC',
+                description: 'The postgame DLC.',
                 version: LocalMods.getCCVersion(),
+                isExtension: true,
+            } as ModEntryLocal,
+            'manlea': {
+                id: 'manlea',
+                name: 'Manlea',
+                description: 'The Manlea skin DLC.',
+                version: LocalMods.getCCVersion(),
+                isExtension: true,
+            } as ModEntryLocal,
+            'ninja-skin': {
+                id: 'ninja-skin',
+                name: 'Ninja Skin',
+                description: 'The ninja skin DLC.',
+                version: LocalMods.getCCVersion(),
+                isExtension: true,
+            } as ModEntryLocal,
+            'scorpion-robo': {
+                id: 'scorpion-robo',
+                name: 'PC Exclusive Extension',
+                description: 'The formerly exclusive PC content.',
+                version: LocalMods.getCCVersion(),
+                isExtension: true,
+            } as ModEntryLocal,
+            'snowman-tank': {
+                id: 'snowman-tank',
+                name: 'Xbox Exclusive Extension',
+                description: 'The formerly exclusive Xbox One content.',
+                version: LocalMods.getCCVersion(),
+                isExtension: true,
+            } as ModEntryLocal,
+            'fish-gear': {
+                id: 'fish-gear',
+                name: 'PS4 Exclusive Extension',
+                description: 'The formerly exclusive PS4 content.',
+                version: LocalMods.getCCVersion(),
+                isExtension: true,
+            } as ModEntryLocal,
+            'flying-hedgehag': {
+                id: 'flying-hedgehag',
+                name: 'Switch Exclusive Extension',
+                description: 'The formerly exclusive Nintendo Switch content.',
+                version: LocalMods.getCCVersion(),
+                isExtension: true,
             } as ModEntryLocal,
         }
     }
@@ -84,6 +127,9 @@ export class ModInstaller {
         for (const depName in mod.dependencies) {
             const reqVersionRange = mod.dependencies[depName]
             if (this.virtualMods[depName]) {
+                if(this.virtualMods[depName].isExtension && !ig.extensions.hasExtension(depName)) {
+                    throw new Error(`Mod: ${mod.id} has a dependant extension missing: ${depName}`)
+                }
                 this.setOrAddNewer(deps, { id: depName } as any, reqVersionRange)
                 continue
             }

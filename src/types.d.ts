@@ -126,6 +126,7 @@ export interface ModEntryLocal extends ModEntryBase {
     disableDisabling?: boolean
     disableUpdate?: boolean
     isGit?: boolean
+    isExtension?: boolean
 }
 
 export type ModEntry = ModEntryServer | ModEntryLocal
