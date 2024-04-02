@@ -3,6 +3,11 @@
 # Change Log
 
 ## [Unreleased]
+
+### Fixed
+
+- Fixed game extensions not being handled
+
 ## [0.9.9] 2024-03-17
 
 ### Changed
