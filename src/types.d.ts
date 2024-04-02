@@ -90,12 +90,19 @@ export type NPDatabasePackageInstallation = {
     source: string
 }
 
-interface ModEntryBase {
-    database: string
+export interface ModEntryBaseBase {
     id: string
     name: string
     description?: string
     version: string
+}
+
+export interface ModEntryLocalVirtual extends ModEntryBaseBase {
+    isExtension?: boolean
+}
+
+interface ModEntryBase extends ModEntryBaseBase {
+    database: string
     isLegacy: boolean
     hasIcon: boolean
     dependencies: Record<string, string>
