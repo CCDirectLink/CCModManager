@@ -5,6 +5,7 @@ import { ModInstallDialogs } from './gui/install-dialogs'
 
 const fs: typeof import('fs') = (0, eval)("require('fs')")
 const path: typeof import('path') = (0, eval)("require('path')")
+const crypto: typeof import('crypto') = (0, eval)('require("crypto")')
 
 import { loadAsync } from 'jszip'
 import semver_satisfies from 'semver/functions/satisfies'
@@ -216,7 +217,8 @@ export class ModInstaller {
         if (installation.type == 'zip') {
             const resp = await fetch(installation.url)
             const data = await resp.arrayBuffer()
-            /* todo: add sha256 verfication */
+            if (!this.checkSHA256(data, installation.hash.sha256))
+                throw new Error(`Mod: ${mod.id} sha256 digest mismatch. Contact mod developers in the modding discord.`)
 
             if (installation.url.endsWith('.ccmod')) {
                 return await this.installCCMod(data, modId)
@@ -228,6 +230,13 @@ export class ModInstaller {
 
     private static async installCCMod(data: ArrayBuffer, id: string) {
         return fs.promises.writeFile(`assets/mods/${id}.ccmod`, new Uint8Array(data))
+    }
+
+    private static checkSHA256(data: ArrayBuffer, extected: string): boolean {
+        const hash = crypto.createHash('sha256')
+        hash.update(Buffer.from(data))
+        const result = hash.digest('hex')
+        return result == extected
     }
 
     private static async installModZip(data: ArrayBuffer, id: string, source: string, prefixPath: string = 'assets/mods') {
