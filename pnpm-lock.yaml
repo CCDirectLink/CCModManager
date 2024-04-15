@@ -20,6 +20,9 @@ devDependencies:
   '@typescript-eslint/parser':
     specifier: ^6.20.0
     version: 6.21.0(eslint@8.57.0)(typescript@5.4.2)
+  crossedeyes:
+    specifier: github:CCDirectLink/CrossedEyes
+    version: github.com/CCDirectLink/CrossedEyes/8c1a3dc86405f94f8effb7cb42e89f42e4741c1d
   esbuild:
     specifier: ^0.20.0
     version: 0.20.1
@@ -52,7 +55,7 @@ devDependencies:
     version: 5.4.2
   ultimate-crosscode-typedefs:
     specifier: github:krypciak/ultimate-crosscode-typedefs
-    version: github.com/krypciak/ultimate-crosscode-typedefs/e5989f38679c55a53c9949aa694966d41c5ba02e
+    version: github.com/krypciak/ultimate-crosscode-typedefs/26d4b51e6064963063fa45cda1afdd2d7dcfea8e
 
 packages:
 
@@ -1331,18 +1334,23 @@ packages:
     engines: {node: '>=10'}
     dev: true
 
+  github.com/CCDirectLink/CrossedEyes/8c1a3dc86405f94f8effb7cb42e89f42e4741c1d:
+    resolution: {tarball: https://codeload.github.com/CCDirectLink/CrossedEyes/tar.gz/8c1a3dc86405f94f8effb7cb42e89f42e4741c1d}
+    name: crossedeyes
+    version: 0.5.9
+    dev: true
+
   github.com/conorlawton/nax-ccuilib/2e7c46fac5a086109c46cddc6bebd476f1cc233f:
     resolution: {tarball: https://codeload.github.com/conorlawton/nax-ccuilib/tar.gz/2e7c46fac5a086109c46cddc6bebd476f1cc233f}
     name: nax-ccuilib
     version: 1.2.3
     dev: true
 
-  github.com/krypciak/ultimate-crosscode-typedefs/e5989f38679c55a53c9949aa694966d41c5ba02e:
-    resolution: {tarball: https://codeload.github.com/krypciak/ultimate-crosscode-typedefs/tar.gz/e5989f38679c55a53c9949aa694966d41c5ba02e}
+  github.com/krypciak/ultimate-crosscode-typedefs/26d4b51e6064963063fa45cda1afdd2d7dcfea8e:
+    resolution: {tarball: https://codeload.github.com/krypciak/ultimate-crosscode-typedefs/tar.gz/26d4b51e6064963063fa45cda1afdd2d7dcfea8e}
     name: ultimate-crosscode-typedefs
     version: 0.0.1
     engines: {node: '>=10.0.0'}
-    prepare: true
     requiresBuild: true
     dependencies:
       '@types/jquery': 1.10.45

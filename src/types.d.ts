@@ -9,9 +9,6 @@ declare global {
         interface OptionsMenu {
             modsButton: sc.ButtonGui
         }
-        interface CheckboxGui {
-            crossedeyesLabel?: string
-        }
         var modManagerAutoUpdate: boolean
     }
     namespace ig {

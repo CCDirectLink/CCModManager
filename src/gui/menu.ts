@@ -10,6 +10,8 @@ import { ModInstallDialogs } from './install-dialogs'
 import { LocalMods } from '../local-mods'
 import { Lang } from '../lang-manager'
 
+import '../../node_modules/crossedeyes/src/tts/gather/checkbox-types.d'
+
 declare global {
     namespace sc {
         enum MOD_MENU_SORT_ORDER {
