@@ -1,16 +1,16 @@
-import 'nax-ccuilib/src/headers/nax/input-field.d.ts'
-import 'nax-ccuilib/src/headers/nax/input-field-cursor.d.ts'
-import 'nax-ccuilib/src/headers/nax/input-field-type.d.ts'
-import './list'
-import './filters'
 import { ModDB } from '../moddb'
 import { InstallQueue, ModInstaller } from '../mod-installer'
 import { ModEntry } from '../types'
 import { ModInstallDialogs } from './install-dialogs'
 import { LocalMods } from '../local-mods'
 import { Lang } from '../lang-manager'
+import './list'
+import './filters'
 
-import '../../node_modules/crossedeyes/src/tts/gather/checkbox-types.d'
+import type * as _ from 'nax-ccuilib/src/headers/nax/input-field.d.ts'
+import type * as __ from 'nax-ccuilib/src/headers/nax/input-field-cursor.d.ts'
+import type * as ___ from 'nax-ccuilib/src/headers/nax/input-field-type.d.ts'
+import type * as ____ from '../../node_modules/crossedeyes/src/tts/gather/checkbox-types.d'
 
 declare global {
     namespace sc {

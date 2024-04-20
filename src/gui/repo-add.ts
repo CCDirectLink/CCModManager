@@ -1,6 +1,6 @@
-import 'nax-ccuilib/src/headers/nax/input-field.d.ts'
-import 'nax-ccuilib/src/headers/nax/input-field-cursor.d.ts'
-import 'nax-ccuilib/src/headers/nax/input-field-type.d.ts'
+import type * as _ from 'nax-ccuilib/src/headers/nax/input-field.d.ts'
+import type * as __ from 'nax-ccuilib/src/headers/nax/input-field-cursor.d.ts'
+import type * as ___ from 'nax-ccuilib/src/headers/nax/input-field-type.d.ts'
 import { ModDB } from '../moddb'
 
 declare global {
