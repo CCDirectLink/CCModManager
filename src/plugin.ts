@@ -4,6 +4,8 @@ import { ModInstaller } from './mod-installer'
 import { ModDB } from './moddb'
 import { Mod1 } from './types'
 
+import 'crosscode-demonizer/src/demomod/types.d.ts'
+
 const autoupdateLocalStorageId = 'ccmodmanager-autoupdate'
 
 export default class ModManager {

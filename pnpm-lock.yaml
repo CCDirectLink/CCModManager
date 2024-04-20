@@ -20,6 +20,9 @@ devDependencies:
   '@typescript-eslint/parser':
     specifier: ^6.20.0
     version: 6.21.0(eslint@8.57.0)(typescript@5.4.2)
+  crosscode-demonizer:
+    specifier: github:krypciak/crosscode-demonizer
+    version: github.com/krypciak/crosscode-demonizer/cdad0efd133ae13ab12bbcd382081f71cde7d7e8
   crossedeyes:
     specifier: github:CCDirectLink/CrossedEyes
     version: github.com/CCDirectLink/CrossedEyes/8c1a3dc86405f94f8effb7cb42e89f42e4741c1d
@@ -1344,6 +1347,12 @@ packages:
     resolution: {tarball: https://codeload.github.com/conorlawton/nax-ccuilib/tar.gz/2e7c46fac5a086109c46cddc6bebd476f1cc233f}
     name: nax-ccuilib
     version: 1.2.3
+    dev: true
+
+  github.com/krypciak/crosscode-demonizer/cdad0efd133ae13ab12bbcd382081f71cde7d7e8:
+    resolution: {tarball: https://codeload.github.com/krypciak/crosscode-demonizer/tar.gz/cdad0efd133ae13ab12bbcd382081f71cde7d7e8}
+    name: crosscode-demonizer
+    version: 1.0.0
     dev: true
 
   github.com/krypciak/ultimate-crosscode-typedefs/26d4b51e6064963063fa45cda1afdd2d7dcfea8e:
