@@ -15,18 +15,20 @@
         "@types/semver": "^7.5.8",
         "@typescript-eslint/eslint-plugin": "^6.20.0",
         "@typescript-eslint/parser": "^6.20.0",
-        "crosscode-demonizer": "github:krypciak/crosscode-demonizer",
-        "crossedeyes": "github:CCDirectLink/CrossedEyes",
+        "typescript": "^5.3.3",
         "esbuild": "^0.20.0",
         "eslint": "^8.56.0",
         "eslint-config-prettier": "^9.1.0",
         "fuzzysort": "^2.0.4",
         "jszip": "^3.10.1",
-        "nax-ccuilib": "github:conorlawton/nax-ccuilib",
         "prettier": "3.2.4",
         "rimraf": "^3.0.2",
         "semver": "^7.6.0",
-        "typescript": "^5.3.3",
+
+        "nax-ccuilib": "github:conorlawton/nax-ccuilib",
+        "ccmoddb": "github:krypciak/CCModDB",
+        "crosscode-demonizer": "github:krypciak/crosscode-demonizer",
+        "crossedeyes": "github:CCDirectLink/CrossedEyes",
         "ultimate-crosscode-typedefs": "github:krypciak/ultimate-crosscode-typedefs"
     }
 }

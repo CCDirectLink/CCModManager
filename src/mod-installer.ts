@@ -269,6 +269,7 @@ export class ModInstaller {
             if (installation.url.endsWith('.ccmod')) {
                 return await this.installCCMod(data, modId)
             } else {
+                if (installation.source === undefined) throw new Error(`Mod: ${mod.id} is a .zip and has no source field. This is a database error.`)
                 return await this.installModZip(data, modId, installation.source)
             }
         }
@@ -313,6 +314,8 @@ export class ModInstaller {
         if (!installation) throw new Error(`ccloader installation missing how???`)
         const resp = await fetch(installation.url)
         const data = await resp.arrayBuffer()
+
+        if (installation.source === undefined) throw new Error(`I mean come on ccloader has to have a source field`)
         this.installModZip(data, '', installation.source, '')
     }
 

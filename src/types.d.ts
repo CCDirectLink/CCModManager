@@ -1,5 +1,7 @@
 import { Mod } from 'ultimate-crosscode-typedefs/modloader/mod'
 
+import type { InstallMethod, PackageDB } from 'ccmoddb/build/src/types'
+
 export {}
 declare global {
     namespace sc {
@@ -33,56 +35,7 @@ export type Mod1 = Mod & {
           }
     )
 
-export type NPDatabase = Record<string, NPDatabasePackage> & { eTag: string }
-
-export interface NPDatabasePackage {
-    metadata?: NPDatabasePackageMetadata
-    metadataCCMod?: NPDatabaseCCMod
-    installation: NPDatabasePackageInstallation[]
-    stars?: number
-    lastUpdateTimestamp?: number
-}
-
-type LocalizedString = Record<string, string> | string
-
-export interface NPDatabaseCCMod {
-    id: string
-    version?: string
-
-    title?: LocalizedString
-    description?: LocalizedString
-    license?: string
-    homepage?: string
-    tags?: string[]
-    authors?: string[] | string
-    icons?: Record<string, string>
-
-    dependencies?: Record<string, string>
-
-    assetsDir?: string
-    modPrefix?: string
-}
-
-export interface NPDatabasePackageMetadata {
-    ccmodType?: 'base' | 'tool' /* so far only ccloader uses this */
-    ccmodHumanName: string
-    name: string
-    version: string
-    description?: string
-    scripts?: Record<string, string>
-    author?: string
-    license?: string
-    homepage?: string
-    ccmodDependencies?: Record<string, string>
-}
-
-export type NPDatabasePackageInstallation = {
-    url: string
-    hash: { sha256: string }
-} & {
-    type: 'zip'
-    source: string
-}
+export type NPDatabase = PackageDB & { eTag: string }
 
 export interface ModEntryBaseBase {
     id: string
@@ -107,7 +60,7 @@ interface ModEntryBase extends ModEntryBaseBase {
 export interface ModEntryServer extends ModEntryBase {
     isLocal: false
     localCounterpart?: ModEntryLocal
-    installation: NPDatabasePackageInstallation[]
+    installation: InstallMethod[]
     lastUpdateTimestamp?: number
     authors: string[]
     tags: string[]
