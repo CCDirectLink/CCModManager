@@ -22,7 +22,7 @@ devDependencies:
     version: 6.21.0(eslint@8.57.0)(typescript@5.4.2)
   ccmoddb:
     specifier: github:krypciak/CCModDB
-    version: github.com/krypciak/CCModDB/9bd6279418d2fa3edda4f5fb82215a022bcf93e3
+    version: github.com/krypciak/CCModDB/352e3e083fd95e77ebe15e543a56ca482c8010c8
   crosscode-demonizer:
     specifier: github:krypciak/crosscode-demonizer
     version: github.com/krypciak/crosscode-demonizer/cdad0efd133ae13ab12bbcd382081f71cde7d7e8
@@ -1672,8 +1672,8 @@ packages:
     version: 1.2.3
     dev: true
 
-  github.com/krypciak/CCModDB/9bd6279418d2fa3edda4f5fb82215a022bcf93e3:
-    resolution: {tarball: https://codeload.github.com/krypciak/CCModDB/tar.gz/9bd6279418d2fa3edda4f5fb82215a022bcf93e3}
+  github.com/krypciak/CCModDB/352e3e083fd95e77ebe15e543a56ca482c8010c8:
+    resolution: {tarball: https://codeload.github.com/krypciak/CCModDB/tar.gz/352e3e083fd95e77ebe15e543a56ca482c8010c8}
     name: ccmoddb
     version: 1.0.0
     dependencies:

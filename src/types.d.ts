@@ -1,6 +1,6 @@
 import { Mod } from 'ultimate-crosscode-typedefs/modloader/mod'
 
-import type { InstallMethod, PackageDB } from 'ccmoddb/build/src/types'
+import type { InstallMethod, PackageDB, ValidTags } from 'ccmoddb/build/src/types'
 
 export {}
 declare global {
@@ -63,7 +63,7 @@ export interface ModEntryServer extends ModEntryBase {
     installation: InstallMethod[]
     lastUpdateTimestamp?: number
     authors: string[]
-    tags: string[]
+    tags: ValidTags[]
 
     dependenciesCached?: Record<string, { mod: ModEntryServer; versionReqRanges: string[] }> /* cached by the installer */
     installStatus?: 'new' | 'dependency' | 'update'

@@ -1,3 +1,4 @@
+import { ValidTags } from 'ccmoddb/build/src/types'
 import { LocalMods } from './local-mods'
 import { ModEntry, ModEntryServer } from './types'
 
@@ -19,7 +20,7 @@ function doesFilterApply(filters: Fliters, mod: ModEntry): boolean {
         if (filters.hideLibraryMods && tags[0] == 'library') return false
 
         for (const hasToHaveTag of filters.tags ?? []) {
-            if (!tags.includes(hasToHaveTag)) return false
+            if (!tags.includes(hasToHaveTag as ValidTags)) return false
         }
     }
     return true
