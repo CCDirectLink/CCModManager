@@ -36,6 +36,13 @@ jobs:
                   echo "VERSION_NUMERIC=$version_numeric" >> $GITHUB_ENV
                   echo "$VERSION" "$version"
 
+                  # Check if the version string contains a hyphen followed by non-empty characters
+                  is_prerealese=false
+                  if [[ $version =~ -([0-9A-Za-z-]+) ]]; then
+                      is_prerealese=true
+                  fi
+                  echo "IS_PREREALESE=$is_prerealese" >> $GITHUB_ENV
+
             - uses: pnpm/action-setup@v3
               name: Install pnpm
               with:
@@ -83,6 +90,7 @@ jobs:
               with:
                   files: |
                       *.ccmod
+                  prerelease: ${{ env.IS_PREREALESE }}
                   name: ${{ env.VERSION }}
                   tag_name: ${{ env.VERSION }}
                   body: ${{ steps.changelog_reader.outputs.changes }}
