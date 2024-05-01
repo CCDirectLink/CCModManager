@@ -13,26 +13,28 @@ jobs:
         steps:
             - uses: actions/checkout@v4
 
+            - name: Install Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 20
+                      
+            - name: Install semver
+              run: |
+                  npm i -g semver
+
             - name: Check commit message
               id: check_commit_message
               run: |
                   version=$(git log --format=%B -n 1 ${{ github.sha }})
                   version=${version:1}
-                  version_numeric=${version:1}
-                  echo "VERSION=$version" >> $GITHUB_ENV
-                  echo "VERSION_NUMERIC=$version_numeric" >> $GITHUB_ENV
-                  echo "$VERSION" "$version"
-                  if [[ "$version" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-                    echo "Commit name matches"
-                  else
+                  version_numeric="$(semver "${version:1}")"
+                  if [[ $? = 1 ]]; then
                     echo "Commit name doesnt match"
                     exit 1
                   fi
-
-            - name: Install Node.js
-              uses: actions/setup-node@v4
-              with:
-                  node-version: 20
+                  echo "VERSION=$version" >> $GITHUB_ENV
+                  echo "VERSION_NUMERIC=$version_numeric" >> $GITHUB_ENV
+                  echo "$VERSION" "$version"
 
             - uses: pnpm/action-setup@v3
               name: Install pnpm
