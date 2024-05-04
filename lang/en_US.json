@@ -12,7 +12,7 @@
         "pages": [
             {
                 "content": [
-                    "Welcome to the mod manager!\nThere are 4 tabs:\n- \\c[3]Online\\c[0] - Search through all availible mods.\n- \\c[3]Selected\\c[0] - Mods you selected to install.\n- \\c[3]Enabled\\c[0] - Mods that are installed and enabled.\n- \\c[3]Disabled\\c[0] - Mods that are installed and disabled.\nSelect the mod sort method by pressing \\i[help3].\nIf a mod title has a list icon (\\i[quest]) before it, that means it has availible in the online repositories, and if it has a question mark (\\i[lore-others]), that means that it's not.\nIf a mod title has a clock (\\i[stats-general]) before it, that means it's awaiting a restart.\nIf a mod title has a news icon (\\i[item-news]) before it, that means it has an update availible.\nPress \\i[menu] to open the filters menu.\nSee the next pages for explanation of seperate tabs."
+                    "Welcome to the mod manager!\n There are 4 tabs:\n - \\c[3]Online\\c[0] - Search through all available mods.\n - \\c[3]Selected\\c[0] - Mods you selected to install.\n - \\c[3]Enabled\\c[0] - Mods that are installed and enabled.\n - \\c[3]Disabled\\c[0] - Mods that are installed and disabled.\n Select the mod sort method by pressing \\i[help3].\n If a mod title has a list icon (\\i[quest]) before it, that means it has available in the online repositories, and if it has a question mark (\\i[lore-others]), that means that it's not.\n If a mod title has a clock (\\i[stats-general]) before it, that means it's awaiting a restart.\n If a mod title has a news icon (\\i[item-news]) before it, that means it has an update available.\n Press \\i[menu] to open the filters menu.\n See the next pages for explanation of separate tabs."
                 ]
             },
             {
@@ -24,19 +24,19 @@
             {
                 "title": "\\c[3]Mod Manager - Selected\\c[0]",
                 "content": [
-                    "The \\c[3]Selected\\c[0] tab contains all mods selected for installation.\nSelected mods have yellow names.\nTo select or deselect a mod for installation, focus a mod and press \\i[key-throw] or \\i[gamepad-a].\nInstall mods by pressing \\i[help4].\n"
+                    "The \\c[3]Selected\\c[0] tab contains all mods selected for installation.\n Selected mods have yellow names.\n To select or deselect a mod for installation, focus a mod and press \\i[key-throw] or \\i[gamepad-a].\n Install mods by pressing \\i[help4].\n "
                 ]
             },
             {
                 "title": "\\c[3]Mod Manager - Enabled\\c[0]",
                 "content": [
-                    "The \\c[3]Enabled\\c[0] tab contains all installed and enabled mods.\nEnabled mods have green names.\nUninstall mods by pressing \\i[help2].\nTo disable a mod, focus a mod and press \\i[key-throw] or \\i[gamepad-a]."
+                    "The \\c[3]Enabled\\c[0] tab contains all installed and enabled mods.\n Enabled mods have green names.\n Uninstall mods by pressing \\i[help2].\n To disable a mod, focus a mod and press \\i[key-throw] or \\i[gamepad-a]."
                 ]
             },
             {
                 "title": "\\c[3]Mod Manager - Disabled\\c[0]",
                 "content": [
-                    "The \\c[3]Disabled\\c[0] tab contains all installed and disabled mods.\nDisabled mods have red names.\nUninstall mods by pressing \\i[help2].\nTo enable a mod, focus a mod and press \\i[key-throw] or \\i[gamepad-a]."
+                    "The \\c[3]Disabled\\c[0] tab contains all installed and disabled mods.\n Disabled mods have red names.\n Uninstall mods by pressing \\i[help2].\n To enable a mod, focus a mod and press \\i[key-throw] or \\i[gamepad-a]."
                 ]
             }
         ]
@@ -55,8 +55,8 @@
     "noModsSelected": "No mods selected",
     "reposButton": "Repositories",
     "areYouSureYouWantTo": "Are you sure you want to:",
-    "areYouSureYouWantToUninstall": "Are you sure you want to uninstall the mod:\n- \\c[3][modName]\\c[0]",
-    "cannotUninstall": "Cannot uninstall the mod: \\c[3][modName]\\c[0] because other mods depend on it:\n",
+    "areYouSureYouWantToUninstall": "Are you sure you want to uninstall the mod:\n - \\c[3][modName]\\c[0]",
+    "cannotUninstall": "Cannot uninstall the mod: \\c[3][modName]\\c[0] because other mods depend on it:\n ",
     "dependencies": "Dependencies:",
     "toUpdate": "Update:",
     "toInstall": "Install:",
@@ -64,12 +64,12 @@
     "upToDate": "Up to date.",
     "updatesFound": "Updated were found.",
     "disableAutoupdate": "Disable autoupdate",
-    "askRestartInstall": "Installed succesfully.\nThe installed mods will start working after a restart.\nDo you want to restart?",
-    "askRestartUninstall": "Uninstalled succesfully.\nThe mod will actually stop working after a restart.\nDo you want to restart?",
-    "modStatesChanged": "Mod states have been changed, they will take effect after a game restart.\nDo you want to restart now?",
+    "askRestartInstall": "Installed successfully.\n The installed mods will start working after a restart.\n Do you want to restart?",
+    "askRestartUninstall": "Uninstalled successfully.\n The mod will actually stop working after a restart.\n Do you want to restart?",
+    "modStatesChanged": "Mod states have been changed, they will take effect after a game restart.\n Do you want to restart now?",
     "noInternet": "Error: No internet connection",
-    "cannotDisable": "Cannot disable the mod: \\c[3][modName]\\c[0] because other mods depend on it:\n",
-    "doYouWantToEnable": "The mod: \\c[3][modName]\\c[0] depends on these disabled mods:\n[mods]Do you also want to enable them?",
+    "cannotDisable": "Cannot disable the mod: \\c[3][modName]\\c[0] because other mods depend on it:\n ",
+    "doYouWantToEnable": "The mod: \\c[3][modName]\\c[0] depends on these disabled mods:\n [mods]Do you also want to enable them?",
     "cannotDisableDisabled": "Disabling the mod: \\c[3][modName]\\c[0] is not allowed.",
     "cannotUninstallDisabled": "Uninstalling the mod: \\c[3][modName]\\c[0] is not allowed.",
     "cannotUninstallGit": "Uninstalling the mod: \\c[3][modName]\\c[0] is not allowed because it is a git repository.",
@@ -78,7 +78,7 @@
     "filters": {
         "gridView": { "name": "Grid view", "description": "Makes the mod list a grid" },
         "local": { "name": "Include local", "description": "Includes installed mods" },
-        "hideLibrary": { "name": "Hide library mods", "description": "Hides mods that don't add any new content themselvs" },
+        "hideLibrary": { "name": "Hide library mods", "description": "Hides mods that don't add any new content themselves" },
         "tagQol": { "name": "QoL", "description": "stands for \"Quality of Life\". Makes the playing experience smoother" },
         "tagPlayerCharacter": { "name": "player character", "description": "adds new playable characters and/or classes" },
         "tagPartyMember": { "name": "party member", "description": "adds new playable characters and/or classes" },
@@ -94,7 +94,7 @@
         "tagCosmetic": { "name": "cosmetic", "description": "adds any kind of cosmetic things like skins, pets or menu skins" },
         "tagFun": { "name": "fun", "description": "fun things not necessarily useful" },
         "tagCheats": { "name": "cheats", "description": "do things you\"re not supposed to do like spawn items or infinite gold" },
-        "tagSpeedrun": { "name": "speedrun", "description": "helps speedrunners with speedruns or practise" },
+        "tagSpeedrun": { "name": "speedrun", "description": "helps speedrunners with speedruns or practice" },
         "tagWidget": { "name": "widget", "description": "adds a CCUILib quick menu widget" },
         "tagLanguage": { "name": "language", "description": "adds a new language" },
         "tagAccessibility": { "name": "accessibility", "description": "makes the game more accessible" },
