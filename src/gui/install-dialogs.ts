@@ -16,7 +16,12 @@ export class ModInstallDialogs {
         if (deps.length == 0 && toInstall.length == 0 && toUpdate.length == 0) return
 
         function modsToStr(mods: ModEntry[]) {
-            return mods.map(mod => `- \\c[3]${prepareModName(mod.name)}\\c[0]\n`).join('')
+            return mods
+                .map(mod => {
+                    const localVersion = LocalMods.getAllRecord()[mod.id]?.version
+                    return `- \\c[3]${prepareModName(mod.name)}\\c[0] ${localVersion ? `${localVersion} -> ` : ''}v${mod.version}\n`
+                })
+                .join('')
         }
         const header = Lang.areYouSureYouWantTo + '\n'
         const toInstallStr = toInstall.length > 0 ? `${Lang.toInstall}\n${modsToStr(toInstall)}` : ''

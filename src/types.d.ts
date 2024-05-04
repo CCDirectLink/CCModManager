@@ -64,6 +64,7 @@ export interface ModEntryServer extends ModEntryBase {
     lastUpdateTimestamp?: number
     authors: string[]
     tags: ValidTags[]
+    testingVersion?: ModEntryServer
 
     dependenciesCached?: Record<string, { mod: ModEntryServer; versionReqRanges: string[] }> /* cached by the installer */
     installStatus?: 'new' | 'dependency' | 'update'

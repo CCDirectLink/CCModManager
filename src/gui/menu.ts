@@ -33,6 +33,7 @@ declare global {
             inputField: nax.ccuilib.InputField
             installButton: sc.ButtonGui
             uninstallButton: sc.ButtonGui
+            testingToggleButton: sc.ButtonGui
             checkUpdatesButton: sc.ButtonGui
             filtersButton: sc.ButtonGui
             filtersPopup: sc.FiltersPopup
@@ -50,6 +51,7 @@ declare global {
             setTabEvent(this: this): void
             showModInstallDialog(this: this): void
             setSettingTabVisibility(this: this, visible: boolean): void
+            getCurrentlyFocusedModEntry(this: this): sc.ModListEntry | undefined
         }
         interface ModMenuConstructor extends ImpactClass<ModMenu> {
             new (): ModMenu
@@ -124,14 +126,7 @@ sc.ModMenu = sc.ListInfoMenu.extend({
         this.uninstallButton = new sc.ButtonGui('\\i[help2]' + Lang.uninstall, 85, true, sc.BUTTON_TYPE.SMALL)
         this.uninstallButton.setPos(390, bottomY)
         this.uninstallButton.onButtonPress = () => {
-            const mod: ModEntry = (
-                this.list.currentList.buttonGroup.elements
-                    .reduce((acc, v) => {
-                        acc.push(...v)
-                        return acc
-                    }, [])
-                    .find((b: ig.FocusGui) => b.focus) as sc.ModListEntry
-            ).mod
+            const mod: ModEntry = this.getCurrentlyFocusedModEntry()!.mod
             const localMod = mod.isLocal ? mod : mod.localCounterpart
             if (localMod /* this should ALWAYS be true but anyways */) {
                 if (ModInstallDialogs.showModUninstallDialog(localMod)) {
@@ -174,6 +169,47 @@ sc.ModMenu = sc.ListInfoMenu.extend({
         this.filtersButton.keepMouseFocus = true /* prevent the focus jumping all over the place on press */
         this.addChildGui(this.filtersButton)
         sc.menu.buttonInteract.addGlobalButton(this.filtersButton, () => sc.control.menu())
+
+        this.testingToggleButton = new sc.ButtonGui('', 1 /* width will get dynamicly changed anyways */, true, sc.BUTTON_TYPE.SMALL)
+        this.testingToggleButton.setAlign(ig.GUI_ALIGN.X_RIGHT, ig.GUI_ALIGN.Y_TOP)
+        this.testingToggleButton.setPos(10, 22)
+        this.testingToggleButton.doStateTransition('HIDDEN')
+        this.testingToggleButton.onButtonPress = () => {
+            if (this.testingToggleButton.hook.currentStateName == 'DEFAULT') {
+                const modEntry = this.getCurrentlyFocusedModEntry()!
+                const mod = modEntry.mod
+                const isOptedIn = ModDB.isModTestingOptIn(mod.id)
+
+                const changeOptInStatus = (status: boolean) => {
+                    ModDB.setModTestingOptInStatus(mod.id, status)
+                    sc.BUTTON_SOUND[status ? 'toggle_on' : 'toggle_off'].play()
+                    const localMod = mod.isLocal ? mod : mod.localCounterpart
+                    const serverMod = mod.isLocal ? mod.serverCounterpart : mod
+                    if (localMod) {
+                        const oldHasUpdate = localMod.hasUpdate
+                        localMod.hasUpdate = ModInstaller.checkLocalModForUpdate(localMod)
+
+                        if (serverMod && InstallQueue.has(serverMod) && oldHasUpdate && !localMod.hasUpdate) {
+                            modEntry.toggleSelection(true)
+                        }
+                    }
+
+                    this.list.reloadEntries()
+                }
+
+                if (isOptedIn) {
+                    changeOptInStatus(!isOptedIn)
+                } else {
+                    changeOptInStatus(!isOptedIn)
+                }
+            } else {
+                sc.BUTTON_SOUND.denied.play()
+            }
+        }
+        this.testingToggleButton.submitSound = undefined
+        this.testingToggleButton.keepMouseFocus = true /* prevent the focus jumping all over the place on press */
+        this.addChildGui(this.testingToggleButton)
+        sc.menu.buttonInteract.addGlobalButton(this.testingToggleButton, () => sc.control.quickmenuPress())
 
         this.setTabEvent()
     },
@@ -265,8 +301,18 @@ sc.ModMenu = sc.ListInfoMenu.extend({
             } else if (message == sc.MOD_MENU_MESSAGES.ENTRY_FOCUSED) {
                 const entry = data as sc.ModListEntry
                 if (entry.mod.isLocal || entry.mod.localCounterpart) this.uninstallButton.setActive(true)
+
+                const serverMod = entry.mod.isLocal ? entry.mod.serverCounterpart : entry.mod
+                if (serverMod?.testingVersion) {
+                    this.testingToggleButton.doStateTransition('DEFAULT')
+                    this.testingToggleButton.setText('\\i[quick] ' + (ModDB.isModTestingOptIn(serverMod.id) ? Lang.testingOptOut : Lang.testingOptIn))
+                } else {
+                    this.testingToggleButton.doStateTransition('HIDDEN')
+                }
             } else if (message == sc.MOD_MENU_MESSAGES.ENTRY_UNFOCUSED) {
                 this.uninstallButton.setActive(false)
+
+                this.testingToggleButton.doStateTransition('HIDDEN')
             }
         }
     },
@@ -336,5 +382,13 @@ sc.ModMenu = sc.ListInfoMenu.extend({
             this.helpGui.hook.zIndex = 15e4
             this.helpGui.hook.pauseGui = true
         }
+    },
+    getCurrentlyFocusedModEntry() {
+        return this.list.currentList.buttonGroup.elements
+            .reduce((acc, v) => {
+                acc.push(...v)
+                return acc
+            }, [])
+            .find((b: ig.FocusGui) => b.focus) as sc.ModListEntry
     },
 })

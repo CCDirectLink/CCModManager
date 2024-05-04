@@ -3,6 +3,15 @@
 # Change Log
 
 ## [Unreleased]
+
+### Added
+
+- Added testing branch support
+
+### Changes
+
+- Mod installation dialog now displays versions
+
 ## [0.9.10] 2024-04-20
 
 ### Added

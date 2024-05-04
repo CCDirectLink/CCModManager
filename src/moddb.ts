@@ -10,6 +10,9 @@ export class ModDB {
 
     static modRecord: Record<string, ModEntryServer[]>
 
+    private static testingOptInModIdsLocalStorageKey = 'CCModManager-testingOptInModIds'
+    private static testingOptInModIds: Set<string> = new Set(JSON.parse(localStorage.getItem(this.testingOptInModIdsLocalStorageKey) ?? '[]'))
+
     static addDatabase(db: ModDB) {
         this.databases[db.name] = db
     }
@@ -18,7 +21,7 @@ export class ModDB {
         if (!force && this.databasesLoaded) return
         this.databasesLoaded = true
         this.databases = {}
-        const urls: string[] = JSON.parse(localStorage.getItem(this.localStorageKey) || JSON.stringify(['@krypciak']))
+        const urls: string[] = JSON.parse(localStorage.getItem(this.localStorageKey) || JSON.stringify(['@krypciak', '@krypciak/CCModDB/testing']))
         for (const url of urls) {
             ModDB.addDatabase(new ModDB(url))
         }
@@ -83,7 +86,7 @@ export class ModDB {
         return mods.reduce((highestVerMod, currMod) => (semver_gt(currMod.version, highestVerMod.version) ? currMod : highestVerMod))
     }
 
-    static async getLocalModOrigin(id: string): Promise<ModEntryServer | undefined> {
+    static async getLocalModOrigins(id: string): Promise<ModEntryServer[]> {
         const matches: ModEntryServer[] = []
         for (const dbName in this.databases) {
             const moddb = this.databases[dbName]
@@ -97,29 +100,59 @@ export class ModDB {
             const dbMod = modRecord[id]
             if (dbMod) matches.push(dbMod)
         }
-        if (matches.length == 0) return
-        let serverMod!: ModEntryServer
-        if (matches.length == 1) {
-            serverMod = matches[0]
-        } else {
-            serverMod = this.getHighestVersionMod(matches)
-        }
-        return serverMod
+        return matches
     }
 
     static async resolveLocalModOrigin(mod: ModEntryLocal) {
-        const serverMod = await this.getLocalModOrigin(mod.id)
-        if (!serverMod) return
-        serverMod.localCounterpart = mod
-        mod.serverCounterpart = serverMod
-        mod.database = serverMod.database
-        mod.stars = serverMod.stars
-        mod.isLegacy = serverMod.isLegacy
+        const serverMods = await this.getLocalModOrigins(mod.id)
+        if (serverMods.length == 0) return
+        let highestVerMod: ModEntryServer = serverMods[0]
+        for (const serverMod of serverMods) {
+            serverMod.localCounterpart = mod
+            if (!this.isDatabaseTesting(serverMod.database)) {
+                if (semver_gt(highestVerMod.version, serverMod.version)) {
+                    highestVerMod = serverMod
+                }
+            }
+        }
+        mod.serverCounterpart = highestVerMod
+        mod.database = highestVerMod.database
+        mod.stars = highestVerMod.stars
+        mod.isLegacy = highestVerMod.isLegacy
     }
 
-    static removeModDuplicates(modsRecord: Record<string, ModEntryServer[]>): Record<string, ModEntryServer> {
+    static isModTestingOptIn(modId: string): boolean {
+        return this.testingOptInModIds.has(modId)
+    }
+
+    static setModTestingOptInStatus(modId: string, status: boolean) {
+        if (status) {
+            this.testingOptInModIds.add(modId)
+        } else {
+            this.testingOptInModIds.delete(modId)
+        }
+        localStorage.setItem(ModDB.testingOptInModIdsLocalStorageKey, JSON.stringify([...this.testingOptInModIds]))
+    }
+
+    private static isDatabaseTesting(databaseName: string): boolean {
+        return databaseName.includes('testing')
+    }
+
+    // private static isModTesting(mod: ModEntryServer) {
+    //     return this.isDatabaseTesting(this.databases[mod.database])
+    // }
+
+    static removeModDuplicatesAndResolveTesting(modsRecord: Record<string, ModEntryServer[]>): Record<string, ModEntryServer> {
         const uniqueMods: Record<string /*modid */, ModEntryServer> = {}
+
+        const testingDbs: string[] = []
+        const nonTestingDbs: string[] = []
+
         for (const dbName in modsRecord) {
+            ;(this.isDatabaseTesting(dbName) ? testingDbs : nonTestingDbs).push(dbName)
+        }
+
+        for (const dbName of nonTestingDbs) {
             const mods = modsRecord[dbName]
             for (const mod of mods) {
                 const prevMod = uniqueMods[mod.id]
@@ -130,6 +163,29 @@ export class ModDB {
                 }
             }
         }
+
+        /* resolve testing */
+        const allNonTestingMods = nonTestingDbs
+            .map(dbName => modsRecord[dbName])
+            /* flatMap */
+            .reduce((acc, v) => acc.concat(v), [])
+
+        for (const testingDbName of testingDbs) {
+            for (const testingMod of modsRecord[testingDbName]) {
+                // prettier-ignore
+                const matchingNonTestingMods = allNonTestingMods.filter(
+                    nonTestingMod =>
+                        nonTestingMod.id == testingMod.id
+                        && semver_gt(testingMod.version, nonTestingMod.version)
+                )
+
+                for (const matchingMod of matchingNonTestingMods) {
+                    matchingMod.testingVersion = testingMod
+                    matchingMod.lastUpdateTimestamp = testingMod.lastUpdateTimestamp
+                }
+            }
+        }
+
         return uniqueMods
     }
 

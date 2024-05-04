@@ -4,6 +4,7 @@ import './list-entry-highlight'
 import { LocalMods } from '../local-mods'
 import { InstallQueue } from '../mod-installer'
 import { ModInstallDialogs, prepareModName } from './install-dialogs'
+import { ModDB } from '../moddb'
 
 declare global {
     namespace sc {
@@ -13,6 +14,7 @@ declare global {
             iconOffset: number
             nameIconPrefixesText: sc.TextGui
             nameText: sc.TextGui
+            textColor: COLOR
             description: sc.TextGui
             versionText: sc.TextGui
             starCount?: sc.TextGui
@@ -27,9 +29,10 @@ declare global {
 
             tryDisableMod(this: this, mod: ModEntryLocal): string | undefined
             tryEnableMod(this: this, mod: ModEntryLocal): string | undefined
+            toggleSelection(this: this, force?: boolean): string | undefined
             getModName(this: this): { icon: string; text: string }
             onButtonPress(this: this): void
-            setNameText(this: this, color: COLORS): void
+            setNameText(this: this, color?: COLOR): void
             updateHighlightWidth(this: this): void
             onButtonPress(this: this): string | undefined
         }
@@ -40,12 +43,13 @@ declare global {
     }
 }
 
-enum COLORS {
-    WHITE = 0,
-    RED = 1,
-    GREEN = 2,
-    YELLOW = 3,
-}
+const COLOR = {
+    WHITE: 0,
+    RED: 1,
+    GREEN: 2,
+    YELLOW: 3,
+} as const
+type COLOR = (typeof COLOR)[keyof typeof COLOR]
 
 sc.ModListEntry = ig.FocusGui.extend({
     ninepatch: new ig.NinePatch('media/gui/CCModManager.png', {
@@ -62,6 +66,10 @@ sc.ModListEntry = ig.FocusGui.extend({
         this.parent()
         this.mod = mod
         this.modList = modList
+
+        if (!mod.isLocal && mod.testingVersion && ModDB.isModTestingOptIn(mod.id)) {
+            mod = mod.testingVersion
+        }
 
         sc.Model.addObserver(sc.modMenu, this)
         const isGrid = modList.isGrid
@@ -84,22 +92,22 @@ sc.ModListEntry = ig.FocusGui.extend({
             this.setSize(regularWidth, height - 3)
         }
 
+        this.nameText = new sc.TextGui('')
+        this.nameIconPrefixesText = new sc.TextGui('')
+        this.setNameText(COLOR.WHITE)
+
         const localMod = mod.isLocal ? mod : mod.localCounterpart
         const serverMod = mod.isLocal ? mod.serverCounterpart : mod
 
-        this.nameText = new sc.TextGui('')
-        this.nameIconPrefixesText = new sc.TextGui('')
-        this.setNameText(COLORS.WHITE)
-
-        if (this.modList.currentTabIndex == sc.MOD_MENU_TAB_INDEXES.DISABLED) this.setNameText(COLORS.RED)
-        else if (this.modList.currentTabIndex == sc.MOD_MENU_TAB_INDEXES.ENABLED) this.setNameText(COLORS.GREEN)
+        if (this.modList.currentTabIndex == sc.MOD_MENU_TAB_INDEXES.DISABLED) this.setNameText(COLOR.RED)
+        else if (this.modList.currentTabIndex == sc.MOD_MENU_TAB_INDEXES.ENABLED) this.setNameText(COLOR.GREEN)
         else {
             if (localMod) {
-                if (localMod.active) this.setNameText(COLORS.GREEN)
-                else this.setNameText(COLORS.RED)
+                if (localMod.active) this.setNameText(COLOR.GREEN)
+                else this.setNameText(COLOR.RED)
             }
         }
-        if (InstallQueue.has(mod)) this.setNameText(COLORS.YELLOW)
+        if (InstallQueue.has(mod)) this.setNameText(COLOR.YELLOW)
 
         this.highlight = new sc.ModListEntryHighlight(this.hook.size.x, this.hook.size.y, this.nameText.hook.size.x, height)
         this.highlight.setPos(this.iconOffset, 0)
@@ -174,14 +182,21 @@ sc.ModListEntry = ig.FocusGui.extend({
             icon += '\\i[ccmodmanager-git]'
         }
 
+        const serverMod = this.mod.isLocal ? this.mod.serverCounterpart : this.mod
+        if (serverMod?.testingVersion) {
+            icon += `\\i[ccmodmanager-testing-${ModDB.isModTestingOptIn(serverMod.id) ? 'on' : 'off'}]`
+        }
+
         return { icon, text: prepareModName(this.mod.name) }
     },
-    setNameText(color: COLORS) {
+    setNameText(color?: COLOR) {
+        color ??= this.textColor
         const { text, icon } = this.getModName()
         this.nameIconPrefixesText.setText(icon)
         this.nameIconPrefixesText.setPos(4 + this.iconOffset, 0)
 
         this.nameText.setFont(sc.fontsystem.font)
+        this.textColor = color
         this.nameText.setText(`\\c[${color}]${text}\\c[0]`)
         this.nameText.setPos(4 + this.iconOffset + this.nameIconPrefixesText.hook.size.x, 0)
 
@@ -229,7 +244,7 @@ sc.ModListEntry = ig.FocusGui.extend({
             deps.push(mod)
             for (const mod of deps) {
                 mod.awaitingRestart = !mod.awaitingRestart
-                sc.Model.notifyObserver(sc.modMenu, sc.MOD_MENU_MESSAGES.ENTRY_UPDATE_COLOR, { mod, color: COLORS.GREEN })
+                sc.Model.notifyObserver(sc.modMenu, sc.MOD_MENU_MESSAGES.ENTRY_UPDATE_COLOR, { mod, color: COLOR.GREEN })
                 sc.BUTTON_SOUND.toggle_on.play()
                 LocalMods.setModActive(mod, true)
                 this.updateHighlightWidth()
@@ -243,14 +258,14 @@ sc.ModListEntry = ig.FocusGui.extend({
             return
         }
         mod.awaitingRestart = !mod.awaitingRestart
-        this.setNameText(COLORS.RED)
+        this.setNameText(COLOR.RED)
         sc.BUTTON_SOUND.toggle_off.play()
         LocalMods.setModActive(mod, false)
         this.updateHighlightWidth()
         return 'Disabled'
     },
     modelChanged(model, message: sc.MOD_MENU_MESSAGES, data) {
-        const d = data as { mod: ModEntryLocal; color: COLORS }
+        const d = data as { mod: ModEntryLocal; color: COLOR }
         if (model == sc.modMenu && message == sc.MOD_MENU_MESSAGES.ENTRY_UPDATE_COLOR && d.mod == this.mod) {
             this.setNameText(d.color)
         }
@@ -263,35 +278,41 @@ sc.ModListEntry = ig.FocusGui.extend({
                 else return this.tryEnableMod(mod)
             } else throw new Error('wat?')
         } else if (mod.localCounterpart) {
-            const localMod = mod.localCounterpart
-            if (localMod.hasUpdate && !localMod.isGit) {
-                if (InstallQueue.has(mod)) {
-                    if (localMod.active) this.setNameText(COLORS.GREEN)
-                    else this.setNameText(COLORS.RED)
-                    sc.BUTTON_SOUND.toggle_off.play()
-                    InstallQueue.delete(mod)
-                    this.updateHighlightWidth()
-                    return 'Un-selected'
-                } else {
-                    this.setNameText(COLORS.YELLOW)
-                    sc.BUTTON_SOUND.toggle_on.play()
-                    InstallQueue.add(mod)
-                    this.updateHighlightWidth()
-                    return 'Selected'
-                }
-            } else sc.BUTTON_SOUND.denied.play()
+            return this.toggleSelection()
         } else {
             if (InstallQueue.has(mod)) {
                 InstallQueue.delete(mod)
                 sc.BUTTON_SOUND.toggle_off.play()
-                this.setNameText(COLORS.WHITE)
+                this.setNameText(COLOR.WHITE)
                 return 'Un-Selected'
             } else {
                 InstallQueue.add(mod)
                 sc.BUTTON_SOUND.toggle_on.play()
-                this.setNameText(COLORS.YELLOW)
+                this.setNameText(COLOR.YELLOW)
                 return 'Selected'
             }
         }
+    },
+    toggleSelection(force = false) {
+        const mod = this.mod
+        if (mod.isLocal) return
+        const localMod = mod.localCounterpart
+        if (!localMod) return
+        if ((force || localMod.hasUpdate) && !localMod.isGit) {
+            if (InstallQueue.has(mod)) {
+                if (localMod.active) this.setNameText(COLOR.GREEN)
+                else this.setNameText(COLOR.RED)
+                sc.BUTTON_SOUND.toggle_off.play()
+                InstallQueue.delete(mod)
+                this.updateHighlightWidth()
+                return 'Un-selected'
+            } else {
+                this.setNameText(COLOR.YELLOW)
+                sc.BUTTON_SOUND.toggle_on.play()
+                InstallQueue.add(mod)
+                this.updateHighlightWidth()
+                return 'Selected'
+            }
+        } else sc.BUTTON_SOUND.denied.play()
     },
 })

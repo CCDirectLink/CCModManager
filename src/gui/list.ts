@@ -209,7 +209,7 @@ sc.ModMenuList = sc.ListTabbedPane.extend({
         }
     },
     populateOnline(list, _, sort: sc.MOD_MENU_SORT_ORDER) {
-        let mods = Object.values(ModDB.removeModDuplicates(ModDB.modRecord))
+        let mods = Object.values(ModDB.removeModDuplicatesAndResolveTesting(ModDB.modRecord))
         mods = createFuzzyFilteredModList(this.filters, mods)
         this.sortModEntries(mods, sort)
         this.populateListFromMods(mods, list)

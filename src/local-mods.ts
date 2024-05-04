@@ -44,11 +44,9 @@ export class LocalMods {
         },
     }
 
-    static isInited() {
-        return !!this.cache
-    }
-
     static async initAll() {
+        if (this.cache) return
+
         let all: ModEntryLocal[]
         if (ModManager.mod.isCCL3) {
             all = [...modloader.installedMods].map(e => this.convertCCL3Mod(e[1]))
@@ -76,15 +74,19 @@ export class LocalMods {
                 })
             ),
         ])
+        this.checkForUpdates()
+    }
 
-        for (const mod of all) {
+    static checkForUpdates() {
+        for (const mod of this.cache) {
             if (!mod.disableUpdate) mod.hasUpdate = ModInstaller.checkLocalModForUpdate(mod)
         }
     }
 
     static async refreshOrigin() {
-        if (!this.isInited()) await this.initAll()
-        return Promise.all(this.cache.map(mod => ModDB.resolveLocalModOrigin(mod)))
+        await this.initAll()
+        await Promise.all(this.cache.map(mod => ModDB.resolveLocalModOrigin(mod)))
+        this.checkForUpdates()
     }
 
     static getAll() {
@@ -94,7 +96,7 @@ export class LocalMods {
 
     private static async createVirtualLocalMods(): Promise<ModEntryLocal[]> {
         const mods: ModEntryLocal[] = []
-        const ccloader = await ModDB.getLocalModOrigin('ccloader')
+        const ccloader = (await ModDB.getLocalModOrigins('ccloader'))[0]
         if (ccloader) mods.push(this.convertServerToLocal(ccloader, this.getCCLoaderVersion(), '', true))
         return mods
     }

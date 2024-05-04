@@ -38,7 +38,13 @@ export class InstallQueue {
         return this.queue.find(m => m.id == mod.id)
     }
     static values(): ModEntryServer[] {
-        return [...this.queue]
+        return [...this.queue].map(mod => {
+            if (mod.testingVersion && ModDB.isModTestingOptIn(mod.id)) {
+                mod.testingVersion.installStatus = mod.installStatus
+                mod = mod.testingVersion
+            }
+            return mod
+        })
     }
 }
 
@@ -160,7 +166,7 @@ export class ModInstaller {
         /* resolve local mod origin */
         LocalMods.initAll()
 
-        this.record = ModDB.removeModDuplicates(modRecords)
+        this.record = ModDB.removeModDuplicatesAndResolveTesting(modRecords)
         this.byNameRecord = {}
         for (const modId in this.record) {
             const mod = this.record[modId]
@@ -261,6 +267,7 @@ export class ModInstaller {
 
         const modId = mod.id.replace(/ /g, '_')
         if (installation.type == 'zip') {
+            console.log(`downloading ${installation.url}`)
             const resp = await fetch(installation.url)
             const data = await resp.arrayBuffer()
             if (!this.checkSHA256(data, installation.hash.sha256))
@@ -358,15 +365,24 @@ export class ModInstaller {
     static checkLocalModForUpdate(mod: ModEntryLocal): boolean {
         const serverMod = mod.serverCounterpart
         if (!serverMod) return false
+        const testingMod = serverMod.testingVersion
+        if (testingMod && ModDB.isModTestingOptIn(serverMod.id)) {
+            return semver_gt(testingMod.version, mod.version)
+        }
         return semver_gt(serverMod.version, mod.version)
     }
 
     static async appendToUpdateModsToQueue(): Promise<boolean> {
         await ModDB.loadAllMods()
+        ModDB.removeModDuplicatesAndResolveTesting(ModDB.modRecord)
         await LocalMods.initAll()
+        await LocalMods.refreshOrigin()
 
         const mods: ModEntryLocal[] = LocalMods.getAll().filter(mod => mod.hasUpdate && !mod.isGit)
-        const serverMods = mods.map(mod => mod.serverCounterpart!)
+        // prettier-ignore
+        const serverMods = mods
+            .map(mod => mod.serverCounterpart!)
+            .map(mod => (mod.testingVersion && ModDB.isModTestingOptIn(mod.id) ? mod.testingVersion : mod))
         InstallQueue.add(...serverMods)
         InstallQueue.add(...(await this.findDepsDatabase(serverMods, ModDB.modRecord)))
         for (const mod of serverMods) mod.installStatus = 'update'

@@ -18,7 +18,7 @@
             {
                 "title": "\\c[3]Mod Manager - Online\\c[0]",
                 "content": [
-                    "The \\c[3]Online\\c[0] tab contains all availible mods you can install.\nTo select or deselect a mod for installation, focus a mod and press \\i[key-throw] or \\i[gamepad-a].\nInstall mods by pressing \\i[help4].\n"
+                    "The \\c[3]Online\\c[0] tab contains all available mods you can install.\n To select or deselect a mod for installation, focus a mod and press \\i[key-throw] or \\i[gamepad-a].\n Install mods by pressing \\i[help4].\n Some mods have testing versions of them, which may be unstable and contain bugs. \n If the testing version is available, a beta letter icon (\\i[ccmodmanager-testing-on], \\i[ccmodmanager-testing-off]) will appear. \n Toggle it with \\i[quick]."
                 ]
             },
             {
@@ -48,6 +48,8 @@
     "settingsTab": "Settings",
     "installButton": "Install \\c[3][modCount]\\c[0] mods",
     "uninstall": "Uninstall",
+    "testingOptIn": "Opt-in into testing",
+    "testingOptOut": "Opt-out of testing",
     "checkUpdates": "Check updates",
     "filtersButton": "Filters",
     "noModsSelected": "No mods selected",
