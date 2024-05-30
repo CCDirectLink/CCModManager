@@ -3,6 +3,12 @@
 # Change Log
 
 ## [Unreleased]
+
+### Added
+
+- Added a 'Visit repository' button
+
+
 ## [0.9.11] 2024-05-18
 
 ### Added
