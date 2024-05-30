@@ -55,6 +55,7 @@ interface ModEntryBase extends ModEntryBaseBase {
     dependencies: Record<string, string>
     stars?: number
     awaitingRestart?: boolean
+    repositoryUrl?: string
 }
 
 export interface ModEntryServer extends ModEntryBase {

@@ -50,6 +50,7 @@
     "uninstall": "Uninstall",
     "testingOptIn": "Opt-in into testing",
     "testingOptOut": "Opt-out of testing",
+    "openRepositoryUrl": "Visit repository",
     "checkUpdates": "Check updates",
     "filtersButton": "Filters",
     "noModsSelected": "No mods selected",

@@ -230,6 +230,7 @@ export class ModDB {
                 lastUpdateTimestamp: data.lastUpdateTimestamp,
                 authors: authors ? (typeof authors === 'string' ? [authors] : authors) : ['unknown'],
                 tags: ccmod?.tags ?? [],
+                repositoryUrl: ccmod?.repository,
             }
         }
     }

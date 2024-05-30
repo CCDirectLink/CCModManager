@@ -14,6 +14,8 @@ type CCL2Mod = {
     description?: string
     version: string
     icons?: { '24'?: string }
+    repository?: string
+    homepage?: string
 
     active?: boolean
 }
@@ -118,6 +120,7 @@ export class LocalMods {
             isLegacy: server.isLegacy,
             hasIcon: server.hasIcon,
             dependencies: server.dependencies,
+            repositoryUrl: server.repositoryUrl,
             path,
             active,
             iconConfig,
@@ -157,6 +160,7 @@ export class LocalMods {
             hasIcon: !!mod.icons?.['24'],
             dependencies: mod.dependencies ?? {},
             path: mod.baseDirectory.substring(0, mod.baseDirectory.length - 1),
+            repositoryUrl: mod.repository,
 
             active: !mod.disabled,
             iconConfig: mod.icons?.['24']
@@ -189,6 +193,7 @@ export class LocalMods {
                 return acc
             }, {}),
             path: mod.baseDirectory.substring(0, mod.baseDirectory.length - 1),
+            repositoryUrl: mod.manifest.repository,
 
             active,
             iconConfig: mod.manifest.icons?.['24']

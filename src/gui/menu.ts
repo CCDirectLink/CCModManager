@@ -34,6 +34,7 @@ declare global {
             installButton: sc.ButtonGui
             uninstallButton: sc.ButtonGui
             testingToggleButton: sc.ButtonGui
+            openRepositoryUrlButton: sc.ButtonGui
             checkUpdatesButton: sc.ButtonGui
             filtersButton: sc.ButtonGui
             filtersPopup: sc.FiltersPopup
@@ -79,6 +80,17 @@ sc.GlobalInput.inject({
     onPostUpdate() {
         if (sc.menu.currentMenu == sc.MENU_SUBMENU.MODS && sc.control.menu()) return
         this.parent()
+    },
+})
+
+sc.Control.inject({
+    menuConfirm() {
+        if (!sc.modMenu?.isVisible()) return this.parent()
+
+        /* remove ig.input.pressed('special') to prevent weird list jumping on space bar press */
+        return this.autoControl
+            ? ig.input.currentDevice == ig.INPUT_DEVICES.GAMEPAD && this.autoControl.get('menuConfirm')
+            : (ig.input.pressed('confirm') || /* ig.input.pressed('special') || */ ig.gamepad.isButtonPressed(ig.BUTTONS.FACE0)) && !ig.interact.isBlocked()
     },
 })
 
@@ -172,7 +184,7 @@ sc.ModMenu = sc.ListInfoMenu.extend({
 
         this.testingToggleButton = new sc.ButtonGui('', 1 /* width will get dynamicly changed anyways */, true, sc.BUTTON_TYPE.SMALL)
         this.testingToggleButton.setAlign(ig.GUI_ALIGN.X_RIGHT, ig.GUI_ALIGN.Y_TOP)
-        this.testingToggleButton.setPos(10, 22)
+        this.testingToggleButton.setPos(160, 22)
         this.testingToggleButton.doStateTransition('HIDDEN')
         this.testingToggleButton.onButtonPress = () => {
             if (this.testingToggleButton.hook.currentStateName == 'DEFAULT') {
@@ -210,6 +222,29 @@ sc.ModMenu = sc.ListInfoMenu.extend({
         this.testingToggleButton.keepMouseFocus = true /* prevent the focus jumping all over the place on press */
         this.addChildGui(this.testingToggleButton)
         sc.menu.buttonInteract.addGlobalButton(this.testingToggleButton, () => sc.control.quickmenuPress())
+
+        this.openRepositoryUrlButton = new sc.ButtonGui('\\i[special]' + Lang.openRepositoryUrl, 140, true, sc.BUTTON_TYPE.SMALL)
+        this.openRepositoryUrlButton.setAlign(ig.GUI_ALIGN.X_RIGHT, ig.GUI_ALIGN.Y_TOP)
+        this.openRepositoryUrlButton.setPos(10, 22)
+        this.openRepositoryUrlButton.doStateTransition('HIDDEN')
+        this.openRepositoryUrlButton.onButtonPress = () => {
+            const tryPress = (): boolean => {
+                if (this.openRepositoryUrlButton.hook.currentStateName != 'DEFAULT') return false
+                const modEntry = this.getCurrentlyFocusedModEntry()!
+                const mod = modEntry.mod
+                if (!mod.repositoryUrl) return false
+                nw.Shell.openExternal(mod.repositoryUrl)
+                return true
+            }
+            sc.BUTTON_SOUND[tryPress() ? 'submit' : 'denied'].play()
+        }
+        this.openRepositoryUrlButton.submitSound = undefined
+        this.openRepositoryUrlButton.keepMouseFocus = true /* prevent the focus jumping all over the place on press */
+        this.addChildGui(this.openRepositoryUrlButton)
+        sc.menu.buttonInteract.addGlobalButton(this.openRepositoryUrlButton, () => {
+            /* R2 press */
+            return ig.input.pressed('special') || ig.gamepad.isButtonPressed(sc.control._getSpecialButton())
+        })
 
         this.setTabEvent()
     },
@@ -309,10 +344,13 @@ sc.ModMenu = sc.ListInfoMenu.extend({
                 } else {
                     this.testingToggleButton.doStateTransition('HIDDEN')
                 }
+
+                this.openRepositoryUrlButton.doStateTransition(entry.mod.repositoryUrl ? 'DEFAULT' : 'HIDDEN')
             } else if (message == sc.MOD_MENU_MESSAGES.ENTRY_UNFOCUSED) {
                 this.uninstallButton.setActive(false)
 
                 this.testingToggleButton.doStateTransition('HIDDEN')
+                this.openRepositoryUrlButton.doStateTransition('HIDDEN')
             }
         }
     },
@@ -330,6 +368,10 @@ sc.ModMenu = sc.ListInfoMenu.extend({
         this.checkUpdatesButton.doStateTransition(state)
         this.inputField.doStateTransition(state)
         this.filtersButton.doStateTransition(state)
+        if (!visible) {
+            this.testingToggleButton.doStateTransition(state)
+            this.openRepositoryUrlButton.doStateTransition(state)
+        }
 
         const main = ig.gui.guiHooks.find(h => h.gui instanceof sc.MainMenu)?.gui as sc.MainMenu | undefined
         if (main?.info) main.info.doStateTransition(state)
