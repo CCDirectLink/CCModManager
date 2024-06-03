@@ -5,8 +5,11 @@ import { ModDB } from './moddb'
 import { Mod1 } from './types'
 
 import type * as _ from 'crosscode-demonizer/src/demomod/types.d.ts'
+import './add-prototypes'
 
-const autoupdateLocalStorageId = 'ccmodmanager-autoupdate'
+import './mod-options'
+
+import { Opts, registerOpts } from './options'
 
 export default class ModManager {
     static dir: string
@@ -18,34 +21,20 @@ export default class ModManager {
         ModManager.mod = mod
         ModManager.mod.isCCL3 = mod.findAllAssets ? true : false
         ModManager.mod.isCCModPacked = mod.baseDirectory.endsWith('.ccmod/')
-
-        // @ts-expect-error
-        window.sc ??= {}
-
-        Object.defineProperty(sc, 'modManagerAutoUpdate', {
-            set(v) {
-                localStorage.setItem(autoupdateLocalStorageId, v.toString())
-            },
-            get() {
-                return localStorage.getItem(autoupdateLocalStorageId) == 'true'
-            },
-        })
-        if (localStorage.getItem(autoupdateLocalStorageId) === null) {
-            sc.modManagerAutoUpdate = true
-        }
     }
 
     async prestart() {
+        this.lang = new LangManager()
+        registerOpts()
         FileCache.init()
         ModInstaller.init()
-        this.lang = new LangManager()
 
         await import('./gui/gui.js')
 
         sc.TitleScreenButtonGui.inject({
             show() {
                 this.parent()
-                if (!ig.isdemo && sc.modManagerAutoUpdate) {
+                if (!ig.isdemo && Opts.autoUpdate) {
                     ModDB.loadDatabases()
                     ModInstaller.checkAllLocalModsForUpdate()
                 }

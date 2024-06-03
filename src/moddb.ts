@@ -1,17 +1,16 @@
 import semver_gt from 'semver/functions/gt'
 import { ModEntry, ModEntryLocal, ModEntryServer, NPDatabase } from './types'
 import { FileCache } from './cache'
+import { Opts } from './options'
 
 export class ModDB {
-    private static localStorageKey = 'CCModManager-databases'
     private static databasesLoaded: boolean = false
 
     static databases: Record<string, ModDB>
 
     static modRecord: Record<string, ModEntryServer[]>
 
-    private static testingOptInModIdsLocalStorageKey = 'CCModManager-testingOptInModIds'
-    private static testingOptInModIds: Set<string> = new Set(JSON.parse(localStorage.getItem(this.testingOptInModIdsLocalStorageKey) ?? '[]'))
+    private static testingOptInModIds: Set<string>
 
     static addDatabase(db: ModDB) {
         this.databases[db.name] = db
@@ -21,11 +20,13 @@ export class ModDB {
         if (!force && this.databasesLoaded) return
         this.databasesLoaded = true
         this.databases = {}
-        const urls: string[] = JSON.parse(localStorage.getItem(this.localStorageKey) || JSON.stringify(['@krypciak', '@krypciak/CCModDB/testing']))
+        const urls: string[] = Opts.repositories
         for (const url of urls) {
             ModDB.addDatabase(new ModDB(url))
         }
         this.saveDatabases()
+
+        ModDB.testingOptInModIds = new Set(Opts.testingOptInMods)
     }
 
     static repoURLToFileName(url: string): string {
@@ -53,8 +54,7 @@ export class ModDB {
     }
 
     static saveDatabases() {
-        const urls: string[] = Object.values(this.databases).map(db => this.minifyRepoURL(db.url))
-        localStorage.setItem(this.localStorageKey, JSON.stringify(urls))
+        Opts.repositories = Object.values(this.databases).map(db => this.minifyRepoURL(db.url))
     }
 
     static async loadAllMods(callback: () => void = () => {}, prefferCache: boolean = false): Promise<void> {
@@ -131,7 +131,7 @@ export class ModDB {
         } else {
             this.testingOptInModIds.delete(modId)
         }
-        localStorage.setItem(ModDB.testingOptInModIdsLocalStorageKey, JSON.stringify([...this.testingOptInModIds]))
+        Opts.testingOptInMods = [...this.testingOptInModIds]
     }
 
     private static isDatabaseTesting(databaseName: string): boolean {

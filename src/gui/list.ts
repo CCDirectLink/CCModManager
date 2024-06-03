@@ -5,8 +5,8 @@ import { LocalMods } from '../local-mods'
 import './list-entry'
 import './repo-add'
 import { InstallQueue } from '../mod-installer'
-import { isGridLocalStorageId } from './filters'
 import { Lang } from '../lang-manager'
+import { Opts } from '../options'
 
 declare global {
     namespace sc {
@@ -19,7 +19,7 @@ declare global {
             }[]
             currentSort: sc.MOD_MENU_SORT_ORDER
             gridColumns: number
-            isGrid: boolean
+            restoreLastPosition?: { tab: number; element: Vec2 }
 
             updateColumnCount(this: this): void
             reloadFilters(this: this): void
@@ -29,7 +29,6 @@ declare global {
             populateSelected(this: this, list: sc.ButtonListBox, buttonGroup: sc.ButtonGroup, sort: sc.MOD_MENU_SORT_ORDER): void
             populateEnabled(this: this, list: sc.ButtonListBox, buttonGroup: sc.ButtonGroup, sort: sc.MOD_MENU_SORT_ORDER): void
             populateDisabled(this: this, list: sc.ButtonListBox, buttonGroup: sc.ButtonGroup, sort: sc.MOD_MENU_SORT_ORDER): void
-            populateSettings(this: this, list: sc.ButtonListBox, buttonGroup: sc.ButtonGroup): void
             populateListFromMods(this: this, mods: ModEntry[], list: sc.ButtonListBox): void
         }
         interface ModMenuListConstructor extends ImpactClass<ModMenuList> {
@@ -42,7 +41,6 @@ declare global {
             SELECTED,
             ENABLED,
             DISABLED,
-            SETTINGS,
         }
     }
 }
@@ -55,7 +53,6 @@ sc.MOD_MENU_TAB_INDEXES = {
     SELECTED: 1,
     ENABLED: 2,
     DISABLED: 3,
-    SETTINGS: 4,
 }
 
 sc.ModMenuList = sc.ListTabbedPane.extend({
@@ -67,7 +64,6 @@ sc.ModMenuList = sc.ListTabbedPane.extend({
     /* extends */
     init() {
         this.parent(false)
-        Object.defineProperty(this, 'isGrid', { get: () => localStorage.getItem(isGridLocalStorageId) == 'true' })
         this.gridColumns = 3
 
         this.tabz = [
@@ -75,7 +71,6 @@ sc.ModMenuList = sc.ListTabbedPane.extend({
             { name: Lang.selectedModsTab, populateFunc: this.populateSelected, icon: 'mod-icon-selected' },
             { name: Lang.enabledTab, populateFunc: this.populateEnabled, icon: 'mod-icon-enabled' },
             { name: Lang.disabledTab, populateFunc: this.populateDisabled, icon: 'mod-icon-disabled' },
-            { name: Lang.settingsTab, populateFunc: this.populateSettings, icon: 'stats-log' },
         ]
         this.filters = {}
         this.currentSort = this.onInitSortType()
@@ -96,8 +91,12 @@ sc.ModMenuList = sc.ListTabbedPane.extend({
     show() {
         this.parent()
 
-        this.setTab(0, true, { skipSounds: true })
-        const firstTabButton = this.tabGroup.elements[0][0] as unknown as sc.ItemTabbedBox.TabButton
+        let tabIndex = 0
+        if (this.restoreLastPosition) {
+            tabIndex = this.restoreLastPosition.tab
+        }
+        this.setTab(tabIndex, true, { skipSounds: true })
+        const firstTabButton = this.tabGroup.elements[tabIndex][0] as unknown as sc.ItemTabbedBox.TabButton
         firstTabButton.setPressed(true)
         this._prevPressed = firstTabButton
         this.resetButtons(firstTabButton)
@@ -106,6 +105,16 @@ sc.ModMenuList = sc.ListTabbedPane.extend({
         ig.interact.setBlockDelay(0.2)
         this.doStateTransition('DEFAULT')
         this.addObservers!()
+
+        if (this.restoreLastPosition) {
+            const pos = this.restoreLastPosition.element
+            /* this can throw an error when the list has changed due to the user changing repositories */
+            try {
+                this.currentList.buttonGroup.unfocusCurrentButton()
+                this.currentList.buttonGroup.focusCurrentButton(pos.x, pos.y)
+            } catch (e) {}
+            this.restoreLastPosition = undefined
+        }
     },
     hide() {
         this.parent()
@@ -140,7 +149,7 @@ sc.ModMenuList = sc.ListTabbedPane.extend({
         return this.parent(index, settings)
     },
     onCreateListEntries(list, buttonGroup) {
-        if (this.isGrid) {
+        if (Opts.isGrid) {
             this.currentList.columns = this.gridColumns
             this.currentList.buttonGroup.selectionType = ig.BUTTON_GROUP_SELECT_TYPE.ALL
 
@@ -159,11 +168,11 @@ sc.ModMenuList = sc.ListTabbedPane.extend({
     },
     addObservers() {
         sc.Model.addObserver(sc.menu, this)
-        sc.Model.addObserver(sc.modMenu, this)
+        sc.Model.addObserver(sc.modMenuGui, this)
     },
     removeObservers() {
         sc.Model.removeObserver(sc.menu, this)
-        sc.Model.removeObserver(sc.modMenu, this)
+        sc.Model.removeObserver(sc.modMenuGui, this)
     },
     modelChanged(model, message, data) {
         if (model == sc.menu) {
@@ -172,20 +181,17 @@ sc.ModMenuList = sc.ListTabbedPane.extend({
                 this.currentSort = sort
                 this.reloadEntries()
             }
-        } else if (model == sc.modMenu) {
-            if (message == sc.MOD_MENU_MESSAGES.REPOSITORY_CHANGED) {
-                ModDB.loadAllMods(() => this.reloadEntries())
-            } else if (message == sc.MOD_MENU_MESSAGES.UPDATE_ENTRIES) {
+        } else if (model == sc.modMenuGui) {
+            if (message == sc.MOD_MENU_MESSAGES.UPDATE_ENTRIES) {
                 this.reloadEntries()
             }
         }
     },
     setTab(index, ignorePrev, settings) {
         this.parent(index, ignorePrev, settings)
-        sc.Model.notifyObserver(sc.modMenu, sc.MOD_MENU_MESSAGES.TAB_CHANGED)
+        sc.Model.notifyObserver(sc.modMenuGui, sc.MOD_MENU_MESSAGES.TAB_CHANGED)
     },
     /* new stuff */
-    populateSettings() {},
     sortModEntries(mods, sort) {
         if (!this.filters.name) {
             function gm(m: ModEntry) {
@@ -234,7 +240,7 @@ sc.ModMenuList = sc.ListTabbedPane.extend({
         for (let i = 0; i < mods.length; i++) {
             const mod = mods[i]
             const newModEntry = new sc.ModListEntry(mod, this)
-            const x = this.isGrid ? (i % this.gridColumns) * (totalWidth / this.gridColumns - 1) : 0
+            const x = Opts.isGrid ? (i % this.gridColumns) * (totalWidth / this.gridColumns - 1) : 0
             list.addButton(newModEntry, undefined, x)
         }
     },
@@ -245,7 +251,7 @@ sc.ModMenuList = sc.ListTabbedPane.extend({
         this.setTab(this.currentTabIndex, true, { skipSounds: true })
     },
     updateColumnCount() {
-        if (this.isGrid) {
+        if (Opts.isGrid) {
             this.currentList.columns = this.gridColumns
             this.currentList.buttonGroup.selectionType = ig.BUTTON_GROUP_SELECT_TYPE.ALL
         } else {

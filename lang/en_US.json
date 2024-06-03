@@ -1,5 +1,16 @@
 {
+    "opts": {
+        "autoUpdate": {
+            "name": "Enable auto update",
+            "description": "When a mod update is found, a pop-up will show up when the game starts asking to update."
+        },
+        "repositoriesButton": {
+            "name": "Repositories",
+            "description": "Edit mod repository links."
+        }
+    },
     "mods": "Mods",
+
     "sort": {
         "stars": "Stars",
         "lastUpdated": "Last updated",
@@ -8,6 +19,17 @@
         }
     },
     "help": {
+        "options": {
+            "title": "CCModManager options",
+            "pages": [
+                {
+                    "title": "Option: \\c[3]Enable autoupdate\\c[0]",
+                    "content": [
+                        "When it's on, after the game starts the mod manager will check if there are any mods to update.\n If it finds any, it will display a pop-up message asking if you want to update."
+                    ]
+                }
+            ]
+        },
         "title": "\\c[3]Mod Manager\\c[0]",
         "pages": [
             {
@@ -17,7 +39,7 @@
             },
             {
                 "title": "\\c[3]Mod Manager - Keybindings\\c[0]",
-                "content": ["Press \\i[menu] to open the filters menu.\n Press \\i[special] to visit the mod repositroy page if available."]
+                "content": ["Press \\i[menu] to open the filters menu.\n Press \\i[special] to visit the mod repository page if available."]
             },
             {
                 "title": "\\c[3]Mod Manager - Online\\c[0]",
@@ -49,16 +71,15 @@
     "selectedModsTab": "Selected",
     "enabledTab": "Enabled",
     "disabledTab": "Disabled",
-    "settingsTab": "Settings",
     "installButton": "Install \\c[3][modCount]\\c[0] mods",
     "uninstall": "Uninstall",
     "testingOptIn": "Opt-in into testing",
     "testingOptOut": "Opt-out of testing",
     "openRepositoryUrl": "Visit repository",
+    "modSettings": "Mod settings",
     "checkUpdates": "Check updates",
     "filtersButton": "Filters",
     "noModsSelected": "No mods selected",
-    "reposButton": "Repositories",
     "areYouSureYouWantTo": "Are you sure you want to:",
     "areYouSureYouWantToUninstall": "Are you sure you want to uninstall the mod:\n - \\c[3][modName]\\c[0]",
     "cannotUninstall": "Cannot uninstall the mod: \\c[3][modName]\\c[0] because other mods depend on it:\n ",
@@ -68,7 +89,6 @@
     "updatesDetected": "Some mods have a new version. Do you want to update now?",
     "upToDate": "Up to date.",
     "updatesFound": "Updated were found.",
-    "disableAutoupdate": "Disable autoupdate",
     "askRestartInstall": "Installed successfully.\n The installed mods will start working after a restart.\n Do you want to restart?",
     "askRestartUninstall": "Uninstalled successfully.\n The mod will actually stop working after a restart.\n Do you want to restart?",
     "modStatesChanged": "Mod states have been changed, they will take effect after a game restart.\n Do you want to restart now?",
@@ -78,7 +98,6 @@
     "cannotDisableDisabled": "Disabling the mod: \\c[3][modName]\\c[0] is not allowed.",
     "cannotUninstallDisabled": "Uninstalling the mod: \\c[3][modName]\\c[0] is not allowed.",
     "cannotUninstallGit": "Uninstalling the mod: \\c[3][modName]\\c[0] is not allowed because it is a git repository.",
-    "enableAutoUpdatePrompt": "Enable auto update prompt on startup",
     "tag": "Tag",
     "filters": {
         "gridView": { "name": "Grid view", "description": "Makes the mod list a grid" },

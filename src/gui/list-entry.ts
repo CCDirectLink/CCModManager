@@ -5,6 +5,7 @@ import { LocalMods } from '../local-mods'
 import { InstallQueue } from '../mod-installer'
 import { ModInstallDialogs, prepareModName } from './install-dialogs'
 import { ModDB } from '../moddb'
+import { Opts } from '../options'
 
 declare global {
     namespace sc {
@@ -71,8 +72,8 @@ sc.ModListEntry = ig.FocusGui.extend({
             mod = mod.testingVersion
         }
 
-        sc.Model.addObserver(sc.modMenu, this)
-        const isGrid = modList.isGrid
+        sc.Model.addObserver(sc.modMenuGui, this)
+        const isGrid = Opts.isGrid
         /* init icon asap */
         FileCache.getIconConfig(mod).then(config => {
             const image = new ig.Image(config.path)
@@ -200,7 +201,7 @@ sc.ModListEntry = ig.FocusGui.extend({
         this.nameText.setText(`\\c[${color}]${text}\\c[0]`)
         this.nameText.setPos(4 + this.iconOffset + this.nameIconPrefixesText.hook.size.x, 0)
 
-        if (this.modList.isGrid || this.nameText.hook.size.x + this.nameIconPrefixesText.hook.size.x - 17 >= this.hook.size.x - this.nameText.hook.pos.x) {
+        if (Opts.isGrid || this.nameText.hook.size.x + this.nameIconPrefixesText.hook.size.x - 17 >= this.hook.size.x - this.nameText.hook.pos.x) {
             this.nameText.setFont(sc.fontsystem.smallFont)
             this.nameText.hook.pos.y = 2
         } else {
@@ -231,12 +232,12 @@ sc.ModListEntry = ig.FocusGui.extend({
     focusGained() {
         this.parent()
         this.highlight.focus = this.focus
-        sc.Model.notifyObserver(sc.modMenu, sc.MOD_MENU_MESSAGES.ENTRY_FOCUSED, this)
+        sc.Model.notifyObserver(sc.modMenuGui, sc.MOD_MENU_MESSAGES.ENTRY_FOCUSED, this)
     },
     focusLost() {
         this.parent()
         this.highlight.focus = this.focus
-        sc.Model.notifyObserver(sc.modMenu, sc.MOD_MENU_MESSAGES.ENTRY_UNFOCUSED, this)
+        sc.Model.notifyObserver(sc.modMenuGui, sc.MOD_MENU_MESSAGES.ENTRY_UNFOCUSED, this)
     },
     tryEnableMod(mod: ModEntryLocal) {
         ModInstallDialogs.checkCanEnableMod(mod).then(deps => {
@@ -244,7 +245,7 @@ sc.ModListEntry = ig.FocusGui.extend({
             deps.push(mod)
             for (const mod of deps) {
                 mod.awaitingRestart = !mod.awaitingRestart
-                sc.Model.notifyObserver(sc.modMenu, sc.MOD_MENU_MESSAGES.ENTRY_UPDATE_COLOR, { mod, color: COLOR.GREEN })
+                sc.Model.notifyObserver(sc.modMenuGui, sc.MOD_MENU_MESSAGES.ENTRY_UPDATE_COLOR, { mod, color: COLOR.GREEN })
                 sc.BUTTON_SOUND.toggle_on.play()
                 LocalMods.setModActive(mod, true)
                 this.updateHighlightWidth()
@@ -266,7 +267,7 @@ sc.ModListEntry = ig.FocusGui.extend({
     },
     modelChanged(model, message: sc.MOD_MENU_MESSAGES, data) {
         const d = data as { mod: ModEntryLocal; color: COLOR }
-        if (model == sc.modMenu && message == sc.MOD_MENU_MESSAGES.ENTRY_UPDATE_COLOR && d.mod == this.mod) {
+        if (model == sc.modMenuGui && message == sc.MOD_MENU_MESSAGES.ENTRY_UPDATE_COLOR && d.mod == this.mod) {
             this.setNameText(d.color)
         }
     },

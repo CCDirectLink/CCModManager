@@ -2,6 +2,7 @@ import type * as _ from 'nax-ccuilib/src/headers/nax/input-field.d.ts'
 import type * as __ from 'nax-ccuilib/src/headers/nax/input-field-cursor.d.ts'
 import type * as ___ from 'nax-ccuilib/src/headers/nax/input-field-type.d.ts'
 import { ModDB } from '../moddb'
+import { LocalMods } from '../local-mods'
 
 declare global {
     namespace sc {
@@ -74,10 +75,9 @@ sc.ModMenuRepoAddPopup = ig.GuiElementBase.extend({
         this.buttonGroup = new sc.ButtonGroup()
         this.buttonInteract.pushButtonGroup(this.buttonGroup)
 
-        const backButton = new sc.ButtonGui('\\i[back]' + ig.lang.get('sc.gui.menu.back'), undefined, true, sc.BUTTON_TYPE.SMALL)
+        const backButton = new sc.ButtonGui('\\i[back]' + ig.lang.get('sc.gui.menu.back'), undefined, true, sc.BUTTON_TYPE.SMALL, sc.BUTTON_SOUND.back)
         backButton.setAlign(ig.GUI_ALIGN.X_RIGHT, ig.GUI_ALIGN.Y_TOP)
         backButton.setPos(0, 0)
-        backButton.submitSound = sc.BUTTON_SOUND.back
         backButton.onButtonPress = () => {
             this.hide()
         }
@@ -148,6 +148,7 @@ sc.ModMenuRepoAddPopup = ig.GuiElementBase.extend({
         this.doStateTransition('DEFAULT')
         ig.interact.addEntry(this.buttonInteract)
         ig.interact.setBlockDelay(0.2)
+        sc.menu.pushBackCallback(() => {})
 
         const dbNames = Object.keys(ModDB.databases)
         for (let i = 0; i < dbNames.length; i++) {
@@ -166,6 +167,7 @@ sc.ModMenuRepoAddPopup = ig.GuiElementBase.extend({
         this.doStateTransition('HIDDEN', undefined, true)
         ig.interact.removeEntry(this.buttonInteract)
         ig.interact.setBlockDelay(0.2)
+        sc.menu.popBackCallback()
 
         ModDB.databases = {}
 
@@ -177,7 +179,10 @@ sc.ModMenuRepoAddPopup = ig.GuiElementBase.extend({
             this.isOkTexts[i].setText('')
         }
         ModDB.saveDatabases()
-        ModDB.loadDatabases()
-        sc.Model.notifyObserver(sc.modMenu, sc.MOD_MENU_MESSAGES.REPOSITORY_CHANGED)
+        ModDB.loadDatabases(true)
+
+        ModDB.loadAllMods(() => {
+            LocalMods.refreshOrigin()
+        }, false)
     },
 })

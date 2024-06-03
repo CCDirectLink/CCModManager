@@ -7,6 +7,7 @@
 ### Added
 
 - Added a 'Visit repository' button
+- Added a per-mod options sub-menu
 
 
 ## [0.9.11] 2024-05-18

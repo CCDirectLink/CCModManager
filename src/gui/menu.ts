@@ -6,6 +6,7 @@ import { LocalMods } from '../local-mods'
 import { Lang } from '../lang-manager'
 import './list'
 import './filters'
+import './options/menu'
 
 import type * as _ from 'nax-ccuilib/src/headers/nax/input-field.d.ts'
 import type * as __ from 'nax-ccuilib/src/headers/nax/input-field-cursor.d.ts'
@@ -22,7 +23,6 @@ declare global {
         enum MOD_MENU_MESSAGES {
             SELECTED_ENTRIES_CHANGED,
             TAB_CHANGED,
-            REPOSITORY_CHANGED,
             UPDATE_ENTRIES,
             ENTRY_FOCUSED,
             ENTRY_UNFOCUSED,
@@ -35,14 +35,10 @@ declare global {
             uninstallButton: sc.ButtonGui
             testingToggleButton: sc.ButtonGui
             openRepositoryUrlButton: sc.ButtonGui
+            modSettingsButton: sc.ButtonGui
             checkUpdatesButton: sc.ButtonGui
             filtersButton: sc.ButtonGui
             filtersPopup: sc.FiltersPopup
-            /* settings */
-            settingButtonGroup: sc.ButtonGroup
-            repositoriesButton: sc.ButtonGui
-            autoupdateLabel: sc.TextGui
-            autoupdateCheckbox: sc.CheckboxGui
             reposPopup: sc.ModMenuRepoAddPopup
 
             setBlackBarVisibility(this: this, visible: boolean): void
@@ -51,14 +47,15 @@ declare global {
             onBackButtonPress(this: this): void
             setTabEvent(this: this): void
             showModInstallDialog(this: this): void
-            setSettingTabVisibility(this: this, visible: boolean): void
             getCurrentlyFocusedModEntry(this: this): sc.ModListEntry | undefined
+            openModSettings(this: this, mod: ModEntry): void
+            openRepositoriesPopup(this: this): void
         }
         interface ModMenuConstructor extends ImpactClass<ModMenu> {
             new (): ModMenu
         }
         var ModMenu: ModMenuConstructor
-        var modMenu: ModMenu
+        var modMenuGui: ModMenu
     }
 }
 sc.MOD_MENU_SORT_ORDER = {
@@ -69,11 +66,10 @@ sc.MOD_MENU_SORT_ORDER = {
 sc.MOD_MENU_MESSAGES = {
     SELECTED_ENTRIES_CHANGED: 0,
     TAB_CHANGED: 1,
-    REPOSITORY_CHANGED: 2,
-    UPDATE_ENTRIES: 3,
-    ENTRY_FOCUSED: 4,
-    ENTRY_UNFOCUSED: 5,
-    ENTRY_UPDATE_COLOR: 6,
+    UPDATE_ENTRIES: 2,
+    ENTRY_FOCUSED: 3,
+    ENTRY_UNFOCUSED: 4,
+    ENTRY_UPDATE_COLOR: 5,
 }
 
 sc.GlobalInput.inject({
@@ -85,7 +81,7 @@ sc.GlobalInput.inject({
 
 sc.Control.inject({
     menuConfirm() {
-        if (!sc.modMenu?.isVisible()) return this.parent()
+        if (!sc.modMenuGui?.isVisible()) return this.parent()
 
         /* remove ig.input.pressed('special') to prevent weird list jumping on space bar press */
         return this.autoControl
@@ -97,7 +93,7 @@ sc.Control.inject({
 sc.ModMenu = sc.ListInfoMenu.extend({
     observers: [],
     init() {
-        sc.modMenu = this
+        sc.modMenuGui = this
         ModDB.loadDatabases()
         this.parent(new sc.ModMenuList())
         this.list.setPos(9, 23)
@@ -159,7 +155,7 @@ sc.ModMenu = sc.ListInfoMenu.extend({
             if (this.list.currentTabIndex == sc.MOD_MENU_TAB_INDEXES.SELECTED) sc.BUTTON_SOUND.submit.play()
             ModInstaller.appendToUpdateModsToQueue().then(hasUpdated => {
                 if (hasUpdated) {
-                    sc.Model.notifyObserver(sc.modMenu, sc.MOD_MENU_MESSAGES.UPDATE_ENTRIES)
+                    sc.Model.notifyObserver(sc.modMenuGui, sc.MOD_MENU_MESSAGES.UPDATE_ENTRIES)
                     this.list.tabGroup._invokePressCallbacks(this.list.tabs[Lang.selectedModsTab], true)
                     sc.Dialogs.showInfoDialog(Lang.updatesFound)
                 } else {
@@ -246,6 +242,29 @@ sc.ModMenu = sc.ListInfoMenu.extend({
             return ig.input.pressed('special') || ig.gamepad.isButtonPressed(sc.control._getSpecialButton())
         })
 
+        this.modSettingsButton = new sc.ButtonGui('\\i[left]' + Lang.modSettings, 140, true, sc.BUTTON_TYPE.SMALL)
+        this.modSettingsButton.setPos(7, bottomY)
+        this.modSettingsButton.doStateTransition('HIDDEN')
+        this.modSettingsButton.onButtonPress = () => {
+            const tryPress = (): boolean => {
+                if (this.modSettingsButton.hook.currentStateName != 'DEFAULT') return false
+                const modEntry = this.getCurrentlyFocusedModEntry()!
+                const mod = modEntry.mod
+
+                if (!sc.modMenu.optionConfigs[mod.id]) return false
+
+                this.openModSettings(mod)
+                return true
+            }
+            sc.BUTTON_SOUND[tryPress() ? 'submit' : 'denied'].play()
+        }
+        this.modSettingsButton.submitSound = undefined
+        this.modSettingsButton.keepMouseFocus = true /* prevent the focus jumping all over the place on press */
+        this.addChildGui(this.modSettingsButton)
+        sc.menu.buttonInteract.addGlobalButton(this.modSettingsButton, () => {
+            return sc.control.leftPressed()
+        })
+
         this.setTabEvent()
     },
     showModInstallDialog() {
@@ -270,65 +289,16 @@ sc.ModMenu = sc.ListInfoMenu.extend({
             this.installButton.doStateTransition('DEFAULT')
             this.checkUpdatesButton.doStateTransition('DEFAULT')
         }
-        if (this.list.currentTabIndex == sc.MOD_MENU_TAB_INDEXES.SETTINGS) {
-            if (!this.settingButtonGroup) {
-                this.settingButtonGroup = new sc.ButtonGroup()
-                /* fix tab switching not working */
-                this.settingButtonGroup.onButtonTraversal = this.list.onButtonTraversal.bind(this.list)
-
-                this.autoupdateCheckbox = new sc.CheckboxGui(sc.modManagerAutoUpdate)
-                this.autoupdateCheckbox.onButtonPress = () => {
-                    sc.modManagerAutoUpdate = this.autoupdateCheckbox.pressed
-                }
-                this.autoupdateCheckbox.setPos(15, 65)
-                this.autoupdateCheckbox.crossedeyesLabel = Lang.enableAutoUpdatePrompt
-
-                this.settingButtonGroup.addFocusGui(this.autoupdateCheckbox, 0, 0)
-                this.addChildGui(this.autoupdateCheckbox)
-
-                this.autoupdateLabel = new sc.TextGui(Lang.enableAutoUpdatePrompt)
-                this.autoupdateLabel.setPos(43, 65)
-                this.addChildGui(this.autoupdateLabel)
-
-                this.repositoriesButton = new sc.ButtonGui(Lang.reposButton)
-                this.repositoriesButton.onButtonPress = () => {
-                    if (!this.reposPopup) this.reposPopup = new sc.ModMenuRepoAddPopup()
-                    this.reposPopup.show()
-                }
-                this.repositoriesButton.setPos(15, 90)
-                this.settingButtonGroup.addFocusGui(this.repositoriesButton, 0, 1)
-                this.addChildGui(this.repositoriesButton)
-
-                this.autoupdateLabel.hook.transitions['HIDDEN'] = this.repositoriesButton.hook.transitions['HIDDEN']
-            }
-            this.setSettingTabVisibility(true)
-        } else if (this.settingButtonGroup) {
-            this.setSettingTabVisibility(false)
-        }
-    },
-    setSettingTabVisibility(visible) {
-        if (!this.settingButtonGroup) return
-        // prettier-ignore
-        ;
-        ;[this.autoupdateCheckbox, this.repositoriesButton, this.autoupdateLabel].forEach(g =>
-            (g as ig.GuiElementBase).doStateTransition(visible ? 'DEFAULT' : 'HIDDEN', true)
-        )
-
-        if (visible) {
-            this.autoupdateCheckbox.focus = true
-            this.settingButtonGroup.setCurrentFocus(0, 0)
-            sc.menu.buttonInteract.pushButtonGroup(this.settingButtonGroup)
-        } else sc.menu.buttonInteract.removeButtonGroup(this.settingButtonGroup)
     },
     addObservers() {
-        sc.Model.addObserver(sc.modMenu, this)
+        sc.Model.addObserver(sc.modMenuGui, this)
     },
     removeObservers() {
-        sc.Model.addObserver(sc.modMenu, this)
+        sc.Model.addObserver(sc.modMenuGui, this)
     },
     modelChanged(model, message, data) {
         this.parent(model, message, data)
-        if (model == sc.modMenu) {
+        if (model == sc.modMenuGui) {
             if (message == sc.MOD_MENU_MESSAGES.TAB_CHANGED) {
                 this.setTabEvent()
             } else if (message == sc.MOD_MENU_MESSAGES.SELECTED_ENTRIES_CHANGED) {
@@ -346,11 +316,14 @@ sc.ModMenu = sc.ListInfoMenu.extend({
                 }
 
                 this.openRepositoryUrlButton.doStateTransition(entry.mod.repositoryUrl ? 'DEFAULT' : 'HIDDEN')
+
+                this.modSettingsButton.doStateTransition(sc.modMenu.optionConfigs[entry.mod.id] ? 'DEFAULT' : 'HIDDEN')
             } else if (message == sc.MOD_MENU_MESSAGES.ENTRY_UNFOCUSED) {
                 this.uninstallButton.setActive(false)
 
                 this.testingToggleButton.doStateTransition('HIDDEN')
                 this.openRepositoryUrlButton.doStateTransition('HIDDEN')
+                this.modSettingsButton.doStateTransition('HIDDEN')
             }
         }
     },
@@ -371,6 +344,7 @@ sc.ModMenu = sc.ListInfoMenu.extend({
         if (!visible) {
             this.testingToggleButton.doStateTransition(state)
             this.openRepositoryUrlButton.doStateTransition(state)
+            this.modSettingsButton.doStateTransition(state)
         }
 
         const main = ig.gui.guiHooks.find(h => h.gui instanceof sc.MainMenu)?.gui as sc.MainMenu | undefined
@@ -391,7 +365,6 @@ sc.ModMenu = sc.ListInfoMenu.extend({
         this.exitMenu()
         this.setAllVisibility(false)
         this.setBlackBarVisibility(true)
-        this.setSettingTabVisibility(false)
 
         if (
             LocalMods.getAll().some(mod => mod.awaitingRestart) ||
@@ -432,5 +405,17 @@ sc.ModMenu = sc.ListInfoMenu.extend({
                 return acc
             }, [])
             .find((b: ig.FocusGui) => b.focus) as sc.ModListEntry
+    },
+    openModSettings(mod) {
+        this.list.restoreLastPosition = {
+            tab: this.list.currentTabIndex,
+            element: Vec2.create(this.list.currentList.buttonGroup.current),
+        }
+        sc.menu.pushMenu(sc.MENU_SUBMENU.MOD_SETTINGS)
+        sc.modSettingsMenu.updateEntries(mod)
+    },
+    openRepositoriesPopup() {
+        if (!this.reposPopup) this.reposPopup = new sc.ModMenuRepoAddPopup()
+        this.reposPopup.show()
     },
 })

@@ -11,7 +11,6 @@ declare global {
         interface OptionsMenu {
             modsButton: sc.ButtonGui
         }
-        var modManagerAutoUpdate: boolean
     }
 }
 

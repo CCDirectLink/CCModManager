@@ -1,5 +1,6 @@
 import { Fliters } from '../filters'
 import { Lang } from '../lang-manager'
+import { Opts } from '../options'
 
 declare global {
     namespace sc {
@@ -30,15 +31,10 @@ declare global {
 }
 
 export const isGridLocalStorageId = 'CCModManager-grid'
-type CheckboxConfig = { key: keyof typeof Lang.filters; default?: boolean } & ({ filterKey?: keyof Fliters } | { localStorageKey: string; callback: () => void })
+type CheckboxConfig = { key: keyof typeof Lang.filters; default?: boolean } & ({ filterKey?: keyof Fliters } | { optsKey: 'isGrid' /* keyof typeof Opts */ })
 
 const checkboxes: CheckboxConfig[] = [
-    {
-        key: 'gridView',
-        localStorageKey: isGridLocalStorageId,
-        default: false,
-        callback: () => sc.modMenu.list.updateColumnCount(),
-    },
+    { key: 'gridView', optsKey: 'isGrid' },
     { key: 'local', filterKey: 'includeLocal', default: true },
     { key: 'hideLibrary', filterKey: 'hideLibraryMods', default: true },
     { key: 'tagQol' },
@@ -70,12 +66,12 @@ sc.ModMenuFilterCheckboxGui = sc.CheckboxGui.extend({
     },
     focusGained() {
         this.parent()
-        sc.modMenu.filtersPopup.infoBar.setText(this.data as string)
-        sc.modMenu.filtersPopup.infoBar.doStateTransition('DEFAULT')
+        sc.modMenuGui.filtersPopup.infoBar.setText(this.data as string)
+        sc.modMenuGui.filtersPopup.infoBar.doStateTransition('DEFAULT')
     },
     focusLost() {
         this.parent()
-        sc.modMenu.filtersPopup.infoBar.doStateTransition('HIDDEN')
+        sc.modMenuGui.filtersPopup.infoBar.doStateTransition('HIDDEN')
     },
 })
 
@@ -89,32 +85,29 @@ sc.FiltersPopup = ig.GuiElementBase.extend({
         return Lang.filters[key]
     },
     setFilterValue(config, state) {
-        const filters = sc.modMenu.list.filters
+        const filters = sc.modMenuGui.list.filters
         if ('filterKey' in config && config.filterKey) {
             filters[config.filterKey] = state as any
-        } else if ('localStorageKey' in config) {
-            localStorage.setItem(config.localStorageKey, state.toString())
-            config.callback()
+        } else if ('optsKey' in config) {
+            Opts[config.optsKey] = state
         } else {
             filters.tags ??= []
             const name = this.getLangData(config.key).name
             if (state) filters.tags.push(name)
             else filters.tags.erase(name)
         }
-        sc.modMenu.list.reloadFilters()
+        sc.modMenuGui.list.reloadFilters()
         /* hack to get the popup button group on top again, because the main mod menu button group got pushed on top when sc.modMenu.list.reloadFilters() is called */
         const arr: sc.ButtonGroup[] = sc.menu.buttonInteract.buttonGroupStack
         const last: number = arr.length
         ;[arr[last - 2], arr[last - 1]] = [arr[last - 1], arr[last - 2]]
     },
     getFilterValue(config) {
-        const filters = sc.modMenu.list.filters
+        const filters = sc.modMenuGui.list.filters
         if ('filterKey' in config && config.filterKey) {
             return filters[config.filterKey] as boolean | undefined
-        } else if ('localStorageKey' in config) {
-            const item = localStorage.getItem(config.localStorageKey)
-            if (item === null) return !!config.default
-            return item == 'true'
+        } else if ('optsKey' in config) {
+            return Opts[config.optsKey]
         } else return filters.tags?.includes(this.getLangData(config.key).name)
     },
     init() {
@@ -154,7 +147,7 @@ sc.FiltersPopup = ig.GuiElementBase.extend({
             checkbox.setPos(x * (textW + spacingW) + offset.x, y * (textH + spacingH))
             checkbox.crossedeyesLabel = (config.key.startsWith('tag') ? `${Lang.tag}: ` : '') + lang.name
             checkbox.data = lang.description
-            if (config.default !== undefined && !('localStorageKey' in config)) {
+            if (config.default !== undefined) {
                 checkbox.setPressed(config.default)
                 this.setFilterValue(config, config.default)
             }
