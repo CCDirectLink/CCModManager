@@ -25,6 +25,7 @@ export type Option = {
 type BUTTON_GROUP = OptionChangeable & {
     type: 'BUTTON_GROUP'
     init: number
+    buttonNames?: string[]
 } & (
         | {
               enum: Enum
@@ -163,7 +164,7 @@ export type OptsType<E extends Options, O extends Record<string, any> = OmitNonC
     } & { flatOpts: FlatOpts<E> }
 
 export namespace ModOptionsSettings {
-    export type LanguageGetter = (category: string, header: string, optionId: string, option: Option) => { name: string; description: string }
+    export type LanguageGetter = (category: string, header: string, optionId: string, option: Option) => { name: string; description: string; buttonNames?: string[] }
 }
 export interface ModOptionsSettings {
     modId: string

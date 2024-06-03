@@ -9,14 +9,35 @@ const optSet = (row: sc.ModOptionsOptionRow, value: any) => {
 
 sc.OPTION_GUIS[sc.OPTION_TYPES.BUTTON_GROUP].inject({
     init(optionRow, x, rowGroup) {
-        this.parent(optionRow, x, rowGroup)
+        this.base = optionRow
+        if (!(this.base instanceof sc.ModOptionsOptionRow)) return this.parent(optionRow, x, rowGroup)
 
-        if (!(this.base instanceof sc.ModOptionsOptionRow)) return
+        const backup = ig.lang.get
+        // @ts-expect-error
+        ig.lang.get = (): string[] => {
+            if (!(optionRow instanceof sc.ModOptionsOptionRow)) throw new Error('what')
+            if (optionRow.guiOption.type != 'BUTTON_GROUP') throw new Error('what')
+
+            return optionRow.guiOption.buttonNames ?? []
+        }
+        /* this crashed at the very last part because the value from sc.optiont.get is null, but it can be safely skipped */
+        try {
+            this.parent(optionRow, x, rowGroup)
+        } catch (e) {}
+        ig.lang.get = backup
 
         const index = optGet(this.base) as number
         this._prevPressed = this.buttons[index]
         this.resetButtons(this._prevPressed)
         rowGroup.setPressedFocusGui(this._prevPressed)
+    },
+    onPressed(button) {
+        if (!(this.base instanceof sc.ModOptionsOptionRow)) return this.parent
+        if (this._prevPressed != button) {
+            this.resetButtons(button)
+            optSet(this.base, button.data.id)
+            this._prevPressed = button
+        }
     },
 })
 

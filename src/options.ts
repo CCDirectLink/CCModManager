@@ -47,7 +47,7 @@ export function registerOpts() {
         {
             modId: 'ccmodmanager',
             title: 'CCModManager',
-            languageGetter: (_category: string, _header: string, optionId: string, _option: Option): { name: string; description: string } => {
+            languageGetter: (_category: string, _header: string, optionId: string, _option: Option) => {
                 return Lang.opts[optionId as keyof typeof Lang.opts]
             },
             helpMenu: Lang.help.options,

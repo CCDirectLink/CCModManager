@@ -141,6 +141,9 @@ sc.ModSettingsMenu = sc.BaseMenu.extend({
             this.hotkeyHelp.doStateTransition('DEFAULT')
         }
     },
+    resetOptionsToDefault() {
+        // TODO: this
+    },
 })
 
 // @ts-expect-error uhhhhhh enum moment
