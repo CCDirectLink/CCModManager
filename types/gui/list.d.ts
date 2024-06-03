@@ -12,9 +12,11 @@ declare global {
                 populateFunc: (list: sc.ButtonListBox, buttonGroup: sc.ButtonGroup, sort: sc.MOD_MENU_SORT_ORDER) => void;
             }[];
             currentSort: sc.MOD_MENU_SORT_ORDER;
-            reposPopup: sc.ModMenuRepoAddPopup;
             gridColumns: number;
-            isGrid: boolean;
+            restoreLastPosition?: {
+                tab: number;
+                element: Vec2;
+            };
             updateColumnCount(this: this): void;
             reloadFilters(this: this): void;
             reloadEntries(this: this): void;
@@ -23,7 +25,6 @@ declare global {
             populateSelected(this: this, list: sc.ButtonListBox, buttonGroup: sc.ButtonGroup, sort: sc.MOD_MENU_SORT_ORDER): void;
             populateEnabled(this: this, list: sc.ButtonListBox, buttonGroup: sc.ButtonGroup, sort: sc.MOD_MENU_SORT_ORDER): void;
             populateDisabled(this: this, list: sc.ButtonListBox, buttonGroup: sc.ButtonGroup, sort: sc.MOD_MENU_SORT_ORDER): void;
-            populateSettings(this: this, list: sc.ButtonListBox, buttonGroup: sc.ButtonGroup): void;
             populateListFromMods(this: this, mods: ModEntry[], list: sc.ButtonListBox): void;
         }
         interface ModMenuListConstructor extends ImpactClass<ModMenuList> {
@@ -34,8 +35,7 @@ declare global {
             ONLINE,
             SELECTED,
             ENABLED,
-            DISABLED,
-            SETTINGS
+            DISABLED
         }
     }
 }

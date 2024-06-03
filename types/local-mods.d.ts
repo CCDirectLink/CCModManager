@@ -10,6 +10,8 @@ type CCL2Mod = {
     icons?: {
         '24'?: string;
     };
+    repository?: string;
+    homepage?: string;
     active?: boolean;
 };
 declare global {
@@ -23,7 +25,13 @@ declare global {
 export declare class LocalMods {
     private static cache;
     private static cacheRecord;
-    static getAll(force?: boolean): ModEntryLocal[];
+    private static localModFlags;
+    static initAll(): Promise<void>;
+    static checkForUpdates(): void;
+    static refreshOrigin(): Promise<void>;
+    static getAll(): ModEntryLocal[];
+    private static createVirtualLocalMods;
+    private static convertServerToLocal;
     static getAllRecord(): Record<string, ModEntryLocal>;
     static getActive(): ModEntryLocal[];
     static getInactive(): ModEntryLocal[];

@@ -1,6 +1,3 @@
-import 'nax-ccuilib/src/headers/nax/input-field.d.ts';
-import 'nax-ccuilib/src/headers/nax/input-field-cursor.d.ts';
-import 'nax-ccuilib/src/headers/nax/input-field-type.d.ts';
 declare global {
     namespace sc {
         interface ModMenuRepoAddPopup extends ig.GuiElementBase {
@@ -21,3 +18,4 @@ declare global {
         var ModMenuRepoAddPopup: ModMenuRepoAddPopupConstructor;
     }
 }
+export {};

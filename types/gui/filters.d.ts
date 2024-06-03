@@ -39,7 +39,6 @@ type CheckboxConfig = {
 } & ({
     filterKey?: keyof Fliters;
 } | {
-    localStorageKey: string;
-    callback: () => void;
+    optsKey: 'isGrid';
 });
 export {};

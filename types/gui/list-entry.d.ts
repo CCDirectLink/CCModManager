@@ -8,6 +8,7 @@ declare global {
             iconOffset: number;
             nameIconPrefixesText: sc.TextGui;
             nameText: sc.TextGui;
+            textColor: COLOR;
             description: sc.TextGui;
             versionText: sc.TextGui;
             starCount?: sc.TextGui;
@@ -27,12 +28,13 @@ declare global {
             iconGui: ig.ImageGui;
             tryDisableMod(this: this, mod: ModEntryLocal): string | undefined;
             tryEnableMod(this: this, mod: ModEntryLocal): string | undefined;
+            toggleSelection(this: this, force?: boolean): string | undefined;
             getModName(this: this): {
                 icon: string;
                 text: string;
             };
             onButtonPress(this: this): void;
-            setNameText(this: this, color: COLORS): void;
+            setNameText(this: this, color?: COLOR): void;
             updateHighlightWidth(this: this): void;
             onButtonPress(this: this): string | undefined;
         }
@@ -42,10 +44,11 @@ declare global {
         var ModListEntry: ModListEntryConstructor;
     }
 }
-declare enum COLORS {
-    WHITE = 0,
-    RED = 1,
-    GREEN = 2,
-    YELLOW = 3
-}
+declare const COLOR: {
+    readonly WHITE: 0;
+    readonly RED: 1;
+    readonly GREEN: 2;
+    readonly YELLOW: 3;
+};
+type COLOR = (typeof COLOR)[keyof typeof COLOR];
 export {};

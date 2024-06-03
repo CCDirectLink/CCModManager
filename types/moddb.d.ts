@@ -2,10 +2,10 @@ import { ModEntry, ModEntryLocal, ModEntryServer, NPDatabase } from './types';
 export declare class ModDB {
     url: string;
     active: boolean;
-    private static localStorageKey;
     private static databasesLoaded;
     static databases: Record<string, ModDB>;
     static modRecord: Record<string, ModEntryServer[]>;
+    private static testingOptInModIds;
     static addDatabase(db: ModDB): void;
     static loadDatabases(force?: boolean): void;
     static repoURLToFileName(url: string): string;
@@ -14,8 +14,12 @@ export declare class ModDB {
     static saveDatabases(): void;
     static loadAllMods(callback?: () => void, prefferCache?: boolean): Promise<void>;
     static getHighestVersionMod<T extends ModEntry>(mods: T[]): T;
+    static getLocalModOrigins(id: string): Promise<ModEntryServer[]>;
     static resolveLocalModOrigin(mod: ModEntryLocal): Promise<void>;
-    static removeModDuplicates(modsRecord: Record<string, ModEntryServer[]>): Record<string, ModEntryServer>;
+    static isModTestingOptIn(modId: string): boolean;
+    static setModTestingOptInStatus(modId: string, status: boolean): void;
+    private static isDatabaseTesting;
+    static removeModDuplicatesAndResolveTesting(modsRecord: Record<string, ModEntryServer[]>): Record<string, ModEntryServer>;
     name: string;
     database: NPDatabase;
     modRecord: Record<string, ModEntryServer>;

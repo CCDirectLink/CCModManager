@@ -1,4 +1,4 @@
-import { ModEntry, ModEntryLocal, ModEntryServer } from './types';
+import { ModEntry, ModEntryLocal, ModEntryLocalVirtual, ModEntryServer } from './types';
 export declare class InstallQueue {
     private static queue;
     static changeUpdate(): void;
@@ -11,7 +11,7 @@ export declare class InstallQueue {
 export declare class ModInstaller {
     static record: Record<string, ModEntryServer>;
     static byNameRecord: Record<string, ModEntryServer>;
-    static virtualMods: Record<string, ModEntryLocal>;
+    static virtualMods: Record<string, ModEntryLocalVirtual>;
     static init(): void;
     private static getModByDepName;
     private static setOrAddNewer;
@@ -22,9 +22,13 @@ export declare class ModInstaller {
     private static updateMod;
     private static downloadAndInstallMod;
     private static installCCMod;
+    private static checkSHA256;
     private static installModZip;
+    private static installCCLoader;
+    private static fileExists;
+    static isDirGit(dirPath: string): Promise<boolean>;
     static getWhatDependsOnAMod(mod: ModEntryLocal, on?: boolean): ModEntryLocal[];
-    static uninstallMod(mod: ModEntryLocal): Promise<boolean>;
+    static uninstallMod(mod: ModEntryLocal): Promise<void>;
     static restartGame(): void;
     static checkLocalModForUpdate(mod: ModEntryLocal): boolean;
     static appendToUpdateModsToQueue(): Promise<boolean>;
