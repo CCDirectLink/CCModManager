@@ -111,8 +111,8 @@ export interface CategorySettings {
 type FlattenOptions<T extends Options> =
     T extends Record<string, infer U>
     ? (U extends Category
-        ? (U['headers'] extends Record<infer K1 extends string, infer V extends Record<string, Record<string, unknown>>>
-            ? { -readonly [K in keyof V]: K extends string ? (V[K] & { id: `${K1}-${K}` /* this isnt perfect */}) : never }
+        ? (U['headers'] extends Record<string, infer V extends Record<string, Record<string, unknown>>>
+            ? { -readonly [K in keyof V]: K extends string ? (V[K] & { id: string }) : never }
             : never)
         : never)
     : never
@@ -250,7 +250,7 @@ function registerAndGetModOptions<T extends Options>(settings: ModOptionsSetting
             const guiStructureHeader = (guiStructureCategory.headers[headerKey] ??= {})
 
             ;(Object.entriesT(optionEntries) as [keyof FlatOpts<T>, Option][]).forEach(([optKey, option], optKeyI) => {
-                const id = `${headerKey}-${optKey as string}`
+                const id = `${settings.modId}-${optKey as string}`
 
                 /* register gui option */
                 const guiOption: GuiOption = Object.assign(option, {
