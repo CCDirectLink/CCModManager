@@ -246,10 +246,10 @@ function registerAndGetModOptions<T extends Options>(settings: ModOptionsSetting
         })
 
         const headers = category.headers
-        let isFirstOption: boolean = true
         Object.entriesT(headers).forEach(([headerKey, optionEntries]) => {
             const guiStructureHeader = (guiStructureCategory.headers[headerKey] ??= {})
 
+            let isFirstOption: boolean = true
             ;(Object.entriesT(optionEntries) as [keyof FlatOpts<T>, Option][]).forEach(([optKey, option], optKeyI) => {
                 const id = `${settings.modId}-${optKey as string}`
 
