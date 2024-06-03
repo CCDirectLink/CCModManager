@@ -287,8 +287,9 @@ function registerAndGetModOptions<T extends Options>(settings: ModOptionsSetting
                 /* register gui option end */
 
                 if (guiOption.type != 'INFO' && guiOption.type != 'BUTTON') {
-                    const get = function () {
+                    const get = function (pure?: boolean) {
                         let v = localStorage.getItem(id)!
+                        if (pure) return v
                         if (option.type == 'CHECKBOX') return v == 'true'
                         if (option.type == 'JSON_DATA') return JSON.parse(v)
                         return Number(v)
@@ -301,7 +302,7 @@ function registerAndGetModOptions<T extends Options>(settings: ModOptionsSetting
 
                     Object.defineProperty(Opts, optKey, { get, set })
 
-                    if (get() === null) {
+                    if (get(true) === null) {
                         set(guiOption.init, true)
                     }
                 }
