@@ -98,7 +98,6 @@ sc.ModSettingsMenu = sc.BaseMenu.extend({
 
         sc.menu.buttonInteract.addGlobalButton(this.hotkeyHelp, () => sc.control.menuHotkeyHelp())
         sc.menu.buttonInteract.addGlobalButton(this.hotkeyDefault, () => sc.control.menuHotkeyHelp2())
-        this.commitHotKeysToTopBar()
 
         this.listBox.showMenu()
     },
@@ -116,8 +115,7 @@ sc.ModSettingsMenu = sc.BaseMenu.extend({
         this.listBox.hideMenu()
     },
     commitHotKeysToTopBar(longTransition) {
-        // if (this.listBox.conf.settings.helpMenu)
-        sc.menu.addHotkey(() => this.hotkeyHelp)
+        if (this.listBox.conf.settings.helpMenu) sc.menu.addHotkey(() => this.hotkeyHelp)
         sc.menu.addHotkey(() => this.hotkeyDefault)
         sc.menu.commitHotkeys(longTransition)
     },
@@ -137,6 +135,7 @@ sc.ModSettingsMenu = sc.BaseMenu.extend({
     updateEntries(mod: ModEntry) {
         this.mod = mod
         this.listBox.updateEntries(mod)
+        this.commitHotKeysToTopBar()
         if (this.listBox.conf.settings.helpMenu) {
             this.hotkeyHelp.doStateTransition('DEFAULT')
         }
