@@ -136,11 +136,6 @@ sc.ModSettingsTabBox = ig.GuiElementBase.extend({
         this.conf = sc.modMenu.optionConfigs[mod.id]
         this.opts = sc.modMenu.options[mod.id]
 
-        const smb = (ig.gui.guiHooks.find(h => h.gui instanceof sc.MainMenu)!.gui as sc.MainMenu).menuDisplay.hook.children
-            .filter(h => h.gui instanceof sc.MainMenu.SubMenuBox)
-            .last().gui as sc.MainMenu.SubMenuBox
-        smb.text.setText(this.mod.name)
-
         this.createTabs()
     },
     createTabs() {

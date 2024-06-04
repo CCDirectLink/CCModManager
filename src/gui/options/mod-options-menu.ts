@@ -22,16 +22,21 @@ declare global {
         interface ModSettingsMenuConstructor extends ImpactClass<ModSettingsMenu> {
             new (): ModSettingsMenu
         }
-        var ModSettingsMenu: ModSettingsMenuConstructor
+        var ModOptionsMenu: ModSettingsMenuConstructor
         var modSettingsMenu: ModSettingsMenu
 
         enum MENU_SUBMENU {
-            MOD_SETTINGS = 375943,
+            MOD_OPTIONS = 375943,
         }
     }
 }
 
-sc.ModSettingsMenu = sc.BaseMenu.extend({
+function getMainMenu(): sc.MainMenu {
+    return ig.gui.guiHooks.find(h => h.gui instanceof sc.MainMenu)!.gui as sc.MainMenu
+}
+
+let menuPurgeTimeoutId: NodeJS.Timeout
+sc.ModOptionsMenu = sc.BaseMenu.extend({
     init() {
         this.parent()
 
@@ -83,13 +88,14 @@ sc.ModSettingsMenu = sc.BaseMenu.extend({
         this.listBox = new sc.ModSettingsTabBox()
         this.addChildGui(this.listBox)
     },
-    addObservers: function () {
+    addObservers() {
         this.listBox.addObservers()
     },
-    removeObservers: function () {
+    removeObservers() {
         this.listBox.removeObservers()
     },
     showMenu(previousMenu, prevSubmenu) {
+        clearTimeout(menuPurgeTimeoutId)
         this.parent(previousMenu, prevSubmenu)
 
         this.addObservers()
@@ -113,6 +119,13 @@ sc.ModSettingsMenu = sc.BaseMenu.extend({
         sc.menu.popBackCallback()
 
         this.listBox.hideMenu()
+
+        /* purging the menu immediately would disable the smooth fade out transition */
+        menuPurgeTimeoutId = setTimeout(() => {
+            const mainMenu = getMainMenu()
+            mainMenu.removeChildGui(this)
+            delete mainMenu.submenus[modOptionsMenuId]
+        }, 1000)
     },
     commitHotKeysToTopBar(longTransition) {
         if (this.listBox.conf.settings.helpMenu) sc.menu.addHotkey(() => this.hotkeyHelp)
@@ -139,6 +152,11 @@ sc.ModSettingsMenu = sc.BaseMenu.extend({
         if (this.listBox.conf.settings.helpMenu) {
             this.hotkeyHelp.doStateTransition('DEFAULT')
         }
+
+        const smb = getMainMenu()
+            .menuDisplay.hook.children.filter(h => h.gui instanceof sc.MainMenu.SubMenuBox)
+            .last().gui as sc.MainMenu.SubMenuBox
+        smb.text.setText(this.mod.name)
     },
     resetOptionsToDefault() {
         // TODO: this
@@ -146,10 +164,11 @@ sc.ModSettingsMenu = sc.BaseMenu.extend({
 })
 
 // @ts-expect-error uhhhhhh enum moment
-sc.MENU_SUBMENU.MOD_SETTINGS = 375943
-sc.SUB_MENU_INFO[sc.MENU_SUBMENU.MOD_SETTINGS] = {
-    Clazz: sc.ModSettingsMenu,
-    name: 'mod_settings_menu',
+sc.MENU_SUBMENU.MOD_OPTIONS = 375943
+const modOptionsMenuId = 'mod_settings_menu'
+sc.SUB_MENU_INFO[sc.MENU_SUBMENU.MOD_OPTIONS] = {
+    Clazz: sc.ModOptionsMenu,
+    name: modOptionsMenuId,
 }
 
 import './tabbox'

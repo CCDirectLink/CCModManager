@@ -20,14 +20,6 @@ for (let i = 0; i < icons.length; i++) {
 }
 sc.fontsystem.font.setMapping(mapping)
 
-// @ts-expect-error
-sc.MENU_SUBMENU.MODS = Math.max(...Object.values(sc.MENU_SUBMENU)) + 1
-
-sc.SUB_MENU_INFO[sc.MENU_SUBMENU.MODS] = {
-    Clazz: sc.ModMenu,
-    name: 'mods',
-}
-
 function enterModsMenu(direct: boolean) {
     if (direct) {
         sc.menu.setDirectMode(true, sc.MENU_SUBMENU.MODS)

@@ -6,7 +6,7 @@ import { LocalMods } from '../local-mods'
 import { Lang } from '../lang-manager'
 import './list'
 import './filters'
-import './options/menu'
+import './options/mod-options-menu'
 
 import type * as _ from 'nax-ccuilib/src/headers/nax/input-field.d.ts'
 import type * as __ from 'nax-ccuilib/src/headers/nax/input-field-cursor.d.ts'
@@ -35,11 +35,21 @@ declare global {
             uninstallButton: sc.ButtonGui
             testingToggleButton: sc.ButtonGui
             openRepositoryUrlButton: sc.ButtonGui
-            modSettingsButton: sc.ButtonGui
+            modOptionsButton: sc.ButtonGui
             checkUpdatesButton: sc.ButtonGui
             filtersButton: sc.ButtonGui
             filtersPopup: sc.FiltersPopup
             reposPopup: sc.ModMenuRepoAddPopup
+
+            initInputField(this: this): void
+            initSortMenu(this: this): void
+            initInstallButton(this: this, bottomY: number): void
+            initUninstallButton(this: this, bottomY: number): void
+            initCheckUpdatesButton(this: this, bottomY: number): void
+            initFiltersButton(this: this, bottomY: number): void
+            initTestingToggleButton(this: this): void
+            initOpenRepositoryUrlButton(this: this): void
+            initModOptionsButton(this: this, bottomY: number): void
 
             setBlackBarVisibility(this: this, visible: boolean): void
             setAllVisibility(this: this, visible: boolean): void
@@ -90,6 +100,11 @@ sc.Control.inject({
     },
 })
 
+function getMainMenu(): sc.MainMenu {
+    return ig.gui.guiHooks.find(h => h.gui instanceof sc.MainMenu)!.gui as sc.MainMenu
+}
+
+let menuPurgeTimeoutId: NodeJS.Timeout
 sc.ModMenu = sc.ListInfoMenu.extend({
     observers: [],
     init() {
@@ -98,6 +113,21 @@ sc.ModMenu = sc.ListInfoMenu.extend({
         this.parent(new sc.ModMenuList())
         this.list.setPos(9, 23)
 
+        this.initSortMenu()
+        const bottomY = 285
+        this.initInstallButton(bottomY)
+        this.initInputField()
+        this.initUninstallButton(bottomY)
+        this.initCheckUpdatesButton(bottomY)
+        this.initFiltersButton(bottomY)
+        this.initTestingToggleButton()
+        this.initOpenRepositoryUrlButton()
+        this.initModOptionsButton(bottomY)
+
+        this.setTabEvent()
+    },
+
+    initInputField() {
         this.inputField = new nax.ccuilib.InputField(232, 20)
         this.inputField.setPos(124, 2)
         this.inputField.onCharacterInput = str => {
@@ -105,14 +135,15 @@ sc.ModMenu = sc.ListInfoMenu.extend({
             this.list.reloadFilters()
         }
         this.addChildGui(this.inputField)
-        /* this NOT is how it's supposed to work but it works so */
-        sc.menu.buttonInteract.addGlobalButton(this.inputField as any, () => false)
 
+        this.inputField.hook.transitions['HIDDEN'] = this.installButton.hook.transitions['HIDDEN']
+    },
+    initSortMenu() {
         this.sortMenu.addButton('name', sc.MOD_MENU_SORT_ORDER.NAME, sc.MOD_MENU_SORT_ORDER.NAME)
         this.sortMenu.addButton('stars', sc.MOD_MENU_SORT_ORDER.STARS, sc.MOD_MENU_SORT_ORDER.STARS)
         this.sortMenu.addButton('lastUpdated', sc.MOD_MENU_SORT_ORDER.LAST_UPDATED, sc.MOD_MENU_SORT_ORDER.LAST_UPDATED)
-
-        const bottomY = 285
+    },
+    initInstallButton(bottomY) {
         this.installButton = new sc.ButtonGui('', 128, true, sc.BUTTON_TYPE.SMALL)
         this.updateInstallButtonText()
         this.installButton.setPos(152, bottomY)
@@ -127,10 +158,8 @@ sc.ModMenu = sc.ListInfoMenu.extend({
         }
         this.installButton.submitSound = undefined
         this.addChildGui(this.installButton)
-        sc.menu.buttonInteract.addGlobalButton(this.installButton, () => sc.control.menuHotkeyHelp4())
-
-        this.inputField.hook.transitions['HIDDEN'] = this.installButton.hook.transitions['HIDDEN']
-
+    },
+    initUninstallButton(bottomY) {
         this.uninstallButton = new sc.ButtonGui('\\i[help2]' + Lang.uninstall, 85, true, sc.BUTTON_TYPE.SMALL)
         this.uninstallButton.setPos(390, bottomY)
         this.uninstallButton.onButtonPress = () => {
@@ -147,8 +176,8 @@ sc.ModMenu = sc.ListInfoMenu.extend({
         this.uninstallButton.submitSound = undefined
         this.uninstallButton.keepMouseFocus = true /* prevent the focus jumping all over the place on press */
         this.addChildGui(this.uninstallButton)
-        sc.menu.buttonInteract.addGlobalButton(this.uninstallButton, () => sc.control.menuHotkeyHelp2())
-
+    },
+    initCheckUpdatesButton(bottomY) {
         this.checkUpdatesButton = new sc.ButtonGui(Lang.checkUpdates, 100, true, sc.BUTTON_TYPE.SMALL)
         this.checkUpdatesButton.setPos(285, bottomY)
         this.checkUpdatesButton.onButtonPress = () => {
@@ -166,8 +195,8 @@ sc.ModMenu = sc.ListInfoMenu.extend({
         this.checkUpdatesButton.submitSound = undefined
         this.checkUpdatesButton.keepMouseFocus = true /* prevent the focus jumping all over the place on press */
         this.addChildGui(this.checkUpdatesButton)
-        sc.menu.buttonInteract.addGlobalButton(this.checkUpdatesButton, () => false)
-
+    },
+    initFiltersButton(bottomY) {
         this.filtersPopup = new sc.FiltersPopup()
         this.filtersButton = new sc.ButtonGui('\\i[menu]' + Lang.filtersButton, 80, true, sc.BUTTON_TYPE.SMALL)
         this.filtersButton.setPos(480, bottomY)
@@ -176,8 +205,8 @@ sc.ModMenu = sc.ListInfoMenu.extend({
         }
         this.filtersButton.keepMouseFocus = true /* prevent the focus jumping all over the place on press */
         this.addChildGui(this.filtersButton)
-        sc.menu.buttonInteract.addGlobalButton(this.filtersButton, () => sc.control.menu())
-
+    },
+    initTestingToggleButton() {
         this.testingToggleButton = new sc.ButtonGui('', 1 /* width will get dynamicly changed anyways */, true, sc.BUTTON_TYPE.SMALL)
         this.testingToggleButton.setAlign(ig.GUI_ALIGN.X_RIGHT, ig.GUI_ALIGN.Y_TOP)
         this.testingToggleButton.setPos(160, 22)
@@ -217,8 +246,8 @@ sc.ModMenu = sc.ListInfoMenu.extend({
         this.testingToggleButton.submitSound = undefined
         this.testingToggleButton.keepMouseFocus = true /* prevent the focus jumping all over the place on press */
         this.addChildGui(this.testingToggleButton)
-        sc.menu.buttonInteract.addGlobalButton(this.testingToggleButton, () => sc.control.quickmenuPress())
-
+    },
+    initOpenRepositoryUrlButton() {
         this.openRepositoryUrlButton = new sc.ButtonGui('\\i[special]' + Lang.openRepositoryUrl, 140, true, sc.BUTTON_TYPE.SMALL)
         this.openRepositoryUrlButton.setAlign(ig.GUI_ALIGN.X_RIGHT, ig.GUI_ALIGN.Y_TOP)
         this.openRepositoryUrlButton.setPos(10, 22)
@@ -237,17 +266,14 @@ sc.ModMenu = sc.ListInfoMenu.extend({
         this.openRepositoryUrlButton.submitSound = undefined
         this.openRepositoryUrlButton.keepMouseFocus = true /* prevent the focus jumping all over the place on press */
         this.addChildGui(this.openRepositoryUrlButton)
-        sc.menu.buttonInteract.addGlobalButton(this.openRepositoryUrlButton, () => {
-            /* R2 press */
-            return ig.input.pressed('special') || ig.gamepad.isButtonPressed(sc.control._getSpecialButton())
-        })
-
-        this.modSettingsButton = new sc.ButtonGui('\\i[left]' + Lang.modSettings, 140, true, sc.BUTTON_TYPE.SMALL)
-        this.modSettingsButton.setPos(7, bottomY)
-        this.modSettingsButton.doStateTransition('HIDDEN')
-        this.modSettingsButton.onButtonPress = () => {
+    },
+    initModOptionsButton(bottomY) {
+        this.modOptionsButton = new sc.ButtonGui('\\i[left]' + Lang.modSettings, 140, true, sc.BUTTON_TYPE.SMALL)
+        this.modOptionsButton.setPos(7, bottomY)
+        this.modOptionsButton.doStateTransition('HIDDEN')
+        this.modOptionsButton.onButtonPress = () => {
             const tryPress = (): boolean => {
-                if (this.modSettingsButton.hook.currentStateName != 'DEFAULT') return false
+                if (this.modOptionsButton.hook.currentStateName != 'DEFAULT') return false
                 const modEntry = this.getCurrentlyFocusedModEntry()!
                 const mod = modEntry.mod
 
@@ -258,15 +284,11 @@ sc.ModMenu = sc.ListInfoMenu.extend({
             }
             sc.BUTTON_SOUND[tryPress() ? 'submit' : 'denied'].play()
         }
-        this.modSettingsButton.submitSound = undefined
-        this.modSettingsButton.keepMouseFocus = true /* prevent the focus jumping all over the place on press */
-        this.addChildGui(this.modSettingsButton)
-        sc.menu.buttonInteract.addGlobalButton(this.modSettingsButton, () => {
-            return sc.control.leftPressed()
-        })
-
-        this.setTabEvent()
+        this.modOptionsButton.submitSound = undefined
+        this.modOptionsButton.keepMouseFocus = true /* prevent the focus jumping all over the place on press */
+        this.addChildGui(this.modOptionsButton)
     },
+
     showModInstallDialog() {
         this.list.tabGroup._invokePressCallbacks(this.list.tabs[Lang.selectedModsTab], true)
         ModInstallDialogs.showModInstallDialog()
@@ -294,7 +316,7 @@ sc.ModMenu = sc.ListInfoMenu.extend({
         sc.Model.addObserver(sc.modMenuGui, this)
     },
     removeObservers() {
-        sc.Model.addObserver(sc.modMenuGui, this)
+        sc.Model.removeObserver(sc.modMenuGui, this)
     },
     modelChanged(model, message, data) {
         this.parent(model, message, data)
@@ -317,13 +339,13 @@ sc.ModMenu = sc.ListInfoMenu.extend({
 
                 this.openRepositoryUrlButton.doStateTransition(entry.mod.repositoryUrl ? 'DEFAULT' : 'HIDDEN')
 
-                this.modSettingsButton.doStateTransition(sc.modMenu.optionConfigs[entry.mod.id] ? 'DEFAULT' : 'HIDDEN')
+                this.modOptionsButton.doStateTransition(sc.modMenu.optionConfigs[entry.mod.id] ? 'DEFAULT' : 'HIDDEN')
             } else if (message == sc.MOD_MENU_MESSAGES.ENTRY_UNFOCUSED) {
                 this.uninstallButton.setActive(false)
 
                 this.testingToggleButton.doStateTransition('HIDDEN')
                 this.openRepositoryUrlButton.doStateTransition('HIDDEN')
-                this.modSettingsButton.doStateTransition('HIDDEN')
+                this.modOptionsButton.doStateTransition('HIDDEN')
             }
         }
     },
@@ -344,7 +366,7 @@ sc.ModMenu = sc.ListInfoMenu.extend({
         if (!visible) {
             this.testingToggleButton.doStateTransition(state)
             this.openRepositoryUrlButton.doStateTransition(state)
-            this.modSettingsButton.doStateTransition(state)
+            this.modOptionsButton.doStateTransition(state)
         }
 
         const main = ig.gui.guiHooks.find(h => h.gui instanceof sc.MainMenu)?.gui as sc.MainMenu | undefined
@@ -352,19 +374,45 @@ sc.ModMenu = sc.ListInfoMenu.extend({
         if (main?.topBar) main.topBar.doStateTransition(state)
     },
     showMenu() {
+        clearTimeout(menuPurgeTimeoutId)
         this.parent()
         sc.menu.pushBackCallback(() => this.onBackButtonPress())
         sc.menu.moveLeaSprite(0, 0, sc.MENU_LEA_STATE.HIDDEN)
 
         this.setAllVisibility(true)
         this.setBlackBarVisibility(false)
+
+        /* this NOT is how it's supposed to work but it works so */
+        sc.menu.buttonInteract.addGlobalButton(this.inputField as any, () => false)
+
+        sc.menu.buttonInteract.addGlobalButton(this.installButton, () => sc.control.menuHotkeyHelp4())
+        sc.menu.buttonInteract.addGlobalButton(this.uninstallButton, () => sc.control.menuHotkeyHelp2())
+        sc.menu.buttonInteract.addGlobalButton(this.checkUpdatesButton, () => false)
+        sc.menu.buttonInteract.addGlobalButton(this.filtersButton, () => sc.control.menu())
+        sc.menu.buttonInteract.addGlobalButton(this.testingToggleButton, () => sc.control.quickmenuPress())
+        sc.menu.buttonInteract.addGlobalButton(this.openRepositoryUrlButton, () => {
+            /* R2 press */
+            return ig.input.pressed('special') || ig.gamepad.isButtonPressed(sc.control._getSpecialButton())
+        })
+        sc.menu.buttonInteract.addGlobalButton(this.modOptionsButton, () => {
+            return sc.control.leftPressed()
+        })
     },
-    hideMenu() {
+    hideMenu(_afterSubmenu, nextSubmenu) {
         this.parent()
         sc.menu.moveLeaSprite(0, 0, sc.MENU_LEA_STATE.LARGE)
         this.exitMenu()
         this.setAllVisibility(false)
         this.setBlackBarVisibility(true)
+
+        sc.menu.buttonInteract.removeGlobalButton(this.inputField as any)
+        sc.menu.buttonInteract.removeGlobalButton(this.installButton)
+        sc.menu.buttonInteract.removeGlobalButton(this.uninstallButton)
+        sc.menu.buttonInteract.removeGlobalButton(this.checkUpdatesButton)
+        sc.menu.buttonInteract.removeGlobalButton(this.filtersButton)
+        sc.menu.buttonInteract.removeGlobalButton(this.testingToggleButton)
+        sc.menu.buttonInteract.removeGlobalButton(this.openRepositoryUrlButton)
+        sc.menu.buttonInteract.removeGlobalButton(this.modOptionsButton)
 
         if (
             LocalMods.getAll().some(mod => mod.awaitingRestart) ||
@@ -375,6 +423,16 @@ sc.ModMenu = sc.ListInfoMenu.extend({
                     ModInstaller.restartGame()
                 }
             })
+        }
+
+        if (nextSubmenu != sc.MENU_SUBMENU.MOD_OPTIONS) {
+            /* purging the menu immediately would disable the smooth fade out transition */
+            menuPurgeTimeoutId = setTimeout(() => {
+                const mainMenu = getMainMenu()
+                mainMenu.removeChildGui(this)
+                this.removeObservers()
+                delete mainMenu.submenus[modsMenuId]
+            }, 1000)
         }
     },
     onBackButtonPress() {
@@ -411,7 +469,7 @@ sc.ModMenu = sc.ListInfoMenu.extend({
             tab: this.list.currentTabIndex,
             element: Vec2.create(this.list.currentList.buttonGroup.current),
         }
-        sc.menu.pushMenu(sc.MENU_SUBMENU.MOD_SETTINGS)
+        sc.menu.pushMenu(sc.MENU_SUBMENU.MOD_OPTIONS)
         sc.modSettingsMenu.updateEntries(mod)
     },
     openRepositoriesPopup() {
@@ -419,3 +477,12 @@ sc.ModMenu = sc.ListInfoMenu.extend({
         this.reposPopup.show()
     },
 })
+
+// @ts-expect-error
+sc.MENU_SUBMENU.MODS = Math.max(...Object.values(sc.MENU_SUBMENU)) + 1
+
+const modsMenuId = 'mods'
+sc.SUB_MENU_INFO[sc.MENU_SUBMENU.MODS] = {
+    Clazz: sc.ModMenu,
+    name: modsMenuId,
+}
