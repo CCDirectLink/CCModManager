@@ -1,7 +1,7 @@
 import { ModEntry } from '../types';
 import './list';
 import './filters';
-import './options/menu';
+import './options/mod-options-menu';
 declare global {
     namespace sc {
         enum MOD_MENU_SORT_ORDER {
@@ -24,11 +24,20 @@ declare global {
             uninstallButton: sc.ButtonGui;
             testingToggleButton: sc.ButtonGui;
             openRepositoryUrlButton: sc.ButtonGui;
-            modSettingsButton: sc.ButtonGui;
+            modOptionsButton: sc.ButtonGui;
             checkUpdatesButton: sc.ButtonGui;
             filtersButton: sc.ButtonGui;
             filtersPopup: sc.FiltersPopup;
             reposPopup: sc.ModMenuRepoAddPopup;
+            initInputField(this: this): void;
+            initSortMenu(this: this): void;
+            initInstallButton(this: this, bottomY: number): void;
+            initUninstallButton(this: this, bottomY: number): void;
+            initCheckUpdatesButton(this: this, bottomY: number): void;
+            initFiltersButton(this: this, bottomY: number): void;
+            initTestingToggleButton(this: this): void;
+            initOpenRepositoryUrlButton(this: this): void;
+            initModOptionsButton(this: this, bottomY: number): void;
             setBlackBarVisibility(this: this, visible: boolean): void;
             setAllVisibility(this: this, visible: boolean): void;
             updateInstallButtonText(this: this): void;

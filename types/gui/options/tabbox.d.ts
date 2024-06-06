@@ -3,9 +3,6 @@ import { ModEntry } from '../../types';
 export {};
 declare global {
     namespace sc {
-        interface MenuModel {
-            optionLastButtonData: sc.ModSettingsTabBox.TabButton['data'];
-        }
         namespace ModSettingsTabBox {
             type GuiOption = sc.OptionInfoBox | sc.ModOptionsOptionRow | sc.ModOptionsOptionButton;
         }
@@ -14,6 +11,8 @@ declare global {
             mod: ModEntry;
             conf: ModSettingsGui;
             opts: Record<string, any>;
+            currentTab: number;
+            lastButtonData: sc.ModSettingsTabBox.TabButton['data'];
             prevIndex: number;
             tabs: Record<string, sc.ModSettingsTabBox.TabButton>;
             tabArray: sc.ModSettingsTabBox.TabButton[];

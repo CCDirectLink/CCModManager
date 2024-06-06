@@ -11,6 +11,7 @@ export type Option = {
 type BUTTON_GROUP = OptionChangeable & {
     type: 'BUTTON_GROUP';
     init: number;
+    buttonNames?: string[];
 } & ({
     enum: Enum;
     group?: string[];
@@ -75,9 +76,9 @@ export interface CategorySettings {
     title: string;
     tabIcon?: string;
 }
-type FlattenOptions<T extends Options> = T extends Record<string, infer U> ? (U extends Category ? (U['headers'] extends Record<infer K1 extends string, infer V extends Record<string, Record<string, unknown>>> ? {
+type FlattenOptions<T extends Options> = T extends Record<string, infer U> ? (U extends Category ? (U['headers'] extends Record<string, infer V extends Record<string, Record<string, unknown>>> ? {
     -readonly [K in keyof V]: K extends string ? (V[K] & {
-        id: `${K1}-${K}`;
+        id: string;
     }) : never;
 } : never) : never) : never;
 type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends ((k: infer I) => void) ? I : never;
@@ -105,6 +106,7 @@ export declare namespace ModOptionsSettings {
     type LanguageGetter = (category: string, header: string, optionId: string, option: Option) => {
         name: string;
         description: string;
+        buttonNames?: string[];
     };
 }
 export interface ModOptionsSettings {

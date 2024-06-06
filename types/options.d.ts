@@ -1,4 +1,5 @@
-export declare const opts: {
+export declare let Opts: ReturnType<typeof sc.modMenu.registerAndGetModOptions<ReturnType<typeof registerOpts>>>;
+export declare function registerOpts(): {
     readonly general: {
         readonly settings: {
             readonly tabIcon: "general";
@@ -32,5 +33,3 @@ export declare const opts: {
         };
     };
 };
-export declare let Opts: ReturnType<typeof sc.modMenu.registerAndGetModOptions<typeof opts>>;
-export declare function registerOpts(): void;
