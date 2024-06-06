@@ -36,24 +36,17 @@ declare global {
         }
         var ModMenuList: ModMenuListConstructor
 
-        enum MOD_MENU_TAB_INDEXES {
-            ONLINE,
-            SELECTED,
-            ENABLED,
-            DISABLED,
+        var MOD_MENU_TAB_INDEXES: {
+            ONLINE: number
+            SELECTED: number
+            ENABLED: number
+            DISABLED: number
         }
     }
 }
 
 export const modMenuListWidth = 552
 const modMenuListHeight = 240
-
-sc.MOD_MENU_TAB_INDEXES = {
-    ONLINE: 0,
-    SELECTED: 1,
-    ENABLED: 2,
-    DISABLED: 3,
-}
 
 sc.ModMenuList = sc.ListTabbedPane.extend({
     transitions: {
@@ -67,11 +60,34 @@ sc.ModMenuList = sc.ListTabbedPane.extend({
         this.gridColumns = 3
 
         this.tabz = [
-            { name: Lang.onlineTab, populateFunc: this.populateOnline, icon: 'mod-icon-online' },
-            { name: Lang.selectedModsTab, populateFunc: this.populateSelected, icon: 'mod-icon-selected' },
-            { name: Lang.enabledTab, populateFunc: this.populateEnabled, icon: 'mod-icon-enabled' },
-            { name: Lang.disabledTab, populateFunc: this.populateDisabled, icon: 'mod-icon-disabled' },
+            ...(!ig.isdemo
+                ? [
+                      { name: Lang.onlineTab, populateFunc: this.populateOnline, icon: 'mod-icon-online' },
+                      { name: Lang.selectedModsTab, populateFunc: this.populateSelected, icon: 'mod-icon-selected' },
+                  ]
+                : []),
+            ...[
+                { name: Lang.enabledTab, populateFunc: this.populateEnabled, icon: 'mod-icon-enabled' },
+                { name: Lang.disabledTab, populateFunc: this.populateDisabled, icon: 'mod-icon-disabled' },
+            ],
         ]
+        if (!ig.isdemo) {
+            sc.MOD_MENU_TAB_INDEXES = {
+                ONLINE: 0,
+                SELECTED: 1,
+                ENABLED: 2,
+                DISABLED: 3,
+            }
+        } else {
+            sc.MOD_MENU_TAB_INDEXES = {
+                ENABLED: 0,
+                DISABLED: 1,
+
+                ONLINE: 1000,
+                SELECTED: 1000,
+            }
+        }
+
         this.filters = {}
         this.currentSort = this.onInitSortType()
 
@@ -84,9 +100,13 @@ sc.ModMenuList = sc.ListTabbedPane.extend({
             this.addTab(this.tabz[i].name, i, {})
         }
 
-        ModDB.loadAllMods(() => {
+        if (!ig.isdemo) {
+            ModDB.loadAllMods(() => {
+                LocalMods.refreshOrigin().then(() => this.reloadEntries())
+            }, true)
+        } else {
             LocalMods.refreshOrigin().then(() => this.reloadEntries())
-        }, true)
+        }
     },
     show() {
         this.parent()
