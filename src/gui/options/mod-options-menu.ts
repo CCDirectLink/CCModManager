@@ -1,5 +1,5 @@
 import { ModEntry } from '../../types'
-import { ModOptionsSettings } from '../../mod-options'
+import { GuiOption, ModOptionsSettings } from '../../mod-options'
 
 declare global {
     namespace sc {
@@ -180,7 +180,21 @@ sc.ModOptionsMenu = sc.BaseMenu.extend({
         smb.text.setText(this.mod.name)
     },
     resetOptionsToDefault() {
-        // TODO: this
+        const options = sc.modMenu.options[this.mod.id]
+        const optionsToReset = Object.getOwnPropertyNames(options).filter(e => e != 'flatOpts')
+        for (const optName of optionsToReset) {
+            const optConfig: GuiOption = options.flatOpts[optName]
+            if (!('init' in optConfig)) throw new Error('what')
+            options[optName] = optConfig.init
+        }
+
+        /* re-open the menu to update the option guis with the new values */
+        sc.menu.popMenu()
+        const mainMenu = getMainMenu()
+        mainMenu.removeChildGui(this)
+        delete mainMenu.submenus[modOptionsMenuId]
+        sc.menu.pushMenu(sc.MENU_SUBMENU.MOD_OPTIONS)
+        sc.modSettingsMenu.updateEntries(this.mod)
     },
 })
 

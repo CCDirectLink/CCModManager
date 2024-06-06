@@ -1,5 +1,7 @@
 import { Lang } from './lang-manager'
+import { LocalMods } from './local-mods'
 import type { Options, Option } from './mod-options'
+import { ModDB } from './moddb'
 
 export let Opts: ReturnType<typeof sc.modMenu.registerAndGetModOptions<ReturnType<typeof registerOpts>>>
 
@@ -25,6 +27,13 @@ export function registerOpts() {
                     repositories: {
                         type: 'JSON_DATA',
                         init: ['@krypciak', '@krypciak/CCModDB/testing'] as string[],
+                        changeEvent() {
+                            ModDB.loadDatabases(true)
+
+                            ModDB.loadAllMods(() => {
+                                LocalMods.refreshOrigin()
+                            }, false)
+                        },
                     },
                     testingOptInMods: {
                         type: 'JSON_DATA',

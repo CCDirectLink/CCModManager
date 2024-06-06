@@ -179,10 +179,5 @@ sc.ModMenuRepoAddPopup = ig.GuiElementBase.extend({
             this.isOkTexts[i].setText('')
         }
         ModDB.saveDatabases()
-        ModDB.loadDatabases(true)
-
-        ModDB.loadAllMods(() => {
-            LocalMods.refreshOrigin()
-        }, false)
     },
 })

@@ -1,6 +1,6 @@
 export type Enum = Record<string, number>
 
-interface OptionChangeable {
+export interface OptionChangeable {
     restart?: boolean
     changeEvent?: () => void
 }

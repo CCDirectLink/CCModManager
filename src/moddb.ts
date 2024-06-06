@@ -24,7 +24,6 @@ export class ModDB {
         for (const url of urls) {
             ModDB.addDatabase(new ModDB(url))
         }
-        this.saveDatabases()
 
         ModDB.testingOptInModIds = new Set(Opts.testingOptInMods)
     }
