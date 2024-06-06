@@ -1,7 +1,8 @@
 import { ModEntry } from '../../types';
+import { ModOptionsSettings } from '../../mod-options';
 declare global {
     namespace sc {
-        interface ModSettingsMenu extends sc.BaseMenu {
+        interface ModSettingsMenu extends sc.BaseMenu, sc.Model.Observer {
             mod: ModEntry;
             helpGui: sc.HelpScreen;
             hotkeyHelp: sc.ButtonGui;
@@ -12,6 +13,8 @@ declare global {
             initListBox(this: this): void;
             createHelpGui(this: this): void;
             commitHotKeysToTopBar(this: this, longTransition?: boolean): void;
+            getHelpMenuLangData(this: this): ModOptionsSettings['helpMenu'];
+            updateHelpButtonVisibility(this: this): void;
             updateEntries(this: this, mod: ModEntry): void;
             resetOptionsToDefault(this: this): void;
         }

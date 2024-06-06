@@ -18,6 +18,7 @@ export declare function registerOpts(): {
                 readonly repositories: {
                     readonly type: "JSON_DATA";
                     readonly init: string[];
+                    readonly changeEvent: () => void;
                 };
                 readonly testingOptInMods: {
                     readonly type: "JSON_DATA";

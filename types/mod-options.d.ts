@@ -1,5 +1,5 @@
 export type Enum = Record<string, number>;
-interface OptionChangeable {
+export interface OptionChangeable {
     restart?: boolean;
     changeEvent?: () => void;
 }
@@ -75,6 +75,7 @@ export type CategoryOptions = Record<string, Record<string, Option>>;
 export interface CategorySettings {
     title: string;
     tabIcon?: string;
+    helpMenu?: ModOptionsSettings['helpMenu'];
 }
 type FlattenOptions<T extends Options> = T extends Record<string, infer U> ? (U extends Category ? (U['headers'] extends Record<string, infer V extends Record<string, Record<string, unknown>>> ? {
     -readonly [K in keyof V]: K extends string ? (V[K] & {
