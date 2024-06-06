@@ -4,9 +4,6 @@ import { ModEntry } from '../../types'
 export {}
 declare global {
     namespace sc {
-        interface MenuModel {
-            optionLastButtonData: sc.ModSettingsTabBox.TabButton['data']
-        }
         namespace ModSettingsTabBox {
             type GuiOption = sc.OptionInfoBox | sc.ModOptionsOptionRow | sc.ModOptionsOptionButton
         }
@@ -17,6 +14,8 @@ declare global {
             conf: ModSettingsGui
             opts: Record<string, any>
 
+            currentTab: number
+            lastButtonData: sc.ModSettingsTabBox.TabButton['data']
             prevIndex: number
             tabs: Record<string, sc.ModSettingsTabBox.TabButton>
             tabArray: sc.ModSettingsTabBox.TabButton[]
@@ -97,7 +96,7 @@ sc.ModSettingsTabBox = ig.GuiElementBase.extend({
 
                 this._resetButtons(button)
                 this._rearrangeTabs()
-                sc.menu.optionLastButtonData = button.data
+                this.lastButtonData = button.data
                 for (let b = this.tabArray.length; b--; )
                     if (button == this.tabArray[b]) {
                         // this._refocusFromCycle = b
@@ -160,7 +159,7 @@ sc.ModSettingsTabBox = ig.GuiElementBase.extend({
             const categorySettings = this.conf.structure[category].settings
             this.tabs[category] = this._createTabButton(categorySettings.title, tabIndex++, category, categorySettings.tabIcon)
         }
-        sc.menu.optionCurrentTab = 0
+        this.currentTab = 0
         this.tabGroup.setCurrentFocus(0, 0)
         const firstTab = this.tabArray[0]
         if (firstTab) {
@@ -169,8 +168,8 @@ sc.ModSettingsTabBox = ig.GuiElementBase.extend({
         }
         this._rearrangeTabs()
 
-        const lastButtonData = (sc.menu.optionLastButtonData = this.tabArray[0].data)
-        this._createCacheList(lastButtonData.type, ig.input.mouseGuiActive, true)
+        this.lastButtonData = this.tabArray[0].data
+        this._createCacheList(this.lastButtonData.type, ig.input.mouseGuiActive, true)
     },
     _createTabButton(title, x, categoryId, icon) {
         const tabWidth = Math.max(90, sc.fontsystem.font.getTextDimensions(title).x + 35)
@@ -190,7 +189,7 @@ sc.ModSettingsTabBox = ig.GuiElementBase.extend({
             this.list.deactivate()
             this.list.doStateTransition('HIDDEN', true)
         }
-        const currentTabIndex = sc.menu.optionCurrentTab
+        const currentTabIndex = this.currentTab
         let tabContent = this.tabContent[currentTabIndex]
         if (tabContent) {
             this.list = tabContent.list!
@@ -292,7 +291,7 @@ sc.ModSettingsTabBox = ig.GuiElementBase.extend({
     },
 
     onButtonTraversal() {
-        let tabIndex = sc.menu.optionCurrentTab
+        let tabIndex = this.currentTab
         let tab = this.tabArray[tabIndex]
         let moveAmount = -1
         if (sc.control.menuCircleRight()) {
@@ -314,8 +313,10 @@ sc.ModSettingsTabBox = ig.GuiElementBase.extend({
             tab.setPressed(true)
             this._resetButtons(tab, true)
             this._rearrangeTabs()
-            sc.menu.optionLastButtonData = tab.data
-            sc.menu.setOptionTab(tabIndex)
+            this.lastButtonData = tab.data
+
+            this.currentTab = tabIndex
+            sc.Model.notifyObserver(sc.menu, sc.MENU_EVENT.OPTION_CHANGED_TAB)
         }
     },
     _resetButtons(tabButton, unfocus) {
@@ -354,7 +355,7 @@ sc.ModSettingsTabBox = ig.GuiElementBase.extend({
     modelChanged(model, message, _data) {
         if (model == sc.menu) {
             if (message == sc.MENU_EVENT.OPTION_CHANGED_TAB) {
-                this._createCacheList(sc.menu.optionLastButtonData.type, ig.input.mouseGuiActive, !ig.input.mouseGuiActive)
+                this._createCacheList(this.lastButtonData.type, ig.input.mouseGuiActive, !ig.input.mouseGuiActive)
             }
         }
     },
