@@ -226,10 +226,9 @@ sc.ModSettingsTabBox = ig.GuiElementBase.extend({
                 button.data && sc.menu.setInfoText(button.data.description ? button.data.description : button.data)
             })
             this.rowButtonGroup.setLeftRightCallback((stepRight, rowIndex) => {
-                if (this.rows[rowIndex]) {
-                    const row = this.rows[rowIndex] as sc.ModOptionsOptionRow
-                    row.onLeftRight(stepRight)
-                }
+                const row = this.rows[rowIndex] as sc.ModOptionsOptionRow
+                if (!row) return false
+                return row.onLeftRight(stepRight)
             })
             this.rowButtonGroup.addPressCallback(_button => {
                 const button = _button as ig.FocusGui & { data?: { row: number } }
