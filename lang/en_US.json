@@ -20,12 +20,18 @@
     },
     "help": {
         "options": {
-            "title": "CCModManager options",
+            "title": "Mod Manager options",
             "pages": [
                 {
                     "title": "Option: \\c[3]Enable autoupdate\\c[0]",
                     "content": [
                         "When it's on, after the game starts the mod manager will check if there are any mods to update.\n If it finds any, it will display a pop-up message asking if you want to update."
+                    ]
+                },
+                {
+                    "title": "Option: \\c[3]Repositories\\c[0]",
+                    "content": [
+                        "You can add custom repositories by clicking the \\c[3]Repositories\\c[0] button.\n A popup will show up with input fields where you can type the repository URL's.\n Repositories tell the mod manager what mods are available for installation."
                     ]
                 }
             ]
