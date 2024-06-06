@@ -106,6 +106,7 @@ export type CategoryOptions = Record<string, Record<string, Option>>
 export interface CategorySettings {
     title: string
     tabIcon?: string
+    helpMenu?: ModOptionsSettings['helpMenu']
 }
 
 // prettier-ignore

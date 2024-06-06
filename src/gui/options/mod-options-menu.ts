@@ -1,8 +1,9 @@
 import { ModEntry } from '../../types'
+import { ModOptionsSettings } from '../../mod-options'
 
 declare global {
     namespace sc {
-        interface ModSettingsMenu extends sc.BaseMenu {
+        interface ModSettingsMenu extends sc.BaseMenu, sc.Model.Observer {
             mod: ModEntry
 
             helpGui: sc.HelpScreen
@@ -15,6 +16,9 @@ declare global {
             initListBox(this: this): void
             createHelpGui(this: this): void
             commitHotKeysToTopBar(this: this, longTransition?: boolean): void
+
+            getHelpMenuLangData(this: this): ModOptionsSettings['helpMenu']
+            updateHelpButtonVisibility(this: this): void
 
             updateEntries(this: this, mod: ModEntry): void
             resetOptionsToDefault(this: this): void
@@ -59,7 +63,7 @@ sc.ModOptionsMenu = sc.BaseMenu.extend({
             HIDDEN: { state: { offsetY: -this.hotkeyHelp.hook.size.y }, time: 0.2, timeFunction: KEY_SPLINES.LINEAR },
         }
         this.hotkeyHelp.onButtonPress = () => {
-            if (!this.listBox.conf.settings.helpMenu) return
+            if (!this.getHelpMenuLangData()) return
             sc.BUTTON_SOUND.submit.play()
             sc.menu.removeHotkeys()
             this.createHelpGui()
@@ -89,9 +93,11 @@ sc.ModOptionsMenu = sc.BaseMenu.extend({
         this.addChildGui(this.listBox)
     },
     addObservers() {
+        sc.Model.addObserver(sc.menu, this)
         this.listBox.addObservers()
     },
     removeObservers() {
+        sc.Model.removeObserver(sc.menu, this)
         this.listBox.removeObservers()
     },
     showMenu(previousMenu, prevSubmenu) {
@@ -128,30 +134,45 @@ sc.ModOptionsMenu = sc.BaseMenu.extend({
         }, 1000)
     },
     commitHotKeysToTopBar(longTransition) {
-        if (this.listBox.conf.settings.helpMenu) sc.menu.addHotkey(() => this.hotkeyHelp)
+        if (this.getHelpMenuLangData()) sc.menu.addHotkey(() => this.hotkeyHelp)
         sc.menu.addHotkey(() => this.hotkeyDefault)
         sc.menu.commitHotkeys(longTransition)
     },
+
+    getHelpMenuLangData() {
+        const currenTabSettings = Object.values(this.listBox.conf.structure)[this.listBox.currentTab].settings.helpMenu
+        return currenTabSettings ?? this.listBox.conf.settings.helpMenu
+    },
     createHelpGui() {
-        if (!this.helpGui && this.listBox.conf.settings.helpMenu) {
-            this.helpGui = new sc.HelpScreen(
-                this,
-                this.listBox.conf.settings.helpMenu.title,
-                this.listBox.conf.settings.helpMenu.pages,
-                () => this.commitHotKeysToTopBar(true),
-                true
-            )
+        const langData = this.getHelpMenuLangData()
+        if (langData) {
+            this.helpGui = new sc.HelpScreen(this, langData.title, langData.pages, () => this.commitHotKeysToTopBar(true), true)
             this.helpGui.hook.zIndex = 15e4
             this.helpGui.hook.pauseGui = true
         }
     },
+    modelChanged(model, message, _data) {
+        if (model == sc.menu && message == sc.MENU_EVENT.OPTION_CHANGED_TAB) {
+            this.updateHelpButtonVisibility()
+        }
+    },
+    updateHelpButtonVisibility() {
+        const hasHelp = !!this.getHelpMenuLangData()
+        const newState = hasHelp ? 'DEFAULT' : 'HIDDEN'
+
+        if (this.hotkeyHelp.hook.currentStateName != newState) {
+            this.hotkeyHelp.doStateTransition(newState)
+            sc.menu.removeHotkeys()
+            this.commitHotKeysToTopBar()
+        }
+    },
+
     updateEntries(mod: ModEntry) {
         this.mod = mod
         this.listBox.updateEntries(mod)
         this.commitHotKeysToTopBar()
-        if (this.listBox.conf.settings.helpMenu) {
-            this.hotkeyHelp.doStateTransition('DEFAULT')
-        }
+
+        this.updateHelpButtonVisibility()
 
         const smb = getMainMenu()
             .menuDisplay.hook.children.filter(h => h.gui instanceof sc.MainMenu.SubMenuBox)

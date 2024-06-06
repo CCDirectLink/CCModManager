@@ -150,7 +150,6 @@ sc.ModSettingsTabBox = ig.GuiElementBase.extend({
         this.tabArray = []
         this.tabGroup?.clear()
         this.rows = []
-        // this.rowButtonGroup?.clear()
         this.tabContent = []
         this.list?.clear()
 
