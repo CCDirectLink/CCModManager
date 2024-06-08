@@ -97,10 +97,11 @@ sc.ModSettingsTabBox = ig.GuiElementBase.extend({
                 this._resetButtons(button)
                 this._rearrangeTabs()
                 this.lastButtonData = button.data
-                for (let b = this.tabArray.length; b--; )
-                    if (button == this.tabArray[b]) {
+                for (let i = this.tabArray.length; i--; )
+                    if (button == this.tabArray[i]) {
                         // this._refocusFromCycle = b
-                        sc.menu.setOptionTab(b)
+                        this.currentTab = i
+                        sc.Model.notifyObserver(sc.menu, sc.MENU_EVENT.OPTION_CHANGED_TAB)
                         break
                     }
                 ig.input.mouseGuiActive && sc.menu.setInfoText('')
