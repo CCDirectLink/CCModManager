@@ -148,6 +148,7 @@ type OmitNonChangeableToUnion<E extends Options, F extends Record<string, any> =
     [T in keyof F]: 
           F[T]['type'] extends 'BUTTON' ? never
         : F[T]['type'] extends 'INFO' ? never
+        : F[T]['type'] extends 'CONTROLS' ? never
         // @ts-expect-error
         : F[T] & { key: `${T}` }
     }[keyof F]
