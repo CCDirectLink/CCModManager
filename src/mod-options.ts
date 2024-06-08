@@ -332,9 +332,15 @@ function registerAndGetModOptions<T extends Options>(settings: ModOptionsSetting
 }
 
 export function modOptionsPrestart() {
-    for (const controlConfig of controlsToSet) {
-        sc.OPTIONS_DEFINITION[controlConfig.id] = controlConfig as any
-    }
+    sc.CrossCode.inject({
+        init() {
+            /* register the keybindings right before sc.KeyBinder#initKeybindings steps in */
+            for (const controlConfig of controlsToSet) {
+                sc.OPTIONS_DEFINITION[controlConfig.id] = controlConfig as any
+            }
+            this.parent()
+        },
+    })
 }
 export function modOptionsPoststart() {
     ig.game.addons.preUpdate.push({
