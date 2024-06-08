@@ -1,5 +1,4 @@
 import { GuiOption } from '../../mod-options';
-export {};
 declare global {
     namespace sc {
         interface ModOptionsOptionInfoBox extends ig.GuiElementBase {

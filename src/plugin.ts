@@ -10,6 +10,7 @@ import './add-prototypes'
 import './mod-options'
 
 import { Opts, registerOpts } from './options'
+import { modOptionsPoststart, modOptionsPrestart } from './mod-options'
 
 export default class ModManager {
     static dir: string
@@ -40,9 +41,11 @@ export default class ModManager {
                 }
             },
         })
+        modOptionsPrestart()
     }
 
     async poststart() {
+        modOptionsPoststart()
         this.lang.poststart()
     }
 }

@@ -16,7 +16,7 @@ export type Option = {
     | ARRAY_SLIDER
     | OBJECT_SILDER
     | CHECKBOX
-    | sc.OptionDefinition.CONTROLS
+    | CONTROLS
     | INFO
     | BUTTON
     | JSON_DATA
@@ -81,6 +81,17 @@ interface BUTTON {
 interface JSON_DATA extends OptionChangeable {
     type: 'JSON_DATA'
     init: any
+}
+
+interface CONTROLS {
+    type: 'CONTROLS'
+    init: { key1: ig.KEY; key2?: ig.KEY }
+
+    pressEvent?: () => void
+    holdEvent?: () => void
+    global?: boolean
+
+    data?: undefined /* typescript is mad for some reason when i remove this line */
 }
 /* options types end */
 
@@ -225,6 +236,8 @@ sc.modMenu ??= {} as any
 sc.modMenu.options ??= {} as any
 sc.modMenu.optionConfigs ??= {} as any
 
+const controlsToSet: (GuiOption & { type: 'CONTROLS' })[] = []
+
 sc.modMenu.registerAndGetModOptions = registerAndGetModOptions
 function registerAndGetModOptions<T extends Options>(settings: ModOptionsSettings, options: T): OptsType<T> {
     const Opts: OptsType<T> = {} as any
@@ -252,7 +265,7 @@ function registerAndGetModOptions<T extends Options>(settings: ModOptionsSetting
 
             let isFirstOption: boolean = true
             ;(Object.entriesT(optionEntries) as [keyof FlatOpts<T>, Option][]).forEach(([optKey, option], optKeyI) => {
-                const id = `${settings.modId}-${optKey as string}`
+                const id = (option.type == 'CONTROLS' ? 'keys-' : '') + `${settings.modId}-${optKey as string}`
 
                 /* register gui option */
                 const guiOption: GuiOption = Object.assign(option, {
@@ -288,7 +301,9 @@ function registerAndGetModOptions<T extends Options>(settings: ModOptionsSetting
                 guiStructureHeader[optKeyI] = guiOption
                 /* register gui option end */
 
-                if (guiOption.type != 'INFO' && guiOption.type != 'BUTTON') {
+                if (guiOption.type == 'CONTROLS') controlsToSet.push(guiOption)
+
+                if (guiOption.type != 'CONTROLS' && guiOption.type != 'INFO' && guiOption.type != 'BUTTON') {
                     const get = function (pure?: boolean) {
                         let v = localStorage.getItem(id)!
                         if (pure) return v
@@ -314,4 +329,27 @@ function registerAndGetModOptions<T extends Options>(settings: ModOptionsSetting
 
     sc.modMenu.options[settings.modId] = Opts
     return Opts
+}
+
+export function modOptionsPrestart() {
+    for (const controlConfig of controlsToSet) {
+        sc.OPTIONS_DEFINITION[controlConfig.id] = controlConfig as any
+    }
+}
+export function modOptionsPoststart() {
+    ig.game.addons.preUpdate.push({
+        onPreUpdate() {
+            const isInGame = sc.model.currentState == sc.GAME_MODEL_STATE.GAME && ig.interact.entries.length == 0
+            for (const controlConfig of controlsToSet) {
+                if (!controlConfig.global && !isInGame) continue
+                const id = controlConfig.id.substring('keys-'.length)
+                if (controlConfig.pressEvent && ig.input.pressed(id)) {
+                    controlConfig.pressEvent()
+                }
+                if (controlConfig.holdEvent && ig.input.state(id)) {
+                    controlConfig.holdEvent()
+                }
+            }
+        },
+    })
 }

@@ -7,7 +7,7 @@ export type Option = {
     name?: ig.LangLabel.Data;
     description?: ig.LangLabel.Data;
     hidden?: boolean | (() => boolean);
-} & (BUTTON_GROUP | ARRAY_SLIDER | OBJECT_SILDER | CHECKBOX | sc.OptionDefinition.CONTROLS | INFO | BUTTON | JSON_DATA);
+} & (BUTTON_GROUP | ARRAY_SLIDER | OBJECT_SILDER | CHECKBOX | CONTROLS | INFO | BUTTON | JSON_DATA);
 type BUTTON_GROUP = OptionChangeable & {
     type: 'BUTTON_GROUP';
     init: number;
@@ -55,6 +55,17 @@ interface BUTTON {
 interface JSON_DATA extends OptionChangeable {
     type: 'JSON_DATA';
     init: any;
+}
+interface CONTROLS {
+    type: 'CONTROLS';
+    init: {
+        key1: ig.KEY;
+        key2?: ig.KEY;
+    };
+    pressEvent?: () => void;
+    holdEvent?: () => void;
+    global?: boolean;
+    data?: undefined;
 }
 export type GuiOption = Option & {
     id: string;
@@ -138,4 +149,6 @@ export type ModSettingsGuiStructureCategory = {
     settings: ModSettingsGuiStructureCategorySettings;
     headers: Record<string, Record<string, GuiOption>>;
 };
+export declare function modOptionsPrestart(): void;
+export declare function modOptionsPoststart(): void;
 export {};

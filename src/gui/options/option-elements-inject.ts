@@ -111,7 +111,6 @@ sc.OPTION_GUIS[sc.OPTION_TYPES.CHECKBOX].inject({
     },
 })
 
-export {}
 declare global {
     namespace sc {
         interface ModOptionsOptionInfoBox extends ig.GuiElementBase {
@@ -183,5 +182,25 @@ sc.ModOptionsOptionButton = ig.GuiElementBase.extend({
         this.addChildGui(this.button)
 
         rowGroup.addFocusGui(this.button, 0, y)
+    },
+})
+
+sc.OPTION_GUIS[sc.OPTION_TYPES.CONTROLS].inject({
+    init(optionRow, x, rowGroup) {
+        if (!(optionRow instanceof sc.ModOptionsOptionRow)) return this.parent(optionRow, x, rowGroup)
+
+        const backup_ig_lang_get = ig.lang.get
+        // @ts-expect-error
+        ig.lang.get = (path: string, ...args) => {
+            if (!(optionRow instanceof sc.ModOptionsOptionRow)) throw new Error('what')
+            if (path == 'sc.gui.options.controls.none') return backup_ig_lang_get.bind(ig.lang)(path, ...args)
+            if (path == 'sc.gui.options.controls.description') return optionRow.guiOption.description
+            if (path.startsWith('sc.gui.options.controls.keys.')) return optionRow.guiOption.name
+            throw new Error('what')
+        }
+
+        this.parent(optionRow, x, rowGroup)
+
+        ig.lang.get = backup_ig_lang_get
     },
 })
