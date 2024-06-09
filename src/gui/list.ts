@@ -174,11 +174,20 @@ sc.ModMenuList = sc.ListTabbedPane.extend({
             this.currentList.buttonGroup.selectionType = ig.BUTTON_GROUP_SELECT_TYPE.ALL
 
             /* apparently rfg cannot make a 3+ column pane display propely so here it is */
-            this.currentList._getContentHeight = function (this: sc.ButtonListBox, _idontneedthis: boolean) {
+            this.currentList._getContentHeight = function (this: sc.ButtonListBox, _isNotFirstCollumn: boolean) {
                 const elements = this.contentPane.hook.children
                 const elementBelow = elements[elements.length - this.columns]
                 if (elementBelow) return elementBelow.pos.y + elementBelow.size.y
                 return this.paddingTop
+            }
+            /* fix last few elements getting cut off when grid mode is on */
+            this.currentList._setContentHeight = function (this: sc.ButtonListBox, height: number) {
+                const children = this.contentPane.hook.children
+                if (children.length % this.columns != 0) {
+                    height += children.last().size.y
+                }
+                this.contentPane.hook.size.y = height
+                this.recalculateScrollBars()
             }
         }
 
