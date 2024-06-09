@@ -34,6 +34,7 @@ type OBJECT_SILDER = OptionChangeable & {
     snap?: boolean;
     fill?: boolean;
     showPercentage?: boolean;
+    customNumberDisplay?: (index: number) => number | string;
 } & ({
     min: number;
     max: number;

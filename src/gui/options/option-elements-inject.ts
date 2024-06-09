@@ -76,6 +76,20 @@ sc.OPTION_GUIS[sc.OPTION_TYPES.OBJECT_SLIDER].inject({
         this.slider.setValue(val)
         this.onChange(this.slider.getValue())
     },
+    updateNumberDisplay() {
+        if (!(this.base instanceof sc.ModOptionsOptionRow)) return this.parent()
+        if (this.base.guiOption.type != 'OBJECT_SLIDER') throw new Error('what')
+
+        const func = this.base.guiOption.customNumberDisplay
+        if (func) {
+            const ret = func(this._lastVal)
+            if (this.currentNumber instanceof sc.TextGui) this.currentNumber.setText(ret as string)
+            else if (this.currentNumber instanceof sc.NumberGui) this.currentNumber.setNumber(ret as number)
+            return
+        }
+
+        return this.parent()
+    },
 })
 
 sc.OPTION_GUIS[sc.OPTION_TYPES.ARRAY_SLIDER].inject({
