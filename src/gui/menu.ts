@@ -470,7 +470,7 @@ sc.ModMenu = sc.ListInfoMenu.extend({
             element: Vec2.create(this.list.currentList.buttonGroup.current),
         }
         sc.menu.pushMenu(sc.MENU_SUBMENU.MOD_OPTIONS)
-        sc.modSettingsMenu.updateEntries(mod)
+        sc.modOptionsMenu.updateEntries(mod)
     },
     openRepositoriesPopup() {
         if (!this.reposPopup) this.reposPopup = new sc.ModMenuRepoAddPopup()

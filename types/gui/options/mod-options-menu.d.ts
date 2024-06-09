@@ -17,12 +17,13 @@ declare global {
             updateHelpButtonVisibility(this: this): void;
             updateEntries(this: this, mod: ModEntry): void;
             resetOptionsToDefault(this: this): void;
+            reopenMenu(this: this): void;
         }
         interface ModSettingsMenuConstructor extends ImpactClass<ModSettingsMenu> {
             new (): ModSettingsMenu;
         }
         var ModOptionsMenu: ModSettingsMenuConstructor;
-        var modSettingsMenu: ModSettingsMenu;
+        var modOptionsMenu: ModSettingsMenu;
         enum MENU_SUBMENU {
             MOD_OPTIONS = 375943
         }

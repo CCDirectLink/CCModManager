@@ -2,6 +2,7 @@ export type Enum = Record<string, number>;
 export interface OptionChangeable {
     restart?: boolean;
     changeEvent?: () => void;
+    updateMenuOnChange?: boolean;
 }
 export type Option = {
     name?: ig.LangLabel.Data;
@@ -99,7 +100,7 @@ type FlattenUnion<T> = {
 };
 type FlatOpts<T extends Options> = FlattenUnion<FlattenOptions<T>>;
 type OmitNonChangeableToUnion<E extends Options, F extends Record<string, any> = FlatOpts<E>> = {
-    [T in keyof F]: F[T]['type'] extends 'BUTTON' ? never : F[T]['type'] extends 'INFO' ? never : F[T] & {
+    [T in keyof F]: F[T]['type'] extends 'BUTTON' ? never : F[T]['type'] extends 'INFO' ? never : F[T]['type'] extends 'CONTROLS' ? never : F[T] & {
         key: `${T}`;
     };
 }[keyof F];

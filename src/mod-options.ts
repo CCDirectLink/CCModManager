@@ -3,6 +3,7 @@ export type Enum = Record<string, number>
 export interface OptionChangeable {
     restart?: boolean
     changeEvent?: () => void
+    updateMenuOnChange?: boolean
 }
 
 // prettier-ignore
@@ -316,6 +317,9 @@ function registerAndGetModOptions<T extends Options>(settings: ModOptionsSetting
                         const str = typeof v === 'object' ? JSON.stringify(v) : v.toString()
                         localStorage.setItem(id, str)
                         if (!noEvent && 'changeEvent' in option && option.changeEvent) option.changeEvent()
+                        if (!noEvent && 'updateMenuOnChange' in option && option.updateMenuOnChange && sc.menu?.currentMenu == sc.MENU_SUBMENU?.MOD_OPTIONS) {
+                            sc.modOptionsMenu.reopenMenu()
+                        }
                     }
 
                     Object.defineProperty(Opts, optKey, { get, set })

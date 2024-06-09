@@ -50,6 +50,7 @@ declare global {
 
             onButtonTraversal(this: this): void
             _resetButtons(this: this, tabButton?: sc.ModSettingsTabBox.TabButton, unfocus?: boolean): void
+            setCurrentTab(this: this, tabIndex: number): void
 
             addObservers(this: this): void
             removeObservers(this: this): void
@@ -89,23 +90,8 @@ sc.ModSettingsTabBox = ig.GuiElementBase.extend({
 
         this.tabGroup.addPressCallback(_button => {
             const button = _button as sc.ModSettingsTabBox.TabButton
-            if (this.prevPressed != button) {
-                sc.BUTTON_SOUND.submit.play()
-                this.prevPressed = button!
-                button.setPressed(true)
-
-                this._resetButtons(button)
-                this._rearrangeTabs()
-                this.lastButtonData = button.data
-                for (let i = this.tabArray.length; i--; )
-                    if (button == this.tabArray[i]) {
-                        // this._refocusFromCycle = b
-                        this.currentTab = i
-                        sc.Model.notifyObserver(sc.menu, sc.MENU_EVENT.OPTION_CHANGED_TAB)
-                        break
-                    }
-                ig.input.mouseGuiActive && sc.menu.setInfoText('')
-            }
+            const tabIndex = this.tabArray.indexOf(button)
+            this.setCurrentTab(tabIndex)
         })
     },
     initMenuPanel() {
@@ -322,6 +308,26 @@ sc.ModSettingsTabBox = ig.GuiElementBase.extend({
         for (const tab of this.tabArray) {
             tabButton != tab && tab.setPressed(false)
             if (unfocus) tab.focus = false
+        }
+    },
+    setCurrentTab(tabIndex) {
+        const button = this.tabArray[tabIndex]
+        if (this.prevPressed != button) {
+            sc.BUTTON_SOUND.submit.play()
+            this.prevPressed = button!
+            button.setPressed(true)
+
+            this._resetButtons(button)
+            this._rearrangeTabs()
+            this.lastButtonData = button.data
+            for (let i = this.tabArray.length; i--; )
+                if (button == this.tabArray[i]) {
+                    // this._refocusFromCycle = b
+                    this.currentTab = i
+                    sc.Model.notifyObserver(sc.menu, sc.MENU_EVENT.OPTION_CHANGED_TAB)
+                    break
+                }
+            ig.input.mouseGuiActive && sc.menu.setInfoText('')
         }
     },
 

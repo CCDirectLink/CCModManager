@@ -22,12 +22,14 @@ declare global {
 
             updateEntries(this: this, mod: ModEntry): void
             resetOptionsToDefault(this: this): void
+
+            reopenMenu(this: this): void
         }
         interface ModSettingsMenuConstructor extends ImpactClass<ModSettingsMenu> {
             new (): ModSettingsMenu
         }
         var ModOptionsMenu: ModSettingsMenuConstructor
-        var modSettingsMenu: ModSettingsMenu
+        var modOptionsMenu: ModSettingsMenu
 
         enum MENU_SUBMENU {
             MOD_OPTIONS = 375943,
@@ -53,7 +55,7 @@ sc.ModOptionsMenu = sc.BaseMenu.extend({
 
         this.doStateTransition('DEFAULT', true)
 
-        sc.modSettingsMenu = this
+        sc.modOptionsMenu = this
     },
     initHotkeyHelp() {
         this.hotkeyHelp = new sc.ButtonGui('\\i[help]' + ig.lang.get('sc.gui.menu.hotkeys.help'), undefined, true, sc.BUTTON_TYPE.SMALL)
@@ -187,14 +189,47 @@ sc.ModOptionsMenu = sc.BaseMenu.extend({
             if (!('init' in optConfig)) throw new Error('what')
             options[optName] = optConfig.init
         }
-
+        this.reopenMenu()
+    },
+    reopenMenu() {
         /* re-open the menu to update the option guis with the new values */
+        this.hide()
+        sc.menu.popBackCallback()
         sc.menu.popMenu()
         const mainMenu = getMainMenu()
         mainMenu.removeChildGui(this)
         delete mainMenu.submenus[modOptionsMenuId]
         sc.menu.pushMenu(sc.MENU_SUBMENU.MOD_OPTIONS)
-        sc.modSettingsMenu.updateEntries(this.mod)
+        /* skip transitions */
+        mainMenu.menuDisplay.boxes.last().doStateTransition('DEFAULT', true)
+        sc.modOptionsMenu.doStateTransition('DEFAULT', true)
+        sc.modOptionsMenu.listBox.doStateTransition('DEFAULT', true)
+
+        sc.modOptionsMenu.updateEntries(this.mod)
+        sc.modOptionsMenu.listBox.setCurrentTab(this.listBox.currentTab)
+
+        /* skip transitions even more */
+        mainMenu.hotkeyBar._hotkeyTimer = 10e10
+        mainMenu.hotkeyBar.doStateTransition('DEFAULT', true)
+        for (const button of mainMenu.hotkeyBar.hook.children) button.doStateTransition('DEFAULT', true)
+
+        ig.interact.setBlockDelay(0)
+
+        /* refocus the last element, we need to find it first cuz it might have moved to a diffrent position */
+        const element = this.listBox.rowButtonGroup.getCurrentElement() as sc.ButtonGui
+        let y!: number
+        const x = sc.modOptionsMenu.listBox.rowButtonGroup.elements.findIndex(arr => {
+            y = arr.findIndex(e => {
+                if (typeof element.data !== typeof e.data) return false
+                if (typeof e.data === 'object' && typeof element.data === 'object') {
+                    return 'description' in e.data! && 'description' in element.data! && e.data.description == element.data.description
+                } else {
+                    return e.data == element.data
+                }
+            })
+            return y != -1
+        })
+        sc.modOptionsMenu.listBox.rowButtonGroup.focusCurrentButton(y, x, false, true, false)
     },
 })
 

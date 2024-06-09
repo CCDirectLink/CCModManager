@@ -43,6 +43,7 @@ declare global {
             _createTabButton(this: this, title: string, x: number, categoryId: string, icon?: string): sc.ModSettingsTabBox.TabButton;
             onButtonTraversal(this: this): void;
             _resetButtons(this: this, tabButton?: sc.ModSettingsTabBox.TabButton, unfocus?: boolean): void;
+            setCurrentTab(this: this, tabIndex: number): void;
             addObservers(this: this): void;
             removeObservers(this: this): void;
         }
