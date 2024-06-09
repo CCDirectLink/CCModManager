@@ -248,7 +248,7 @@ sc.ModMenu = sc.ListInfoMenu.extend({
         this.addChildGui(this.testingToggleButton)
     },
     initOpenRepositoryUrlButton() {
-        this.openRepositoryUrlButton = new sc.ButtonGui('\\i[special]' + Lang.openRepositoryUrl, 140, true, sc.BUTTON_TYPE.SMALL)
+        this.openRepositoryUrlButton = new sc.ButtonGui('\\i[left]' + Lang.openRepositoryUrl, 140, true, sc.BUTTON_TYPE.SMALL)
         this.openRepositoryUrlButton.setAlign(ig.GUI_ALIGN.X_RIGHT, ig.GUI_ALIGN.Y_TOP)
         this.openRepositoryUrlButton.setPos(10, 22)
         this.openRepositoryUrlButton.doStateTransition('HIDDEN')
@@ -268,7 +268,7 @@ sc.ModMenu = sc.ListInfoMenu.extend({
         this.addChildGui(this.openRepositoryUrlButton)
     },
     initModOptionsButton(bottomY) {
-        this.modOptionsButton = new sc.ButtonGui('\\i[left]' + Lang.modSettings, 140, true, sc.BUTTON_TYPE.SMALL)
+        this.modOptionsButton = new sc.ButtonGui('\\i[special]' + Lang.modSettings, 140, true, sc.BUTTON_TYPE.SMALL)
         this.modOptionsButton.setPos(7, bottomY)
         this.modOptionsButton.doStateTransition('HIDDEN')
         this.modOptionsButton.onButtonPress = () => {
@@ -390,13 +390,11 @@ sc.ModMenu = sc.ListInfoMenu.extend({
         sc.menu.buttonInteract.addGlobalButton(this.checkUpdatesButton, () => false)
         sc.menu.buttonInteract.addGlobalButton(this.filtersButton, () => sc.control.menu())
         sc.menu.buttonInteract.addGlobalButton(this.testingToggleButton, () => sc.control.quickmenuPress())
-        sc.menu.buttonInteract.addGlobalButton(this.openRepositoryUrlButton, () => {
-            /* R2 press */
-            return ig.input.pressed('special') || ig.gamepad.isButtonPressed(sc.control._getSpecialButton())
-        })
-        sc.menu.buttonInteract.addGlobalButton(this.modOptionsButton, () => {
-            return sc.control.leftPressed()
-        })
+        sc.menu.buttonInteract.addGlobalButton(this.openRepositoryUrlButton, () => sc.control.leftPressed())
+        sc.menu.buttonInteract.addGlobalButton(
+            this.modOptionsButton,
+            () => ig.input.pressed('special') /* space bar */ || /* R2 press */ ig.gamepad.isButtonPressed(sc.control._getSpecialButton())
+        )
     },
     hideMenu(_afterSubmenu, nextSubmenu) {
         this.parent()
