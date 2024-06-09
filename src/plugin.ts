@@ -47,5 +47,16 @@ export default class ModManager {
     async poststart() {
         modOptionsPoststart()
         this.lang.poststart()
+
+        if (!window.nax?.ccuilib?.InputField) {
+            // @ts-expect-error
+            window.nax ??= {}
+            // @ts-expect-error
+            window.nax.ccuilib ??= {}
+            // @ts-expect-error
+            await import('nax-ccuilib/src/ui/input-field-cursor.js')
+            // @ts-expect-error
+            await import('nax-ccuilib/src/ui/input-field.js')
+        }
     }
 }
