@@ -235,6 +235,9 @@ Number.prototype.round = function (this: number, decimalPlaces?: number) {
     return Math.round(this * decimalPlaces) / decimalPlaces
 }
 
+export const ObjectKeysT: <K extends string | number | symbol, V>(object: Record<K, V>) => K[] = Object.keys as any
+export const ObjectEntriesT: <K extends string | number | symbol, V>(object: { [key in K]?: V }) => [K, V][] = Object.entries as any
+
 window.sc ??= {} as any
 sc.modMenu ??= {} as any
 sc.modMenu.options ??= {} as any
@@ -255,7 +258,7 @@ function registerAndGetModOptions<T extends Options>(settings: ModOptionsSetting
 
     const languageGetter = settings.languageGetter ?? defaultLanguageGetter
 
-    Object.entriesT(options).forEach(([catKey, category]) => {
+    ObjectEntriesT(options).forEach(([catKey, category]) => {
         const guiStructureCategorySettings: ModSettingsGuiStructureCategorySettings = category.settings
 
         const guiStructureCategory = (guiStructure[catKey] ??= {
@@ -264,11 +267,11 @@ function registerAndGetModOptions<T extends Options>(settings: ModOptionsSetting
         })
 
         const headers = category.headers
-        Object.entriesT(headers).forEach(([headerKey, optionEntries]) => {
+        ObjectEntriesT(headers).forEach(([headerKey, optionEntries]) => {
             const guiStructureHeader = (guiStructureCategory.headers[headerKey] ??= {})
 
             let isFirstOption: boolean = true
-            ;(Object.entriesT(optionEntries) as [keyof FlatOpts<T>, Option][]).forEach(([optKey, option], optKeyI) => {
+            ;(ObjectEntriesT(optionEntries) as [keyof FlatOpts<T>, Option][]).forEach(([optKey, option], optKeyI) => {
                 const id = (option.type == 'CONTROLS' ? 'keys-' : '') + `${settings.modId}-${optKey as string}`
 
                 /* register gui option */

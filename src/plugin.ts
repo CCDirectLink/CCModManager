@@ -5,7 +5,6 @@ import { ModDB } from './moddb'
 import { Mod1 } from './types'
 
 import type * as _ from 'crosscode-demonizer/src/demomod/types.d.ts'
-import './add-prototypes'
 
 import './mod-options'
 
