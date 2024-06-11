@@ -1,6 +1,6 @@
 declare global {
     namespace modmanager.gui {
-        interface ModMenuRepoAddPopup extends ig.GuiElementBase {
+        interface RepoAddPopup extends ig.GuiElementBase {
             gfx: ig.Image;
             buttonInteract: ig.ButtonInteractEntry;
             buttonGroup: sc.ButtonGroup;
@@ -12,10 +12,10 @@ declare global {
             show(this: this): void;
             hide(this: this): void;
         }
-        interface ModMenuRepoAddPopupConstructor extends ImpactClass<ModMenuRepoAddPopup> {
-            new (): ModMenuRepoAddPopup;
+        interface RepoAddPopupConstructor extends ImpactClass<RepoAddPopup> {
+            new (): RepoAddPopup;
         }
-        var ModMenuRepoAddPopup: ModMenuRepoAddPopupConstructor;
+        var RepoAddPopup: RepoAddPopupConstructor;
     }
 }
 export {};

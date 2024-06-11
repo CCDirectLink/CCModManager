@@ -2,12 +2,12 @@ import { ModEntry } from '../../types';
 import { ModOptionsSettings } from '../../mod-options';
 declare global {
     namespace modmanager.gui {
-        interface ModSettingsMenu extends sc.BaseMenu, sc.Model.Observer {
+        interface OptionsMenu extends sc.BaseMenu, sc.Model.Observer {
             mod: ModEntry;
             helpGui: sc.HelpScreen;
             hotkeyHelp: sc.ButtonGui;
             hotkeyDefault: sc.ButtonGui;
-            listBox: modmanager.gui.ModSettingsTabBox;
+            listBox: modmanager.gui.OptionsTabBox;
             initHotkeyHelp(this: this): void;
             initHotkeyDefault(this: this): void;
             initListBox(this: this): void;
@@ -19,11 +19,11 @@ declare global {
             resetOptionsToDefault(this: this): void;
             reopenMenu(this: this): void;
         }
-        interface ModSettingsMenuConstructor extends ImpactClass<ModSettingsMenu> {
-            new (): ModSettingsMenu;
+        interface OptionsMenuConstructor extends ImpactClass<OptionsMenu> {
+            new (): OptionsMenu;
         }
-        var ModOptionsMenu: ModSettingsMenuConstructor;
-        var modOptionsMenu: ModSettingsMenu;
+        var OptionsMenu: OptionsMenuConstructor;
+        var optionsMenu: OptionsMenu;
     }
     namespace sc {
         enum MENU_SUBMENU {

@@ -3,29 +3,29 @@ import { ModEntry } from '../../types';
 export {};
 declare global {
     namespace modmanager.gui {
-        namespace ModSettingsTabBox {
-            type GuiOption = sc.OptionInfoBox | modmanager.gui.ModOptionsOptionRow | modmanager.gui.ModOptionsOptionButton;
+        namespace OptionsTabBox {
+            type GuiOption = sc.OptionInfoBox | modmanager.gui.OptionsOptionRow | modmanager.gui.OptionsOptionButton;
         }
-        interface ModSettingsTabBox extends ig.GuiElementBase, sc.Model.Observer {
+        interface OptionsTabBox extends ig.GuiElementBase, sc.Model.Observer {
             gfx: ig.Image;
             mod: ModEntry;
             conf: ModSettingsGui;
             opts: Record<string, any>;
             currentTab: number;
-            lastButtonData: modmanager.gui.ModSettingsTabBox.TabButton['data'];
+            lastButtonData: modmanager.gui.OptionsTabBox.TabButton['data'];
             prevIndex: number;
-            tabs: Record<string, modmanager.gui.ModSettingsTabBox.TabButton>;
-            tabArray: modmanager.gui.ModSettingsTabBox.TabButton[];
+            tabs: Record<string, modmanager.gui.OptionsTabBox.TabButton>;
+            tabArray: modmanager.gui.OptionsTabBox.TabButton[];
             tabGroup: sc.ButtonGroup;
-            rows: modmanager.gui.ModSettingsTabBox.GuiOption[];
+            rows: modmanager.gui.OptionsTabBox.GuiOption[];
             rowButtonGroup: sc.RowButtonGroup;
             tabContent: {
-                buttonGroup: Nullable<modmanager.gui.ModSettingsTabBox['rowButtonGroup']>;
-                list: Nullable<modmanager.gui.ModSettingsTabBox['list']>;
-                rows: Nullable<modmanager.gui.ModSettingsTabBox['rows']>;
+                buttonGroup: Nullable<modmanager.gui.OptionsTabBox['rowButtonGroup']>;
+                list: Nullable<modmanager.gui.OptionsTabBox['list']>;
+                rows: Nullable<modmanager.gui.OptionsTabBox['rows']>;
             }[];
             list: sc.ButtonListBox;
-            prevPressed: modmanager.gui.ModSettingsTabBox.TabButton;
+            prevPressed: modmanager.gui.OptionsTabBox.TabButton;
             menuScanLines: sc.MenuScanLines;
             keyBinder: sc.KeyBinderGui;
             initTabGroup(this: this): void;
@@ -40,17 +40,17 @@ declare global {
             _createOptionList(this: this, category: string): void;
             _rearrangeTabs(this: this): void;
             _createCacheList(this: this, category: string, bool1?: boolean, bool2?: boolean): void;
-            _createTabButton(this: this, title: string, x: number, categoryId: string, icon?: string): modmanager.gui.ModSettingsTabBox.TabButton;
+            _createTabButton(this: this, title: string, x: number, categoryId: string, icon?: string): modmanager.gui.OptionsTabBox.TabButton;
             onButtonTraversal(this: this): void;
-            _resetButtons(this: this, tabButton?: modmanager.gui.ModSettingsTabBox.TabButton, unfocus?: boolean): void;
+            _resetButtons(this: this, tabButton?: modmanager.gui.OptionsTabBox.TabButton, unfocus?: boolean): void;
             setCurrentTab(this: this, tabIndex: number): void;
             addObservers(this: this): void;
             removeObservers(this: this): void;
         }
-        interface ModSettingsTabBoxConstructor extends ImpactClass<ModSettingsTabBox> {
-            TabButton: modmanager.gui.ModSettingsTabBox.TabButtonConstructor;
-            new (): ModSettingsTabBox;
+        interface OptionsTabBoxConstructor extends ImpactClass<OptionsTabBox> {
+            TabButton: modmanager.gui.OptionsTabBox.TabButtonConstructor;
+            new (): OptionsTabBox;
         }
-        var ModSettingsTabBox: ModSettingsTabBoxConstructor;
+        var OptionsTabBox: OptionsTabBoxConstructor;
     }
 }

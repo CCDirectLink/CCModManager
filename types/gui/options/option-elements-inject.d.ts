@@ -1,25 +1,25 @@
 import { GuiOption } from '../../mod-options';
 declare global {
     namespace modmanager.gui {
-        interface ModOptionsOptionInfoBox extends ig.GuiElementBase {
+        interface OptionsOptionInfoBox extends ig.GuiElementBase {
             text: sc.TextGui;
             box: sc.CenterBoxGui;
         }
-        interface ModOptionsOptionInfoBoxConstructor extends ImpactClass<ModOptionsOptionInfoBox> {
-            new (option: GuiOption, width: number): ModOptionsOptionInfoBox;
+        interface OptionsOptionInfoBoxConstructor extends ImpactClass<OptionsOptionInfoBox> {
+            new (option: GuiOption, width: number): OptionsOptionInfoBox;
         }
-        var ModOptionsOptionInfoBox: ModOptionsOptionInfoBoxConstructor;
+        var OptionsOptionInfoBox: OptionsOptionInfoBoxConstructor;
     }
 }
 declare global {
     namespace modmanager.gui {
-        interface ModOptionsOptionButton extends ig.GuiElementBase {
+        interface OptionsOptionButton extends ig.GuiElementBase {
             option: GuiOption;
             button: sc.ButtonGui;
         }
-        interface ModOptionsOptionButtonConstructor extends ImpactClass<ModOptionsOptionButton> {
-            new (option: GuiOption, y: number, rowGroup: sc.RowButtonGroup, width: number): ModOptionsOptionButton;
+        interface OptionsOptionButtonConstructor extends ImpactClass<OptionsOptionButton> {
+            new (option: GuiOption, y: number, rowGroup: sc.RowButtonGroup, width: number): OptionsOptionButton;
         }
-        var ModOptionsOptionButton: ModOptionsOptionButtonConstructor;
+        var OptionsOptionButton: OptionsOptionButtonConstructor;
     }
 }

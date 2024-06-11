@@ -4,12 +4,12 @@ import './filters';
 import './options/mod-options-menu';
 declare global {
     namespace modmanager.gui {
-        enum MOD_MENU_SORT_ORDER {
+        enum MENU_SORT_ORDER {
             NAME,
             STARS,
             LAST_UPDATED
         }
-        enum MOD_MENU_MESSAGES {
+        enum MENU_MESSAGES {
             SELECTED_ENTRIES_CHANGED,
             TAB_CHANGED,
             UPDATE_ENTRIES,
@@ -17,8 +17,8 @@ declare global {
             ENTRY_UNFOCUSED,
             ENTRY_UPDATE_COLOR
         }
-        interface ModMenu extends sc.ListInfoMenu, sc.Model {
-            list: ModMenuList;
+        interface Menu extends sc.ListInfoMenu, sc.Model {
+            list: MenuList;
             inputField: nax.ccuilib.InputField;
             installButton: sc.ButtonGui;
             uninstallButton: sc.ButtonGui;
@@ -28,7 +28,7 @@ declare global {
             checkUpdatesButton: sc.ButtonGui;
             filtersButton: sc.ButtonGui;
             filtersPopup: modmanager.gui.FiltersPopup;
-            reposPopup: modmanager.gui.ModMenuRepoAddPopup;
+            reposPopup: modmanager.gui.RepoAddPopup;
             initInputField(this: this): void;
             initSortMenu(this: this): void;
             initInstallButton(this: this, bottomY: number): void;
@@ -44,15 +44,15 @@ declare global {
             onBackButtonPress(this: this): void;
             setTabEvent(this: this): void;
             showModInstallDialog(this: this): void;
-            getCurrentlyFocusedModEntry(this: this): modmanager.gui.ModListEntry | undefined;
+            getCurrentlyFocusedModEntry(this: this): modmanager.gui.ListEntry | undefined;
             openModSettings(this: this, mod: ModEntry): void;
             openRepositoriesPopup(this: this): void;
         }
-        interface ModMenuConstructor extends ImpactClass<ModMenu> {
-            new (): ModMenu;
+        interface MenuConstructor extends ImpactClass<Menu> {
+            new (): Menu;
         }
-        var ModMenu: ModMenuConstructor;
-        var modMenuGui: ModMenu;
+        var Menu: MenuConstructor;
+        var menu: Menu;
     }
     namespace sc {
         enum MENU_SUBMENU {

@@ -29,7 +29,7 @@ declare global {
         interface FilterCheckoxConstructor extends ImpactClass<FilterCheckox> {
             new (): FilterCheckox;
         }
-        var ModMenuFilterCheckboxGui: FilterCheckoxConstructor;
+        var FilterCheckboxGui: FilterCheckoxConstructor;
     }
 }
 export declare const isGridLocalStorageId = "CCModManager-grid";

@@ -2,7 +2,7 @@ import { ModEntry, ModEntryLocal } from '../types';
 import './list-entry-highlight';
 declare global {
     namespace modmanager.gui {
-        interface ModListEntry extends ig.FocusGui, sc.Model.Observer {
+        interface ListEntry extends ig.FocusGui, sc.Model.Observer {
             ninepatch: ig.NinePatch;
             mod: ModEntry;
             iconOffset: number;
@@ -15,8 +15,8 @@ declare global {
             lastUpdated?: sc.TextGui;
             authors?: sc.TextGui;
             tags?: sc.TextGui;
-            modList: modmanager.gui.ModMenuList;
-            highlight: ModListEntryHighlight;
+            modList: modmanager.gui.MenuList;
+            highlight: ListEntryHighlight;
             modEntryActionButtonStart: {
                 height: number;
                 ninepatch: ig.NinePatch;
@@ -38,10 +38,10 @@ declare global {
             updateHighlightWidth(this: this): void;
             onButtonPress(this: this): string | undefined;
         }
-        interface ModListEntryConstructor extends ImpactClass<ModListEntry> {
-            new (mod: ModEntry, modList: modmanager.gui.ModMenuList): ModListEntry;
+        interface ListEntryConstructor extends ImpactClass<ListEntry> {
+            new (mod: ModEntry, modList: modmanager.gui.MenuList): ListEntry;
         }
-        var ModListEntry: ModListEntryConstructor;
+        var ListEntry: ListEntryConstructor;
     }
 }
 declare const COLOR: {

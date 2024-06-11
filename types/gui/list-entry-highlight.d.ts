@@ -1,7 +1,7 @@
 export {};
 declare global {
     namespace modmanager.gui {
-        interface ModListEntryHighlight extends ig.GuiElementBase {
+        interface ListEntryHighlight extends ig.GuiElementBase {
             gfx: ig.Image;
             ninepatch: ig.NinePatch;
             buttonCover: ig.NinePatch;
@@ -13,9 +13,9 @@ declare global {
             focus: boolean;
             updateWidth(this: this, width: number, textWidth: number): void;
         }
-        interface ModListEntryHighlightConstructor extends ImpactClass<ModListEntryHighlight> {
-            new (width: number, height: number, textWidth: number, buttonWidth: number): ModListEntryHighlight;
+        interface ListEntryHighlightConstructor extends ImpactClass<ListEntryHighlight> {
+            new (width: number, height: number, textWidth: number, buttonWidth: number): ListEntryHighlight;
         }
-        var ModListEntryHighlight: ModListEntryHighlightConstructor;
+        var ListEntryHighlight: ListEntryHighlightConstructor;
     }
 }
