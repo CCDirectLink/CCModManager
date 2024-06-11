@@ -1,6 +1,6 @@
 import { GuiOption } from '../../mod-options';
 declare global {
-    namespace sc {
+    namespace modmanager.gui {
         interface ModOptionsOptionInfoBox extends ig.GuiElementBase {
             text: sc.TextGui;
             box: sc.CenterBoxGui;
@@ -12,7 +12,7 @@ declare global {
     }
 }
 declare global {
-    namespace sc {
+    namespace modmanager.gui {
         interface ModOptionsOptionButton extends ig.GuiElementBase {
             option: GuiOption;
             button: sc.ButtonGui;

@@ -1,13 +1,13 @@
 import { ModEntry } from '../../types';
 import { ModOptionsSettings } from '../../mod-options';
 declare global {
-    namespace sc {
+    namespace modmanager.gui {
         interface ModSettingsMenu extends sc.BaseMenu, sc.Model.Observer {
             mod: ModEntry;
             helpGui: sc.HelpScreen;
             hotkeyHelp: sc.ButtonGui;
             hotkeyDefault: sc.ButtonGui;
-            listBox: sc.ModSettingsTabBox;
+            listBox: modmanager.gui.ModSettingsTabBox;
             initHotkeyHelp(this: this): void;
             initHotkeyDefault(this: this): void;
             initListBox(this: this): void;
@@ -24,6 +24,8 @@ declare global {
         }
         var ModOptionsMenu: ModSettingsMenuConstructor;
         var modOptionsMenu: ModSettingsMenu;
+    }
+    namespace sc {
         enum MENU_SUBMENU {
             MOD_OPTIONS = 375943
         }

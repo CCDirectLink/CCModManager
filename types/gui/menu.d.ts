@@ -3,7 +3,7 @@ import './list';
 import './filters';
 import './options/mod-options-menu';
 declare global {
-    namespace sc {
+    namespace modmanager.gui {
         enum MOD_MENU_SORT_ORDER {
             NAME,
             STARS,
@@ -27,8 +27,8 @@ declare global {
             modOptionsButton: sc.ButtonGui;
             checkUpdatesButton: sc.ButtonGui;
             filtersButton: sc.ButtonGui;
-            filtersPopup: sc.FiltersPopup;
-            reposPopup: sc.ModMenuRepoAddPopup;
+            filtersPopup: modmanager.gui.FiltersPopup;
+            reposPopup: modmanager.gui.ModMenuRepoAddPopup;
             initInputField(this: this): void;
             initSortMenu(this: this): void;
             initInstallButton(this: this, bottomY: number): void;
@@ -44,7 +44,7 @@ declare global {
             onBackButtonPress(this: this): void;
             setTabEvent(this: this): void;
             showModInstallDialog(this: this): void;
-            getCurrentlyFocusedModEntry(this: this): sc.ModListEntry | undefined;
+            getCurrentlyFocusedModEntry(this: this): modmanager.gui.ModListEntry | undefined;
             openModSettings(this: this, mod: ModEntry): void;
             openRepositoriesPopup(this: this): void;
         }
@@ -53,5 +53,10 @@ declare global {
         }
         var ModMenu: ModMenuConstructor;
         var modMenuGui: ModMenu;
+    }
+    namespace sc {
+        enum MENU_SUBMENU {
+            MODS
+        }
     }
 }

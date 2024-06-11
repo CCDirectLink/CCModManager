@@ -1,6 +1,6 @@
 export {};
 declare global {
-    namespace sc {
+    namespace modmanager.gui {
         interface ModListEntryHighlight extends ig.GuiElementBase {
             gfx: ig.Image;
             ninepatch: ig.NinePatch;

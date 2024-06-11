@@ -133,12 +133,10 @@ export interface ModOptionsSettings {
     languageGetter?: ModOptionsSettings.LanguageGetter;
 }
 declare global {
-    namespace sc {
-        var modMenu: {
-            optionConfigs: Record<string, ModSettingsGui>;
-            options: Record<string, Record<string, any>>;
-            registerAndGetModOptions<T extends Options>(settings: ModOptionsSettings, options: T): OptsType<T>;
-        };
+    namespace modmanager {
+        var optionConfigs: Record<string, ModSettingsGui>;
+        var options: Record<string, Record<string, any>>;
+        function registerAndGetModOptions<T extends Options>(settings: ModOptionsSettings, options: T): OptsType<T>;
     }
 }
 export type ModSettingsGui = {
@@ -151,6 +149,10 @@ export type ModSettingsGuiStructureCategory = {
     settings: ModSettingsGuiStructureCategorySettings;
     headers: Record<string, Record<string, GuiOption>>;
 };
+export declare const ObjectKeysT: <K extends string | number | symbol, V>(object: Record<K, V>) => K[];
+export declare const ObjectEntriesT: <K extends string | number | symbol, V>(object: {
+    [key in K]?: V;
+}) => [K, V][];
 export declare function modOptionsPrestart(): void;
 export declare function modOptionsPoststart(): void;
 export {};

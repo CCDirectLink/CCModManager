@@ -1,6 +1,6 @@
 import type { GuiOption } from '../../mod-options';
 declare global {
-    namespace sc {
+    namespace modmanager.gui {
         interface ModOptionsOptionRow extends sc.OptionRow {
             guiOption: GuiOption;
         }

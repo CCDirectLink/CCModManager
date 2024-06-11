@@ -1,5 +1,4 @@
 import { Mod1 } from './types';
-import './add-prototypes';
 import './mod-options';
 export default class ModManager {
     static dir: string;

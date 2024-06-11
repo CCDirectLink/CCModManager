@@ -1,5 +1,5 @@
 declare global {
-    namespace sc {
+    namespace modmanager.gui {
         interface ModMenuRepoAddPopup extends ig.GuiElementBase {
             gfx: ig.Image;
             buttonInteract: ig.ButtonInteractEntry;

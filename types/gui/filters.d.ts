@@ -1,14 +1,14 @@
 import { Fliters } from '../filters';
 import { Lang } from '../lang-manager';
 declare global {
-    namespace sc {
+    namespace modmanager.gui {
         interface FiltersPopup extends ig.GuiElementBase {
             gfx: ig.Image;
             buttonGroup: sc.ButtonGroup;
             backButton: sc.ButtonGui;
             checkboxesGuis: {
                 text: sc.TextGui;
-                checkbox: sc.FilterCheckox;
+                checkbox: modmanager.gui.FilterCheckox;
             }[];
             infoBar: sc.InfoBar;
             getLangData(this: this, key: keyof typeof Lang.filters): {
