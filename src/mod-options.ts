@@ -332,7 +332,7 @@ function registerAndGetModOptions<T extends Options>(settings: ModOptionsSetting
                             option.updateMenuOnChange &&
                             sc.menu?.currentMenu == sc.MENU_SUBMENU?.MOD_OPTIONS
                         ) {
-                            modmanager.gui.modOptionsMenu.reopenMenu()
+                            modmanager.gui.optionsMenu.reopenMenu()
                         }
                     }
 

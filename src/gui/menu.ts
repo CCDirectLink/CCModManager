@@ -15,12 +15,12 @@ import type * as ____ from '../../node_modules/crossedeyes/src/tts/gather/checkb
 
 declare global {
     namespace modmanager.gui {
-        enum MOD_MENU_SORT_ORDER {
+        enum MENU_SORT_ORDER {
             NAME,
             STARS,
             LAST_UPDATED,
         }
-        enum MOD_MENU_MESSAGES {
+        enum MENU_MESSAGES {
             SELECTED_ENTRIES_CHANGED,
             TAB_CHANGED,
             UPDATE_ENTRIES,
@@ -28,8 +28,8 @@ declare global {
             ENTRY_UNFOCUSED,
             ENTRY_UPDATE_COLOR,
         }
-        interface ModMenu extends sc.ListInfoMenu, sc.Model {
-            list: ModMenuList
+        interface Menu extends sc.ListInfoMenu, sc.Model {
+            list: MenuList
             inputField: nax.ccuilib.InputField
             installButton: sc.ButtonGui
             uninstallButton: sc.ButtonGui
@@ -39,7 +39,7 @@ declare global {
             checkUpdatesButton: sc.ButtonGui
             filtersButton: sc.ButtonGui
             filtersPopup: modmanager.gui.FiltersPopup
-            reposPopup: modmanager.gui.ModMenuRepoAddPopup
+            reposPopup: modmanager.gui.RepoAddPopup
 
             initInputField(this: this): void
             initSortMenu(this: this): void
@@ -57,15 +57,15 @@ declare global {
             onBackButtonPress(this: this): void
             setTabEvent(this: this): void
             showModInstallDialog(this: this): void
-            getCurrentlyFocusedModEntry(this: this): modmanager.gui.ModListEntry | undefined
+            getCurrentlyFocusedModEntry(this: this): modmanager.gui.ListEntry | undefined
             openModSettings(this: this, mod: ModEntry): void
             openRepositoriesPopup(this: this): void
         }
-        interface ModMenuConstructor extends ImpactClass<ModMenu> {
-            new (): ModMenu
+        interface MenuConstructor extends ImpactClass<Menu> {
+            new (): Menu
         }
-        var ModMenu: ModMenuConstructor
-        var modMenuGui: ModMenu
+        var Menu: MenuConstructor
+        var menu: Menu
     }
     namespace sc {
         enum MENU_SUBMENU {
@@ -73,19 +73,20 @@ declare global {
         }
     }
 }
-modmanager.gui.MOD_MENU_SORT_ORDER = {
+modmanager.gui.MENU_SORT_ORDER = {
     NAME: 0,
     STARS: 1,
     LAST_UPDATED: 2,
-}
-modmanager.gui.MOD_MENU_MESSAGES = {
+} as const
+
+modmanager.gui.MENU_MESSAGES = {
     SELECTED_ENTRIES_CHANGED: 0,
     TAB_CHANGED: 1,
     UPDATE_ENTRIES: 2,
     ENTRY_FOCUSED: 3,
     ENTRY_UNFOCUSED: 4,
     ENTRY_UPDATE_COLOR: 5,
-}
+} as const
 
 sc.GlobalInput.inject({
     onPostUpdate() {
@@ -96,7 +97,7 @@ sc.GlobalInput.inject({
 
 sc.Control.inject({
     menuConfirm() {
-        if (!modmanager.gui.modMenuGui?.isVisible()) return this.parent()
+        if (!modmanager.gui.menu?.isVisible()) return this.parent()
 
         /* remove ig.input.pressed('special') to prevent weird list jumping on space bar press */
         return this.autoControl
@@ -112,12 +113,12 @@ function getMainMenu(): sc.MainMenu {
 }
 
 let menuPurgeTimeoutId: NodeJS.Timeout
-modmanager.gui.ModMenu = sc.ListInfoMenu.extend({
+modmanager.gui.Menu = sc.ListInfoMenu.extend({
     observers: [],
     init() {
-        modmanager.gui.modMenuGui = this
+        modmanager.gui.menu = this
         ModDB.loadDatabases()
-        this.parent(new modmanager.gui.ModMenuList())
+        this.parent(new modmanager.gui.MenuList())
         this.list.setPos(9, 23)
 
         this.initSortMenu()
@@ -146,20 +147,12 @@ modmanager.gui.ModMenu = sc.ListInfoMenu.extend({
         this.inputField.hook.transitions['HIDDEN'] = this.installButton.hook.transitions['HIDDEN']
     },
     initSortMenu() {
-        this.sortMenu.addButton(
-            'name',
-            modmanager.gui.MOD_MENU_SORT_ORDER.NAME,
-            modmanager.gui.MOD_MENU_SORT_ORDER.NAME
-        )
-        this.sortMenu.addButton(
-            'stars',
-            modmanager.gui.MOD_MENU_SORT_ORDER.STARS,
-            modmanager.gui.MOD_MENU_SORT_ORDER.STARS
-        )
+        this.sortMenu.addButton('name', modmanager.gui.MENU_SORT_ORDER.NAME, modmanager.gui.MENU_SORT_ORDER.NAME)
+        this.sortMenu.addButton('stars', modmanager.gui.MENU_SORT_ORDER.STARS, modmanager.gui.MENU_SORT_ORDER.STARS)
         this.sortMenu.addButton(
             'lastUpdated',
-            modmanager.gui.MOD_MENU_SORT_ORDER.LAST_UPDATED,
-            modmanager.gui.MOD_MENU_SORT_ORDER.LAST_UPDATED
+            modmanager.gui.MENU_SORT_ORDER.LAST_UPDATED,
+            modmanager.gui.MENU_SORT_ORDER.LAST_UPDATED
         )
     },
     initInstallButton(bottomY) {
@@ -203,7 +196,7 @@ modmanager.gui.ModMenu = sc.ListInfoMenu.extend({
             if (this.list.currentTabIndex == modmanager.gui.MOD_MENU_TAB_INDEXES.SELECTED) sc.BUTTON_SOUND.submit.play()
             ModInstaller.appendToUpdateModsToQueue().then(hasUpdated => {
                 if (hasUpdated) {
-                    sc.Model.notifyObserver(modmanager.gui.modMenuGui, modmanager.gui.MOD_MENU_MESSAGES.UPDATE_ENTRIES)
+                    sc.Model.notifyObserver(modmanager.gui.menu, modmanager.gui.MENU_MESSAGES.UPDATE_ENTRIES)
                     this.list.tabGroup._invokePressCallbacks(this.list.tabs[Lang.selectedModsTab], true)
                     sc.Dialogs.showInfoDialog(Lang.updatesFound)
                 } else {
@@ -345,20 +338,20 @@ modmanager.gui.ModMenu = sc.ListInfoMenu.extend({
         }
     },
     addObservers() {
-        sc.Model.addObserver(modmanager.gui.modMenuGui, this)
+        sc.Model.addObserver(modmanager.gui.menu, this)
     },
     removeObservers() {
-        sc.Model.removeObserver(modmanager.gui.modMenuGui, this)
+        sc.Model.removeObserver(modmanager.gui.menu, this)
     },
     modelChanged(model, message, data) {
         this.parent(model, message, data)
-        if (model == modmanager.gui.modMenuGui) {
-            if (message == modmanager.gui.MOD_MENU_MESSAGES.TAB_CHANGED) {
+        if (model == modmanager.gui.menu) {
+            if (message == modmanager.gui.MENU_MESSAGES.TAB_CHANGED) {
                 this.setTabEvent()
-            } else if (message == modmanager.gui.MOD_MENU_MESSAGES.SELECTED_ENTRIES_CHANGED) {
+            } else if (message == modmanager.gui.MENU_MESSAGES.SELECTED_ENTRIES_CHANGED) {
                 this.updateInstallButtonText()
-            } else if (message == modmanager.gui.MOD_MENU_MESSAGES.ENTRY_FOCUSED) {
-                const entry = data as modmanager.gui.ModListEntry
+            } else if (message == modmanager.gui.MENU_MESSAGES.ENTRY_FOCUSED) {
+                const entry = data as modmanager.gui.ListEntry
                 if (entry.mod.isLocal || entry.mod.localCounterpart) this.uninstallButton.setActive(true)
 
                 const serverMod = entry.mod.isLocal ? entry.mod.serverCounterpart : entry.mod
@@ -374,7 +367,7 @@ modmanager.gui.ModMenu = sc.ListInfoMenu.extend({
                 this.openRepositoryUrlButton.doStateTransition(entry.mod.repositoryUrl ? 'DEFAULT' : 'HIDDEN')
 
                 this.modOptionsButton.doStateTransition(modmanager.optionConfigs[entry.mod.id] ? 'DEFAULT' : 'HIDDEN')
-            } else if (message == modmanager.gui.MOD_MENU_MESSAGES.ENTRY_UNFOCUSED) {
+            } else if (message == modmanager.gui.MENU_MESSAGES.ENTRY_UNFOCUSED) {
                 this.uninstallButton.setActive(false)
 
                 this.testingToggleButton.doStateTransition('HIDDEN')
@@ -498,7 +491,7 @@ modmanager.gui.ModMenu = sc.ListInfoMenu.extend({
                 acc.push(...v)
                 return acc
             }, [])
-            .find((b: ig.FocusGui) => b.focus) as modmanager.gui.ModListEntry
+            .find((b: ig.FocusGui) => b.focus) as modmanager.gui.ListEntry
     },
     openModSettings(mod) {
         this.list.restoreLastPosition = {
@@ -506,10 +499,10 @@ modmanager.gui.ModMenu = sc.ListInfoMenu.extend({
             element: Vec2.create(this.list.currentList.buttonGroup.current),
         }
         sc.menu.pushMenu(sc.MENU_SUBMENU.MOD_OPTIONS)
-        modmanager.gui.modOptionsMenu.updateEntries(mod)
+        modmanager.gui.optionsMenu.updateEntries(mod)
     },
     openRepositoriesPopup() {
-        if (!this.reposPopup) this.reposPopup = new modmanager.gui.ModMenuRepoAddPopup()
+        if (!this.reposPopup) this.reposPopup = new modmanager.gui.RepoAddPopup()
         this.reposPopup.show()
     },
 })
@@ -519,6 +512,6 @@ sc.MENU_SUBMENU.MODS = Math.max(...Object.values(sc.MENU_SUBMENU)) + 1
 
 const modsMenuId = 'mods'
 sc.SUB_MENU_INFO[sc.MENU_SUBMENU.MODS] = {
-    Clazz: modmanager.gui.ModMenu,
+    Clazz: modmanager.gui.Menu,
     name: modsMenuId,
 }

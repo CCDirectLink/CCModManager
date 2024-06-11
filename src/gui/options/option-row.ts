@@ -2,22 +2,22 @@ import type { GuiOption } from '../../mod-options'
 
 declare global {
     namespace modmanager.gui {
-        interface ModOptionsOptionRow extends sc.OptionRow {
+        interface OptionsOptionRow extends sc.OptionRow {
             guiOption: GuiOption
         }
-        interface ModOptionsOptionRowConstructor extends ImpactClass<ModOptionsOptionRow> {
+        interface OptionsOptionRowConstructor extends ImpactClass<OptionsOptionRow> {
             new (
                 option: GuiOption,
                 row: number,
                 rowGroup: sc.RowButtonGroup,
                 width?: number,
                 height?: number
-            ): ModOptionsOptionRow
+            ): OptionsOptionRow
         }
-        var ModOptionsOptionRow: ModOptionsOptionRowConstructor
+        var OptionsOptionRow: OptionsOptionRowConstructor
     }
 }
-modmanager.gui.ModOptionsOptionRow = sc.OptionRow.extend({
+modmanager.gui.OptionsOptionRow = sc.OptionRow.extend({
     init(option, row, rowGroup, width, height) {
         ig.GuiElementBase.prototype.init.call(this)
 

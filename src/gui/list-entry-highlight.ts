@@ -1,7 +1,7 @@
 export {}
 declare global {
     namespace modmanager.gui {
-        interface ModListEntryHighlight extends ig.GuiElementBase {
+        interface ListEntryHighlight extends ig.GuiElementBase {
             gfx: ig.Image
             ninepatch: ig.NinePatch
             buttonCover: ig.NinePatch
@@ -14,14 +14,14 @@ declare global {
 
             updateWidth(this: this, width: number, textWidth: number): void
         }
-        interface ModListEntryHighlightConstructor extends ImpactClass<ModListEntryHighlight> {
-            new (width: number, height: number, textWidth: number, buttonWidth: number): ModListEntryHighlight
+        interface ListEntryHighlightConstructor extends ImpactClass<ListEntryHighlight> {
+            new (width: number, height: number, textWidth: number, buttonWidth: number): ListEntryHighlight
         }
-        var ModListEntryHighlight: ModListEntryHighlightConstructor
+        var ListEntryHighlight: ListEntryHighlightConstructor
     }
 }
 
-modmanager.gui.ModListEntryHighlight = ig.GuiElementBase.extend({
+modmanager.gui.ListEntryHighlight = ig.GuiElementBase.extend({
     gfx: new ig.Image('media/gui/CCModManager.png'),
     ninepatch: new ig.NinePatch('media/gui/CCModManager.png', {
         left: 3,

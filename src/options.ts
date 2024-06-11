@@ -21,7 +21,7 @@ export function registerOpts() {
                     repositoriesButton: {
                         type: 'BUTTON',
                         onPress() {
-                            modmanager.gui.modMenuGui.openRepositoriesPopup()
+                            modmanager.gui.menu.openRepositoriesPopup()
                         },
                     },
                     repositories: {
@@ -44,7 +44,7 @@ export function registerOpts() {
                         init: false,
                         hidden: true,
                         changeEvent() {
-                            modmanager.gui.modMenuGui.list.updateColumnCount()
+                            modmanager.gui.menu.list.updateColumnCount()
                         },
                     },
                 },

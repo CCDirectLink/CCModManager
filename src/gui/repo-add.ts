@@ -5,7 +5,7 @@ import { ModDB } from '../moddb'
 
 declare global {
     namespace modmanager.gui {
-        interface ModMenuRepoAddPopup extends ig.GuiElementBase {
+        interface RepoAddPopup extends ig.GuiElementBase {
             gfx: ig.Image
             buttonInteract: ig.ButtonInteractEntry
             buttonGroup: sc.ButtonGroup
@@ -18,10 +18,10 @@ declare global {
             show(this: this): void
             hide(this: this): void
         }
-        interface ModMenuRepoAddPopupConstructor extends ImpactClass<ModMenuRepoAddPopup> {
-            new (): ModMenuRepoAddPopup
+        interface RepoAddPopupConstructor extends ImpactClass<RepoAddPopup> {
+            new (): RepoAddPopup
         }
-        var ModMenuRepoAddPopup: ModMenuRepoAddPopupConstructor
+        var RepoAddPopup: RepoAddPopupConstructor
     }
 }
 
@@ -45,7 +45,7 @@ function isValidUrl(urlString: string) {
     return !!urlPattern.test(urlString)
 }
 
-modmanager.gui.ModMenuRepoAddPopup = ig.GuiElementBase.extend({
+modmanager.gui.RepoAddPopup = ig.GuiElementBase.extend({
     gfx: new ig.Image('media/gui/menu.png'),
     transitions: {
         DEFAULT: { state: { alpha: 1 }, time: 0.2, timeFunction: KEY_SPLINES.EASE_OUT },

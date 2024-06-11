@@ -26,7 +26,7 @@ declare global {
         interface FilterCheckoxConstructor extends ImpactClass<FilterCheckox> {
             new (): FilterCheckox
         }
-        var ModMenuFilterCheckboxGui: FilterCheckoxConstructor
+        var FilterCheckboxGui: FilterCheckoxConstructor
     }
 }
 
@@ -63,18 +63,18 @@ const checkboxes: CheckboxConfig[] = [
     { key: 'tagLibrary' },
 ]
 
-modmanager.gui.ModMenuFilterCheckboxGui = sc.CheckboxGui.extend({
+modmanager.gui.FilterCheckboxGui = sc.CheckboxGui.extend({
     init() {
         this.parent(false)
     },
     focusGained() {
         this.parent()
-        modmanager.gui.modMenuGui.filtersPopup.infoBar.setText(this.data as string)
-        modmanager.gui.modMenuGui.filtersPopup.infoBar.doStateTransition('DEFAULT')
+        modmanager.gui.menu.filtersPopup.infoBar.setText(this.data as string)
+        modmanager.gui.menu.filtersPopup.infoBar.doStateTransition('DEFAULT')
     },
     focusLost() {
         this.parent()
-        modmanager.gui.modMenuGui.filtersPopup.infoBar.doStateTransition('HIDDEN')
+        modmanager.gui.menu.filtersPopup.infoBar.doStateTransition('HIDDEN')
     },
 })
 
@@ -88,7 +88,7 @@ modmanager.gui.FiltersPopup = ig.GuiElementBase.extend({
         return Lang.filters[key]
     },
     setFilterValue(config, state) {
-        const filters = modmanager.gui.modMenuGui.list.filters
+        const filters = modmanager.gui.menu.list.filters
         if ('filterKey' in config && config.filterKey) {
             filters[config.filterKey] = state as any
         } else if ('optsKey' in config) {
@@ -99,14 +99,14 @@ modmanager.gui.FiltersPopup = ig.GuiElementBase.extend({
             if (state) filters.tags.push(name)
             else filters.tags.erase(name)
         }
-        modmanager.gui.modMenuGui.list.reloadFilters()
+        modmanager.gui.menu.list.reloadFilters()
         /* hack to get the popup button group on top again, because the main mod menu button group got pushed on top when sc.modMenu.list.reloadFilters() is called */
         const arr: sc.ButtonGroup[] = sc.menu.buttonInteract.buttonGroupStack
         const last: number = arr.length
         ;[arr[last - 2], arr[last - 1]] = [arr[last - 1], arr[last - 2]]
     },
     getFilterValue(config) {
-        const filters = modmanager.gui.modMenuGui.list.filters
+        const filters = modmanager.gui.menu.list.filters
         if ('filterKey' in config && config.filterKey) {
             return filters[config.filterKey] as boolean | undefined
         } else if ('optsKey' in config) {
@@ -146,7 +146,7 @@ modmanager.gui.FiltersPopup = ig.GuiElementBase.extend({
 
             const x = i % tagsW
             const y = (i / tagsW).floor()
-            const checkbox = new modmanager.gui.ModMenuFilterCheckboxGui()
+            const checkbox = new modmanager.gui.FilterCheckboxGui()
             checkbox.setPos(x * (textW + spacingW) + offset.x, y * (textH + spacingH))
             checkbox.crossedeyesLabel = (config.key.startsWith('tag') ? `${Lang.tag}: ` : '') + lang.name
             checkbox.data = lang.description

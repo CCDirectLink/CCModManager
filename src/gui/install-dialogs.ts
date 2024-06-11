@@ -39,11 +39,8 @@ export class ModInstallDialogs {
                 ModInstaller.install(toInstall)
                     .then(() => {
                         InstallQueue.clear()
-                        modmanager.gui.modMenuGui &&
-                            sc.Model.notifyObserver(
-                                modmanager.gui.modMenuGui,
-                                modmanager.gui.MOD_MENU_MESSAGES.UPDATE_ENTRIES
-                            )
+                        modmanager.gui.menu &&
+                            sc.Model.notifyObserver(modmanager.gui.menu, modmanager.gui.MENU_MESSAGES.UPDATE_ENTRIES)
                         sc.BUTTON_SOUND.shop_cash.play()
                         sc.Dialogs.showYesNoDialog(Lang.askRestartInstall, sc.DIALOG_INFO_ICON.QUESTION, button => {
                             if (button.data == 0) {
@@ -115,10 +112,7 @@ export class ModInstallDialogs {
                         .then(() => {
                             localMod.awaitingRestart = true
                             localMod.active = false
-                            sc.Model.notifyObserver(
-                                modmanager.gui.modMenuGui,
-                                modmanager.gui.MOD_MENU_MESSAGES.UPDATE_ENTRIES
-                            )
+                            sc.Model.notifyObserver(modmanager.gui.menu, modmanager.gui.MENU_MESSAGES.UPDATE_ENTRIES)
                             sc.BUTTON_SOUND.shop_cash.play()
                             sc.Dialogs.showYesNoDialog(
                                 Lang.askRestartUninstall,

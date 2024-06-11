@@ -9,7 +9,7 @@ import { Opts } from '../options'
 
 declare global {
     namespace modmanager.gui {
-        export interface ModListEntry extends ig.FocusGui, sc.Model.Observer {
+        export interface ListEntry extends ig.FocusGui, sc.Model.Observer {
             ninepatch: ig.NinePatch
             mod: ModEntry
             iconOffset: number
@@ -22,8 +22,8 @@ declare global {
             lastUpdated?: sc.TextGui
             authors?: sc.TextGui
             tags?: sc.TextGui
-            modList: modmanager.gui.ModMenuList
-            highlight: ModListEntryHighlight
+            modList: modmanager.gui.MenuList
+            highlight: ListEntryHighlight
             modEntryActionButtonStart: { height: number; ninepatch: ig.NinePatch; highlight: sc.ButtonGui.Highlight }
             modEntryActionButtons: sc.ButtonGui.Type & { ninepatch: ig.NinePatch }
             iconGui: ig.ImageGui
@@ -37,10 +37,10 @@ declare global {
             updateHighlightWidth(this: this): void
             onButtonPress(this: this): string | undefined
         }
-        interface ModListEntryConstructor extends ImpactClass<ModListEntry> {
-            new (mod: ModEntry, modList: modmanager.gui.ModMenuList): ModListEntry
+        interface ListEntryConstructor extends ImpactClass<ListEntry> {
+            new (mod: ModEntry, modList: modmanager.gui.MenuList): ListEntry
         }
-        var ModListEntry: ModListEntryConstructor
+        var ListEntry: ListEntryConstructor
     }
 }
 
@@ -52,7 +52,7 @@ const COLOR = {
 } as const
 type COLOR = (typeof COLOR)[keyof typeof COLOR]
 
-modmanager.gui.ModListEntry = ig.FocusGui.extend({
+modmanager.gui.ListEntry = ig.FocusGui.extend({
     ninepatch: new ig.NinePatch('media/gui/CCModManager.png', {
         width: 42,
         height: 26,
@@ -72,7 +72,7 @@ modmanager.gui.ModListEntry = ig.FocusGui.extend({
             mod = mod.testingVersion
         }
 
-        sc.Model.addObserver(modmanager.gui.modMenuGui, this)
+        sc.Model.addObserver(modmanager.gui.menu, this)
         const isGrid = Opts.isGrid
         /* init icon asap */
         FileCache.getIconConfig(mod).then(config => {
@@ -111,7 +111,7 @@ modmanager.gui.ModListEntry = ig.FocusGui.extend({
         }
         if (InstallQueue.has(mod)) this.setNameText(COLOR.YELLOW)
 
-        this.highlight = new modmanager.gui.ModListEntryHighlight(
+        this.highlight = new modmanager.gui.ListEntryHighlight(
             this.hook.size.x,
             this.hook.size.y,
             this.nameText.hook.size.x,
@@ -252,12 +252,12 @@ modmanager.gui.ModListEntry = ig.FocusGui.extend({
     focusGained() {
         this.parent()
         this.highlight.focus = this.focus
-        sc.Model.notifyObserver(modmanager.gui.modMenuGui, modmanager.gui.MOD_MENU_MESSAGES.ENTRY_FOCUSED, this)
+        sc.Model.notifyObserver(modmanager.gui.menu, modmanager.gui.MENU_MESSAGES.ENTRY_FOCUSED, this)
     },
     focusLost() {
         this.parent()
         this.highlight.focus = this.focus
-        sc.Model.notifyObserver(modmanager.gui.modMenuGui, modmanager.gui.MOD_MENU_MESSAGES.ENTRY_UNFOCUSED, this)
+        sc.Model.notifyObserver(modmanager.gui.menu, modmanager.gui.MENU_MESSAGES.ENTRY_UNFOCUSED, this)
     },
     tryEnableMod(mod: ModEntryLocal) {
         ModInstallDialogs.checkCanEnableMod(mod).then(deps => {
@@ -265,11 +265,10 @@ modmanager.gui.ModListEntry = ig.FocusGui.extend({
             deps.push(mod)
             for (const mod of deps) {
                 mod.awaitingRestart = !mod.awaitingRestart
-                sc.Model.notifyObserver(
-                    modmanager.gui.modMenuGui,
-                    modmanager.gui.MOD_MENU_MESSAGES.ENTRY_UPDATE_COLOR,
-                    { mod, color: COLOR.GREEN }
-                )
+                sc.Model.notifyObserver(modmanager.gui.menu, modmanager.gui.MENU_MESSAGES.ENTRY_UPDATE_COLOR, {
+                    mod,
+                    color: COLOR.GREEN,
+                })
                 sc.BUTTON_SOUND.toggle_on.play()
                 LocalMods.setModActive(mod, true)
                 this.updateHighlightWidth()
@@ -289,11 +288,11 @@ modmanager.gui.ModListEntry = ig.FocusGui.extend({
         this.updateHighlightWidth()
         return 'Disabled'
     },
-    modelChanged(model, message: modmanager.gui.MOD_MENU_MESSAGES, data) {
+    modelChanged(model, message: modmanager.gui.MENU_MESSAGES, data) {
         const d = data as { mod: ModEntryLocal; color: COLOR }
         if (
-            model == modmanager.gui.modMenuGui &&
-            message == modmanager.gui.MOD_MENU_MESSAGES.ENTRY_UPDATE_COLOR &&
+            model == modmanager.gui.menu &&
+            message == modmanager.gui.MENU_MESSAGES.ENTRY_UPDATE_COLOR &&
             d.mod == this.mod
         ) {
             this.setNameText(d.color)

@@ -18,11 +18,8 @@ export class InstallQueue {
     private static queue: ModEntryServer[] = []
 
     static changeUpdate() {
-        modmanager.gui.modMenuGui &&
-            sc.Model.notifyObserver(
-                modmanager.gui.modMenuGui,
-                modmanager.gui.MOD_MENU_MESSAGES.SELECTED_ENTRIES_CHANGED
-            )
+        modmanager.gui.menu &&
+            sc.Model.notifyObserver(modmanager.gui.menu, modmanager.gui.MENU_MESSAGES.SELECTED_ENTRIES_CHANGED)
     }
     static add(...mods: ModEntryServer[]) {
         for (const mod of mods) {
