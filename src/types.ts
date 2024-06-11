@@ -1,4 +1,4 @@
-import { Mod } from 'ultimate-crosscode-typedefs/modloader/mod'
+import type { Mod } from 'ultimate-crosscode-typedefs/modloader/mod'
 
 import type { InstallMethod, PackageDB, ValidTags } from 'ccmoddb/build/src/types'
 
