@@ -58,9 +58,20 @@ modmanager.gui.ModListEntryHighlight = ig.GuiElementBase.extend({
         this.textWidth = textWidth
     },
     updateDrawables(renderer) {
-        this.ninepatch.draw(renderer, this.hook.size.x - this.buttonWidth - 6, this.hook.size.y + 1, this.focus ? 'focus' : 'default')
+        this.ninepatch.draw(
+            renderer,
+            this.hook.size.x - this.buttonWidth - 6,
+            this.hook.size.y + 1,
+            this.focus ? 'focus' : 'default'
+        )
 
-        this.buttonCover.draw(renderer, this.buttonWidth + 4, this.hook.size.y + 1, this.focus ? 'focus' : 'default', this.hook.size.x - this.buttonWidth - 30)
+        this.buttonCover.draw(
+            renderer,
+            this.buttonWidth + 4,
+            this.hook.size.y + 1,
+            this.focus ? 'focus' : 'default',
+            this.hook.size.x - this.buttonWidth - 30
+        )
 
         renderer.addPattern(this.focus ? this.textTagHighlighted : this.textTag, 3, 3, 90, 0, this.textWidth, 13)
 

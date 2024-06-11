@@ -31,7 +31,10 @@ declare global {
 }
 
 export const isGridLocalStorageId = 'CCModManager-grid'
-type CheckboxConfig = { key: keyof typeof Lang.filters; default?: boolean } & ({ filterKey?: keyof Fliters } | { optsKey: 'isGrid' /* keyof typeof Opts */ })
+type CheckboxConfig = { key: keyof typeof Lang.filters; default?: boolean } & (
+    | { filterKey?: keyof Fliters }
+    | { optsKey: 'isGrid' /* keyof typeof Opts */ }
+)
 
 const checkboxes: CheckboxConfig[] = [
     { key: 'gridView', optsKey: 'isGrid' },
@@ -165,7 +168,12 @@ modmanager.gui.FiltersPopup = ig.GuiElementBase.extend({
         }
         box.setSize(tagsW * textW + spacingW * 2 + offset.x, maxY * (textH + spacingH) + offset.y)
 
-        this.backButton = new sc.ButtonGui('\\i[back]' + ig.lang.get('sc.gui.menu.back'), undefined, true, sc.BUTTON_TYPE.SMALL)
+        this.backButton = new sc.ButtonGui(
+            '\\i[back]' + ig.lang.get('sc.gui.menu.back'),
+            undefined,
+            true,
+            sc.BUTTON_TYPE.SMALL
+        )
         this.backButton.setAlign(ig.GUI_ALIGN.X_RIGHT, ig.GUI_ALIGN.Y_TOP)
         this.backButton.setPos(0, 0)
         this.backButton.submitSound = sc.BUTTON_SOUND.back

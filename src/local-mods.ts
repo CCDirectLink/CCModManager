@@ -30,7 +30,10 @@ export class LocalMods {
     private static cache: ModEntryLocal[]
     private static cacheRecord: Record<string, ModEntryLocal>
 
-    private static localModFlags: Record<string, { disableUninstall?: boolean; disableDisabling?: boolean; disableUpdate?: boolean }> = {
+    private static localModFlags: Record<
+        string,
+        { disableUninstall?: boolean; disableDisabling?: boolean; disableUpdate?: boolean }
+    > = {
         ccloader: {
             disableDisabling: true,
             disableUninstall: true,

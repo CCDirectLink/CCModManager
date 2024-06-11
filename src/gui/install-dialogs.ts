@@ -29,31 +29,40 @@ export class ModInstallDialogs {
         const depsStr = deps.length > 0 ? `${Lang.dependencies}\n${modsToStr(deps)}` : ''
 
         const str = `${header}${toInstallStr}${toUpdateStr}${depsStr}`
-        sc.Dialogs.showChoiceDialog(str, sc.DIALOG_INFO_ICON.QUESTION, [ig.lang.get('sc.gui.dialogs.yes'), ig.lang.get('sc.gui.dialogs.no')], button => {
-            if (button.data != 0) return
-            const toInstall = InstallQueue.values()
-            ModInstaller.install(toInstall)
-                .then(() => {
-                    InstallQueue.clear()
-                    modmanager.gui.modMenuGui && sc.Model.notifyObserver(modmanager.gui.modMenuGui, modmanager.gui.MOD_MENU_MESSAGES.UPDATE_ENTRIES)
-                    sc.BUTTON_SOUND.shop_cash.play()
-                    sc.Dialogs.showYesNoDialog(Lang.askRestartInstall, sc.DIALOG_INFO_ICON.QUESTION, button => {
-                        if (button.data == 0) {
-                            ModInstaller.restartGame()
-                        } else {
-                            toInstall.forEach(mod => {
-                                mod.awaitingRestart = true
-                            })
-                        }
+        sc.Dialogs.showChoiceDialog(
+            str,
+            sc.DIALOG_INFO_ICON.QUESTION,
+            [ig.lang.get('sc.gui.dialogs.yes'), ig.lang.get('sc.gui.dialogs.no')],
+            button => {
+                if (button.data != 0) return
+                const toInstall = InstallQueue.values()
+                ModInstaller.install(toInstall)
+                    .then(() => {
+                        InstallQueue.clear()
+                        modmanager.gui.modMenuGui &&
+                            sc.Model.notifyObserver(
+                                modmanager.gui.modMenuGui,
+                                modmanager.gui.MOD_MENU_MESSAGES.UPDATE_ENTRIES
+                            )
+                        sc.BUTTON_SOUND.shop_cash.play()
+                        sc.Dialogs.showYesNoDialog(Lang.askRestartInstall, sc.DIALOG_INFO_ICON.QUESTION, button => {
+                            if (button.data == 0) {
+                                ModInstaller.restartGame()
+                            } else {
+                                toInstall.forEach(mod => {
+                                    mod.awaitingRestart = true
+                                })
+                            }
+                        })
                     })
-                })
-                .catch(err => {
-                    FileCache.isThereInternet(true).then(isThereInternet => {
-                        if (!isThereInternet) err = Lang.noInternet
-                        sc.Dialogs.showErrorDialog(err)
+                    .catch(err => {
+                        FileCache.isThereInternet(true).then(isThereInternet => {
+                            if (!isThereInternet) err = Lang.noInternet
+                            sc.Dialogs.showErrorDialog(err)
+                        })
                     })
-                })
-        })
+            }
+        )
     }
 
     static showAutoUpdateDialog() {
@@ -62,18 +71,25 @@ export class ModInstallDialogs {
         const toUpdate = InstallQueue.values().filter(mod => mod.installStatus == 'update')
         if (deps.length == 0 && toInstall.length == 0 && toUpdate.length == 0) return
 
-        sc.Dialogs.showChoiceDialog(Lang.updatesDetected, sc.DIALOG_INFO_ICON.QUESTION, [ig.lang.get('sc.gui.dialogs.yes'), ig.lang.get('sc.gui.dialogs.no')], button => {
-            if (button.data == 0) {
-                this.showModInstallDialog()
-            } else {
-                InstallQueue.clear()
+        sc.Dialogs.showChoiceDialog(
+            Lang.updatesDetected,
+            sc.DIALOG_INFO_ICON.QUESTION,
+            [ig.lang.get('sc.gui.dialogs.yes'), ig.lang.get('sc.gui.dialogs.no')],
+            button => {
+                if (button.data == 0) {
+                    this.showModInstallDialog()
+                } else {
+                    InstallQueue.clear()
+                }
             }
-        })
+        )
     }
 
     static showModUninstallDialog(localMod: ModEntryLocal): boolean {
         if (localMod.disableUninstall) {
-            sc.Dialogs.showErrorDialog(Lang.cannotUninstallDisabled.replace(/\[modName\]/, prepareModName(localMod.name)))
+            sc.Dialogs.showErrorDialog(
+                Lang.cannotUninstallDisabled.replace(/\[modName\]/, prepareModName(localMod.name))
+            )
             return false
         }
         if (localMod.isGit) {
@@ -83,30 +99,43 @@ export class ModInstallDialogs {
         const deps = ModInstaller.getWhatDependsOnAMod(localMod)
         if (deps.length > 0) {
             sc.Dialogs.showErrorDialog(
-                Lang.cannotUninstall.replace(/\[modName\]/, prepareModName(localMod.name)) + deps.map(mod => `- \\c[3]${prepareModName(mod.name)}\\c[0]\n`).join('')
+                Lang.cannotUninstall.replace(/\[modName\]/, prepareModName(localMod.name)) +
+                    deps.map(mod => `- \\c[3]${prepareModName(mod.name)}\\c[0]\n`).join('')
             )
             return false
         }
         const str = Lang.areYouSureYouWantToUninstall.replace(/\[modName\]/, prepareModName(localMod.name))
-        sc.Dialogs.showChoiceDialog(str, sc.DIALOG_INFO_ICON.QUESTION, [ig.lang.get('sc.gui.dialogs.no'), ig.lang.get('sc.gui.dialogs.yes')], button => {
-            if (button.data == 1) {
-                ModInstaller.uninstallMod(localMod)
-                    .then(() => {
-                        localMod.awaitingRestart = true
-                        localMod.active = false
-                        sc.Model.notifyObserver(modmanager.gui.modMenuGui, modmanager.gui.MOD_MENU_MESSAGES.UPDATE_ENTRIES)
-                        sc.BUTTON_SOUND.shop_cash.play()
-                        sc.Dialogs.showYesNoDialog(Lang.askRestartUninstall, sc.DIALOG_INFO_ICON.QUESTION, button => {
-                            if (button.data == 0) {
-                                ModInstaller.restartGame()
-                            }
+        sc.Dialogs.showChoiceDialog(
+            str,
+            sc.DIALOG_INFO_ICON.QUESTION,
+            [ig.lang.get('sc.gui.dialogs.no'), ig.lang.get('sc.gui.dialogs.yes')],
+            button => {
+                if (button.data == 1) {
+                    ModInstaller.uninstallMod(localMod)
+                        .then(() => {
+                            localMod.awaitingRestart = true
+                            localMod.active = false
+                            sc.Model.notifyObserver(
+                                modmanager.gui.modMenuGui,
+                                modmanager.gui.MOD_MENU_MESSAGES.UPDATE_ENTRIES
+                            )
+                            sc.BUTTON_SOUND.shop_cash.play()
+                            sc.Dialogs.showYesNoDialog(
+                                Lang.askRestartUninstall,
+                                sc.DIALOG_INFO_ICON.QUESTION,
+                                button => {
+                                    if (button.data == 0) {
+                                        ModInstaller.restartGame()
+                                    }
+                                }
+                            )
                         })
-                    })
-                    .catch(err => {
-                        sc.Dialogs.showErrorDialog(err)
-                    })
+                        .catch(err => {
+                            sc.Dialogs.showErrorDialog(err)
+                        })
+                }
             }
-        })
+        )
         return true
     }
 
@@ -118,7 +147,8 @@ export class ModInstallDialogs {
         const deps = ModInstaller.getWhatDependsOnAMod(mod, true)
         if (deps.length == 0) return true
         sc.Dialogs.showErrorDialog(
-            Lang.cannotDisable.replace(/\[modName\]/, prepareModName(mod.name)) + deps.map(mod => `- \\c[3]${prepareModName(mod.name)}\\c[0]\n`).join('')
+            Lang.cannotDisable.replace(/\[modName\]/, prepareModName(mod.name)) +
+                deps.map(mod => `- \\c[3]${prepareModName(mod.name)}\\c[0]\n`).join('')
         )
         return false
     }

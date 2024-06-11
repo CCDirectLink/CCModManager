@@ -54,7 +54,10 @@ export interface ModEntryServer extends ModEntryBase {
     tags: ValidTags[]
     testingVersion?: ModEntryServer
 
-    dependenciesCached?: Record<string, { mod: ModEntryServer; versionReqRanges: string[] }> /* cached by the installer */
+    dependenciesCached?: Record<
+        string,
+        { mod: ModEntryServer; versionReqRanges: string[] }
+    > /* cached by the installer */
     installStatus?: 'new' | 'dependency' | 'update'
 }
 

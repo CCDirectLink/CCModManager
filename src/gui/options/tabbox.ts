@@ -5,7 +5,10 @@ export {}
 declare global {
     namespace modmanager.gui {
         namespace ModSettingsTabBox {
-            type GuiOption = sc.OptionInfoBox | modmanager.gui.ModOptionsOptionRow | modmanager.gui.ModOptionsOptionButton
+            type GuiOption =
+                | sc.OptionInfoBox
+                | modmanager.gui.ModOptionsOptionRow
+                | modmanager.gui.ModOptionsOptionButton
         }
         interface ModSettingsTabBox extends ig.GuiElementBase, sc.Model.Observer {
             gfx: ig.Image
@@ -46,7 +49,13 @@ declare global {
             _createOptionList(this: this, category: string): void
             _rearrangeTabs(this: this): void
             _createCacheList(this: this, category: string, bool1?: boolean, bool2?: boolean): void
-            _createTabButton(this: this, title: string, x: number, categoryId: string, icon?: string): modmanager.gui.ModSettingsTabBox.TabButton
+            _createTabButton(
+                this: this,
+                title: string,
+                x: number,
+                categoryId: string,
+                icon?: string
+            ): modmanager.gui.ModSettingsTabBox.TabButton
 
             onButtonTraversal(this: this): void
             _resetButtons(this: this, tabButton?: modmanager.gui.ModSettingsTabBox.TabButton, unfocus?: boolean): void
@@ -143,7 +152,12 @@ modmanager.gui.ModSettingsTabBox = ig.GuiElementBase.extend({
         let tabIndex = 0
         for (const category in this.conf.structure) {
             const categorySettings = this.conf.structure[category].settings
-            this.tabs[category] = this._createTabButton(categorySettings.title, tabIndex++, category, categorySettings.tabIcon)
+            this.tabs[category] = this._createTabButton(
+                categorySettings.title,
+                tabIndex++,
+                category,
+                categorySettings.tabIcon
+            )
         }
         this.currentTab = 0
         this.tabGroup.setCurrentFocus(0, 0)

@@ -59,7 +59,12 @@ modmanager.gui.ModOptionsMenu = sc.BaseMenu.extend({
         modmanager.gui.modOptionsMenu = this
     },
     initHotkeyHelp() {
-        this.hotkeyHelp = new sc.ButtonGui('\\i[help]' + ig.lang.get('sc.gui.menu.hotkeys.help'), undefined, true, sc.BUTTON_TYPE.SMALL)
+        this.hotkeyHelp = new sc.ButtonGui(
+            '\\i[help]' + ig.lang.get('sc.gui.menu.hotkeys.help'),
+            undefined,
+            true,
+            sc.BUTTON_TYPE.SMALL
+        )
         this.hotkeyHelp.keepMouseFocus = true
         this.hotkeyHelp.hook.transitions = {
             DEFAULT: { state: {}, time: 0.2, timeFunction: KEY_SPLINES.EASE },
@@ -77,11 +82,20 @@ modmanager.gui.ModOptionsMenu = sc.BaseMenu.extend({
         this.hotkeyHelp.doStateTransition('HIDDEN')
     },
     initHotkeyDefault() {
-        this.hotkeyDefault = new sc.ButtonGui('\\i[help2]' + ig.lang.get('sc.gui.menu.hotkeys.reset-default'), undefined, true, sc.BUTTON_TYPE.SMALL)
+        this.hotkeyDefault = new sc.ButtonGui(
+            '\\i[help2]' + ig.lang.get('sc.gui.menu.hotkeys.reset-default'),
+            undefined,
+            true,
+            sc.BUTTON_TYPE.SMALL
+        )
         this.hotkeyDefault.keepMouseFocus = true
         this.hotkeyDefault.hook.transitions = {
             DEFAULT: { state: {}, time: 0.2, timeFunction: KEY_SPLINES.EASE },
-            HIDDEN: { state: { offsetY: -this.hotkeyDefault.hook.size.y }, time: 0.2, timeFunction: KEY_SPLINES.LINEAR },
+            HIDDEN: {
+                state: { offsetY: -this.hotkeyDefault.hook.size.y },
+                time: 0.2,
+                timeFunction: KEY_SPLINES.LINEAR,
+            },
         }
         this.hotkeyDefault.onButtonPress = () => {
             sc.Dialogs.showYesNoDialog(ig.lang.get('sc.gui.dialogs.resetAsk'), sc.DIALOG_INFO_ICON.WARNING, button => {
@@ -149,7 +163,13 @@ modmanager.gui.ModOptionsMenu = sc.BaseMenu.extend({
     createHelpGui() {
         const langData = this.getHelpMenuLangData()
         if (langData) {
-            this.helpGui = new sc.HelpScreen(this, langData.title, langData.pages, () => this.commitHotKeysToTopBar(true), true)
+            this.helpGui = new sc.HelpScreen(
+                this,
+                langData.title,
+                langData.pages,
+                () => this.commitHotKeysToTopBar(true),
+                true
+            )
             this.helpGui.hook.zIndex = 15e4
             this.helpGui.hook.pauseGui = true
         }
@@ -223,7 +243,11 @@ modmanager.gui.ModOptionsMenu = sc.BaseMenu.extend({
             y = arr.findIndex(e => {
                 if (typeof element.data !== typeof e.data) return false
                 if (typeof e.data === 'object' && typeof element.data === 'object') {
-                    return 'description' in e.data! && 'description' in element.data! && e.data.description == element.data.description
+                    return (
+                        'description' in e.data! &&
+                        'description' in element.data! &&
+                        e.data.description == element.data.description
+                    )
                 } else {
                     return e.data == element.data
                 }

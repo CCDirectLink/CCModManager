@@ -180,7 +180,12 @@ export type OptsType<E extends Options, O extends Record<string, any> = OmitNonC
     } & { flatOpts: FlatOpts<E> }
 
 export namespace ModOptionsSettings {
-    export type LanguageGetter = (category: string, header: string, optionId: string, option: Option) => { name: string; description: string; buttonNames?: string[] }
+    export type LanguageGetter = (
+        category: string,
+        header: string,
+        optionId: string,
+        option: Option
+    ) => { name: string; description: string; buttonNames?: string[] }
 }
 export interface ModOptionsSettings {
     modId: string
@@ -234,7 +239,8 @@ Number.prototype.round = function (this: number, decimalPlaces?: number) {
 }
 
 export const ObjectKeysT: <K extends string | number | symbol, V>(object: Record<K, V>) => K[] = Object.keys as any
-export const ObjectEntriesT: <K extends string | number | symbol, V>(object: { [key in K]?: V }) => [K, V][] = Object.entries as any
+export const ObjectEntriesT: <K extends string | number | symbol, V>(object: { [key in K]?: V }) => [K, V][] =
+    Object.entries as any
 
 window.modmanager ??= {} as any
 modmanager.gui = {} as any
@@ -320,7 +326,12 @@ function registerAndGetModOptions<T extends Options>(settings: ModOptionsSetting
                         const str = typeof v === 'object' ? JSON.stringify(v) : v.toString()
                         localStorage.setItem(id, str)
                         if (!noEvent && 'changeEvent' in option && option.changeEvent) option.changeEvent()
-                        if (!noEvent && 'updateMenuOnChange' in option && option.updateMenuOnChange && sc.menu?.currentMenu == sc.MENU_SUBMENU?.MOD_OPTIONS) {
+                        if (
+                            !noEvent &&
+                            'updateMenuOnChange' in option &&
+                            option.updateMenuOnChange &&
+                            sc.menu?.currentMenu == sc.MENU_SUBMENU?.MOD_OPTIONS
+                        ) {
                             modmanager.gui.modOptionsMenu.reopenMenu()
                         }
                     }

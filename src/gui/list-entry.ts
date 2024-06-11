@@ -101,7 +101,8 @@ modmanager.gui.ModListEntry = ig.FocusGui.extend({
         const serverMod = mod.isLocal ? mod.serverCounterpart : mod
 
         if (this.modList.currentTabIndex == modmanager.gui.MOD_MENU_TAB_INDEXES.DISABLED) this.setNameText(COLOR.RED)
-        else if (this.modList.currentTabIndex == modmanager.gui.MOD_MENU_TAB_INDEXES.ENABLED) this.setNameText(COLOR.GREEN)
+        else if (this.modList.currentTabIndex == modmanager.gui.MOD_MENU_TAB_INDEXES.ENABLED)
+            this.setNameText(COLOR.GREEN)
         else {
             if (localMod) {
                 if (localMod.active) this.setNameText(COLOR.GREEN)
@@ -110,7 +111,12 @@ modmanager.gui.ModListEntry = ig.FocusGui.extend({
         }
         if (InstallQueue.has(mod)) this.setNameText(COLOR.YELLOW)
 
-        this.highlight = new modmanager.gui.ModListEntryHighlight(this.hook.size.x, this.hook.size.y, this.nameText.hook.size.x, height)
+        this.highlight = new modmanager.gui.ModListEntryHighlight(
+            this.hook.size.x,
+            this.hook.size.y,
+            this.nameText.hook.size.x,
+            height
+        )
         this.highlight.setPos(this.iconOffset, 0)
         this.addChildGui(this.highlight)
         this.addChildGui(this.nameText)
@@ -136,7 +142,11 @@ modmanager.gui.ModListEntry = ig.FocusGui.extend({
                 const tags = serverMod.tags
                 const str = tags.map(a => `\\c[0]${a}\\c[0]`).join(', ')
                 const addSpace = str.length > 100 ? 60 : 0
-                this.tags = new sc.TextGui(str, { font: sc.fontsystem.smallFont, maxWidth: 130 + addSpace, linePadding: -4 })
+                this.tags = new sc.TextGui(str, {
+                    font: sc.fontsystem.smallFont,
+                    maxWidth: 130 + addSpace,
+                    linePadding: -4,
+                })
                 this.tags.setAlign(ig.GUI_ALIGN.X_RIGHT, ig.GUI_ALIGN.Y_TOP)
                 this.tags.setPos(4, 15)
                 this.addChildGui(this.tags)
@@ -201,7 +211,11 @@ modmanager.gui.ModListEntry = ig.FocusGui.extend({
         this.nameText.setText(`\\c[${color}]${text}\\c[0]`)
         this.nameText.setPos(4 + this.iconOffset + this.nameIconPrefixesText.hook.size.x, 0)
 
-        if (Opts.isGrid || this.nameText.hook.size.x + this.nameIconPrefixesText.hook.size.x - 17 >= this.hook.size.x - this.nameText.hook.pos.x) {
+        if (
+            Opts.isGrid ||
+            this.nameText.hook.size.x + this.nameIconPrefixesText.hook.size.x - 17 >=
+                this.hook.size.x - this.nameText.hook.pos.x
+        ) {
             this.nameText.setFont(sc.fontsystem.smallFont)
             this.nameText.hook.pos.y = 2
         } else {
@@ -213,7 +227,10 @@ modmanager.gui.ModListEntry = ig.FocusGui.extend({
         if (this.authors) {
             this.authors.setPos(this.nameText.hook.pos.x + this.nameText.hook.size.x + 4, 2)
             if (this.authors.font !== sc.fontsystem.tinyFont) {
-                const spaceLeft = this.hook.size.x - this.authors.hook.pos.x - (this.hook.size.x - (this.starCount?.hook.pos.x ?? this.versionText.hook.pos.x))
+                const spaceLeft =
+                    this.hook.size.x -
+                    this.authors.hook.pos.x -
+                    (this.hook.size.x - (this.starCount?.hook.pos.x ?? this.versionText.hook.pos.x))
                 const freeSpace = spaceLeft - this.authors.hook.size.x
                 if (freeSpace <= 0) {
                     this.authors.setFont(sc.fontsystem.tinyFont)
@@ -222,7 +239,10 @@ modmanager.gui.ModListEntry = ig.FocusGui.extend({
             }
         }
         const authorsW = this.authors?.hook.size.x
-        this.highlight?.updateWidth(this.hook.size.x, this.nameIconPrefixesText.hook.size.x + this.nameText.hook.size.x + (authorsW ? authorsW + 6 : 0))
+        this.highlight?.updateWidth(
+            this.hook.size.x,
+            this.nameIconPrefixesText.hook.size.x + this.nameText.hook.size.x + (authorsW ? authorsW + 6 : 0)
+        )
     },
     updateDrawables(renderer) {
         if (this.modList.hook.currentStateName != 'HIDDEN') {
@@ -245,7 +265,11 @@ modmanager.gui.ModListEntry = ig.FocusGui.extend({
             deps.push(mod)
             for (const mod of deps) {
                 mod.awaitingRestart = !mod.awaitingRestart
-                sc.Model.notifyObserver(modmanager.gui.modMenuGui, modmanager.gui.MOD_MENU_MESSAGES.ENTRY_UPDATE_COLOR, { mod, color: COLOR.GREEN })
+                sc.Model.notifyObserver(
+                    modmanager.gui.modMenuGui,
+                    modmanager.gui.MOD_MENU_MESSAGES.ENTRY_UPDATE_COLOR,
+                    { mod, color: COLOR.GREEN }
+                )
                 sc.BUTTON_SOUND.toggle_on.play()
                 LocalMods.setModActive(mod, true)
                 this.updateHighlightWidth()
@@ -267,14 +291,21 @@ modmanager.gui.ModListEntry = ig.FocusGui.extend({
     },
     modelChanged(model, message: modmanager.gui.MOD_MENU_MESSAGES, data) {
         const d = data as { mod: ModEntryLocal; color: COLOR }
-        if (model == modmanager.gui.modMenuGui && message == modmanager.gui.MOD_MENU_MESSAGES.ENTRY_UPDATE_COLOR && d.mod == this.mod) {
+        if (
+            model == modmanager.gui.modMenuGui &&
+            message == modmanager.gui.MOD_MENU_MESSAGES.ENTRY_UPDATE_COLOR &&
+            d.mod == this.mod
+        ) {
             this.setNameText(d.color)
         }
     },
     onButtonPress() {
         let mod = this.mod
         if (mod.isLocal) {
-            if (this.modList.currentTabIndex == modmanager.gui.MOD_MENU_TAB_INDEXES.ENABLED || this.modList.currentTabIndex == modmanager.gui.MOD_MENU_TAB_INDEXES.DISABLED) {
+            if (
+                this.modList.currentTabIndex == modmanager.gui.MOD_MENU_TAB_INDEXES.ENABLED ||
+                this.modList.currentTabIndex == modmanager.gui.MOD_MENU_TAB_INDEXES.DISABLED
+            ) {
                 if (mod.active) return this.tryDisableMod(mod)
                 else return this.tryEnableMod(mod)
             } else throw new Error('wat?')

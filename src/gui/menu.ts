@@ -101,7 +101,9 @@ sc.Control.inject({
         /* remove ig.input.pressed('special') to prevent weird list jumping on space bar press */
         return this.autoControl
             ? ig.input.currentDevice == ig.INPUT_DEVICES.GAMEPAD && this.autoControl.get('menuConfirm')
-            : (ig.input.pressed('confirm') || /* ig.input.pressed('special') || */ ig.gamepad.isButtonPressed(ig.BUTTONS.FACE0)) && !ig.interact.isBlocked()
+            : (ig.input.pressed('confirm') ||
+                  /* ig.input.pressed('special') || */ ig.gamepad.isButtonPressed(ig.BUTTONS.FACE0)) &&
+                  !ig.interact.isBlocked()
     },
 })
 
@@ -144,9 +146,21 @@ modmanager.gui.ModMenu = sc.ListInfoMenu.extend({
         this.inputField.hook.transitions['HIDDEN'] = this.installButton.hook.transitions['HIDDEN']
     },
     initSortMenu() {
-        this.sortMenu.addButton('name', modmanager.gui.MOD_MENU_SORT_ORDER.NAME, modmanager.gui.MOD_MENU_SORT_ORDER.NAME)
-        this.sortMenu.addButton('stars', modmanager.gui.MOD_MENU_SORT_ORDER.STARS, modmanager.gui.MOD_MENU_SORT_ORDER.STARS)
-        this.sortMenu.addButton('lastUpdated', modmanager.gui.MOD_MENU_SORT_ORDER.LAST_UPDATED, modmanager.gui.MOD_MENU_SORT_ORDER.LAST_UPDATED)
+        this.sortMenu.addButton(
+            'name',
+            modmanager.gui.MOD_MENU_SORT_ORDER.NAME,
+            modmanager.gui.MOD_MENU_SORT_ORDER.NAME
+        )
+        this.sortMenu.addButton(
+            'stars',
+            modmanager.gui.MOD_MENU_SORT_ORDER.STARS,
+            modmanager.gui.MOD_MENU_SORT_ORDER.STARS
+        )
+        this.sortMenu.addButton(
+            'lastUpdated',
+            modmanager.gui.MOD_MENU_SORT_ORDER.LAST_UPDATED,
+            modmanager.gui.MOD_MENU_SORT_ORDER.LAST_UPDATED
+        )
     },
     initInstallButton(bottomY) {
         this.installButton = new sc.ButtonGui('', 128, true, sc.BUTTON_TYPE.SMALL)
@@ -212,7 +226,12 @@ modmanager.gui.ModMenu = sc.ListInfoMenu.extend({
         this.addChildGui(this.filtersButton)
     },
     initTestingToggleButton() {
-        this.testingToggleButton = new sc.ButtonGui('', 1 /* width will get dynamicly changed anyways */, true, sc.BUTTON_TYPE.SMALL)
+        this.testingToggleButton = new sc.ButtonGui(
+            '',
+            1 /* width will get dynamicly changed anyways */,
+            true,
+            sc.BUTTON_TYPE.SMALL
+        )
         this.testingToggleButton.setAlign(ig.GUI_ALIGN.X_RIGHT, ig.GUI_ALIGN.Y_TOP)
         this.testingToggleButton.setPos(160, 22)
         this.testingToggleButton.doStateTransition('HIDDEN')
@@ -253,7 +272,12 @@ modmanager.gui.ModMenu = sc.ListInfoMenu.extend({
         this.addChildGui(this.testingToggleButton)
     },
     initOpenRepositoryUrlButton() {
-        this.openRepositoryUrlButton = new sc.ButtonGui('\\i[left]' + Lang.openRepositoryUrl, 140, true, sc.BUTTON_TYPE.SMALL)
+        this.openRepositoryUrlButton = new sc.ButtonGui(
+            '\\i[left]' + Lang.openRepositoryUrl,
+            140,
+            true,
+            sc.BUTTON_TYPE.SMALL
+        )
         this.openRepositoryUrlButton.setAlign(ig.GUI_ALIGN.X_RIGHT, ig.GUI_ALIGN.Y_TOP)
         this.openRepositoryUrlButton.setPos(10, 22)
         this.openRepositoryUrlButton.doStateTransition('HIDDEN')
@@ -301,7 +325,10 @@ modmanager.gui.ModMenu = sc.ListInfoMenu.extend({
     updateInstallButtonText() {
         const count = InstallQueue.values().length
         if (count > 0) {
-            this.installButton.setText('\\i[help4]' + Lang.installButton.replace(/\[modCount\]/, count.toString()), true)
+            this.installButton.setText(
+                '\\i[help4]' + Lang.installButton.replace(/\[modCount\]/, count.toString()),
+                true
+            )
         } else {
             this.installButton.setText(Lang.noModsSelected, true)
         }
@@ -337,7 +364,9 @@ modmanager.gui.ModMenu = sc.ListInfoMenu.extend({
                 const serverMod = entry.mod.isLocal ? entry.mod.serverCounterpart : entry.mod
                 if (serverMod?.testingVersion) {
                     this.testingToggleButton.doStateTransition('DEFAULT')
-                    this.testingToggleButton.setText('\\i[quick] ' + (ModDB.isModTestingOptIn(serverMod.id) ? Lang.testingOptOut : Lang.testingOptIn))
+                    this.testingToggleButton.setText(
+                        '\\i[quick] ' + (ModDB.isModTestingOptIn(serverMod.id) ? Lang.testingOptOut : Lang.testingOptIn)
+                    )
                 } else {
                     this.testingToggleButton.doStateTransition('HIDDEN')
                 }
@@ -398,7 +427,9 @@ modmanager.gui.ModMenu = sc.ListInfoMenu.extend({
         sc.menu.buttonInteract.addGlobalButton(this.openRepositoryUrlButton, () => sc.control.leftPressed())
         sc.menu.buttonInteract.addGlobalButton(
             this.modOptionsButton,
-            () => ig.input.pressed('special') /* space bar */ || /* R2 press */ ig.gamepad.isButtonPressed(sc.control._getSpecialButton())
+            () =>
+                ig.input.pressed('special') /* space bar */ ||
+                /* R2 press */ ig.gamepad.isButtonPressed(sc.control._getSpecialButton())
         )
     },
     hideMenu(_afterSubmenu, nextSubmenu) {
@@ -419,7 +450,9 @@ modmanager.gui.ModMenu = sc.ListInfoMenu.extend({
 
         if (
             LocalMods.getAll().some(mod => mod.awaitingRestart) ||
-            Object.values(ModDB.databases).some(db => db.active && Object.values(db.modRecord).some(mod => mod.awaitingRestart))
+            Object.values(ModDB.databases).some(
+                db => db.active && Object.values(db.modRecord).some(mod => mod.awaitingRestart)
+            )
         ) {
             sc.Dialogs.showYesNoDialog(Lang.modStatesChanged, sc.DIALOG_INFO_ICON.QUESTION, button => {
                 if (button.data == 0) {

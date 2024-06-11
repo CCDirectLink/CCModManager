@@ -74,7 +74,13 @@ modmanager.gui.ModMenuRepoAddPopup = ig.GuiElementBase.extend({
         this.buttonGroup = new sc.ButtonGroup()
         this.buttonInteract.pushButtonGroup(this.buttonGroup)
 
-        const backButton = new sc.ButtonGui('\\i[back]' + ig.lang.get('sc.gui.menu.back'), undefined, true, sc.BUTTON_TYPE.SMALL, sc.BUTTON_SOUND.back)
+        const backButton = new sc.ButtonGui(
+            '\\i[back]' + ig.lang.get('sc.gui.menu.back'),
+            undefined,
+            true,
+            sc.BUTTON_TYPE.SMALL,
+            sc.BUTTON_SOUND.back
+        )
         backButton.setAlign(ig.GUI_ALIGN.X_RIGHT, ig.GUI_ALIGN.Y_TOP)
         backButton.setPos(0, 0)
         backButton.onButtonPress = () => {

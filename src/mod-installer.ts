@@ -18,7 +18,11 @@ export class InstallQueue {
     private static queue: ModEntryServer[] = []
 
     static changeUpdate() {
-        modmanager.gui.modMenuGui && sc.Model.notifyObserver(modmanager.gui.modMenuGui, modmanager.gui.MOD_MENU_MESSAGES.SELECTED_ENTRIES_CHANGED)
+        modmanager.gui.modMenuGui &&
+            sc.Model.notifyObserver(
+                modmanager.gui.modMenuGui,
+                modmanager.gui.MOD_MENU_MESSAGES.SELECTED_ENTRIES_CHANGED
+            )
     }
     static add(...mods: ModEntryServer[]) {
         for (const mod of mods) {
@@ -162,7 +166,11 @@ export class ModInstaller {
         return true
     }
 
-    static async findDepsDatabase(mods: ModEntryServer[], modRecords: Record<string, ModEntryServer[]>, includeInstalled: boolean = false): Promise<ModEntryServer[]> {
+    static async findDepsDatabase(
+        mods: ModEntryServer[],
+        modRecords: Record<string, ModEntryServer[]>,
+        includeInstalled: boolean = false
+    ): Promise<ModEntryServer[]> {
         /* resolve local mod origin */
         LocalMods.initAll()
 
@@ -208,7 +216,9 @@ export class ModInstaller {
             const virtualMod = this.virtualMods[virtualModId]
 
             if (!this.matchesVersionReqRanges(virtualMod, dep.versionReqRanges)) {
-                throw new Error(`${virtualMod.name} version does not meat the requirement: ${dep.versionReqRanges.join(', ')}`)
+                throw new Error(
+                    `${virtualMod.name} version does not meat the requirement: ${dep.versionReqRanges.join(', ')}`
+                )
             }
             delete deps[virtualModId]
         }
@@ -233,7 +243,9 @@ export class ModInstaller {
     static async install(mods: ModEntryServer[]) {
         console.log('mods to install:', mods.map(mod => mod.id).join(', '))
 
-        const modsToInstall: ModEntryServer[] = mods.filter(mod => mod.installStatus == 'new' || mod.installStatus == 'dependency')
+        const modsToInstall: ModEntryServer[] = mods.filter(
+            mod => mod.installStatus == 'new' || mod.installStatus == 'dependency'
+        )
         const promises: Promise<void>[] = []
         for (const mod of modsToInstall) {
             promises.push(this.downloadAndInstallMod(mod))
@@ -276,7 +288,8 @@ export class ModInstaller {
             if (installation.url.endsWith('.ccmod')) {
                 return await this.installCCMod(data, modId)
             } else {
-                if (installation.source === undefined) throw new Error(`Mod: ${mod.id} is a .zip and has no source field. This is a database error.`)
+                if (installation.source === undefined)
+                    throw new Error(`Mod: ${mod.id} is a .zip and has no source field. This is a database error.`)
                 return await this.installModZip(data, modId, installation.source)
             }
         }
@@ -293,7 +306,12 @@ export class ModInstaller {
         return result == extected
     }
 
-    private static async installModZip(data: ArrayBuffer, id: string, source: string, prefixPath: string = 'assets/mods') {
+    private static async installModZip(
+        data: ArrayBuffer,
+        id: string,
+        source: string,
+        prefixPath: string = 'assets/mods'
+    ) {
         const zip = await loadAsync(data)
 
         await Promise.all(

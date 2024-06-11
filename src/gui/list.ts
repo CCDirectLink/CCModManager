@@ -15,7 +15,11 @@ declare global {
             tabz: {
                 name: string
                 icon: string
-                populateFunc: (list: sc.ButtonListBox, buttonGroup: sc.ButtonGroup, sort: modmanager.gui.MOD_MENU_SORT_ORDER) => void
+                populateFunc: (
+                    list: sc.ButtonListBox,
+                    buttonGroup: sc.ButtonGroup,
+                    sort: modmanager.gui.MOD_MENU_SORT_ORDER
+                ) => void
             }[]
             currentSort: modmanager.gui.MOD_MENU_SORT_ORDER
             gridColumns: number
@@ -25,10 +29,30 @@ declare global {
             reloadFilters(this: this): void
             reloadEntries(this: this): void
             sortModEntries(this: this, mods: ModEntry[], sort: modmanager.gui.MOD_MENU_SORT_ORDER): void
-            populateOnline(this: this, list: sc.ButtonListBox, buttonGroup: sc.ButtonGroup, sort: modmanager.gui.MOD_MENU_SORT_ORDER): void
-            populateSelected(this: this, list: sc.ButtonListBox, buttonGroup: sc.ButtonGroup, sort: modmanager.gui.MOD_MENU_SORT_ORDER): void
-            populateEnabled(this: this, list: sc.ButtonListBox, buttonGroup: sc.ButtonGroup, sort: modmanager.gui.MOD_MENU_SORT_ORDER): void
-            populateDisabled(this: this, list: sc.ButtonListBox, buttonGroup: sc.ButtonGroup, sort: modmanager.gui.MOD_MENU_SORT_ORDER): void
+            populateOnline(
+                this: this,
+                list: sc.ButtonListBox,
+                buttonGroup: sc.ButtonGroup,
+                sort: modmanager.gui.MOD_MENU_SORT_ORDER
+            ): void
+            populateSelected(
+                this: this,
+                list: sc.ButtonListBox,
+                buttonGroup: sc.ButtonGroup,
+                sort: modmanager.gui.MOD_MENU_SORT_ORDER
+            ): void
+            populateEnabled(
+                this: this,
+                list: sc.ButtonListBox,
+                buttonGroup: sc.ButtonGroup,
+                sort: modmanager.gui.MOD_MENU_SORT_ORDER
+            ): void
+            populateDisabled(
+                this: this,
+                list: sc.ButtonListBox,
+                buttonGroup: sc.ButtonGroup,
+                sort: modmanager.gui.MOD_MENU_SORT_ORDER
+            ): void
             populateListFromMods(this: this, mods: ModEntry[], list: sc.ButtonListBox): void
         }
         interface ModMenuListConstructor extends ImpactClass<ModMenuList> {

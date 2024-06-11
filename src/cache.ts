@@ -55,7 +55,9 @@ export class FileCache {
     static _isThereInternet: boolean | undefined
     static async isThereInternet(force: boolean = false): Promise<boolean> {
         if (force) FileCache._isThereInternet = undefined
-        return (FileCache._isThereInternet ??= await new Promise(resolve => dns.resolve('www.gnu.org', (err: any) => resolve(!err)))) as boolean
+        return (FileCache._isThereInternet ??= await new Promise(resolve =>
+            dns.resolve('www.gnu.org', (err: any) => resolve(!err))
+        )) as boolean
     }
 
     static getDefaultModIconConfig() {
@@ -73,7 +75,8 @@ export class FileCache {
         await fs.promises.mkdir(`${this.cacheDir}`, { recursive: true })
 
         this.inCache = new Set()
-        for await (const path of getFilesRecursive(this.cacheDir)) this.inCache.add(path.substring('./assets/mod-data/CCModManager/cache/'.length))
+        for await (const path of getFilesRecursive(this.cacheDir))
+            this.inCache.add(path.substring('./assets/mod-data/CCModManager/cache/'.length))
     }
 
     static prepareDatabase(name: string) {

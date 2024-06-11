@@ -82,7 +82,9 @@ export class ModDB {
     }
 
     static getHighestVersionMod<T extends ModEntry>(mods: T[]): T {
-        return mods.reduce((highestVerMod, currMod) => (semver_gt(currMod.version, highestVerMod.version) ? currMod : highestVerMod))
+        return mods.reduce((highestVerMod, currMod) =>
+            semver_gt(currMod.version, highestVerMod.version) ? currMod : highestVerMod
+        )
     }
 
     static async getLocalModOrigins(id: string): Promise<ModEntryServer[]> {
@@ -141,7 +143,9 @@ export class ModDB {
     //     return this.isDatabaseTesting(this.databases[mod.database])
     // }
 
-    static removeModDuplicatesAndResolveTesting(modsRecord: Record<string, ModEntryServer[]>): Record<string, ModEntryServer> {
+    static removeModDuplicatesAndResolveTesting(
+        modsRecord: Record<string, ModEntryServer[]>
+    ): Record<string, ModEntryServer> {
         const uniqueMods: Record<string /*modid */, ModEntryServer> = {}
 
         const testingDbs: string[] = []

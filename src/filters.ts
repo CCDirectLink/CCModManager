@@ -14,7 +14,12 @@ export interface Fliters {
 
 function doesFilterApply(filters: Fliters, mod: ModEntry): boolean {
     if (filters.hasIcon && !mod.hasIcon) return false
-    if (!filters.includeLocal && !mod.isLocal /* we only want to exclude server entries of local mods */ && LocalMods.getAllRecord()[mod.id]) return false
+    if (
+        !filters.includeLocal &&
+        !mod.isLocal /* we only want to exclude server entries of local mods */ &&
+        LocalMods.getAllRecord()[mod.id]
+    )
+        return false
     const tags = (mod.isLocal ? mod.serverCounterpart : mod)?.tags
     if (tags) {
         if (filters.hideLibraryMods && tags[0] == 'library') return false

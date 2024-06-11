@@ -6,7 +6,13 @@ declare global {
             guiOption: GuiOption
         }
         interface ModOptionsOptionRowConstructor extends ImpactClass<ModOptionsOptionRow> {
-            new (option: GuiOption, row: number, rowGroup: sc.RowButtonGroup, width?: number, height?: number): ModOptionsOptionRow
+            new (
+                option: GuiOption,
+                row: number,
+                rowGroup: sc.RowButtonGroup,
+                width?: number,
+                height?: number
+            ): ModOptionsOptionRow
         }
         var ModOptionsOptionRow: ModOptionsOptionRowConstructor
     }
@@ -39,7 +45,8 @@ modmanager.gui.ModOptionsOptionRow = sc.OptionRow.extend({
         this.addChildGui(imageGui)
 
         const x = this.hook.size.x - 175
-        const optionType = sc.OPTION_TYPES[this.option.type] as 0 | 1 | 2 | 3 | 4 | 5 /* <- all sc.OPTION_TYPES values expect sc.OPTION_TYPES.INFO */
+        // prettier-ignore
+        const optionType = sc.OPTION_TYPES[this.option.type] as | 0 | 1 | 2 | 3 | 4 | 5 /* <- all sc.OPTION_TYPES values expect sc.OPTION_TYPES.INFO */
         const optionClass = sc.OPTION_GUIS[optionType]
         if (optionClass) {
             const typeGui: ig.GuiElementBase = new optionClass(this as unknown as sc.OptionRow, x, rowGroup)
