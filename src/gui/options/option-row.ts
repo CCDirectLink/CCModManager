@@ -1,7 +1,7 @@
 import type { GuiOption } from '../../mod-options'
 
 declare global {
-    namespace sc {
+    namespace modmanager.gui {
         interface ModOptionsOptionRow extends sc.OptionRow {
             guiOption: GuiOption
         }
@@ -11,7 +11,7 @@ declare global {
         var ModOptionsOptionRow: ModOptionsOptionRowConstructor
     }
 }
-sc.ModOptionsOptionRow = sc.OptionRow.extend({
+modmanager.gui.ModOptionsOptionRow = sc.OptionRow.extend({
     init(option, row, rowGroup, width, height) {
         ig.GuiElementBase.prototype.init.call(this)
 

@@ -29,6 +29,14 @@ function enterModsMenu(direct: boolean) {
     }
 }
 
+declare global {
+    namespace sc {
+        interface OptionsMenu {
+            modsButton: sc.ButtonGui
+        }
+    }
+}
+
 sc.OptionsMenu.inject({
     init() {
         this.parent()

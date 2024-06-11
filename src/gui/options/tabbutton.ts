@@ -1,6 +1,6 @@
 export {}
 declare global {
-    namespace sc.ModSettingsTabBox {
+    namespace modmanager.gui.ModSettingsTabBox {
         interface TabButton extends sc.ItemTabbedBox.TabButton {
             data: {
                 type: string
@@ -17,4 +17,4 @@ declare global {
         }
     }
 }
-sc.ModSettingsTabBox.TabButton = sc.ItemTabbedBox.TabButton.extend({})
+modmanager.gui.ModSettingsTabBox.TabButton = sc.ItemTabbedBox.TabButton.extend({})

@@ -9,26 +9,26 @@ import { Lang } from '../lang-manager'
 import { Opts } from '../options'
 
 declare global {
-    namespace sc {
+    namespace modmanager.gui {
         interface ModMenuList extends sc.ListTabbedPane, sc.Model.Observer {
             filters: Fliters
             tabz: {
                 name: string
                 icon: string
-                populateFunc: (list: sc.ButtonListBox, buttonGroup: sc.ButtonGroup, sort: sc.MOD_MENU_SORT_ORDER) => void
+                populateFunc: (list: sc.ButtonListBox, buttonGroup: sc.ButtonGroup, sort: modmanager.gui.MOD_MENU_SORT_ORDER) => void
             }[]
-            currentSort: sc.MOD_MENU_SORT_ORDER
+            currentSort: modmanager.gui.MOD_MENU_SORT_ORDER
             gridColumns: number
             restoreLastPosition?: { tab: number; element: Vec2 }
 
             updateColumnCount(this: this): void
             reloadFilters(this: this): void
             reloadEntries(this: this): void
-            sortModEntries(this: this, mods: ModEntry[], sort: sc.MOD_MENU_SORT_ORDER): void
-            populateOnline(this: this, list: sc.ButtonListBox, buttonGroup: sc.ButtonGroup, sort: sc.MOD_MENU_SORT_ORDER): void
-            populateSelected(this: this, list: sc.ButtonListBox, buttonGroup: sc.ButtonGroup, sort: sc.MOD_MENU_SORT_ORDER): void
-            populateEnabled(this: this, list: sc.ButtonListBox, buttonGroup: sc.ButtonGroup, sort: sc.MOD_MENU_SORT_ORDER): void
-            populateDisabled(this: this, list: sc.ButtonListBox, buttonGroup: sc.ButtonGroup, sort: sc.MOD_MENU_SORT_ORDER): void
+            sortModEntries(this: this, mods: ModEntry[], sort: modmanager.gui.MOD_MENU_SORT_ORDER): void
+            populateOnline(this: this, list: sc.ButtonListBox, buttonGroup: sc.ButtonGroup, sort: modmanager.gui.MOD_MENU_SORT_ORDER): void
+            populateSelected(this: this, list: sc.ButtonListBox, buttonGroup: sc.ButtonGroup, sort: modmanager.gui.MOD_MENU_SORT_ORDER): void
+            populateEnabled(this: this, list: sc.ButtonListBox, buttonGroup: sc.ButtonGroup, sort: modmanager.gui.MOD_MENU_SORT_ORDER): void
+            populateDisabled(this: this, list: sc.ButtonListBox, buttonGroup: sc.ButtonGroup, sort: modmanager.gui.MOD_MENU_SORT_ORDER): void
             populateListFromMods(this: this, mods: ModEntry[], list: sc.ButtonListBox): void
         }
         interface ModMenuListConstructor extends ImpactClass<ModMenuList> {
@@ -48,7 +48,7 @@ declare global {
 export const modMenuListWidth = 552
 const modMenuListHeight = 240
 
-sc.ModMenuList = sc.ListTabbedPane.extend({
+modmanager.gui.ModMenuList = sc.ListTabbedPane.extend({
     transitions: {
         DEFAULT: { state: {}, time: 0.2, timeFunction: KEY_SPLINES.LINEAR },
         HIDDEN: { state: { alpha: 0, offsetX: 218 }, time: 0.2, timeFunction: KEY_SPLINES.LINEAR },
@@ -72,14 +72,14 @@ sc.ModMenuList = sc.ListTabbedPane.extend({
             ],
         ]
         if (!ig.isdemo) {
-            sc.MOD_MENU_TAB_INDEXES = {
+            modmanager.gui.MOD_MENU_TAB_INDEXES = {
                 ONLINE: 0,
                 SELECTED: 1,
                 ENABLED: 2,
                 DISABLED: 3,
             }
         } else {
-            sc.MOD_MENU_TAB_INDEXES = {
+            modmanager.gui.MOD_MENU_TAB_INDEXES = {
                 ENABLED: 0,
                 DISABLED: 1,
 
@@ -142,7 +142,7 @@ sc.ModMenuList = sc.ListTabbedPane.extend({
         this.removeObservers!()
     },
     onInitSortType() {
-        return sc.MOD_MENU_SORT_ORDER.LAST_UPDATED
+        return modmanager.gui.MOD_MENU_SORT_ORDER.LAST_UPDATED
     },
     onTabButtonCreation(key: string, _index: number, settings) {
         const icon = this.tabz.find(tab => tab.name == key)!.icon
@@ -197,28 +197,28 @@ sc.ModMenuList = sc.ListTabbedPane.extend({
     },
     addObservers() {
         sc.Model.addObserver(sc.menu, this)
-        sc.Model.addObserver(sc.modMenuGui, this)
+        sc.Model.addObserver(modmanager.gui.modMenuGui, this)
     },
     removeObservers() {
         sc.Model.removeObserver(sc.menu, this)
-        sc.Model.removeObserver(sc.modMenuGui, this)
+        sc.Model.removeObserver(modmanager.gui.modMenuGui, this)
     },
     modelChanged(model, message, data) {
         if (model == sc.menu) {
             if (message == sc.MENU_EVENT.SORT_LIST) {
-                const sort = ((data as sc.ButtonGui).data as any).sortType as sc.MOD_MENU_SORT_ORDER
+                const sort = ((data as sc.ButtonGui).data as any).sortType as modmanager.gui.MOD_MENU_SORT_ORDER
                 this.currentSort = sort
                 this.reloadEntries()
             }
-        } else if (model == sc.modMenuGui) {
-            if (message == sc.MOD_MENU_MESSAGES.UPDATE_ENTRIES) {
+        } else if (model == modmanager.gui.modMenuGui) {
+            if (message == modmanager.gui.MOD_MENU_MESSAGES.UPDATE_ENTRIES) {
                 this.reloadEntries()
             }
         }
     },
     setTab(index, ignorePrev, settings) {
         this.parent(index, ignorePrev, settings)
-        sc.Model.notifyObserver(sc.modMenuGui, sc.MOD_MENU_MESSAGES.TAB_CHANGED)
+        sc.Model.notifyObserver(modmanager.gui.modMenuGui, modmanager.gui.MOD_MENU_MESSAGES.TAB_CHANGED)
     },
     /* new stuff */
     sortModEntries(mods, sort) {
@@ -226,12 +226,12 @@ sc.ModMenuList = sc.ListTabbedPane.extend({
             function gm(m: ModEntry) {
                 return m.isLocal && m.serverCounterpart ? m.serverCounterpart : m
             }
-            if (sort == sc.MOD_MENU_SORT_ORDER.NAME) {
+            if (sort == modmanager.gui.MOD_MENU_SORT_ORDER.NAME) {
                 mods.sort((a, b) => a.name.localeCompare(b.name))
-            } else if (sort == sc.MOD_MENU_SORT_ORDER.STARS) {
+            } else if (sort == modmanager.gui.MOD_MENU_SORT_ORDER.STARS) {
                 mods.sort((a, b) => a.name.localeCompare(b.name))
                 mods.sort((a, b) => (gm(b).stars ?? -100) - (gm(a).stars ?? -100))
-            } else if (sort == sc.MOD_MENU_SORT_ORDER.LAST_UPDATED) {
+            } else if (sort == modmanager.gui.MOD_MENU_SORT_ORDER.LAST_UPDATED) {
                 mods.sort((a, b) => a.name.localeCompare(b.name))
                 mods.sort((a1, b1) => {
                     const a = gm(a1)
@@ -243,23 +243,23 @@ sc.ModMenuList = sc.ListTabbedPane.extend({
             }
         }
     },
-    populateOnline(list, _, sort: sc.MOD_MENU_SORT_ORDER) {
+    populateOnline(list, _, sort: modmanager.gui.MOD_MENU_SORT_ORDER) {
         let mods = Object.values(ModDB.removeModDuplicatesAndResolveTesting(ModDB.modRecord))
         mods = createFuzzyFilteredModList(this.filters, mods)
         this.sortModEntries(mods, sort)
         this.populateListFromMods(mods, list)
     },
-    populateSelected(list, _, sort: sc.MOD_MENU_SORT_ORDER) {
+    populateSelected(list, _, sort: modmanager.gui.MOD_MENU_SORT_ORDER) {
         const mods = createFuzzyFilteredModList(this.filters, InstallQueue.values())
         this.sortModEntries(mods, sort)
         this.populateListFromMods(mods, list)
     },
-    populateEnabled(list, _, sort: sc.MOD_MENU_SORT_ORDER) {
+    populateEnabled(list, _, sort: modmanager.gui.MOD_MENU_SORT_ORDER) {
         const mods = createFuzzyFilteredModList(this.filters, LocalMods.getActive())
         this.sortModEntries(mods, sort)
         this.populateListFromMods(mods, list)
     },
-    populateDisabled(list, _, sort: sc.MOD_MENU_SORT_ORDER) {
+    populateDisabled(list, _, sort: modmanager.gui.MOD_MENU_SORT_ORDER) {
         const mods = createFuzzyFilteredModList(this.filters, LocalMods.getInactive())
         this.sortModEntries(mods, sort)
         this.populateListFromMods(mods, list)
@@ -268,7 +268,7 @@ sc.ModMenuList = sc.ListTabbedPane.extend({
         const totalWidth = this.hook.size.x
         for (let i = 0; i < mods.length; i++) {
             const mod = mods[i]
-            const newModEntry = new sc.ModListEntry(mod, this)
+            const newModEntry = new modmanager.gui.ModListEntry(mod, this)
             const x = Opts.isGrid ? (i % this.gridColumns) * (totalWidth / this.gridColumns - 1) : 0
             list.addButton(newModEntry, undefined, x)
         }

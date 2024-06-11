@@ -14,7 +14,7 @@ import type * as ___ from 'nax-ccuilib/src/headers/nax/input-field-type.d.ts'
 import type * as ____ from '../../node_modules/crossedeyes/src/tts/gather/checkbox-types.d'
 
 declare global {
-    namespace sc {
+    namespace modmanager.gui {
         enum MOD_MENU_SORT_ORDER {
             NAME,
             STARS,
@@ -38,8 +38,8 @@ declare global {
             modOptionsButton: sc.ButtonGui
             checkUpdatesButton: sc.ButtonGui
             filtersButton: sc.ButtonGui
-            filtersPopup: sc.FiltersPopup
-            reposPopup: sc.ModMenuRepoAddPopup
+            filtersPopup: modmanager.gui.FiltersPopup
+            reposPopup: modmanager.gui.ModMenuRepoAddPopup
 
             initInputField(this: this): void
             initSortMenu(this: this): void
@@ -57,7 +57,7 @@ declare global {
             onBackButtonPress(this: this): void
             setTabEvent(this: this): void
             showModInstallDialog(this: this): void
-            getCurrentlyFocusedModEntry(this: this): sc.ModListEntry | undefined
+            getCurrentlyFocusedModEntry(this: this): modmanager.gui.ModListEntry | undefined
             openModSettings(this: this, mod: ModEntry): void
             openRepositoriesPopup(this: this): void
         }
@@ -67,13 +67,18 @@ declare global {
         var ModMenu: ModMenuConstructor
         var modMenuGui: ModMenu
     }
+    namespace sc {
+        enum MENU_SUBMENU {
+            MODS,
+        }
+    }
 }
-sc.MOD_MENU_SORT_ORDER = {
+modmanager.gui.MOD_MENU_SORT_ORDER = {
     NAME: 0,
     STARS: 1,
     LAST_UPDATED: 2,
 }
-sc.MOD_MENU_MESSAGES = {
+modmanager.gui.MOD_MENU_MESSAGES = {
     SELECTED_ENTRIES_CHANGED: 0,
     TAB_CHANGED: 1,
     UPDATE_ENTRIES: 2,
@@ -91,7 +96,7 @@ sc.GlobalInput.inject({
 
 sc.Control.inject({
     menuConfirm() {
-        if (!sc.modMenuGui?.isVisible()) return this.parent()
+        if (!modmanager.gui.modMenuGui?.isVisible()) return this.parent()
 
         /* remove ig.input.pressed('special') to prevent weird list jumping on space bar press */
         return this.autoControl
@@ -105,12 +110,12 @@ function getMainMenu(): sc.MainMenu {
 }
 
 let menuPurgeTimeoutId: NodeJS.Timeout
-sc.ModMenu = sc.ListInfoMenu.extend({
+modmanager.gui.ModMenu = sc.ListInfoMenu.extend({
     observers: [],
     init() {
-        sc.modMenuGui = this
+        modmanager.gui.modMenuGui = this
         ModDB.loadDatabases()
-        this.parent(new sc.ModMenuList())
+        this.parent(new modmanager.gui.ModMenuList())
         this.list.setPos(9, 23)
 
         this.initSortMenu()
@@ -139,16 +144,16 @@ sc.ModMenu = sc.ListInfoMenu.extend({
         this.inputField.hook.transitions['HIDDEN'] = this.installButton.hook.transitions['HIDDEN']
     },
     initSortMenu() {
-        this.sortMenu.addButton('name', sc.MOD_MENU_SORT_ORDER.NAME, sc.MOD_MENU_SORT_ORDER.NAME)
-        this.sortMenu.addButton('stars', sc.MOD_MENU_SORT_ORDER.STARS, sc.MOD_MENU_SORT_ORDER.STARS)
-        this.sortMenu.addButton('lastUpdated', sc.MOD_MENU_SORT_ORDER.LAST_UPDATED, sc.MOD_MENU_SORT_ORDER.LAST_UPDATED)
+        this.sortMenu.addButton('name', modmanager.gui.MOD_MENU_SORT_ORDER.NAME, modmanager.gui.MOD_MENU_SORT_ORDER.NAME)
+        this.sortMenu.addButton('stars', modmanager.gui.MOD_MENU_SORT_ORDER.STARS, modmanager.gui.MOD_MENU_SORT_ORDER.STARS)
+        this.sortMenu.addButton('lastUpdated', modmanager.gui.MOD_MENU_SORT_ORDER.LAST_UPDATED, modmanager.gui.MOD_MENU_SORT_ORDER.LAST_UPDATED)
     },
     initInstallButton(bottomY) {
         this.installButton = new sc.ButtonGui('', 128, true, sc.BUTTON_TYPE.SMALL)
         this.updateInstallButtonText()
         this.installButton.setPos(152, bottomY)
         this.installButton.onButtonPress = () => {
-            if (this.list.currentTabIndex == sc.MOD_MENU_TAB_INDEXES.SELECTED) sc.BUTTON_SOUND.submit.play()
+            if (this.list.currentTabIndex == modmanager.gui.MOD_MENU_TAB_INDEXES.SELECTED) sc.BUTTON_SOUND.submit.play()
             ModInstaller.findDepsDatabase(InstallQueue.values(), ModDB.modRecord)
                 .then(mods => {
                     InstallQueue.add(...mods)
@@ -181,10 +186,10 @@ sc.ModMenu = sc.ListInfoMenu.extend({
         this.checkUpdatesButton = new sc.ButtonGui(Lang.checkUpdates, 100, true, sc.BUTTON_TYPE.SMALL)
         this.checkUpdatesButton.setPos(285, bottomY)
         this.checkUpdatesButton.onButtonPress = () => {
-            if (this.list.currentTabIndex == sc.MOD_MENU_TAB_INDEXES.SELECTED) sc.BUTTON_SOUND.submit.play()
+            if (this.list.currentTabIndex == modmanager.gui.MOD_MENU_TAB_INDEXES.SELECTED) sc.BUTTON_SOUND.submit.play()
             ModInstaller.appendToUpdateModsToQueue().then(hasUpdated => {
                 if (hasUpdated) {
-                    sc.Model.notifyObserver(sc.modMenuGui, sc.MOD_MENU_MESSAGES.UPDATE_ENTRIES)
+                    sc.Model.notifyObserver(modmanager.gui.modMenuGui, modmanager.gui.MOD_MENU_MESSAGES.UPDATE_ENTRIES)
                     this.list.tabGroup._invokePressCallbacks(this.list.tabs[Lang.selectedModsTab], true)
                     sc.Dialogs.showInfoDialog(Lang.updatesFound)
                 } else {
@@ -197,7 +202,7 @@ sc.ModMenu = sc.ListInfoMenu.extend({
         this.addChildGui(this.checkUpdatesButton)
     },
     initFiltersButton(bottomY) {
-        this.filtersPopup = new sc.FiltersPopup()
+        this.filtersPopup = new modmanager.gui.FiltersPopup()
         this.filtersButton = new sc.ButtonGui('\\i[menu]' + Lang.filtersButton, 80, true, sc.BUTTON_TYPE.SMALL)
         this.filtersButton.setPos(480, bottomY)
         this.filtersButton.onButtonPress = () => {
@@ -277,7 +282,7 @@ sc.ModMenu = sc.ListInfoMenu.extend({
                 const modEntry = this.getCurrentlyFocusedModEntry()!
                 const mod = modEntry.mod
 
-                if (!sc.modMenu.optionConfigs[mod.id]) return false
+                if (!modmanager.optionConfigs[mod.id]) return false
 
                 this.openModSettings(mod)
                 return true
@@ -304,7 +309,7 @@ sc.ModMenu = sc.ListInfoMenu.extend({
     },
     setTabEvent() {
         /* handle install button */
-        if (this.list.currentTabIndex > sc.MOD_MENU_TAB_INDEXES.SELECTED) {
+        if (this.list.currentTabIndex > modmanager.gui.MOD_MENU_TAB_INDEXES.SELECTED) {
             this.installButton.doStateTransition('HIDDEN')
             this.checkUpdatesButton.doStateTransition('HIDDEN')
         } else {
@@ -313,20 +318,20 @@ sc.ModMenu = sc.ListInfoMenu.extend({
         }
     },
     addObservers() {
-        sc.Model.addObserver(sc.modMenuGui, this)
+        sc.Model.addObserver(modmanager.gui.modMenuGui, this)
     },
     removeObservers() {
-        sc.Model.removeObserver(sc.modMenuGui, this)
+        sc.Model.removeObserver(modmanager.gui.modMenuGui, this)
     },
     modelChanged(model, message, data) {
         this.parent(model, message, data)
-        if (model == sc.modMenuGui) {
-            if (message == sc.MOD_MENU_MESSAGES.TAB_CHANGED) {
+        if (model == modmanager.gui.modMenuGui) {
+            if (message == modmanager.gui.MOD_MENU_MESSAGES.TAB_CHANGED) {
                 this.setTabEvent()
-            } else if (message == sc.MOD_MENU_MESSAGES.SELECTED_ENTRIES_CHANGED) {
+            } else if (message == modmanager.gui.MOD_MENU_MESSAGES.SELECTED_ENTRIES_CHANGED) {
                 this.updateInstallButtonText()
-            } else if (message == sc.MOD_MENU_MESSAGES.ENTRY_FOCUSED) {
-                const entry = data as sc.ModListEntry
+            } else if (message == modmanager.gui.MOD_MENU_MESSAGES.ENTRY_FOCUSED) {
+                const entry = data as modmanager.gui.ModListEntry
                 if (entry.mod.isLocal || entry.mod.localCounterpart) this.uninstallButton.setActive(true)
 
                 const serverMod = entry.mod.isLocal ? entry.mod.serverCounterpart : entry.mod
@@ -339,8 +344,8 @@ sc.ModMenu = sc.ListInfoMenu.extend({
 
                 this.openRepositoryUrlButton.doStateTransition(entry.mod.repositoryUrl ? 'DEFAULT' : 'HIDDEN')
 
-                this.modOptionsButton.doStateTransition(sc.modMenu.optionConfigs[entry.mod.id] ? 'DEFAULT' : 'HIDDEN')
-            } else if (message == sc.MOD_MENU_MESSAGES.ENTRY_UNFOCUSED) {
+                this.modOptionsButton.doStateTransition(modmanager.optionConfigs[entry.mod.id] ? 'DEFAULT' : 'HIDDEN')
+            } else if (message == modmanager.gui.MOD_MENU_MESSAGES.ENTRY_UNFOCUSED) {
                 this.uninstallButton.setActive(false)
 
                 this.testingToggleButton.doStateTransition('HIDDEN')
@@ -460,7 +465,7 @@ sc.ModMenu = sc.ListInfoMenu.extend({
                 acc.push(...v)
                 return acc
             }, [])
-            .find((b: ig.FocusGui) => b.focus) as sc.ModListEntry
+            .find((b: ig.FocusGui) => b.focus) as modmanager.gui.ModListEntry
     },
     openModSettings(mod) {
         this.list.restoreLastPosition = {
@@ -468,10 +473,10 @@ sc.ModMenu = sc.ListInfoMenu.extend({
             element: Vec2.create(this.list.currentList.buttonGroup.current),
         }
         sc.menu.pushMenu(sc.MENU_SUBMENU.MOD_OPTIONS)
-        sc.modOptionsMenu.updateEntries(mod)
+        modmanager.gui.modOptionsMenu.updateEntries(mod)
     },
     openRepositoriesPopup() {
-        if (!this.reposPopup) this.reposPopup = new sc.ModMenuRepoAddPopup()
+        if (!this.reposPopup) this.reposPopup = new modmanager.gui.ModMenuRepoAddPopup()
         this.reposPopup.show()
     },
 })
@@ -481,6 +486,6 @@ sc.MENU_SUBMENU.MODS = Math.max(...Object.values(sc.MENU_SUBMENU)) + 1
 
 const modsMenuId = 'mods'
 sc.SUB_MENU_INFO[sc.MENU_SUBMENU.MODS] = {
-    Clazz: sc.ModMenu,
+    Clazz: modmanager.gui.ModMenu,
     name: modsMenuId,
 }

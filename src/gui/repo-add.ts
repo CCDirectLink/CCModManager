@@ -2,10 +2,9 @@ import type * as _ from 'nax-ccuilib/src/headers/nax/input-field.d.ts'
 import type * as __ from 'nax-ccuilib/src/headers/nax/input-field-cursor.d.ts'
 import type * as ___ from 'nax-ccuilib/src/headers/nax/input-field-type.d.ts'
 import { ModDB } from '../moddb'
-import { LocalMods } from '../local-mods'
 
 declare global {
-    namespace sc {
+    namespace modmanager.gui {
         interface ModMenuRepoAddPopup extends ig.GuiElementBase {
             gfx: ig.Image
             buttonInteract: ig.ButtonInteractEntry
@@ -46,7 +45,7 @@ function isValidUrl(urlString: string) {
     return !!urlPattern.test(urlString)
 }
 
-sc.ModMenuRepoAddPopup = ig.GuiElementBase.extend({
+modmanager.gui.ModMenuRepoAddPopup = ig.GuiElementBase.extend({
     gfx: new ig.Image('media/gui/menu.png'),
     transitions: {
         DEFAULT: { state: { alpha: 1 }, time: 0.2, timeFunction: KEY_SPLINES.EASE_OUT },

@@ -208,13 +208,11 @@ const defaultLanguageGetter: ModOptionsSettings.LanguageGetter = (category, head
 }
 
 declare global {
-    namespace sc {
-        var modMenu: {
-            optionConfigs: Record<string, ModSettingsGui>
-            options: Record<string, Record<string, any>>
+    namespace modmanager {
+        var optionConfigs: Record<string, ModSettingsGui>
+        var options: Record<string, Record<string, any>>
 
-            registerAndGetModOptions<T extends Options>(settings: ModOptionsSettings, options: T): OptsType<T>
-        }
+        function registerAndGetModOptions<T extends Options>(settings: ModOptionsSettings, options: T): OptsType<T>
     }
 }
 
@@ -238,20 +236,20 @@ Number.prototype.round = function (this: number, decimalPlaces?: number) {
 export const ObjectKeysT: <K extends string | number | symbol, V>(object: Record<K, V>) => K[] = Object.keys as any
 export const ObjectEntriesT: <K extends string | number | symbol, V>(object: { [key in K]?: V }) => [K, V][] = Object.entries as any
 
-window.sc ??= {} as any
-sc.modMenu ??= {} as any
-sc.modMenu.options ??= {} as any
-sc.modMenu.optionConfigs ??= {} as any
+window.modmanager ??= {} as any
+modmanager.gui = {} as any
+modmanager.options = {}
+modmanager.optionConfigs = {}
 
 const controlsToSet: (GuiOption & { type: 'CONTROLS' })[] = []
 
-sc.modMenu.registerAndGetModOptions = registerAndGetModOptions
+modmanager.registerAndGetModOptions = registerAndGetModOptions
 function registerAndGetModOptions<T extends Options>(settings: ModOptionsSettings, options: T): OptsType<T> {
     const Opts: OptsType<T> = {} as any
     Opts.flatOpts = {} as any
 
     const guiStructure: ModSettingsGuiStructure = {}
-    sc.modMenu.optionConfigs[settings.modId] = {
+    modmanager.optionConfigs[settings.modId] = {
         settings,
         structure: guiStructure,
     }
@@ -323,7 +321,7 @@ function registerAndGetModOptions<T extends Options>(settings: ModOptionsSetting
                         localStorage.setItem(id, str)
                         if (!noEvent && 'changeEvent' in option && option.changeEvent) option.changeEvent()
                         if (!noEvent && 'updateMenuOnChange' in option && option.updateMenuOnChange && sc.menu?.currentMenu == sc.MENU_SUBMENU?.MOD_OPTIONS) {
-                            sc.modOptionsMenu.reopenMenu()
+                            modmanager.gui.modOptionsMenu.reopenMenu()
                         }
                     }
 
@@ -337,7 +335,7 @@ function registerAndGetModOptions<T extends Options>(settings: ModOptionsSetting
         })
     })
 
-    sc.modMenu.options[settings.modId] = Opts
+    modmanager.options[settings.modId] = Opts
     return Opts
 }
 

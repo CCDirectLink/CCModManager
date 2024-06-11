@@ -1,23 +1,23 @@
 import { GuiOption } from '../../mod-options'
 
-const optGet = (row: sc.ModOptionsOptionRow): unknown => {
-    return sc.modMenu.options[row.guiOption.modId][row.guiOption.baseId]
+const optGet = (row: modmanager.gui.ModOptionsOptionRow): unknown => {
+    return modmanager.options[row.guiOption.modId][row.guiOption.baseId]
 }
-const optSet = (row: sc.ModOptionsOptionRow, value: any) => {
-    sc.modMenu.options[row.guiOption.modId][row.guiOption.baseId] = value
+const optSet = (row: modmanager.gui.ModOptionsOptionRow, value: any) => {
+    modmanager.options[row.guiOption.modId][row.guiOption.baseId] = value
 }
 
 sc.OPTION_GUIS[sc.OPTION_TYPES.BUTTON_GROUP].inject({
     init(optionRow, x, rowGroup) {
         this.base = optionRow
-        if (!(this.base instanceof sc.ModOptionsOptionRow)) return this.parent(optionRow, x, rowGroup)
+        if (!(this.base instanceof modmanager.gui.ModOptionsOptionRow)) return this.parent(optionRow, x, rowGroup)
 
         const index = optGet(this.base) as number
 
         const backup_ig_lang_get = ig.lang.get
         // @ts-expect-error
         ig.lang.get = (): string[] => {
-            if (!(optionRow instanceof sc.ModOptionsOptionRow)) throw new Error('what')
+            if (!(optionRow instanceof modmanager.gui.ModOptionsOptionRow)) throw new Error('what')
             if (optionRow.guiOption.type != 'BUTTON_GROUP') throw new Error('what')
 
             return optionRow.guiOption.buttonNames ?? []
@@ -31,7 +31,7 @@ sc.OPTION_GUIS[sc.OPTION_TYPES.BUTTON_GROUP].inject({
         sc.options.get = backup_sc_options_get
     },
     onPressed(button) {
-        if (!(this.base instanceof sc.ModOptionsOptionRow)) return this.parent
+        if (!(this.base instanceof modmanager.gui.ModOptionsOptionRow)) return this.parent
         if (this._prevPressed != button) {
             this.resetButtons(button)
             optSet(this.base, button.data.id)
@@ -43,7 +43,7 @@ sc.OPTION_GUIS[sc.OPTION_TYPES.BUTTON_GROUP].inject({
 sc.OPTION_GUIS[sc.OPTION_TYPES.OBJECT_SLIDER].inject({
     init(optionRow, x, rowGroup) {
         this.parent(optionRow, x, rowGroup)
-        if (!(this.base instanceof sc.ModOptionsOptionRow)) return
+        if (!(this.base instanceof modmanager.gui.ModOptionsOptionRow)) return
 
         const value = optGet(this.base) as number
         const index = this.entries.findIndex(v => v == value)
@@ -51,7 +51,7 @@ sc.OPTION_GUIS[sc.OPTION_TYPES.OBJECT_SLIDER].inject({
         this.onChange(index)
     },
     onChange(index) {
-        if (!(this.base instanceof sc.ModOptionsOptionRow)) return this.parent(index)
+        if (!(this.base instanceof modmanager.gui.ModOptionsOptionRow)) return this.parent(index)
 
         if (index != this._lastVal) {
             this._lastVal = index
@@ -60,7 +60,7 @@ sc.OPTION_GUIS[sc.OPTION_TYPES.OBJECT_SLIDER].inject({
         }
     },
     modelChanged(model, message, data) {
-        if (!(this.base instanceof sc.ModOptionsOptionRow)) return this.parent(model, message, data)
+        if (!(this.base instanceof modmanager.gui.ModOptionsOptionRow)) return this.parent(model, message, data)
 
         if (model == sc.options && message == sc.OPTIONS_EVENT.OPTION_CHANGED) {
             const value = optGet(this.base) as number
@@ -77,7 +77,7 @@ sc.OPTION_GUIS[sc.OPTION_TYPES.OBJECT_SLIDER].inject({
         this.onChange(this.slider.getValue())
     },
     updateNumberDisplay() {
-        if (!(this.base instanceof sc.ModOptionsOptionRow)) return this.parent()
+        if (!(this.base instanceof modmanager.gui.ModOptionsOptionRow)) return this.parent()
         if (this.base.guiOption.type != 'OBJECT_SLIDER') throw new Error('what')
 
         const func = this.base.guiOption.customNumberDisplay
@@ -95,7 +95,7 @@ sc.OPTION_GUIS[sc.OPTION_TYPES.OBJECT_SLIDER].inject({
 sc.OPTION_GUIS[sc.OPTION_TYPES.ARRAY_SLIDER].inject({
     init(optionRow, x, rowGroup) {
         this.parent(optionRow, x, rowGroup)
-        if (!(this.base instanceof sc.ModOptionsOptionRow)) return
+        if (!(this.base instanceof modmanager.gui.ModOptionsOptionRow)) return
 
         const value = optGet(this.base) as number
         this.slider.setValue(value * this.scale)
@@ -104,7 +104,7 @@ sc.OPTION_GUIS[sc.OPTION_TYPES.ARRAY_SLIDER].inject({
     onLeftRight(direction) {
         this.parent(direction)
 
-        if (!(this.base instanceof sc.ModOptionsOptionRow)) return
+        if (!(this.base instanceof modmanager.gui.ModOptionsOptionRow)) return
 
         optSet(this.base, this._lastVal / this.scale)
     },
@@ -114,19 +114,19 @@ sc.OPTION_GUIS[sc.OPTION_TYPES.CHECKBOX].inject({
     init(optionRow, x, rowGroup) {
         this.parent(optionRow, x, rowGroup)
 
-        if (!(this.base instanceof sc.ModOptionsOptionRow)) return
+        if (!(this.base instanceof modmanager.gui.ModOptionsOptionRow)) return
 
         this.button.setPressed(optGet(this.base) as boolean)
     },
     onPressed(checkbox) {
-        if (!(this.base instanceof sc.ModOptionsOptionRow)) return this.parent(checkbox)
+        if (!(this.base instanceof modmanager.gui.ModOptionsOptionRow)) return this.parent(checkbox)
 
         checkbox == this.button && optSet(this.base, checkbox.pressed)
     },
 })
 
 declare global {
-    namespace sc {
+    namespace modmanager.gui {
         interface ModOptionsOptionInfoBox extends ig.GuiElementBase {
             text: sc.TextGui
             box: sc.CenterBoxGui
@@ -138,7 +138,7 @@ declare global {
     }
 }
 
-sc.ModOptionsOptionInfoBox = ig.GuiElementBase.extend({
+modmanager.gui.ModOptionsOptionInfoBox = ig.GuiElementBase.extend({
     init(option, width) {
         this.parent()
         this.text = new sc.TextGui(option.name, { maxWidth: width - 36, font: sc.fontsystem.smallFont })
@@ -154,7 +154,7 @@ sc.ModOptionsOptionInfoBox = ig.GuiElementBase.extend({
 })
 
 declare global {
-    namespace sc {
+    namespace modmanager.gui {
         interface ModOptionsOptionButton extends ig.GuiElementBase {
             option: GuiOption
             button: sc.ButtonGui
@@ -166,7 +166,7 @@ declare global {
     }
 }
 
-sc.ModOptionsOptionButton = ig.GuiElementBase.extend({
+modmanager.gui.ModOptionsOptionButton = ig.GuiElementBase.extend({
     init(option, y, rowGroup, width) {
         this.parent()
         this.option = option
@@ -201,12 +201,12 @@ sc.ModOptionsOptionButton = ig.GuiElementBase.extend({
 
 sc.OPTION_GUIS[sc.OPTION_TYPES.CONTROLS].inject({
     init(optionRow, x, rowGroup) {
-        if (!(optionRow instanceof sc.ModOptionsOptionRow)) return this.parent(optionRow, x, rowGroup)
+        if (!(optionRow instanceof modmanager.gui.ModOptionsOptionRow)) return this.parent(optionRow, x, rowGroup)
 
         const backup_ig_lang_get = ig.lang.get
         // @ts-expect-error
         ig.lang.get = (path: string, ...args) => {
-            if (!(optionRow instanceof sc.ModOptionsOptionRow)) throw new Error('what')
+            if (!(optionRow instanceof modmanager.gui.ModOptionsOptionRow)) throw new Error('what')
             if (path == 'sc.gui.options.controls.none') return backup_ig_lang_get.bind(ig.lang)(path, ...args)
             if (path == 'sc.gui.options.controls.description') return optionRow.guiOption.description
             if (path.startsWith('sc.gui.options.controls.keys.')) return optionRow.guiOption.name

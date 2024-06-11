@@ -3,9 +3,9 @@ import { ModEntry } from '../../types'
 
 export {}
 declare global {
-    namespace sc {
+    namespace modmanager.gui {
         namespace ModSettingsTabBox {
-            type GuiOption = sc.OptionInfoBox | sc.ModOptionsOptionRow | sc.ModOptionsOptionButton
+            type GuiOption = sc.OptionInfoBox | modmanager.gui.ModOptionsOptionRow | modmanager.gui.ModOptionsOptionButton
         }
         interface ModSettingsTabBox extends ig.GuiElementBase, sc.Model.Observer {
             gfx: ig.Image
@@ -15,20 +15,20 @@ declare global {
             opts: Record<string, any>
 
             currentTab: number
-            lastButtonData: sc.ModSettingsTabBox.TabButton['data']
+            lastButtonData: modmanager.gui.ModSettingsTabBox.TabButton['data']
             prevIndex: number
-            tabs: Record<string, sc.ModSettingsTabBox.TabButton>
-            tabArray: sc.ModSettingsTabBox.TabButton[]
+            tabs: Record<string, modmanager.gui.ModSettingsTabBox.TabButton>
+            tabArray: modmanager.gui.ModSettingsTabBox.TabButton[]
             tabGroup: sc.ButtonGroup
-            rows: sc.ModSettingsTabBox.GuiOption[]
+            rows: modmanager.gui.ModSettingsTabBox.GuiOption[]
             rowButtonGroup: sc.RowButtonGroup
             tabContent: {
-                buttonGroup: Nullable<sc.ModSettingsTabBox['rowButtonGroup']>
-                list: Nullable<sc.ModSettingsTabBox['list']>
-                rows: Nullable<sc.ModSettingsTabBox['rows']>
+                buttonGroup: Nullable<modmanager.gui.ModSettingsTabBox['rowButtonGroup']>
+                list: Nullable<modmanager.gui.ModSettingsTabBox['list']>
+                rows: Nullable<modmanager.gui.ModSettingsTabBox['rows']>
             }[]
             list: sc.ButtonListBox
-            prevPressed: sc.ModSettingsTabBox.TabButton
+            prevPressed: modmanager.gui.ModSettingsTabBox.TabButton
             menuScanLines: sc.MenuScanLines
             keyBinder: sc.KeyBinderGui
 
@@ -46,24 +46,24 @@ declare global {
             _createOptionList(this: this, category: string): void
             _rearrangeTabs(this: this): void
             _createCacheList(this: this, category: string, bool1?: boolean, bool2?: boolean): void
-            _createTabButton(this: this, title: string, x: number, categoryId: string, icon?: string): sc.ModSettingsTabBox.TabButton
+            _createTabButton(this: this, title: string, x: number, categoryId: string, icon?: string): modmanager.gui.ModSettingsTabBox.TabButton
 
             onButtonTraversal(this: this): void
-            _resetButtons(this: this, tabButton?: sc.ModSettingsTabBox.TabButton, unfocus?: boolean): void
+            _resetButtons(this: this, tabButton?: modmanager.gui.ModSettingsTabBox.TabButton, unfocus?: boolean): void
             setCurrentTab(this: this, tabIndex: number): void
 
             addObservers(this: this): void
             removeObservers(this: this): void
         }
         interface ModSettingsTabBoxConstructor extends ImpactClass<ModSettingsTabBox> {
-            TabButton: sc.ModSettingsTabBox.TabButtonConstructor
+            TabButton: modmanager.gui.ModSettingsTabBox.TabButtonConstructor
             new (): ModSettingsTabBox
         }
         var ModSettingsTabBox: ModSettingsTabBoxConstructor
     }
 }
 
-sc.ModSettingsTabBox = ig.GuiElementBase.extend({
+modmanager.gui.ModSettingsTabBox = ig.GuiElementBase.extend({
     gfx: new ig.Image('media/gui/menu.png'),
 
     init() {
@@ -89,7 +89,7 @@ sc.ModSettingsTabBox = ig.GuiElementBase.extend({
         this.tabGroup = new sc.ButtonGroup()
 
         this.tabGroup.addPressCallback(_button => {
-            const button = _button as sc.ModSettingsTabBox.TabButton
+            const button = _button as modmanager.gui.ModSettingsTabBox.TabButton
             const tabIndex = this.tabArray.indexOf(button)
             this.setCurrentTab(tabIndex)
         })
@@ -119,8 +119,8 @@ sc.ModSettingsTabBox = ig.GuiElementBase.extend({
 
     updateEntries(mod) {
         this.mod = mod
-        this.conf = sc.modMenu.optionConfigs[mod.id]
-        this.opts = sc.modMenu.options[mod.id]
+        this.conf = modmanager.optionConfigs[mod.id]
+        this.opts = modmanager.options[mod.id]
 
         this.createTabs()
     },
@@ -159,7 +159,7 @@ sc.ModSettingsTabBox = ig.GuiElementBase.extend({
     },
     _createTabButton(title, x, categoryId, icon) {
         const tabWidth = Math.max(90, sc.fontsystem.font.getTextDimensions(title).x + 35)
-        const tabButton = new sc.ModSettingsTabBox.TabButton(title, icon, tabWidth)
+        const tabButton = new modmanager.gui.ModSettingsTabBox.TabButton(title, icon, tabWidth)
         tabButton.textChild.setPos(7, 1)
         tabButton.setPos(0, 2)
         tabButton.data = { type: categoryId }
@@ -212,14 +212,14 @@ sc.ModSettingsTabBox = ig.GuiElementBase.extend({
                 button.data && sc.menu.setInfoText(button.data.description ? button.data.description : button.data)
             })
             this.rowButtonGroup.setLeftRightCallback((stepRight, rowIndex) => {
-                const row = this.rows[rowIndex] as sc.ModOptionsOptionRow
+                const row = this.rows[rowIndex] as modmanager.gui.ModOptionsOptionRow
                 if (!row) return false
                 return row.onLeftRight(stepRight)
             })
             this.rowButtonGroup.addPressCallback(_button => {
                 const button = _button as ig.FocusGui & { data?: { row: number } }
                 if (button.data?.row != undefined) {
-                    const row = this.rows[button.data.row] as sc.ModOptionsOptionRow
+                    const row = this.rows[button.data.row] as modmanager.gui.ModOptionsOptionRow
                     row.onPressed(button)
                 }
             })
@@ -249,14 +249,14 @@ sc.ModSettingsTabBox = ig.GuiElementBase.extend({
                     continue
                 }
 
-                let optionGui: sc.ModSettingsTabBox.GuiOption
+                let optionGui: modmanager.gui.ModSettingsTabBox.GuiOption
 
                 if (option.type == 'INFO') {
-                    optionGui = new sc.ModOptionsOptionInfoBox(option, 431)
+                    optionGui = new modmanager.gui.ModOptionsOptionInfoBox(option, 431)
                 } else if (option.type == 'BUTTON') {
-                    optionGui = new sc.ModOptionsOptionButton(option, optionI, this.rowButtonGroup, 431)
+                    optionGui = new modmanager.gui.ModOptionsOptionButton(option, optionI, this.rowButtonGroup, 431)
                 } else {
-                    optionGui = new sc.ModOptionsOptionRow(option, optionI, this.rowButtonGroup, 431)
+                    optionGui = new modmanager.gui.ModOptionsOptionRow(option, optionI, this.rowButtonGroup, 431)
                 }
                 this.rows[optionI] = optionGui
                 optionI++

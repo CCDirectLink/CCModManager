@@ -1,6 +1,6 @@
 export {}
 declare global {
-    namespace sc {
+    namespace modmanager.gui {
         interface ModListEntryHighlight extends ig.GuiElementBase {
             gfx: ig.Image
             ninepatch: ig.NinePatch
@@ -21,7 +21,7 @@ declare global {
     }
 }
 
-sc.ModListEntryHighlight = ig.GuiElementBase.extend({
+modmanager.gui.ModListEntryHighlight = ig.GuiElementBase.extend({
     gfx: new ig.Image('media/gui/CCModManager.png'),
     ninepatch: new ig.NinePatch('media/gui/CCModManager.png', {
         left: 3,

@@ -2,14 +2,14 @@ import { ModEntry } from '../../types'
 import { GuiOption, ModOptionsSettings } from '../../mod-options'
 
 declare global {
-    namespace sc {
+    namespace modmanager.gui {
         interface ModSettingsMenu extends sc.BaseMenu, sc.Model.Observer {
             mod: ModEntry
 
             helpGui: sc.HelpScreen
             hotkeyHelp: sc.ButtonGui
             hotkeyDefault: sc.ButtonGui
-            listBox: sc.ModSettingsTabBox
+            listBox: modmanager.gui.ModSettingsTabBox
 
             initHotkeyHelp(this: this): void
             initHotkeyDefault(this: this): void
@@ -30,7 +30,8 @@ declare global {
         }
         var ModOptionsMenu: ModSettingsMenuConstructor
         var modOptionsMenu: ModSettingsMenu
-
+    }
+    namespace sc {
         enum MENU_SUBMENU {
             MOD_OPTIONS = 375943,
         }
@@ -42,7 +43,7 @@ function getMainMenu(): sc.MainMenu {
 }
 
 let menuPurgeTimeoutId: NodeJS.Timeout
-sc.ModOptionsMenu = sc.BaseMenu.extend({
+modmanager.gui.ModOptionsMenu = sc.BaseMenu.extend({
     init() {
         this.parent()
 
@@ -55,7 +56,7 @@ sc.ModOptionsMenu = sc.BaseMenu.extend({
 
         this.doStateTransition('DEFAULT', true)
 
-        sc.modOptionsMenu = this
+        modmanager.gui.modOptionsMenu = this
     },
     initHotkeyHelp() {
         this.hotkeyHelp = new sc.ButtonGui('\\i[help]' + ig.lang.get('sc.gui.menu.hotkeys.help'), undefined, true, sc.BUTTON_TYPE.SMALL)
@@ -91,7 +92,7 @@ sc.ModOptionsMenu = sc.BaseMenu.extend({
         }
     },
     initListBox() {
-        this.listBox = new sc.ModSettingsTabBox()
+        this.listBox = new modmanager.gui.ModSettingsTabBox()
         this.addChildGui(this.listBox)
     },
     addObservers() {
@@ -182,7 +183,7 @@ sc.ModOptionsMenu = sc.BaseMenu.extend({
         smb.text.setText(this.mod.name)
     },
     resetOptionsToDefault() {
-        const options = sc.modMenu.options[this.mod.id]
+        const options = modmanager.options[this.mod.id]
         const optionsToReset = Object.getOwnPropertyNames(options).filter(e => e != 'flatOpts')
         for (const optName of optionsToReset) {
             const optConfig: GuiOption = options.flatOpts[optName]
@@ -202,11 +203,11 @@ sc.ModOptionsMenu = sc.BaseMenu.extend({
         sc.menu.pushMenu(sc.MENU_SUBMENU.MOD_OPTIONS)
         /* skip transitions */
         mainMenu.menuDisplay.boxes.last().doStateTransition('DEFAULT', true)
-        sc.modOptionsMenu.doStateTransition('DEFAULT', true)
-        sc.modOptionsMenu.listBox.doStateTransition('DEFAULT', true)
+        modmanager.gui.modOptionsMenu.doStateTransition('DEFAULT', true)
+        modmanager.gui.modOptionsMenu.listBox.doStateTransition('DEFAULT', true)
 
-        sc.modOptionsMenu.updateEntries(this.mod)
-        sc.modOptionsMenu.listBox.setCurrentTab(this.listBox.currentTab)
+        modmanager.gui.modOptionsMenu.updateEntries(this.mod)
+        modmanager.gui.modOptionsMenu.listBox.setCurrentTab(this.listBox.currentTab)
 
         /* skip transitions even more */
         mainMenu.hotkeyBar._hotkeyTimer = 10e10
@@ -218,7 +219,7 @@ sc.ModOptionsMenu = sc.BaseMenu.extend({
         /* refocus the last element, we need to find it first cuz it might have moved to a diffrent position */
         const element = this.listBox.rowButtonGroup.getCurrentElement() as sc.ButtonGui
         let y!: number
-        const x = sc.modOptionsMenu.listBox.rowButtonGroup.elements.findIndex(arr => {
+        const x = modmanager.gui.modOptionsMenu.listBox.rowButtonGroup.elements.findIndex(arr => {
             y = arr.findIndex(e => {
                 if (typeof element.data !== typeof e.data) return false
                 if (typeof e.data === 'object' && typeof element.data === 'object') {
@@ -229,7 +230,7 @@ sc.ModOptionsMenu = sc.BaseMenu.extend({
             })
             return y != -1
         })
-        sc.modOptionsMenu.listBox.rowButtonGroup.focusCurrentButton(y, x, false, true, false)
+        modmanager.gui.modOptionsMenu.listBox.rowButtonGroup.focusCurrentButton(y, x, false, true, false)
     },
 })
 
@@ -237,7 +238,7 @@ sc.ModOptionsMenu = sc.BaseMenu.extend({
 sc.MENU_SUBMENU.MOD_OPTIONS = 375943
 const modOptionsMenuId = 'mod_settings_menu'
 sc.SUB_MENU_INFO[sc.MENU_SUBMENU.MOD_OPTIONS] = {
-    Clazz: sc.ModOptionsMenu,
+    Clazz: modmanager.gui.ModOptionsMenu,
     name: modOptionsMenuId,
 }
 

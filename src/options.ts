@@ -3,7 +3,7 @@ import { LocalMods } from './local-mods'
 import type { Options, Option } from './mod-options'
 import { ModDB } from './moddb'
 
-export let Opts: ReturnType<typeof sc.modMenu.registerAndGetModOptions<ReturnType<typeof registerOpts>>>
+export let Opts: ReturnType<typeof modmanager.registerAndGetModOptions<ReturnType<typeof registerOpts>>>
 
 export function registerOpts() {
     const opts = {
@@ -21,7 +21,7 @@ export function registerOpts() {
                     repositoriesButton: {
                         type: 'BUTTON',
                         onPress() {
-                            sc.modMenuGui.openRepositoriesPopup()
+                            modmanager.gui.modMenuGui.openRepositoriesPopup()
                         },
                     },
                     repositories: {
@@ -44,14 +44,14 @@ export function registerOpts() {
                         init: false,
                         hidden: true,
                         changeEvent() {
-                            sc.modMenuGui.list.updateColumnCount()
+                            modmanager.gui.modMenuGui.list.updateColumnCount()
                         },
                     },
                 },
             },
         },
     } as const satisfies Options
-    Opts = sc.modMenu.registerAndGetModOptions(
+    Opts = modmanager.registerAndGetModOptions(
         {
             modId: 'ccmodmanager',
             title: 'CCModManager',

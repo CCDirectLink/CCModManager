@@ -8,7 +8,7 @@ import { ModDB } from '../moddb'
 import { Opts } from '../options'
 
 declare global {
-    namespace sc {
+    namespace modmanager.gui {
         export interface ModListEntry extends ig.FocusGui, sc.Model.Observer {
             ninepatch: ig.NinePatch
             mod: ModEntry
@@ -22,7 +22,7 @@ declare global {
             lastUpdated?: sc.TextGui
             authors?: sc.TextGui
             tags?: sc.TextGui
-            modList: sc.ModMenuList
+            modList: modmanager.gui.ModMenuList
             highlight: ModListEntryHighlight
             modEntryActionButtonStart: { height: number; ninepatch: ig.NinePatch; highlight: sc.ButtonGui.Highlight }
             modEntryActionButtons: sc.ButtonGui.Type & { ninepatch: ig.NinePatch }
@@ -38,7 +38,7 @@ declare global {
             onButtonPress(this: this): string | undefined
         }
         interface ModListEntryConstructor extends ImpactClass<ModListEntry> {
-            new (mod: ModEntry, modList: sc.ModMenuList): ModListEntry
+            new (mod: ModEntry, modList: modmanager.gui.ModMenuList): ModListEntry
         }
         var ModListEntry: ModListEntryConstructor
     }
@@ -52,7 +52,7 @@ const COLOR = {
 } as const
 type COLOR = (typeof COLOR)[keyof typeof COLOR]
 
-sc.ModListEntry = ig.FocusGui.extend({
+modmanager.gui.ModListEntry = ig.FocusGui.extend({
     ninepatch: new ig.NinePatch('media/gui/CCModManager.png', {
         width: 42,
         height: 26,
@@ -72,7 +72,7 @@ sc.ModListEntry = ig.FocusGui.extend({
             mod = mod.testingVersion
         }
 
-        sc.Model.addObserver(sc.modMenuGui, this)
+        sc.Model.addObserver(modmanager.gui.modMenuGui, this)
         const isGrid = Opts.isGrid
         /* init icon asap */
         FileCache.getIconConfig(mod).then(config => {
@@ -100,8 +100,8 @@ sc.ModListEntry = ig.FocusGui.extend({
         const localMod = mod.isLocal ? mod : mod.localCounterpart
         const serverMod = mod.isLocal ? mod.serverCounterpart : mod
 
-        if (this.modList.currentTabIndex == sc.MOD_MENU_TAB_INDEXES.DISABLED) this.setNameText(COLOR.RED)
-        else if (this.modList.currentTabIndex == sc.MOD_MENU_TAB_INDEXES.ENABLED) this.setNameText(COLOR.GREEN)
+        if (this.modList.currentTabIndex == modmanager.gui.MOD_MENU_TAB_INDEXES.DISABLED) this.setNameText(COLOR.RED)
+        else if (this.modList.currentTabIndex == modmanager.gui.MOD_MENU_TAB_INDEXES.ENABLED) this.setNameText(COLOR.GREEN)
         else {
             if (localMod) {
                 if (localMod.active) this.setNameText(COLOR.GREEN)
@@ -110,7 +110,7 @@ sc.ModListEntry = ig.FocusGui.extend({
         }
         if (InstallQueue.has(mod)) this.setNameText(COLOR.YELLOW)
 
-        this.highlight = new sc.ModListEntryHighlight(this.hook.size.x, this.hook.size.y, this.nameText.hook.size.x, height)
+        this.highlight = new modmanager.gui.ModListEntryHighlight(this.hook.size.x, this.hook.size.y, this.nameText.hook.size.x, height)
         this.highlight.setPos(this.iconOffset, 0)
         this.addChildGui(this.highlight)
         this.addChildGui(this.nameText)
@@ -232,12 +232,12 @@ sc.ModListEntry = ig.FocusGui.extend({
     focusGained() {
         this.parent()
         this.highlight.focus = this.focus
-        sc.Model.notifyObserver(sc.modMenuGui, sc.MOD_MENU_MESSAGES.ENTRY_FOCUSED, this)
+        sc.Model.notifyObserver(modmanager.gui.modMenuGui, modmanager.gui.MOD_MENU_MESSAGES.ENTRY_FOCUSED, this)
     },
     focusLost() {
         this.parent()
         this.highlight.focus = this.focus
-        sc.Model.notifyObserver(sc.modMenuGui, sc.MOD_MENU_MESSAGES.ENTRY_UNFOCUSED, this)
+        sc.Model.notifyObserver(modmanager.gui.modMenuGui, modmanager.gui.MOD_MENU_MESSAGES.ENTRY_UNFOCUSED, this)
     },
     tryEnableMod(mod: ModEntryLocal) {
         ModInstallDialogs.checkCanEnableMod(mod).then(deps => {
@@ -245,7 +245,7 @@ sc.ModListEntry = ig.FocusGui.extend({
             deps.push(mod)
             for (const mod of deps) {
                 mod.awaitingRestart = !mod.awaitingRestart
-                sc.Model.notifyObserver(sc.modMenuGui, sc.MOD_MENU_MESSAGES.ENTRY_UPDATE_COLOR, { mod, color: COLOR.GREEN })
+                sc.Model.notifyObserver(modmanager.gui.modMenuGui, modmanager.gui.MOD_MENU_MESSAGES.ENTRY_UPDATE_COLOR, { mod, color: COLOR.GREEN })
                 sc.BUTTON_SOUND.toggle_on.play()
                 LocalMods.setModActive(mod, true)
                 this.updateHighlightWidth()
@@ -265,16 +265,16 @@ sc.ModListEntry = ig.FocusGui.extend({
         this.updateHighlightWidth()
         return 'Disabled'
     },
-    modelChanged(model, message: sc.MOD_MENU_MESSAGES, data) {
+    modelChanged(model, message: modmanager.gui.MOD_MENU_MESSAGES, data) {
         const d = data as { mod: ModEntryLocal; color: COLOR }
-        if (model == sc.modMenuGui && message == sc.MOD_MENU_MESSAGES.ENTRY_UPDATE_COLOR && d.mod == this.mod) {
+        if (model == modmanager.gui.modMenuGui && message == modmanager.gui.MOD_MENU_MESSAGES.ENTRY_UPDATE_COLOR && d.mod == this.mod) {
             this.setNameText(d.color)
         }
     },
     onButtonPress() {
         let mod = this.mod
         if (mod.isLocal) {
-            if (this.modList.currentTabIndex == sc.MOD_MENU_TAB_INDEXES.ENABLED || this.modList.currentTabIndex == sc.MOD_MENU_TAB_INDEXES.DISABLED) {
+            if (this.modList.currentTabIndex == modmanager.gui.MOD_MENU_TAB_INDEXES.ENABLED || this.modList.currentTabIndex == modmanager.gui.MOD_MENU_TAB_INDEXES.DISABLED) {
                 if (mod.active) return this.tryDisableMod(mod)
                 else return this.tryEnableMod(mod)
             } else throw new Error('wat?')

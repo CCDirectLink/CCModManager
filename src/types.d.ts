@@ -2,18 +2,6 @@ import { Mod } from 'ultimate-crosscode-typedefs/modloader/mod'
 
 import type { InstallMethod, PackageDB, ValidTags } from 'ccmoddb/build/src/types'
 
-export {}
-declare global {
-    namespace sc {
-        enum MENU_SUBMENU {
-            MODS,
-        }
-        interface OptionsMenu {
-            modsButton: sc.ButtonGui
-        }
-    }
-}
-
 export type Mod1 = Mod & {
     isCCModPacked: boolean
     findAllAssets?(): void /* only there for ccl2, used to set isCCL3 */
