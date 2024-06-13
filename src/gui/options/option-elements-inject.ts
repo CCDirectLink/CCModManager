@@ -31,7 +31,7 @@ sc.OPTION_GUIS[sc.OPTION_TYPES.BUTTON_GROUP].inject({
         sc.options.get = backup_sc_options_get
     },
     onPressed(button) {
-        if (!(this.base instanceof modmanager.gui.OptionsOptionRow)) return this.parent
+        if (!(this.base instanceof modmanager.gui.OptionsOptionRow)) return this.parent(button)
         if (this._prevPressed != button) {
             this.resetButtons(button)
             optSet(this.base, button.data.id)
@@ -171,11 +171,6 @@ modmanager.gui.OptionsOptionButton = ig.GuiElementBase.extend({
         this.parent()
         this.option = option
         if (option.type != 'BUTTON') throw new Error('how')
-
-        // this.box = new sc.CenterBoxGui(element, true)
-        // this.box.setAlign(ig.GUI_ALIGN.X_CENTER, ig.GUI_ALIGN.Y_TOP)
-        // this.box.setPos(1, 0)
-        // this.addChildGui(this.box)
 
         this.button = new sc.ButtonGui(option.name)
         if (option.onPress) {
