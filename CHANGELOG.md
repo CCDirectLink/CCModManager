@@ -3,6 +3,11 @@
 # Change Log
 
 ## [Unreleased]
+
+### Fixed
+
+- Fixed crash when switching buttons using a mouse on BUTTON_GROUP 
+
 ## [0.9.14] 2024-06-13
 ## [0.9.13] 2024-06-12
 ## [0.9.12] 2024-06-10

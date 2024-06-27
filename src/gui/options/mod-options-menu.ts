@@ -237,7 +237,9 @@ modmanager.gui.OptionsMenu = sc.BaseMenu.extend({
         ig.interact.setBlockDelay(0)
 
         /* refocus the last element, we need to find it first cuz it might have moved to a diffrent position */
-        const element = this.listBox.rowButtonGroup.getCurrentElement() as sc.ButtonGui
+        const element = this.listBox.rowButtonGroup.getCurrentElement() as sc.ButtonGui | undefined
+        if (!element) return
+
         let y!: number
         const x = modmanager.gui.optionsMenu.listBox.rowButtonGroup.elements.findIndex(arr => {
             y = arr.findIndex(e => {
