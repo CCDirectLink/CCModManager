@@ -1,9 +1,11 @@
 export type Enum = Record<string, number>;
+/** Option that has state that can change */
 export interface OptionChangeable {
     restart?: boolean;
     changeEvent?: () => void;
     updateMenuOnChange?: boolean;
 }
+/** A option entry */
 export type Option = {
     name?: ig.LangLabel.Data;
     description?: ig.LangLabel.Data;
@@ -134,8 +136,11 @@ export interface ModOptionsSettings {
 }
 declare global {
     namespace modmanager {
+        /** Contains the layouts used for displaying the mod options menu */
         var optionConfigs: Record<string, ModSettingsGui>;
+        /** Contains the options objects for each registered mod. */
         var options: Record<string, Record<string, any>>;
+        /** Register the mod options. Don't run it in preload to avoid race conditions, prestart and above is fine. */
         function registerAndGetModOptions<T extends Options>(settings: ModOptionsSettings, options: T): OptsType<T>;
     }
 }
