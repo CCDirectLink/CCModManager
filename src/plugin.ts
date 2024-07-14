@@ -9,6 +9,7 @@ import type * as _ from 'crosscode-demonizer/src/demomod/types.d.ts'
 import './mod-options'
 
 import { Opts, registerOpts } from './options'
+
 import { modOptionsPoststart, modOptionsPrestart } from './mod-options'
 
 export default class ModManager {
@@ -26,6 +27,12 @@ export default class ModManager {
     async prestart() {
         this.lang = new LangManager()
         registerOpts()
+        // TODO: Remove later
+        if (Opts.repositories.includes('@krypciak'))
+            localStorage['ccmodmanager-repositories'] = JSON.stringify(
+                Opts.repositories.map(url => (url == '@krypciak' ? '@krypciak/CCModDB/stable' : url))
+            )
+
         FileCache.init()
         ModInstaller.init()
 

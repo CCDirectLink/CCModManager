@@ -118,7 +118,7 @@ export class FileCache {
     }
 
     static async checkDatabaseUrl(url: string): Promise<boolean> {
-        url = `${url}/npDatabase.json`
+        url = `${url}/npDatabase.min.json`
         try {
             await getETag(url)
             return true
@@ -129,7 +129,7 @@ export class FileCache {
 
     static async getDatabase(name: string, create: (database: NPDatabase) => void): Promise<void> {
         const path = `${name}/db.json`
-        const url = `${ModDB.databases[name].url}/npDatabase.json`
+        const url = `${ModDB.databases[name].url}/npDatabase.min.json`
 
         const cachedPromise = this.getCachedFile<NPDatabase>(path, true)
         let eTag!: string

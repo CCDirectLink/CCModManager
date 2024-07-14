@@ -74,7 +74,6 @@ modmanager.gui.ListEntry = ig.FocusGui.extend({
 
         sc.Model.addObserver(modmanager.gui.menu, this)
         const isGrid = Opts.isGrid
-        /* init icon asap */
         FileCache.getIconConfig(mod).then(config => {
             const image = new ig.Image(config.path)
             this.iconGui = new ig.ImageGui(image, config.offsetX, config.offsetY, config.sizeX, config.sizeY)

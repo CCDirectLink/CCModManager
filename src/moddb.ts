@@ -37,16 +37,12 @@ export class ModDB {
     static minifyRepoURL(url: string): string {
         if (url.startsWith('https://raw.githubusercontent.com/')) {
             url = `@${url.substring('https://raw.githubusercontent.com/'.length)}`
-            if (url.endsWith('/master')) url = url.substring(0, url.length - '/master'.length)
-            if (url.endsWith('/CCModDB')) url = url.substring(0, url.length - '/CCModDB'.length)
         }
         return url
     }
 
     static expandRepoURL(url: string): string {
         if (url.startsWith('@')) {
-            if (!url.endsWith('/CCModDB') && !url.match(/\//g)) url = `${url}/CCModDB`
-            if (!url.endsWith('/master') && url.match(/\//g)!.length == 1) url = `${url}/master`
             url = `https://raw.githubusercontent.com/${url.substring(1)}`
         }
         return url

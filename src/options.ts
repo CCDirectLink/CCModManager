@@ -26,7 +26,7 @@ export function registerOpts() {
                     },
                     repositories: {
                         type: 'JSON_DATA',
-                        init: ['@krypciak', '@krypciak/CCModDB/testing'] as string[],
+                        init: ['@krypciak/CCModDB/stable', '@krypciak/CCModDB/testing'] as string[],
                         changeEvent() {
                             ModDB.loadDatabases(true)
 
@@ -62,5 +62,6 @@ export function registerOpts() {
         },
         opts
     )
+
     return opts
 }
