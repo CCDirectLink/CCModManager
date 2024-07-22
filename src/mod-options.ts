@@ -154,14 +154,14 @@ type OmitNonChangeableToUnion<E extends Options, F extends Record<string, any> =
           F[T]['type'] extends 'BUTTON' ? never
         : F[T]['type'] extends 'INFO' ? never
         : F[T]['type'] extends 'CONTROLS' ? never
-        // @ts-expect-error
-        : F[T] & { key: `${T}` }
+        // symbol type cannot be converted into a string...
+        : T extends string | number | bigint | boolean | null | undefined ? (F[T] & { key: `${T}` }) : never
     }[keyof F]
 
 type OmitNonChangeable<
     E extends Options,
     F = FlatOpts<E>,
-    // @ts-expect-error
+    /** @ts-expect-error **/
     O extends keyof F = OmitNonChangeableToUnion<E>['key'],
 > = {
     [K in O]: F[K]

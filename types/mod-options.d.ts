@@ -103,11 +103,13 @@ type FlattenUnion<T> = {
 };
 type FlatOpts<T extends Options> = FlattenUnion<FlattenOptions<T>>;
 type OmitNonChangeableToUnion<E extends Options, F extends Record<string, any> = FlatOpts<E>> = {
-    [T in keyof F]: F[T]['type'] extends 'BUTTON' ? never : F[T]['type'] extends 'INFO' ? never : F[T]['type'] extends 'CONTROLS' ? never : F[T] & {
+    [T in keyof F]: F[T]['type'] extends 'BUTTON' ? never : F[T]['type'] extends 'INFO' ? never : F[T]['type'] extends 'CONTROLS' ? never : T extends string | number | bigint | boolean | null | undefined ? (F[T] & {
         key: `${T}`;
-    };
+    }) : never;
 }[keyof F];
-type OmitNonChangeable<E extends Options, F = FlatOpts<E>, O extends keyof F = OmitNonChangeableToUnion<E>['key']> = {
+type OmitNonChangeable<E extends Options, F = FlatOpts<E>, 
+/** @ts-expect-error **/
+O extends keyof F = OmitNonChangeableToUnion<E>['key']> = {
     [K in O]: F[K];
 };
 type Writable<T> = {
