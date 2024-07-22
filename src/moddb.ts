@@ -20,7 +20,7 @@ export class ModDB {
         if (!force && this.databasesLoaded) return
         this.databasesLoaded = true
         this.databases = {}
-        const urls: string[] = Opts.repositories
+        const urls = Opts.repositories
         for (const url of urls) {
             ModDB.addDatabase(new ModDB(url))
         }

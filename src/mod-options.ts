@@ -167,16 +167,12 @@ type OmitNonChangeable<
     [K in O]: F[K]
 }
 
-type Writable<T> = {
-    -readonly [P in keyof T]: T[P]
-}
-
 // prettier-ignore
 export type OptsType<E extends Options, O extends Record<string, any> = OmitNonChangeable<E>> = {
     [T in keyof O]: 
           O[T]['type'] extends 'CHECKBOX' ? boolean
         : O[T]['type'] extends 'BUTTON_GROUP' ? O[T]['enum'][keyof O[T]['enum']]
-        : O[T]['type'] extends 'JSON_DATA' ? Writable<O[T]['init']>
+        : O[T]['type'] extends 'JSON_DATA' ? Readonly<O[T]['init']>
     
         : number
     } & { flatOpts: FlatOpts<E> }
