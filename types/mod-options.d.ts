@@ -112,11 +112,8 @@ type OmitNonChangeable<E extends Options, F = FlatOpts<E>,
 O extends keyof F = OmitNonChangeableToUnion<E>['key']> = {
     [K in O]: F[K];
 };
-type Writable<T> = {
-    -readonly [P in keyof T]: T[P];
-};
 export type OptsType<E extends Options, O extends Record<string, any> = OmitNonChangeable<E>> = {
-    [T in keyof O]: O[T]['type'] extends 'CHECKBOX' ? boolean : O[T]['type'] extends 'BUTTON_GROUP' ? O[T]['enum'][keyof O[T]['enum']] : O[T]['type'] extends 'JSON_DATA' ? Writable<O[T]['init']> : number;
+    [T in keyof O]: O[T]['type'] extends 'CHECKBOX' ? boolean : O[T]['type'] extends 'BUTTON_GROUP' ? O[T]['enum'][keyof O[T]['enum']] : O[T]['type'] extends 'JSON_DATA' ? Readonly<O[T]['init']> : number;
 } & {
     flatOpts: FlatOpts<E>;
 };
