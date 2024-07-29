@@ -3,6 +3,11 @@
 # Change Log
 
 ## [Unreleased]
+
+### Changed
+
+- Update the mod database endpoint
+
 ## [0.9.15] 2024-06-27
 
 ### Fixed
