@@ -211,25 +211,24 @@ export class ModDB {
         this.modRecord = {}
         for (const [name, data] of Object.entries(this.database)) {
             if (typeof data === 'string') continue
-            const meta = data.metadata
-            const ccmod = data.metadataCCMod
-            const authors = ccmod?.authors
+            const ccmod = data.metadataCCMod!
+            const authors = ccmod.authors
             this.modRecord[name] = {
                 database: databaseName,
                 isLocal: false,
                 id: name,
-                name: ccmod?.title ? ig.LangLabel.getText(ccmod.title) : meta!.ccmodHumanName || name,
-                description: ccmod?.description ? ig.LangLabel.getText(ccmod.description) : meta!.description,
-                version: ccmod?.version || meta!.version,
-                isLegacy: !ccmod,
-                hasIcon: ccmod?.icons ? !!ccmod.icons['24'] : false,
+                name: ig.LangLabel.getText(ccmod.title),
+                description: ig.LangLabel.getText(ccmod.description),
+                version: ccmod.version,
+                isLegacy: false,
+                hasIcon: ccmod.icons ? !!ccmod.icons['24'] : false,
                 stars: data.stars,
-                dependencies: ccmod?.dependencies || meta?.ccmodDependencies || {},
+                dependencies: ccmod.dependencies || {},
                 installation: data.installation,
                 lastUpdateTimestamp: data.lastUpdateTimestamp,
                 authors: authors ? (typeof authors === 'string' ? [authors] : authors) : ['unknown'],
-                tags: ccmod?.tags ?? [],
-                repositoryUrl: ccmod?.repository,
+                tags: ccmod.tags ?? [],
+                repositoryUrl: ccmod.repository,
             }
         }
     }
