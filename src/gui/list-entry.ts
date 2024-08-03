@@ -169,8 +169,8 @@ modmanager.gui.ListEntry = ig.FocusGui.extend({
                 this.addChildGui(this.lastUpdated)
             }
 
-            if (mod.stars !== undefined) {
-                this.starCount = new sc.TextGui(`${mod.stars}\\i[save-star]`)
+            if (serverMod?.stars !== undefined) {
+                this.starCount = new sc.TextGui(`${serverMod.stars}\\i[save-star]`)
                 this.starCount.setPos(496 - this.starCount.hook.size.x, 0)
                 this.addChildGui(this.starCount)
             }

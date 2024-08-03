@@ -114,7 +114,6 @@ export class ModDB {
         }
         mod.serverCounterpart = highestVerMod
         mod.database = highestVerMod.database
-        mod.stars = highestVerMod.stars
         mod.isLegacy = highestVerMod.isLegacy
     }
 
@@ -181,6 +180,7 @@ export class ModDB {
                 for (const matchingMod of matchingNonTestingMods) {
                     matchingMod.testingVersion = testingMod
                     matchingMod.lastUpdateTimestamp = testingMod.lastUpdateTimestamp
+                    matchingMod.stars = testingMod.stars
                 }
             }
         }

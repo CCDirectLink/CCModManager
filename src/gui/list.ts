@@ -254,7 +254,13 @@ modmanager.gui.MenuList = sc.ListTabbedPane.extend({
                 mods.sort((a, b) => a.name.localeCompare(b.name))
             } else if (sort == modmanager.gui.MENU_SORT_ORDER.STARS) {
                 mods.sort((a, b) => a.name.localeCompare(b.name))
-                mods.sort((a, b) => (gm(b).stars ?? -100) - (gm(a).stars ?? -100))
+                mods.sort((a1, b1) => {
+                    const a = gm(a1)
+                    const b = gm(b1)
+                    const ta = ('stars' in a && a.stars) || -100
+                    const tb = ('stars' in b && b.stars) || -100
+                    return tb - ta
+                })
             } else if (sort == modmanager.gui.MENU_SORT_ORDER.LAST_UPDATED) {
                 mods.sort((a, b) => a.name.localeCompare(b.name))
                 mods.sort((a1, b1) => {

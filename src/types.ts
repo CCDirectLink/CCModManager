@@ -49,8 +49,6 @@ interface ModEntryBase extends ModEntryBaseBase {
     hasIcon: boolean
     /** Copy of the dependencies from the mod manifest */
     dependencies: Record<string, string>
-    /** GitHub star count, local mods have this set if they have a server counterpart */
-    stars?: number
     /** True when the mod enabled state was changed, or the mod was updated */
     awaitingRestart?: boolean
     /** Mod repository web link */
@@ -67,6 +65,8 @@ export interface ModEntryServer extends ModEntryBase {
     lastUpdateTimestamp?: number
     /** Author list, may be empty */
     authors: string[]
+    /** GitHub star count, local mods have this set if they have a server counterpart */
+    stars?: number
     /** Mod tag list */
     tags: ValidTags[]
     /** The testing counterpart */
