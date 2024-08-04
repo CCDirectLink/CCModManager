@@ -113,10 +113,6 @@ sc.Control.inject({
     },
 })
 
-function getMainMenu(): sc.MainMenu {
-    return ig.gui.guiHooks.find(h => h.gui instanceof sc.MainMenu)!.gui as sc.MainMenu
-}
-
 let menuPurgeTimeoutId: NodeJS.Timeout
 modmanager.gui.Menu = sc.ListInfoMenu.extend({
     observers: [],
@@ -408,7 +404,7 @@ modmanager.gui.Menu = sc.ListInfoMenu.extend({
     },
     setBlackBarVisibility(visible) {
         const state = visible ? 'DEFAULT' : 'HIDDEN'
-        const main = ig.gui.guiHooks.find(h => h.gui instanceof sc.MainMenu)?.gui as sc.MainMenu | undefined
+        const main = sc.menu.guiReference
         if (main?.info) main.info.doStateTransition(state)
         if (main?.topBar) main.topBar.doStateTransition(state)
     },
@@ -427,7 +423,7 @@ modmanager.gui.Menu = sc.ListInfoMenu.extend({
             this.changelogButton.doStateTransition(state)
         }
 
-        const main = ig.gui.guiHooks.find(h => h.gui instanceof sc.MainMenu)?.gui as sc.MainMenu | undefined
+        const main = sc.menu.guiReference
         if (main?.info) main.info.doStateTransition(state)
         if (main?.topBar) main.topBar.doStateTransition(state)
     },
@@ -490,10 +486,10 @@ modmanager.gui.Menu = sc.ListInfoMenu.extend({
         if (nextSubmenu != sc.MENU_SUBMENU.MOD_OPTIONS) {
             /* purging the menu immediately would disable the smooth fade out transition */
             menuPurgeTimeoutId = setTimeout(() => {
-                const mainMenu = getMainMenu()
-                mainMenu.removeChildGui(this)
+                const main = sc.menu.guiReference
+                main.removeChildGui(this)
                 this.removeObservers()
-                delete mainMenu.submenus[modsMenuId]
+                main.submenus[modsMenuId]
             }, 1000)
         }
     },

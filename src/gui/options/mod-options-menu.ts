@@ -38,10 +38,6 @@ declare global {
     }
 }
 
-function getMainMenu(): sc.MainMenu {
-    return ig.gui.guiHooks.find(h => h.gui instanceof sc.MainMenu)!.gui as sc.MainMenu
-}
-
 let menuPurgeTimeoutId: NodeJS.Timeout
 modmanager.gui.OptionsMenu = sc.BaseMenu.extend({
     init() {
@@ -145,7 +141,7 @@ modmanager.gui.OptionsMenu = sc.BaseMenu.extend({
 
         /* purging the menu immediately would disable the smooth fade out transition */
         menuPurgeTimeoutId = setTimeout(() => {
-            const mainMenu = getMainMenu()
+            const mainMenu = sc.menu.guiReference
             mainMenu.removeChildGui(this)
             delete mainMenu.submenus[modOptionsMenuId]
         }, 1000)
@@ -197,7 +193,7 @@ modmanager.gui.OptionsMenu = sc.BaseMenu.extend({
 
         this.updateHelpButtonVisibility()
 
-        const smb = getMainMenu()
+        const smb = sc.menu.guiReference
             .menuDisplay.hook.children.filter(h => h.gui instanceof sc.MainMenu.SubMenuBox)
             .last().gui as sc.MainMenu.SubMenuBox
         smb.text.setText(this.mod.name)
@@ -217,7 +213,7 @@ modmanager.gui.OptionsMenu = sc.BaseMenu.extend({
         this.hide()
         sc.menu.popBackCallback()
         sc.menu.popMenu()
-        const mainMenu = getMainMenu()
+        const mainMenu = sc.menu.guiReference
         mainMenu.removeChildGui(this)
         delete mainMenu.submenus[modOptionsMenuId]
         sc.menu.pushMenu(sc.MENU_SUBMENU.MOD_OPTIONS)
