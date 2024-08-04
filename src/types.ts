@@ -1,6 +1,6 @@
 import type { Mod } from 'ultimate-crosscode-typedefs/modloader/mod'
 
-import type { InstallMethod, PackageDB, ValidTags } from 'ccmoddb/build/src/types'
+import type { InstallMethod, PackageDB, ValidTags, ReleasePage } from 'ccmoddb/build/src/types'
 
 export type Mod1 = Mod & {
     isCCModPacked: boolean
@@ -67,6 +67,8 @@ export interface ModEntryServer extends ModEntryBase {
     authors: string[]
     /** GitHub star count, local mods have this set if they have a server counterpart */
     stars?: number
+    /** Represents the release page info fetched from the mods repository */
+    releasePages?: ReleasePage[]
     /** Mod tag list */
     tags: ValidTags[]
     /** The testing counterpart */

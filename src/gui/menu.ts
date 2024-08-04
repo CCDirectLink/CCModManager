@@ -1,11 +1,12 @@
 import { ModDB } from '../moddb'
 import { InstallQueue, ModInstaller } from '../mod-installer'
-import { ModEntry } from '../types'
+import { ModEntry, ModEntryServer } from '../types'
 import { ModInstallDialogs } from './install-dialogs'
 import { LocalMods } from '../local-mods'
 import { Lang } from '../lang-manager'
 import './list'
 import './filters'
+import './changelog'
 import './options/mod-options-menu'
 
 import type * as _ from 'nax-ccuilib/src/headers/nax/input-field.d.ts'
@@ -40,6 +41,8 @@ declare global {
             filtersButton: sc.ButtonGui
             filtersPopup: modmanager.gui.FiltersPopup
             reposPopup: modmanager.gui.RepoAddPopup
+            changelogButton: sc.ButtonGui
+            changelogPopup?: modmanager.gui.Changelog
 
             initInputField(this: this): void
             initSortMenu(this: this): void
@@ -50,6 +53,7 @@ declare global {
             initTestingToggleButton(this: this): void
             initOpenRepositoryUrlButton(this: this): void
             initModOptionsButton(this: this, bottomY: number): void
+            initChangelogButton(this: this): void
 
             setBlackBarVisibility(this: this, visible: boolean): void
             setAllVisibility(this: this, visible: boolean): void
@@ -60,6 +64,7 @@ declare global {
             getCurrentlyFocusedModEntry(this: this): modmanager.gui.ListEntry | undefined
             openModSettings(this: this, mod: ModEntry): void
             openRepositoriesPopup(this: this): void
+            openChangelogPopup(this: this, mod: ModEntryServer): void
         }
         interface MenuConstructor extends ImpactClass<Menu> {
             new (): Menu
@@ -131,6 +136,7 @@ modmanager.gui.Menu = sc.ListInfoMenu.extend({
         this.initTestingToggleButton()
         this.initOpenRepositoryUrlButton()
         this.initModOptionsButton(bottomY)
+        this.initChangelogButton()
 
         this.setTabEvent()
     },
@@ -226,7 +232,7 @@ modmanager.gui.Menu = sc.ListInfoMenu.extend({
             sc.BUTTON_TYPE.SMALL
         )
         this.testingToggleButton.setAlign(ig.GUI_ALIGN.X_RIGHT, ig.GUI_ALIGN.Y_TOP)
-        this.testingToggleButton.setPos(160, 22)
+        this.testingToggleButton.setPos(264, 22)
         this.testingToggleButton.doStateTransition('HIDDEN')
         this.testingToggleButton.onButtonPress = () => {
             if (this.testingToggleButton.hook.currentStateName == 'DEFAULT') {
@@ -310,6 +316,29 @@ modmanager.gui.Menu = sc.ListInfoMenu.extend({
         this.modOptionsButton.keepMouseFocus = true /* prevent the focus jumping all over the place on press */
         this.addChildGui(this.modOptionsButton)
     },
+    initChangelogButton() {
+        this.changelogButton = new sc.ButtonGui('\\i[right]' + Lang.changelogButton, 100, true, sc.BUTTON_TYPE.SMALL)
+        this.changelogButton.setAlign(ig.GUI_ALIGN.X_RIGHT, ig.GUI_ALIGN.Y_TOP)
+        this.changelogButton.setPos(155, 22)
+        this.changelogButton.doStateTransition('HIDDEN')
+        this.changelogButton.onButtonPress = () => {
+            const tryPress = (): boolean => {
+                if (this.changelogButton.hook.currentStateName != 'DEFAULT') return false
+                const modEntry = this.getCurrentlyFocusedModEntry()!
+                const mod = modEntry.mod
+
+                const serverMod = mod.isLocal ? mod.serverCounterpart : mod
+                if (!serverMod?.releasePages) return false
+
+                this.openChangelogPopup(serverMod)
+                return true
+            }
+            sc.BUTTON_SOUND[tryPress() ? 'submit' : 'denied'].play()
+        }
+        this.changelogButton.submitSound = undefined
+        this.changelogButton.keepMouseFocus = true /* prevent the focus jumping all over the place on press */
+        this.addChildGui(this.changelogButton)
+    },
 
     showModInstallDialog() {
         this.list.tabGroup._invokePressCallbacks(this.list.tabs[Lang.selectedModsTab], true)
@@ -357,9 +386,7 @@ modmanager.gui.Menu = sc.ListInfoMenu.extend({
                 const serverMod = entry.mod.isLocal ? entry.mod.serverCounterpart : entry.mod
                 if (serverMod?.testingVersion) {
                     this.testingToggleButton.doStateTransition('DEFAULT')
-                    this.testingToggleButton.setText(
-                        '\\i[quick] ' + (ModDB.isModTestingOptIn(serverMod.id) ? Lang.testingOptOut : Lang.testingOptIn)
-                    )
+                    this.testingToggleButton.setText('\\i[quick] ' + Lang.testingButton)
                 } else {
                     this.testingToggleButton.doStateTransition('HIDDEN')
                 }
@@ -367,12 +394,15 @@ modmanager.gui.Menu = sc.ListInfoMenu.extend({
                 this.openRepositoryUrlButton.doStateTransition(entry.mod.repositoryUrl ? 'DEFAULT' : 'HIDDEN')
 
                 this.modOptionsButton.doStateTransition(modmanager.optionConfigs[entry.mod.id] ? 'DEFAULT' : 'HIDDEN')
+
+                this.changelogButton.doStateTransition(serverMod?.releasePages ? 'DEFAULT' : 'HIDDEN')
             } else if (message == modmanager.gui.MENU_MESSAGES.ENTRY_UNFOCUSED) {
                 this.uninstallButton.setActive(false)
 
                 this.testingToggleButton.doStateTransition('HIDDEN')
                 this.openRepositoryUrlButton.doStateTransition('HIDDEN')
                 this.modOptionsButton.doStateTransition('HIDDEN')
+                this.changelogButton.doStateTransition('HIDDEN')
             }
         }
     },
@@ -394,6 +424,7 @@ modmanager.gui.Menu = sc.ListInfoMenu.extend({
             this.testingToggleButton.doStateTransition(state)
             this.openRepositoryUrlButton.doStateTransition(state)
             this.modOptionsButton.doStateTransition(state)
+            this.changelogButton.doStateTransition(state)
         }
 
         const main = ig.gui.guiHooks.find(h => h.gui instanceof sc.MainMenu)?.gui as sc.MainMenu | undefined
@@ -418,6 +449,7 @@ modmanager.gui.Menu = sc.ListInfoMenu.extend({
         sc.menu.buttonInteract.addGlobalButton(this.filtersButton, () => sc.control.menu())
         sc.menu.buttonInteract.addGlobalButton(this.testingToggleButton, () => sc.control.quickmenuPress())
         sc.menu.buttonInteract.addGlobalButton(this.openRepositoryUrlButton, () => sc.control.leftPressed())
+        sc.menu.buttonInteract.addGlobalButton(this.changelogButton, () => sc.control.rightPressed())
         sc.menu.buttonInteract.addGlobalButton(
             this.modOptionsButton,
             () =>
@@ -440,6 +472,7 @@ modmanager.gui.Menu = sc.ListInfoMenu.extend({
         sc.menu.buttonInteract.removeGlobalButton(this.testingToggleButton)
         sc.menu.buttonInteract.removeGlobalButton(this.openRepositoryUrlButton)
         sc.menu.buttonInteract.removeGlobalButton(this.modOptionsButton)
+        sc.menu.buttonInteract.removeGlobalButton(this.changelogButton)
 
         if (
             LocalMods.getAll().some(mod => mod.awaitingRestart) ||
@@ -502,8 +535,13 @@ modmanager.gui.Menu = sc.ListInfoMenu.extend({
         modmanager.gui.optionsMenu.updateEntries(mod)
     },
     openRepositoriesPopup() {
-        if (!this.reposPopup) this.reposPopup = new modmanager.gui.RepoAddPopup()
+        this.reposPopup ??= new modmanager.gui.RepoAddPopup()
         this.reposPopup.show()
+    },
+    openChangelogPopup(mod) {
+        this.changelogPopup ??= new modmanager.gui.Changelog()
+        this.changelogPopup.setMod(mod)
+        this.changelogPopup.openMenu()
     },
 })
 

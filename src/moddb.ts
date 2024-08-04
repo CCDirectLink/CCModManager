@@ -229,6 +229,7 @@ export class ModDB {
                 authors: authors ? (typeof authors === 'string' ? [authors] : authors) : ['unknown'],
                 tags: ccmod.tags ?? [],
                 repositoryUrl: ccmod.repository,
+                releasePages: data.releasePages,
             }
         }
     }
