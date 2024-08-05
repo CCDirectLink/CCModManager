@@ -46,7 +46,7 @@
             {
                 "title": "\\c[3]Mod Manager - Keybindings\\c[0]",
                 "content": [
-                    "Press \\i[menu] to open the filters menu.\n Press \\i[left] to visit the mod repository page if available. \n Some mods can be configured via their own options sub-menu. Press \\i[special] to access it."
+                    "Press \\i[menu] to open the filters menu.\n Press \\i[left] to visit the mod repository page if available. \n Press \\i[right] to visit the mod's changelog if available. \n Some mods can be configured via their own options sub-menu. Press \\i[special] to access it."
                 ]
             },
             {
