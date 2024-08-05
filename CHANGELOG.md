@@ -3,6 +3,11 @@
 # Change Log
 
 ## [Unreleased]
+
+### Added
+
+- Added the mod changelog menu
+
 ## [0.9.16] 2024-07-29
 
 ### Changed
