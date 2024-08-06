@@ -7,7 +7,8 @@
 ### Fixed
 
 - Fixed filters menu back button not being clickable by mouse + other weirdness
-- Fix manual updating of pre-release mods
+- Fixed manual updating of pre-release mods
+- Fixed mod options BUTTON y spacing
 
 ## [0.9.17] 2024-08-05
 

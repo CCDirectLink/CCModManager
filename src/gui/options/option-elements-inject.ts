@@ -186,7 +186,7 @@ modmanager.gui.OptionsOptionButton = ig.GuiElementBase.extend({
             backup()
             sc.menu.setInfoText(this.data as string)
         }
-        this.setSize(width, this.button.hook.size.y - 5)
+        this.setSize(width, this.button.hook.size.y)
 
         this.addChildGui(this.button)
 
