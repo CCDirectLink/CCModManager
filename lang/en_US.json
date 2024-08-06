@@ -7,6 +7,10 @@
         "repositoriesButton": {
             "name": "Repositories",
             "description": "Edit mod repository links."
+        },
+        "resetRepositoriesButton": {
+            "name": "Reset repositories to default",
+            "description": "Resets the repositories to the default ones."
         }
     },
     "mods": "Mods",
@@ -106,13 +110,23 @@
     "cannotDisableDisabled": "Disabling the mod: \\c[3][modName]\\c[0] is not allowed.",
     "cannotUninstallDisabled": "Uninstalling the mod: \\c[3][modName]\\c[0] is not allowed.",
     "cannotUninstallGit": "Uninstalling the mod: \\c[3][modName]\\c[0] is not allowed because it is a git repository.",
+    "repositoriesReset": "Repositories have been reset back to default.",
     "tag": "Tag",
     "filters": {
         "gridView": { "name": "Grid view", "description": "Makes the mod list a grid" },
         "local": { "name": "Include local", "description": "Includes installed mods" },
-        "hideLibrary": { "name": "Hide library mods", "description": "Hides mods that don't add any new content themselves" },
-        "tagQol": { "name": "QoL", "description": "stands for \"Quality of Life\". Makes the playing experience smoother" },
-        "tagPlayerCharacter": { "name": "player character", "description": "adds new playable characters and/or classes" },
+        "hideLibrary": {
+            "name": "Hide library mods",
+            "description": "Hides mods that don't add any new content themselves"
+        },
+        "tagQol": {
+            "name": "QoL",
+            "description": "stands for \"Quality of Life\". Makes the playing experience smoother"
+        },
+        "tagPlayerCharacter": {
+            "name": "player character",
+            "description": "adds new playable characters and/or classes"
+        },
         "tagPartyMember": { "name": "party member", "description": "adds new playable characters and/or classes" },
         "tagCombatArts": { "name": "combat arts", "description": "adds new combat arts" },
         "tagPvpDuel": { "name": "pvp duel", "description": "adds a pvp duel" },
@@ -123,9 +137,15 @@
         "tagBoss": { "name": "boss", "description": "adds new bosses" },
         "tagPuzzle": { "name": "puzzle", "description": "adds new puzzles or something puzzle related" },
         "tagNg+": { "name": "ng+", "description": "adds additional ng+ options" },
-        "tagCosmetic": { "name": "cosmetic", "description": "adds any kind of cosmetic things like skins, pets or menu skins" },
+        "tagCosmetic": {
+            "name": "cosmetic",
+            "description": "adds any kind of cosmetic things like skins, pets or menu skins"
+        },
         "tagFun": { "name": "fun", "description": "fun things not necessarily useful" },
-        "tagCheats": { "name": "cheats", "description": "do things you\"re not supposed to do like spawn items or infinite gold" },
+        "tagCheats": {
+            "name": "cheats",
+            "description": "do things you\"re not supposed to do like spawn items or infinite gold"
+        },
         "tagSpeedrun": { "name": "speedrun", "description": "helps speedrunners with speedruns or practice" },
         "tagWidget": { "name": "widget", "description": "adds a CCUILib quick menu widget" },
         "tagLanguage": { "name": "language", "description": "adds a new language" },

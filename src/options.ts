@@ -18,12 +18,6 @@ export function registerOpts() {
                         type: 'CHECKBOX',
                         init: true,
                     },
-                    repositoriesButton: {
-                        type: 'BUTTON',
-                        onPress() {
-                            modmanager.gui.menu.openRepositoriesPopup()
-                        },
-                    },
                     repositories: {
                         type: 'JSON_DATA',
                         init: ['@krypciak/CCModDB/stable', '@krypciak/CCModDB/testing'] as string[],
@@ -33,6 +27,19 @@ export function registerOpts() {
                             ModDB.loadAllMods(() => {
                                 LocalMods.refreshOrigin()
                             }, false)
+                        },
+                    },
+                    repositoriesButton: {
+                        type: 'BUTTON',
+                        onPress() {
+                            modmanager.gui.menu.openRepositoriesPopup()
+                        },
+                    },
+                    resetRepositoriesButton: {
+                        type: 'BUTTON',
+                        onPress() {
+                            Opts.repositories = Opts.flatOpts.repositories.init
+                            sc.Dialogs.showInfoDialog(Lang.repositoriesReset)
                         },
                     },
                     testingOptInMods: {

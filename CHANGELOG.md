@@ -4,6 +4,10 @@
 
 ## [Unreleased]
 
+### Added
+ 
+- Added the "Reset repositories to default" button to the CCModManager options
+
 ### Fixed
 
 - Fixed filters menu back button not being clickable by mouse + other weirdness
