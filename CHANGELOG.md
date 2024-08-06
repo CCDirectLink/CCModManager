@@ -10,6 +10,10 @@
 - Added the "Clear database cache" button to the CCModManager options
 - Added a checkbox to keep chromium flags on CCLoader update to the CCModManager options
 
+### Changed
+
+- Removed the "v" before from the mod update dialog for consistency
+
 ### Fixed
 
 - Fixed filters menu back button not being clickable by mouse + other weirdness

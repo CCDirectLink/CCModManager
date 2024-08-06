@@ -19,7 +19,7 @@ export class ModInstallDialogs {
             return mods
                 .map(mod => {
                     const localVersion = LocalMods.getAllRecord()[mod.id]?.version
-                    return `- \\c[3]${prepareModName(mod.name)}\\c[0] ${localVersion ? `${localVersion} -> ` : ''}v${mod.version}\n`
+                    return `- \\c[3]${prepareModName(mod.name)}\\c[0] ${localVersion ? `${localVersion} -> ` : ''}${mod.version}\n`
                 })
                 .join('')
         }
