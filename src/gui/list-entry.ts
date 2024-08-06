@@ -122,9 +122,22 @@ modmanager.gui.ListEntry = ig.FocusGui.extend({
         this.addChildGui(this.nameIconPrefixesText)
 
         if (!isGrid) {
+            if (serverMod?.tags) {
+                const tags = serverMod.tags
+                const str = tags.map(a => `\\c[0]${a}\\c[0]`).join(', ')
+                this.tags = new sc.TextGui(str, {
+                    font: sc.fontsystem.smallFont,
+                    maxWidth: 130 + (str.length > 100 ? 60 : 0),
+                    linePadding: -4,
+                })
+                this.tags.setAlign(ig.GUI_ALIGN.X_RIGHT, ig.GUI_ALIGN.Y_TOP)
+                this.tags.setPos(4, 15)
+                this.addChildGui(this.tags)
+            }
+
             this.description = new sc.TextGui(mod.description ?? '', {
                 font: sc.fontsystem.smallFont,
-                maxWidth: this.hook.size.x - 110,
+                maxWidth: this.hook.size.x - (this.tags?.hook.size.x ?? 0) - 50,
                 linePadding: -4,
             })
             this.description.setPos(4 + this.iconOffset, 14)
@@ -135,20 +148,6 @@ modmanager.gui.ListEntry = ig.FocusGui.extend({
                 const str = `by ${authors.map(a => `\\c[3]${a}\\c[0]`).join(', ')}`
                 this.authors = new sc.TextGui(str, { font: sc.fontsystem.smallFont, linePadding: -1 })
                 this.addChildGui(this.authors)
-            }
-
-            if (serverMod?.tags) {
-                const tags = serverMod.tags
-                const str = tags.map(a => `\\c[0]${a}\\c[0]`).join(', ')
-                const addSpace = str.length > 100 ? 60 : 0
-                this.tags = new sc.TextGui(str, {
-                    font: sc.fontsystem.smallFont,
-                    maxWidth: 130 + addSpace,
-                    linePadding: -4,
-                })
-                this.tags.setAlign(ig.GUI_ALIGN.X_RIGHT, ig.GUI_ALIGN.Y_TOP)
-                this.tags.setPos(4, 15)
-                this.addChildGui(this.tags)
             }
 
             this.versionText = new sc.TextGui(`v${mod.version}`, { font: sc.fontsystem.tinyFont })

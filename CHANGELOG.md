@@ -20,6 +20,7 @@
 - Fixed manual updating of pre-release mods
 - Fixed mod options BUTTON y spacing
 - Fixed mod installation successful dialog poping up before the installation finished
+- Prevent mod description and mod tags overlapping each other
 
 ## [0.9.17] 2024-08-05
 
