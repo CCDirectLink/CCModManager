@@ -23,43 +23,67 @@ export class ModInstallDialogs {
                 })
                 .join('')
         }
-        const header = Lang.areYouSureYouWantTo + '\n'
         const toInstallStr = toInstall.length > 0 ? `${Lang.toInstall}\n${modsToStr(toInstall)}` : ''
         const toUpdateStr = toUpdate.length > 0 ? `${Lang.toUpdate}\n${modsToStr(toUpdate)}` : ''
         const depsStr = deps.length > 0 ? `${Lang.dependencies}\n${modsToStr(deps)}` : ''
 
-        const str = `${header}${toInstallStr}${toUpdateStr}${depsStr}`
-        sc.Dialogs.showChoiceDialog(
-            str,
-            sc.DIALOG_INFO_ICON.QUESTION,
-            [ig.lang.get('sc.gui.dialogs.yes'), ig.lang.get('sc.gui.dialogs.no')],
-            button => {
-                if (button.data != 0) return
-                const toInstall = InstallQueue.values()
-                ModInstaller.install(toInstall)
-                    .then(() => {
-                        InstallQueue.clear()
-                        modmanager.gui.menu &&
-                            sc.Model.notifyObserver(modmanager.gui.menu, modmanager.gui.MENU_MESSAGES.UPDATE_ENTRIES)
-                        sc.BUTTON_SOUND.shop_cash.play()
-                        sc.Dialogs.showYesNoDialog(Lang.askRestartInstall, sc.DIALOG_INFO_ICON.QUESTION, button => {
-                            if (button.data == 0) {
-                                ModInstaller.restartGame()
-                            } else {
-                                toInstall.forEach(mod => {
-                                    mod.awaitingRestart = true
-                                })
-                            }
-                        })
+        const str = `${toInstallStr}${toUpdateStr}${depsStr}`
+
+        let notAgain = false
+        const installModsFunc = () => {
+            if (notAgain) return
+            notAgain = true
+
+            const toInstall = InstallQueue.values()
+            ModInstaller.install(toInstall)
+                .then(() => {
+                    InstallQueue.clear()
+                    modmanager.gui.menu &&
+                        sc.Model.notifyObserver(modmanager.gui.menu, modmanager.gui.MENU_MESSAGES.UPDATE_ENTRIES)
+
+                    dialog.closeMenu()
+
+                    sc.BUTTON_SOUND.shop_cash.play()
+
+                    sc.Dialogs.showYesNoDialog(Lang.askRestartInstall, sc.DIALOG_INFO_ICON.QUESTION, button => {
+                        if (button.data == 0) {
+                            ModInstaller.restartGame()
+                        } else {
+                            toInstall.forEach(mod => {
+                                mod.awaitingRestart = true
+                            })
+                        }
                     })
-                    .catch(err => {
-                        FileCache.isThereInternet(true).then(isThereInternet => {
-                            if (!isThereInternet) err = Lang.noInternet
-                            sc.Dialogs.showErrorDialog(err)
-                        })
+                })
+                .catch(err => {
+                    FileCache.isThereInternet(true).then(isThereInternet => {
+                        if (!isThereInternet) err = Lang.noInternet
+                        sc.Dialogs.showErrorDialog(err)
                     })
-            }
+                })
+        }
+
+        const dialog = new modmanager.gui.MultiPageButtonBoxGui(undefined, undefined, [
+            {
+                name: Lang.install,
+                onPress: installModsFunc,
+            },
+            {
+                name: ig.lang.get('sc.gui.shop.cancel'),
+                onPress() {
+                    dialog.closeMenu()
+                },
+            },
+        ])
+        dialog.setContent(
+            Lang.installButton.replace(/\[modCount\]/, (toInstall.length + toUpdate.length + deps.length).toString()),
+            [
+                {
+                    content: [str],
+                },
+            ]
         )
+        dialog.openMenu()
     }
 
     static showAutoUpdateDialog() {

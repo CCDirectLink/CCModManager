@@ -27,13 +27,7 @@ export function generateChangelogPage(page: ReleasePage): sc.MultiPageBoxGui.Con
     }, [] as string[])
 
     return {
-        /* split the lines into arrays of max 3 lines,
-         * the scroll box does not reneder loooong entries */
-        content: lines.reduce((acc, v, i) => {
-            if (i % 3 == 0) acc.push('')
-            acc[acc.length - 1] = acc.last() + v + '\n'
-            return acc
-        }, [] as string[]),
+        content: [lines.join('\n')],
 
         title:
             yellow +

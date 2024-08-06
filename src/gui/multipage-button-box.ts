@@ -8,7 +8,12 @@ declare global {
                 onPress: (pageIndex: number) => void
             }[]
 
-            setContent(this: this, defaultHeaderText: string, pages: sc.MultiPageBoxGui.ConditionalPage[]): void
+            setContent(
+                this: this,
+                defaultHeaderText: string,
+                pages: sc.MultiPageBoxGui.ConditionalPage[],
+                partitionPages?: boolean
+            ): void
         }
         interface MultiPageButtonBoxGuiConstructor extends ImpactClass<MultiPageButtonBoxGui> {
             new (
@@ -28,8 +33,23 @@ modmanager.gui.MultiPageButtonBoxGui = sc.MultiPageBoxGui.extend({
         this.hook.zIndex = 15e4
         this.hook.pauseGui = true
     },
-    setContent(defaultHeaderText, pages) {
+    setContent(defaultHeaderText, pages, partitionPages = true) {
         this.setDefaultHeaderText(defaultHeaderText)
+
+        if (partitionPages) {
+            /* split the lines into arrays of max 3 lines,
+             * the scroll box does not reneder loooong entries */
+            for (const page of pages) {
+                page.content = page.content
+                    .join('\n')
+                    .split('\n')
+                    .reduce((acc, v, i) => {
+                        if (i % 3 == 0) acc.push('')
+                        acc[acc.length - 1] = acc.last() + v + '\n'
+                        return acc
+                    }, [] as string[])
+            }
+        }
 
         this.pages = []
         this.pageCounter.setMax(0)
