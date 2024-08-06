@@ -15,7 +15,7 @@
         "@types/semver": "^7.5.8",
         "@typescript-eslint/eslint-plugin": "^6.21.0",
         "@typescript-eslint/parser": "^6.21.0",
-        "ccmoddb": "github:krypciak/CCModDB#master-final",
+        "ccmoddb": "github:krypciak/CCModDB",
         "crosscode-demonizer": "github:krypciak/crosscode-demonizer",
         "crossedeyes": "github:CCDirectLink/CrossedEyes",
         "esbuild": "^0.20.2",

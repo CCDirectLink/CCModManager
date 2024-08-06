@@ -11,6 +11,7 @@
 - Added a checkbox to keep chromium flags on CCLoader update to the CCModManager options
 - Added a checkbox to unpack installed or updated `.ccmod` mods to the CCModManager options
 - Added a button to reinstall all installed mods to the CCModManager options
+- Added the "Visit release page" button to the mod changelog menu
 
 ### Changed
 

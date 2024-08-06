@@ -109,6 +109,7 @@
     "checkUpdates": "Check updates",
     "filtersButton": "Filters",
     "changelogButton": "Changelog",
+    "visitReleasePage": "Visit release page",
     "noModsSelected": "No mods selected",
     "areYouSureYouWantTo": "Are you sure you want to:",
     "areYouSureYouWantToUninstall": "Are you sure you want to uninstall the mod:\n - \\c[3][modName]\\c[0]",
