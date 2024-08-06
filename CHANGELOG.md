@@ -9,6 +9,7 @@
 - Added the "Reset repositories to default" button to the CCModManager options
 - Added the "Clear database cache" button to the CCModManager options
 - Added a checkbox to keep chromium flags on CCLoader update to the CCModManager options
+- Added a checkbox to unpack installed or updated `.ccmod` mods
 
 ### Changed
 

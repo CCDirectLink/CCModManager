@@ -58,6 +58,10 @@ export function registerOpts() {
                     },
                 },
                 advanced: {
+                    unpackCCMods: {
+                        type: 'CHECKBOX',
+                        init: false,
+                    },
                     keepChromiumFlags: {
                         type: 'CHECKBOX',
                         init: true,

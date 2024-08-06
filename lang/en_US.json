@@ -21,6 +21,10 @@
         "keepChromiumFlags": {
             "name": "Keep chromium flags",
             "description": "Keeps the chromium flags on CCLoader update instead of overriding them."
+        },
+        "unpackCCMods": {
+            "name": "Unpack .ccmod files",
+            "description": "Unpacks the .ccmod files when installing or updating them."
         }
     },
     "mods": "Mods",

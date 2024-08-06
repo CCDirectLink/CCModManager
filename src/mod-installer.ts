@@ -282,13 +282,20 @@ export class ModInstaller {
             if (!this.checkSHA256(data, installation.hash.sha256))
                 throw new Error(`Mod: ${mod.id} sha256 digest mismatch. Contact mod developers in the modding discord.`)
 
+            let installationSource: string
+
             if (installation.url.endsWith('.ccmod')) {
-                return await this.installCCMod(data, modId)
+                if (Opts.unpackCCMods) {
+                    installationSource = ''
+                } else {
+                    return await this.installCCMod(data, modId)
+                }
             } else {
                 if (installation.source === undefined)
                     throw new Error(`Mod: ${mod.id} is a .zip and has no source field. This is a database error.`)
-                return await this.installModZip(data, modId, installation.source)
+                installationSource = installation.source
             }
+            return await this.installModZip(data, modId, installationSource)
         }
     }
 
