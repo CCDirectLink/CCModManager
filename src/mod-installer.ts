@@ -370,7 +370,11 @@ export class ModInstaller {
         if (mod.disableUninstall) throw new Error('Attempted to uninstall mod that has uninstalling disabled!')
         if (mod.isGit) throw new Error('Attempted to uninstall mod that is git!')
         console.log('uninstall', mod.id)
-        return new Promise<void>(resolve => rimraf(mod.path, fs, () => resolve()))
+        return ModInstaller.removeDirRecursive(mod.path)
+    }
+
+    static async removeDirRecursive(path: string) {
+        return new Promise<void>(resolve => rimraf(path, fs, () => resolve()))
     }
 
     static restartGame() {

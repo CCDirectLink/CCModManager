@@ -7,6 +7,7 @@
 ### Added
  
 - Added the "Reset repositories to default" button to the CCModManager options
+- Added the "Clear database cache" button to the CCModManager options
 
 ### Fixed
 

@@ -1,3 +1,4 @@
+import { FileCache } from './cache'
 import { Lang } from './lang-manager'
 import { LocalMods } from './local-mods'
 import type { Options, Option } from './mod-options'
@@ -39,7 +40,15 @@ export function registerOpts() {
                         type: 'BUTTON',
                         onPress() {
                             Opts.repositories = Opts.flatOpts.repositories.init
-                            sc.Dialogs.showInfoDialog(Lang.repositoriesReset)
+                            sc.Dialogs.showInfoDialog(Lang.opts.resetRepositoriesButton.onclickPopup)
+                        },
+                    },
+                    clearCacheButton: {
+                        type: 'BUTTON',
+                        onPress() {
+                            FileCache.deleteOnDiskCache().then(() => {
+                                sc.Dialogs.showInfoDialog(Lang.opts.clearCacheButton.onclickPopup)
+                            })
                         },
                     },
                     testingOptInMods: {

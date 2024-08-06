@@ -1,3 +1,4 @@
+import { ModInstaller } from './mod-installer'
 import { ModDB } from './moddb'
 import { ModEntry, ModImageConfig as ModIconConfig, NPDatabase } from './types'
 
@@ -112,7 +113,7 @@ export class FileCache {
     private static async downloadAndWriteDatabase(path: string, url: string, eTag: string) {
         const data: NPDatabase = (this.cache[path] = await (await fetch(url)).json())
         data.eTag = eTag
-        fs.writeFile(`${this.cacheDir}/${path}`, JSON.stringify(data), () => {})
+        fs.promises.writeFile(`${this.cacheDir}/${path}`, JSON.stringify(data))
         this.inCache.add(path)
         return data
     }
@@ -161,5 +162,10 @@ export class FileCache {
         if (toJSON) data = JSON.parse(data.toString())
         this.cache[path] = data
         return data as T
+    }
+
+    static async deleteOnDiskCache() {
+        await ModInstaller.removeDirRecursive(this.cacheDir)
+        await fs.promises.mkdir(this.cacheDir, { recursive: true })
     }
 }

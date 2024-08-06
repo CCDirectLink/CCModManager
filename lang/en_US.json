@@ -10,7 +10,13 @@
         },
         "resetRepositoriesButton": {
             "name": "Reset repositories to default",
-            "description": "Resets the repositories to the default ones."
+            "description": "Resets the repositories to the default ones.",
+            "onclickPopup": "Repositories have been reset back to default."
+        },
+        "clearCacheButton": {
+            "name": "Clear database cache",
+            "description": "Clears all database cache. Usually not necessary.",
+            "onclickPopup": "Cache has been cleared. Restarting the game is advised."
         }
     },
     "mods": "Mods",
@@ -110,7 +116,6 @@
     "cannotDisableDisabled": "Disabling the mod: \\c[3][modName]\\c[0] is not allowed.",
     "cannotUninstallDisabled": "Uninstalling the mod: \\c[3][modName]\\c[0] is not allowed.",
     "cannotUninstallGit": "Uninstalling the mod: \\c[3][modName]\\c[0] is not allowed because it is a git repository.",
-    "repositoriesReset": "Repositories have been reset back to default.",
     "tag": "Tag",
     "filters": {
         "gridView": { "name": "Grid view", "description": "Makes the mod list a grid" },
