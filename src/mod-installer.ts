@@ -13,6 +13,7 @@ import semver_gt from 'semver/functions/gt'
 
 // @ts-expect-error
 import rimraf from 'rimraf'
+import { Opts } from './options'
 
 export class InstallQueue {
     private static queue: ModEntryServer[] = []
@@ -338,7 +339,24 @@ export class ModInstaller {
         const data = await resp.arrayBuffer()
 
         if (installation.source === undefined) throw new Error(`I mean come on ccloader has to have a source field`)
-        this.installModZip(data, '', installation.source, '')
+
+        const packageJsonPath: string = 'package.json'
+        async function readPackageJson(): Promise<{ 'chromium-args': string }> {
+            return JSON.parse(await fs.promises.readFile(packageJsonPath, 'utf8'))
+        }
+
+        let chromiumFlags: string | undefined
+        if (Opts.keepChromiumFlags) {
+            chromiumFlags = (await readPackageJson())['chromium-args']
+        }
+
+        await this.installModZip(data, '', installation.source, '')
+
+        if (chromiumFlags) {
+            const packageJson = await readPackageJson()
+            packageJson['chromium-args'] = chromiumFlags
+            await fs.promises.writeFile(packageJsonPath, JSON.stringify(packageJson, null, 4))
+        }
     }
 
     private static async fileExists(filePath: string) {

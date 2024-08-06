@@ -193,8 +193,8 @@ modmanager.gui.OptionsMenu = sc.BaseMenu.extend({
 
         this.updateHelpButtonVisibility()
 
-        const smb = sc.menu.guiReference
-            .menuDisplay.hook.children.filter(h => h.gui instanceof sc.MainMenu.SubMenuBox)
+        const smb = sc.menu.guiReference.menuDisplay.hook.children
+            .filter(h => h.gui instanceof sc.MainMenu.SubMenuBox)
             .last().gui as sc.MainMenu.SubMenuBox
         smb.text.setText(this.mod.name)
     },

@@ -19,17 +19,6 @@ export function registerOpts() {
                         type: 'CHECKBOX',
                         init: true,
                     },
-                    repositories: {
-                        type: 'JSON_DATA',
-                        init: ['@krypciak/CCModDB/stable', '@krypciak/CCModDB/testing'] as string[],
-                        changeEvent() {
-                            ModDB.loadDatabases(true)
-
-                            ModDB.loadAllMods(() => {
-                                LocalMods.refreshOrigin()
-                            }, false)
-                        },
-                    },
                     repositoriesButton: {
                         type: 'BUTTON',
                         onPress() {
@@ -43,12 +32,16 @@ export function registerOpts() {
                             sc.Dialogs.showInfoDialog(Lang.opts.resetRepositoriesButton.onclickPopup)
                         },
                     },
-                    clearCacheButton: {
-                        type: 'BUTTON',
-                        onPress() {
-                            FileCache.deleteOnDiskCache().then(() => {
-                                sc.Dialogs.showInfoDialog(Lang.opts.clearCacheButton.onclickPopup)
-                            })
+
+                    repositories: {
+                        type: 'JSON_DATA',
+                        init: ['@krypciak/CCModDB/stable', '@krypciak/CCModDB/testing'] as string[],
+                        changeEvent() {
+                            ModDB.loadDatabases(true)
+
+                            ModDB.loadAllMods(() => {
+                                LocalMods.refreshOrigin()
+                            }, false)
                         },
                     },
                     testingOptInMods: {
@@ -61,6 +54,20 @@ export function registerOpts() {
                         hidden: true,
                         changeEvent() {
                             modmanager.gui.menu.list.updateColumnCount()
+                        },
+                    },
+                },
+                advanced: {
+                    keepChromiumFlags: {
+                        type: 'CHECKBOX',
+                        init: true,
+                    },
+                    clearCacheButton: {
+                        type: 'BUTTON',
+                        onPress() {
+                            FileCache.deleteOnDiskCache().then(() => {
+                                sc.Dialogs.showInfoDialog(Lang.opts.clearCacheButton.onclickPopup)
+                            })
                         },
                     },
                 },

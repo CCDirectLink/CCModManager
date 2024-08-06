@@ -17,6 +17,10 @@
             "name": "Clear database cache",
             "description": "Clears all database cache. Usually not necessary.",
             "onclickPopup": "Cache has been cleared. Restarting the game is advised."
+        },
+        "keepChromiumFlags": {
+            "name": "Keep chromium flags",
+            "description": "Keeps the chromium flags on CCLoader update instead of overriding them."
         }
     },
     "mods": "Mods",
