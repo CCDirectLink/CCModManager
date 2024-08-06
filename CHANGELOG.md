@@ -3,6 +3,11 @@
 # Change Log
 
 ## [Unreleased]
+
+### Fixed
+
+- Fixed filters menu back button not being clickable by mouse + other weirdness
+
 ## [0.9.17] 2024-08-05
 
 ### Added

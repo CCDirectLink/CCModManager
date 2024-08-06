@@ -6,6 +6,7 @@ declare global {
     namespace modmanager.gui {
         interface FiltersPopup extends ig.GuiElementBase {
             gfx: ig.Image
+            buttonInteract: ig.ButtonInteractEntry
             buttonGroup: sc.ButtonGroup
             backButton: sc.ButtonGui
             checkboxesGuis: { text: sc.TextGui; checkbox: modmanager.gui.FilterCheckox }[]
@@ -128,7 +129,9 @@ modmanager.gui.FiltersPopup = ig.GuiElementBase.extend({
         this.infoBar.doStateTransition('HIDDEN')
         this.addChildGui(this.infoBar)
 
+        this.buttonInteract = new ig.ButtonInteractEntry()
         this.buttonGroup = new sc.ButtonGroup()
+        this.buttonInteract.pushButtonGroup(this.buttonGroup)
 
         const box = new ig.GuiElementBase()
 
@@ -194,12 +197,11 @@ modmanager.gui.FiltersPopup = ig.GuiElementBase.extend({
     show() {
         ig.gui.addGuiElement(this)
         this.doStateTransition('DEFAULT')
-        ig.interact.setBlockDelay(0.2)
 
-        sc.menu.buttonInteract.pushButtonGroup(this.buttonGroup)
-        sc.menu.pushBackCallback(() => {
-            this.backButton.onButtonPress()
-        })
+        ig.interact.addEntry(this.buttonInteract)
+        ig.interact.setBlockDelay(0.2)
+        this.buttonInteract.clearAllButtons()
+        this.buttonInteract.addGlobalButton(this.backButton, () => sc.control.menuBack())
 
         for (let i = 0; i < this.checkboxesGuis.length; i++) {
             const guis = this.checkboxesGuis[i]
@@ -210,9 +212,8 @@ modmanager.gui.FiltersPopup = ig.GuiElementBase.extend({
     hide() {
         this.doStateTransition('HIDDEN', undefined, true)
         this.infoBar.doStateTransition('HIDDEN')
-        sc.menu.buttonInteract.removeButtonGroup(this.buttonGroup)
-        sc.menu.buttonInteract.removeGlobalButton(this.backButton)
+
+        ig.interact.removeEntry(this.buttonInteract)
         ig.interact.setBlockDelay(0.2)
-        sc.menu.popBackCallback()
     },
 })
