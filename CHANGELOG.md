@@ -15,6 +15,7 @@
 - Fixed filters menu back button not being clickable by mouse + other weirdness
 - Fixed manual updating of pre-release mods
 - Fixed mod options BUTTON y spacing
+- Fixed mod installation successful dialog poping up before the installation finished
 
 ## [0.9.17] 2024-08-05
 

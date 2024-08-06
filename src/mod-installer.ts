@@ -262,11 +262,10 @@ export class ModInstaller {
         if (!local) throw new Error('wat')
 
         if (local.id == 'ccloader') {
-            this.installCCLoader(mod)
-            return
+            return this.installCCLoader(mod)
         }
-        this.uninstallMod(local)
-        this.downloadAndInstallMod(mod)
+        await this.uninstallMod(local)
+        await this.downloadAndInstallMod(mod)
     }
 
     private static async downloadAndInstallMod(mod: ModEntryServer) {
@@ -323,7 +322,6 @@ export class ModInstaller {
                     }
 
                     const filepath = path.join(prefixPath, id, relative)
-                    console.log(filepath)
                     try {
                         await fs.promises.mkdir(path.dirname(filepath), { recursive: true })
                     } catch {}
