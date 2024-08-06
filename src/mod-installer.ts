@@ -41,7 +41,7 @@ export class InstallQueue {
     static values(): ModEntryServer[] {
         return [...this.queue].map(mod => {
             if (mod.testingVersion && ModDB.isModTestingOptIn(mod.id)) {
-                mod.testingVersion.installStatus = mod.installStatus
+                if (mod.installStatus) mod.testingVersion.installStatus = mod.installStatus
                 mod = mod.testingVersion
             }
             return mod
