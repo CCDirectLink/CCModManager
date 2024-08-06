@@ -25,6 +25,10 @@
         "unpackCCMods": {
             "name": "Unpack .ccmod files",
             "description": "Unpacks the .ccmod files when installing or updating them."
+        },
+        "reinstallAllMods": {
+            "name": "Reinstall all installed mods",
+            "description": "Reinstall all mods that are reinstallable (are in the database and aren't Git repos)."
         }
     },
     "mods": "Mods",

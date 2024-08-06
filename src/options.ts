@@ -1,6 +1,8 @@
 import { FileCache } from './cache'
+import { ModInstallDialogs } from './gui/install-dialogs'
 import { Lang } from './lang-manager'
 import { LocalMods } from './local-mods'
+import { InstallQueue } from './mod-installer'
 import type { Options, Option } from './mod-options'
 import { ModDB } from './moddb'
 
@@ -72,6 +74,24 @@ export function registerOpts() {
                             FileCache.deleteOnDiskCache().then(() => {
                                 sc.Dialogs.showInfoDialog(Lang.opts.clearCacheButton.onclickPopup)
                             })
+                        },
+                    },
+                    reinstallAllMods: {
+                        type: 'BUTTON',
+                        onPress() {
+                            const reinstallableMods = LocalMods.getAll()
+                                .filter(
+                                    mod =>
+                                        mod.serverCounterpart &&
+                                        !mod.isGit &&
+                                        !LocalMods.localModFlags[mod.id]?.disableUninstall
+                                )
+                                .map(mod => mod.serverCounterpart!)
+
+                            for (const mod of reinstallableMods) mod.installStatus = 'update'
+
+                            InstallQueue.add(...reinstallableMods)
+                            ModInstallDialogs.showModInstallDialog()
                         },
                     },
                 },
