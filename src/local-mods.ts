@@ -24,6 +24,10 @@ declare global {
     var activeMods: CCL2Mod[]
     var inactiveMods: CCL2Mod[]
     var versions: { ccloader: string; crosscode: string }
+    /* ccl3 types only */
+    namespace modloader {
+        const _runtimeMod: Mod
+    }
 }
 
 export class LocalMods {
@@ -44,6 +48,11 @@ export class LocalMods {
             disableUpdate: true,
         },
         'CCLoader display version': {
+            disableUninstall: true,
+            disableUpdate: true,
+        },
+        'ccloader-runtime': {
+            disableDisabling: true,
             disableUninstall: true,
             disableUpdate: true,
         },
@@ -180,7 +189,7 @@ export class LocalMods {
     }
 
     private static convertCCL3Mod(mod: Mod): ModEntryLocal {
-        const active = sc.options.get(`modEnabled-${mod.id}`) as boolean
+        const active = mod == modloader._runtimeMod ? true : (sc.options.get(`modEnabled-${mod.id}`) as boolean)
         return {
             database: 'LOCAL',
             isLocal: true,

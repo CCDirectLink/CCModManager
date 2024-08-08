@@ -25,6 +25,7 @@
 - Fixed mod installation successful dialog poping up before the installation finished
 - Prevent mod description and mod tags overlapping each other
 - Fixed the confirmation buttons for the mod installation prompt getting off-screen when the mod list is too big
+- Improved ccloader3 compatibility
 
 ## [0.9.17] 2024-08-05
 
