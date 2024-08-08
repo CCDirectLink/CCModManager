@@ -3,6 +3,11 @@
 # Change Log
 
 ## [Unreleased]
+
+### Fixed
+
+- Fixed the mod menu sometimes being blank when reopening it
+
 ## [0.9.18] 2024-08-08
 
 ### Added
