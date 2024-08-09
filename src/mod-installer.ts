@@ -192,15 +192,11 @@ export class ModInstaller {
         const deps: Record<string, DepEntry> = {}
         for (const mod of mods) {
             mod.installStatus = 'new' /* set default */
-            try {
-                const modDeps = this.getModDependencies(mod)
-                for (const modId in modDeps) {
-                    const entry = modDeps[modId]
-                    this.setOrAddNewer(deps, entry.mod, ...entry.versionReqRanges)
-                    entry.mod.installStatus = 'dependency'
-                }
-            } catch (err) {
-                console.warn(`Mod Manager: ${(err as Error).message}`)
+            const modDeps = this.getModDependencies(mod)
+            for (const modId in modDeps) {
+                const entry = modDeps[modId]
+                this.setOrAddNewer(deps, entry.mod, ...entry.versionReqRanges)
+                entry.mod.installStatus = 'dependency'
             }
         }
         if (!includeInstalled) {

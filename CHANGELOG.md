@@ -17,6 +17,7 @@
 - Fixed the mod menu sometimes being blank when reopening it
 - Block exiting from the mod install menu with keys such as escape
 - Don't block dependency mod uninstalling when all parent mods have been uninstalled in the current session
+- Disallow installing mods that depend on missing extensions (such as DLC)
 
 ## [0.9.18] 2024-08-08
 
