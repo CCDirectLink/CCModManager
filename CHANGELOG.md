@@ -4,6 +4,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Added mod installation progress indication
+
 ### Fixed
 
 - Fixed the mod menu sometimes being blank when reopening it

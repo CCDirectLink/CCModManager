@@ -52,7 +52,17 @@ export class InstallQueue {
 
 type DepEntry = { mod: ModEntryServer; versionReqRanges: string[] }
 
+export type ModInstallerDownloadingProgress = { length: number; received: number }
+export type ModInstallerEventListener = {
+    preparing(mod: ModEntryServer): void
+    downloading(mod: ModEntryServer, progressFunc: () => ModInstallerDownloadingProgress): void
+    installing(mod: ModEntryServer): void
+    done(mod: ModEntryServer): void
+}
+
 export class ModInstaller {
+    static eventListeners: ModInstallerEventListener[] = []
+
     static record: Record<string, ModEntryServer>
     static byNameRecord: Record<string, ModEntryServer>
     static virtualMods: Record<string, ModEntryLocalVirtual>
@@ -254,6 +264,7 @@ export class ModInstaller {
             promises.push(this.updateMod(mod))
         }
         await Promise.all(promises)
+
         console.log('done')
     }
 
@@ -268,8 +279,42 @@ export class ModInstaller {
         await this.downloadAndInstallMod(mod)
     }
 
+    private static downloadWithProgress(resp: Response): {
+        arrayBuffer: Promise<ArrayBuffer>
+        progressFunc: () => ModInstallerDownloadingProgress
+    } {
+        const reader = resp.body!.getReader()
+        const length = +resp.headers.get('content-length')!
+        let received = 0
+
+        return {
+            arrayBuffer: new Promise(async resolve => {
+                const chunks: Uint8Array[] = []
+
+                while (true) {
+                    const { done, value } = await reader.read()
+                    if (done) break
+
+                    chunks.push(value)
+                    received += value.length
+                }
+
+                const body = new Uint8Array(received)
+                let position = 0
+                for (const chunk of chunks) {
+                    body.set(chunk, position)
+                    position += chunk.length
+                }
+                resolve(body.buffer)
+            }),
+            progressFunc: () => ({ length, received }),
+        }
+    }
+
     private static async downloadAndInstallMod(mod: ModEntryServer) {
         console.log('installing mod:', mod.id)
+
+        for (const { preparing: func } of this.eventListeners) func && func(mod)
 
         const installation = mod.installation.find(i => i.type === 'zip')
         if (!installation) throw new Error(`Mod: ${mod.id} has no known installation methods.`)
@@ -277,26 +322,33 @@ export class ModInstaller {
         const modId = mod.id.replace(/ /g, '_')
         if (installation.type == 'zip') {
             console.log(`downloading ${installation.url}`)
+
             const resp = await fetch(installation.url)
-            const data = await resp.arrayBuffer()
+
+            const { arrayBuffer, progressFunc } = this.downloadWithProgress(resp)
+
+            for (const { downloading: func } of this.eventListeners) func && func(mod, progressFunc)
+
+            const data = await arrayBuffer
+
             if (!this.checkSHA256(data, installation.hash.sha256))
                 throw new Error(`Mod: ${mod.id} sha256 digest mismatch. Contact mod developers in the modding discord.`)
 
-            let installationSource: string
+            for (const { installing: func } of this.eventListeners) func && func(mod)
 
-            if (installation.url.endsWith('.ccmod')) {
-                if (Opts.unpackCCMods) {
-                    installationSource = ''
-                } else {
-                    return await this.installCCMod(data, modId)
-                }
+            if (installation.url.endsWith('.ccmod') && !Opts.unpackCCMods) {
+                await this.installCCMod(data, modId)
             } else {
-                if (installation.source === undefined)
+                const installationSource: string | undefined =
+                    installation.url.endsWith('.ccmod') && Opts.unpackCCMods ? '' : installation.source
+
+                if (installationSource === undefined)
                     throw new Error(`Mod: ${mod.id} is a .zip and has no source field. This is a database error.`)
-                installationSource = installation.source
+
+                await this.installModZip(data, modId, installationSource)
             }
-            return await this.installModZip(data, modId, installationSource)
         }
+        for (const { done: func } of this.eventListeners) func && func(mod)
     }
 
     private static async installCCMod(data: ArrayBuffer, id: string) {

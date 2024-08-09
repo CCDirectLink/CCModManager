@@ -452,7 +452,6 @@ modmanager.gui.Menu = sc.ListInfoMenu.extend({
                 ig.input.pressed('special') /* space bar */ ||
                 /* R2 press */ ig.gamepad.isButtonPressed(sc.control._getSpecialButton())
         )
-
     },
     hideMenu(_afterSubmenu, nextSubmenu) {
         this.parent()

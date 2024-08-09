@@ -102,6 +102,7 @@
     "enabledTab": "Enabled",
     "disabledTab": "Disabled",
     "installButton": "Install \\c[3][modCount]\\c[0] mods",
+    "installingModsHeader": "Installing \\c[3][modCount]\\c[0] mods...",
     "uninstall": "Uninstall",
     "testingButton": "Testing",
     "openRepositoryUrl": "Visit repository",

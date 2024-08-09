@@ -3,6 +3,7 @@ declare global {
     namespace modmanager.gui {
         interface MultiPageButtonBoxGui extends sc.MultiPageBoxGui {
             userButtonGroup?: sc.ButtonGroup
+            userButtons?: sc.ButtonGui[]
             buttonConfigs?: {
                 name: string
                 onPress: (pageIndex: number) => void
@@ -14,6 +15,10 @@ declare global {
                 pages: sc.MultiPageBoxGui.ConditionalPage[],
                 partitionPages?: boolean
             ): void
+            partitionContent(this: this, content: string[]): string[]
+            setPageHeader(this: this, pageIndex: number, header: string): void
+            setPageText(this: this, pageIndex: number, content: string[], partitionPages?: boolean): void
+            refreshPage(this: this): void
         }
         interface MultiPageButtonBoxGuiConstructor extends ImpactClass<MultiPageButtonBoxGui> {
             new (
@@ -40,20 +45,46 @@ modmanager.gui.MultiPageButtonBoxGui = sc.MultiPageBoxGui.extend({
             /* split the lines into arrays of max 3 lines,
              * the scroll box does not reneder loooong entries */
             for (const page of pages) {
-                page.content = page.content
-                    .join('\n')
-                    .split('\n')
-                    .reduce((acc, v, i) => {
-                        if (i % 3 == 0) acc.push('')
-                        acc[acc.length - 1] = acc.last() + v + '\n'
-                        return acc
-                    }, [] as string[])
+                page.content = this.partitionContent(page.content)
             }
         }
 
         this.pages = []
         this.pageCounter.setMax(0)
         this.addPages(pages)
+    },
+    partitionContent(content) {
+        return content
+            .join('\n')
+            .split('\n')
+            .reduce((acc, v, i) => {
+                if (i % 3 == 0) acc.push('')
+                acc[acc.length - 1] = acc.last() + v + '\n'
+                return acc
+            }, [] as string[])
+    },
+    setPageText(pageIndex, content, partitionContent = true) {
+        const page = this.pages[pageIndex]
+        page.content = partitionContent ? this.partitionContent(content) : content
+    },
+    setPageHeader(pageIndex, header) {
+        this.pages[pageIndex].header = header
+    },
+    refreshPage() {
+        /* fix scroll being set to the very top */
+        const backup = this.scrollContainer.setElement
+        this.scrollContainer.setElement = function (this: sc.HelpScrollContainer, gui) {
+            this.content.removeAllChildren()
+            this.content.hook.size.y = 0
+            // this.scrollPane.box.doScrollTransition(0, 0, 0)
+            // this.scrollPane.recalculateScrollBars(true)
+            this.content.addChildGui(gui)
+            this._updateContentHeight()
+        }
+
+        this._setPage(this.curPage)
+
+        this.scrollContainer.setElement = backup
     },
     openMenu(...args) {
         this.hook.removeAfterTransition = false
@@ -100,6 +131,7 @@ modmanager.gui.MultiPageButtonBoxGui = sc.MultiPageBoxGui.extend({
             const y = this.pageCounter.hook.pos.y
 
             this.userButtonGroup = new sc.ButtonGroup()
+            this.userButtons = []
 
             for (let i = 0; i < this.buttonConfigs.length; i++) {
                 const { name, onPress: callback } = this.buttonConfigs[i]
@@ -110,6 +142,7 @@ modmanager.gui.MultiPageButtonBoxGui = sc.MultiPageBoxGui.extend({
                 b.setPos(x, y)
                 x += b.hook.size.x + spacing
 
+                this.userButtons.push(b)
                 this.userButtonGroup.addFocusGui(b, i, 0)
                 b.setAlign(ig.GUI_ALIGN.X_LEFT, ig.GUI_ALIGN.Y_TOP)
                 this.content.addChildGui(b)
