@@ -1,0 +1,8 @@
+plugin.js
+*.ccmod
+*.png~
+*.kra~
+*.kra
+node_modules
+pack
+bundle.zip
