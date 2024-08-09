@@ -8,6 +8,7 @@ declare global {
                 name: string
                 onPress: (pageIndex: number) => void
             }[]
+            blockClosing?: boolean
 
             setContent(
                 this: this,
@@ -90,6 +91,10 @@ modmanager.gui.MultiPageButtonBoxGui = sc.MultiPageBoxGui.extend({
         this.hook.removeAfterTransition = false
         this.parent(...args)
         ig.gui.addGuiElement(this)
+    },
+    closeMenu() {
+        if (this.blockClosing) return
+        this.parent()
     },
     _createInitContent(width) {
         /* this is the most hacky function ive ever written */

@@ -11,6 +11,7 @@
 ### Fixed
 
 - Fixed the mod menu sometimes being blank when reopening it
+- Block exiting from the mod install menu with keys such as escape
 
 ## [0.9.18] 2024-08-08
 

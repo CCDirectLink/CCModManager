@@ -98,6 +98,7 @@ export class ModInstallDialogs {
             cancelButton.setActive(false)
 
             dialog.setPageHeader(0, Lang.installingModsHeader.replace(/\[modCount\]/, modCount.toString()))
+            dialog.blockClosing = true
 
             const eventIndex = ModInstaller.eventListeners.push({
                 preparing(mod) {
@@ -136,6 +137,7 @@ export class ModInstallDialogs {
                         sc.Model.notifyObserver(modmanager.gui.menu, modmanager.gui.MENU_MESSAGES.UPDATE_ENTRIES)
 
                     ModInstaller.eventListeners.splice(eventIndex, 1)
+                    dialog.blockClosing = false
                     dialog.closeMenu()
 
                     sc.BUTTON_SOUND.shop_cash.play()
