@@ -8,6 +8,10 @@
 
 - Added mod installation progress indication
 
+### Changed
+
+- Revert the button order in the mod uninstallation popup to "YES NO" from "NO YES"
+
 ### Fixed
 
 - Fixed the mod menu sometimes being blank when reopening it

@@ -205,9 +205,9 @@ export class ModInstallDialogs {
         sc.Dialogs.showChoiceDialog(
             str,
             sc.DIALOG_INFO_ICON.QUESTION,
-            [ig.lang.get('sc.gui.dialogs.no'), ig.lang.get('sc.gui.dialogs.yes')],
+            [ig.lang.get('sc.gui.dialogs.yes'), ig.lang.get('sc.gui.dialogs.no')],
             button => {
-                if (button.data == 1) {
+                if (button.data == 0) {
                     ModInstaller.uninstallMod(localMod)
                         .then(() => {
                             localMod.awaitingRestart = true
