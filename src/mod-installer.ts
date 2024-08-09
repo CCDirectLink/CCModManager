@@ -68,60 +68,61 @@ export class ModInstaller {
     static virtualMods: Record<string, ModEntryLocalVirtual>
 
     static init() {
+        const version = LocalMods.getCCVersion()
         this.virtualMods = {
             crosscode: {
                 id: 'crosscode',
                 name: 'CrossCode',
                 description: 'The base game.',
-                version: LocalMods.getCCVersion(),
+                version,
             },
             'post-game': {
                 id: 'post-game',
                 name: 'Post Game DLC',
                 description: 'The postgame DLC.',
-                version: LocalMods.getCCVersion(),
+                version,
                 isExtension: true,
             },
             manlea: {
                 id: 'manlea',
                 name: 'Manlea',
                 description: 'The Manlea skin DLC.',
-                version: LocalMods.getCCVersion(),
+                version,
                 isExtension: true,
             },
             'ninja-skin': {
                 id: 'ninja-skin',
                 name: 'Ninja Skin',
                 description: 'The ninja skin DLC.',
-                version: LocalMods.getCCVersion(),
+                version,
                 isExtension: true,
             },
             'scorpion-robo': {
                 id: 'scorpion-robo',
                 name: 'PC Exclusive Extension',
                 description: 'The formerly exclusive PC content.',
-                version: LocalMods.getCCVersion(),
+                version,
                 isExtension: true,
             },
             'snowman-tank': {
                 id: 'snowman-tank',
                 name: 'Xbox Exclusive Extension',
                 description: 'The formerly exclusive Xbox One content.',
-                version: LocalMods.getCCVersion(),
+                version,
                 isExtension: true,
             },
             'fish-gear': {
                 id: 'fish-gear',
                 name: 'PS4 Exclusive Extension',
                 description: 'The formerly exclusive PS4 content.',
-                version: LocalMods.getCCVersion(),
+                version,
                 isExtension: true,
             },
             'flying-hedgehag': {
                 id: 'flying-hedgehag',
                 name: 'Switch Exclusive Extension',
                 description: 'The formerly exclusive Nintendo Switch content.',
-                version: LocalMods.getCCVersion(),
+                version,
                 isExtension: true,
             },
         }
@@ -328,7 +329,9 @@ export class ModInstaller {
             const data = await arrayBuffer
 
             if (!this.checkSHA256(data, installation.hash.sha256))
-                throw new Error(`Mod: ${mod.id} "${mod.name}" sha256 digest mismatch. Contact mod developers in the modding discord.`)
+                throw new Error(
+                    `Mod: ${mod.id} "${mod.name}" sha256 digest mismatch. Contact mod developers in the modding discord.`
+                )
 
             for (const { installing: func } of this.eventListeners) func && func(mod)
 
@@ -339,7 +342,9 @@ export class ModInstaller {
                     installation.url.endsWith('.ccmod') && Opts.unpackCCMods ? '' : installation.source
 
                 if (installationSource === undefined)
-                    throw new Error(`Mod: ${mod.id} "${mod.name}" is a .zip and has no source field. This is a database error.`)
+                    throw new Error(
+                        `Mod: ${mod.id} "${mod.name}" is a .zip and has no source field. This is a database error.`
+                    )
 
                 await this.installModZip(data, modId, installationSource)
             }
