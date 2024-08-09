@@ -193,7 +193,7 @@ export class ModInstallDialogs {
             sc.Dialogs.showErrorDialog(Lang.cannotUninstallGit.replace(/\[modName\]/, prepareModName(localMod.name)))
             return false
         }
-        const deps = ModInstaller.getWhatDependsOnAMod(localMod)
+        const deps = ModInstaller.getWhatDependsOnAMod(localMod).filter(mod => !mod.uninstalled)
         if (deps.length > 0) {
             sc.Dialogs.showErrorDialog(
                 Lang.cannotUninstall.replace(/\[modName\]/, prepareModName(localMod.name)) +
@@ -212,6 +212,7 @@ export class ModInstallDialogs {
                         .then(() => {
                             localMod.awaitingRestart = true
                             localMod.active = false
+                            localMod.uninstalled = true
                             sc.Model.notifyObserver(modmanager.gui.menu, modmanager.gui.MENU_MESSAGES.UPDATE_ENTRIES)
                             sc.BUTTON_SOUND.shop_cash.play()
                             sc.Dialogs.showYesNoDialog(

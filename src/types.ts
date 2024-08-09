@@ -81,7 +81,7 @@ export interface ModEntryServer extends ModEntryBase {
 
 export interface ModEntryLocal extends ModEntryBase {
     isLocal: true
-    /* Is the mod currently loaded */
+    /* Will the mod be loaded on next restart */
     active: boolean
     /* Config used for displaying the icon */
     iconConfig: ModImageConfig
@@ -91,6 +91,8 @@ export interface ModEntryLocal extends ModEntryBase {
     path: string
     /** Does the mod have a newer version available for installation */
     hasUpdate: boolean
+    /** Has the mod been uninstalled in the current session */
+    uninstalled?: boolean
     /** Never true for an ordinary mod, it's for stuff like CCLoader... Full list specified in local-mods.ts */
     disableUninstall?: boolean
     /** Never true for an ordinary mod, it's for stuff like CCLoader... Full list specified in local-mods.ts */
