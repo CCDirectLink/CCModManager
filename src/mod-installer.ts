@@ -147,14 +147,14 @@ export class ModInstaller {
             const reqVersionRange = mod.dependencies[depName]
             if (this.virtualMods[depName]) {
                 if (this.virtualMods[depName].isExtension && !ig.extensions.hasExtension(depName)) {
-                    throw new Error(`Mod: ${mod.id} has a dependant extension missing: ${depName}`)
+                    throw new Error(`Mod: ${mod.id} "${mod.name}" has a dependant extension missing: ${depName}`)
                 }
                 this.setOrAddNewer(deps, { id: depName } as any, reqVersionRange)
                 continue
             }
             const dep = this.getModByDepName(depName)
 
-            if (!dep) throw new Error(`Mod: ${mod.id} has a dependency missing: ${depName}`)
+            if (!dep) throw new Error(`Mod: ${mod.id} "${mod.name}" has a dependency missing: ${depName}`)
 
             this.setOrAddNewer(deps, dep, reqVersionRange)
 
@@ -232,7 +232,7 @@ export class ModInstaller {
                 const { mod: serverMod, versionReqRanges } = deps[modId]
                 if (!this.matchesVersionReqRanges(serverMod, versionReqRanges))
                     throw new Error(
-                        `Dependency: ${serverMod.name} (${serverMod.id}) that cannot be resolved: version range: ${versionReqRanges.join(', ')} was not met. Database has only: ${serverMod.version}`
+                        `Dependency: ${serverMod.id} "${serverMod.name}" that cannot be resolved: version range: ${versionReqRanges.join(', ')} was not met. Database has only: ${serverMod.version}`
                     )
             }
         }
@@ -313,7 +313,7 @@ export class ModInstaller {
         for (const { preparing: func } of this.eventListeners) func && func(mod)
 
         const installation = mod.installation.find(i => i.type === 'zip')
-        if (!installation) throw new Error(`Mod: ${mod.id} has no known installation methods.`)
+        if (!installation) throw new Error(`Mod: ${mod.id} "${mod.name}" has no known installation methods.`)
 
         const modId = mod.id.replace(/ /g, '_')
         if (installation.type == 'zip') {
@@ -328,7 +328,7 @@ export class ModInstaller {
             const data = await arrayBuffer
 
             if (!this.checkSHA256(data, installation.hash.sha256))
-                throw new Error(`Mod: ${mod.id} sha256 digest mismatch. Contact mod developers in the modding discord.`)
+                throw new Error(`Mod: ${mod.id} "${mod.name}" sha256 digest mismatch. Contact mod developers in the modding discord.`)
 
             for (const { installing: func } of this.eventListeners) func && func(mod)
 
@@ -339,7 +339,7 @@ export class ModInstaller {
                     installation.url.endsWith('.ccmod') && Opts.unpackCCMods ? '' : installation.source
 
                 if (installationSource === undefined)
-                    throw new Error(`Mod: ${mod.id} is a .zip and has no source field. This is a database error.`)
+                    throw new Error(`Mod: ${mod.id} "${mod.name}" is a .zip and has no source field. This is a database error.`)
 
                 await this.installModZip(data, modId, installationSource)
             }
