@@ -1,6 +1,6 @@
 import { LocalMods } from './local-mods'
 import { ModDB } from './moddb'
-import { ModEntry, ModEntryBaseBase, ModEntryLocal, ModEntryLocalVirtual, ModEntryServer } from './types'
+import { ModEntry, ModEntryLocal, ModEntryLocalVirtual, ModEntryServer } from './types'
 import { ModInstallDialogs } from './gui/install-dialogs'
 
 const fs: typeof import('fs') = (0, eval)("require('fs')")
@@ -10,6 +10,7 @@ const crypto: typeof import('crypto') = (0, eval)('require("crypto")')
 import { loadAsync } from 'jszip'
 import semver_satisfies from 'semver/functions/satisfies'
 import semver_gt from 'semver/functions/gt'
+import semver_major from 'semver/functions/major'
 
 // @ts-expect-error
 import rimraf from 'rimraf'
@@ -157,6 +158,25 @@ export class ModInstaller {
 
             if (!dep) throw new Error(`Mod: ${mod.id} "${mod.name}" has a dependency missing: ${depName}`)
 
+            if (dep.id == 'ccloader') {
+                const localMajor = semver_major(LocalMods.getCCLoaderVersion())
+                const serverMajor = semver_major(this.record['ccloader'].version)
+
+                if (
+                    localMajor != serverMajor &&
+                    !semver_satisfies(mod.version, reqVersionRange, { includePrerelease: true })
+                ) {
+                    const msg = `Mod: ${mod.id} "${mod.name}" depends on a different major version of CCLoader than is installed. Installed: ${localMajor}, expected: ${serverMajor}`
+
+                    if (Opts.ignoreCCLoaderMajorVersion) {
+                        console.warn(msg)
+                        continue
+                    } else {
+                        throw new Error(msg)
+                    }
+                }
+            }
+
             this.setOrAddNewer(deps, dep, reqVersionRange)
 
             const depDeps = this.getModDependencies(dep)
@@ -168,9 +188,9 @@ export class ModInstaller {
         return deps
     }
 
-    private static matchesVersionReqRanges(mod: ModEntryBaseBase, versionReqRanges: string[]) {
+    private static matchesVersionReqRanges(mod: { version: string }, versionReqRanges: string[]) {
         for (const range of versionReqRanges) {
-            if (!semver_satisfies(mod.version, range)) return false
+            if (!semver_satisfies(mod.version, range, { includePrerelease: true })) return false
         }
         return true
     }
@@ -227,6 +247,7 @@ export class ModInstaller {
             }
             delete deps[virtualModId]
         }
+
         if (!includeInstalled) {
             /* check if dependency versions are in the database */
             for (const modId in deps) {

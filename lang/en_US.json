@@ -22,6 +22,10 @@
             "name": "Keep chromium flags",
             "description": "Keeps the chromium flags on CCLoader update instead of overriding them."
         },
+        "ignoreCCLoaderMajorVersion": {
+            "name": "Ignore CCLoader major ver",
+            "description": "Allows installing mods that depend on CCLoader2 while using CCLoader3."
+        },
         "unpackCCMods": {
             "name": "Unpack .ccmod files",
             "description": "Unpacks the .ccmod files when installing or updating them."

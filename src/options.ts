@@ -68,6 +68,10 @@ export function registerOpts() {
                         type: 'CHECKBOX',
                         init: true,
                     },
+                    ignoreCCLoaderMajorVersion: {
+                        type: 'CHECKBOX',
+                        init: false,
+                    },
                     clearCacheButton: {
                         type: 'BUTTON',
                         onPress() {
