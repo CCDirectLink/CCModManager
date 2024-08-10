@@ -8,13 +8,18 @@ const path: typeof import('path') = (0, eval)("require('path')")
 const crypto: typeof import('crypto') = (0, eval)('require("crypto")')
 
 import { loadAsync } from 'jszip'
-import semver_satisfies from 'semver/functions/satisfies'
-import semver_gt from 'semver/functions/gt'
-import semver_major from 'semver/functions/major'
+
+export let semver: typeof import('semver')
+
+declare global {
+    /* ccl2 only */
+    var semver: typeof import('semver')
+}
 
 // @ts-expect-error
 import rimraf from 'rimraf'
 import { Opts } from './options'
+import ModManager from './plugin'
 
 export class InstallQueue {
     private static queue: ModEntryServer[] = []
@@ -69,6 +74,8 @@ export class ModInstaller {
     static virtualMods: Record<string, ModEntryLocalVirtual>
 
     static init() {
+        semver = ModManager.mod.isCCL3 ? (ccmod.semver as typeof import('semver')) : window.semver
+
         const version = LocalMods.getCCVersion()
         this.virtualMods = {
             crosscode: {
@@ -159,12 +166,12 @@ export class ModInstaller {
             if (!dep) throw new Error(`Mod: ${mod.id} "${mod.name}" has a dependency missing: ${depName}`)
 
             if (dep.id == 'ccloader') {
-                const localMajor = semver_major(LocalMods.getCCLoaderVersion())
-                const serverMajor = semver_major(this.record['ccloader'].version)
+                const localMajor = semver.major(LocalMods.getCCLoaderVersion())
+                const serverMajor = semver.major(this.record['ccloader'].version)
 
                 if (
                     localMajor != serverMajor &&
-                    !semver_satisfies(mod.version, reqVersionRange, { includePrerelease: true })
+                    !semver.satisfies(mod.version, reqVersionRange, { includePrerelease: true })
                 ) {
                     const msg = `Mod: ${mod.id} "${mod.name}" depends on a different major version of CCLoader than is installed. Installed: ${localMajor}, expected: ${serverMajor}`
 
@@ -190,7 +197,7 @@ export class ModInstaller {
 
     private static matchesVersionReqRanges(mod: { version: string }, versionReqRanges: string[]) {
         for (const range of versionReqRanges) {
-            if (!semver_satisfies(mod.version, range, { includePrerelease: true })) return false
+            if (!semver.satisfies(mod.version, range, { includePrerelease: true })) return false
         }
         return true
     }
@@ -487,9 +494,9 @@ export class ModInstaller {
         if (!serverMod) return false
         const testingMod = serverMod.testingVersion
         if (testingMod && ModDB.isModTestingOptIn(serverMod.id)) {
-            return semver_gt(testingMod.version, mod.version)
+            return semver.gt(testingMod.version, mod.version)
         }
-        return semver_gt(serverMod.version, mod.version)
+        return semver.gt(serverMod.version, mod.version)
     }
 
     static async appendToUpdateModsToQueue(): Promise<boolean> {

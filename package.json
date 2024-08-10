@@ -27,7 +27,6 @@
         "nax-ccuilib": "github:conorlawton/nax-ccuilib",
         "prettier": "3.2.4",
         "rimraf": "^3.0.2",
-        "semver": "^7.6.2",
         "typescript": "^5.4.5",
         "ultimate-crosscode-typedefs": "github:krypciak/ultimate-crosscode-typedefs"
     }

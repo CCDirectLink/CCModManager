@@ -1,7 +1,7 @@
-import semver_gt from 'semver/functions/gt'
 import { ModEntry, ModEntryLocal, ModEntryServer, NPDatabase } from './types'
 import { FileCache } from './cache'
 import { Opts } from './options'
+import { semver } from './mod-installer'
 
 export class ModDB {
     private static databasesLoaded: boolean = false
@@ -79,7 +79,7 @@ export class ModDB {
 
     static getHighestVersionMod<T extends ModEntry>(mods: T[]): T {
         return mods.reduce((highestVerMod, currMod) =>
-            semver_gt(currMod.version, highestVerMod.version) ? currMod : highestVerMod
+            semver.gt(currMod.version, highestVerMod.version) ? currMod : highestVerMod
         )
     }
 
@@ -107,7 +107,7 @@ export class ModDB {
         for (const serverMod of serverMods) {
             serverMod.localCounterpart = mod
             if (!this.isDatabaseTesting(serverMod.database)) {
-                if (semver_gt(highestVerMod.version, serverMod.version)) {
+                if (semver.gt(highestVerMod.version, serverMod.version)) {
                     highestVerMod = serverMod
                 }
             }
@@ -174,7 +174,7 @@ export class ModDB {
                 const matchingNonTestingMods = allNonTestingMods.filter(
                     nonTestingMod =>
                         nonTestingMod.id == testingMod.id
-                        && semver_gt(testingMod.version, nonTestingMod.version)
+                        && semver.gt(testingMod.version, nonTestingMod.version)
                 )
 
                 for (const matchingMod of matchingNonTestingMods) {
