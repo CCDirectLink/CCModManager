@@ -7,6 +7,7 @@
 ### Changed
 
 - Decrease mod size
+- Prevent backspace from quitting the mod manager menu
 
 ### Fixed
 

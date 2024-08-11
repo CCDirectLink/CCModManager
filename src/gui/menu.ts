@@ -111,6 +111,17 @@ sc.Control.inject({
                   /* ig.input.pressed('special') || */ ig.gamepad.isButtonPressed(ig.BUTTONS.FACE0)) &&
                   !ig.interact.isBlocked()
     },
+    menuBack() {
+        if (modmanager.gui.menu?.hook.currentStateName != 'DEFAULT') return this.parent()
+
+        /* Prevent backspace from closing the menu, it happens accidentally when you try to search something */
+        return this.autoControl
+            ? this.autoControl.get('menuBack')
+            : ig.input.pressed('pause') ||
+                  // ig.input.pressed('back') ||
+                  ig.input.pressed('dash') ||
+                  ig.gamepad.isButtonPressed(ig.BUTTONS.FACE1)
+    },
 })
 
 let menuPurgeTimeoutId: NodeJS.Timeout
