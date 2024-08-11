@@ -9,5 +9,8 @@
     "icons": {
         "24": "icon/icon.png"
     },
+    "dependencies": {
+        "ccloader": ">=3.2.2-alpha || ^2.0.0"
+    },
     "plugin": "plugin.js"
 }
