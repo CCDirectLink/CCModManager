@@ -7,8 +7,6 @@ const fs: typeof import('fs') = (0, eval)("require('fs')")
 const path: typeof import('path') = (0, eval)("require('path')")
 const crypto: typeof import('crypto') = (0, eval)('require("crypto")')
 
-
-
 // @ts-expect-error
 import rimraf from 'rimraf'
 import { Opts } from './options'
@@ -67,7 +65,6 @@ export class ModInstaller {
     static virtualMods: Record<string, ModEntryLocalVirtual>
 
     static init() {
-
         const version = LocalMods.getCCVersion()
         this.virtualMods = {
             crosscode: {
@@ -158,12 +155,13 @@ export class ModInstaller {
             if (!dep) throw new Error(`Mod: ${mod.id} "${mod.name}" has a dependency missing: ${depName}`)
 
             if (dep.id == 'ccloader') {
-                const localMajor = semver.major(LocalMods.getCCLoaderVersion())
+                const localVersion = LocalMods.getCCLoaderVersion()
+                const localMajor = semver.major(localVersion)
                 const serverMajor = semver.major(this.record['ccloader'].version)
 
                 if (
                     localMajor != serverMajor &&
-                    !semver.satisfies(mod.version, reqVersionRange, { includePrerelease: true })
+                    !semver.satisfies(localVersion, reqVersionRange, { includePrerelease: true })
                 ) {
                     const msg = `Mod: ${mod.id} "${mod.name}" depends on a different major version of CCLoader than is installed. Installed: ${localMajor}, expected: ${serverMajor}`
 
