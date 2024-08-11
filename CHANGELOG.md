@@ -4,6 +4,10 @@
 
 ## [Unreleased]
 
+### Changed
+
+- Decrease mod size
+
 ### Fixed
 
 - Prevent CCLoader downgrade attempts when using CCLoader3 and downloading a mod that requires CCLoader2

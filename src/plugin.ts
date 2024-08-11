@@ -11,6 +11,7 @@ import './mod-options'
 import { Opts, registerOpts } from './options'
 
 import { modOptionsPoststart, modOptionsPrestart } from './mod-options'
+import { initLibraries } from './library-providers'
 
 export default class ModManager {
     static dir: string
@@ -25,6 +26,7 @@ export default class ModManager {
     }
 
     async prestart() {
+        initLibraries()
         this.lang = new LangManager()
         registerOpts()
         // TODO: Remove later

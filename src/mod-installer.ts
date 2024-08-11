@@ -7,19 +7,12 @@ const fs: typeof import('fs') = (0, eval)("require('fs')")
 const path: typeof import('path') = (0, eval)("require('path')")
 const crypto: typeof import('crypto') = (0, eval)('require("crypto")')
 
-import { loadAsync } from 'jszip'
 
-export let semver: typeof import('semver')
-
-declare global {
-    /* ccl2 only */
-    var semver: typeof import('semver')
-}
 
 // @ts-expect-error
 import rimraf from 'rimraf'
 import { Opts } from './options'
-import ModManager from './plugin'
+import { JSZip, semver } from './library-providers'
 
 export class InstallQueue {
     private static queue: ModEntryServer[] = []
@@ -74,7 +67,6 @@ export class ModInstaller {
     static virtualMods: Record<string, ModEntryLocalVirtual>
 
     static init() {
-        semver = ModManager.mod.isCCL3 ? (ccmod.semver as typeof import('semver')) : window.semver
 
         const version = LocalMods.getCCVersion()
         this.virtualMods = {
@@ -397,7 +389,7 @@ export class ModInstaller {
         source: string,
         prefixPath: string = 'assets/mods'
     ) {
-        const zip = await loadAsync(data)
+        const zip = await JSZip.loadAsync(data)
 
         await Promise.all(
             Object.values(zip.files)

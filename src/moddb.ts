@@ -1,7 +1,7 @@
 import { ModEntry, ModEntryLocal, ModEntryServer, NPDatabase } from './types'
 import { FileCache } from './cache'
 import { Opts } from './options'
-import { semver } from './mod-installer'
+import { semver } from './library-providers'
 
 export class ModDB {
     private static databasesLoaded: boolean = false
