@@ -55,6 +55,7 @@ declare global {
             initModOptionsButton(this: this, bottomY: number): void
             initChangelogButton(this: this): void
 
+            isInMenuStack(this: this): boolean
             setBlackBarVisibility(this: this, visible: boolean): void
             setAllVisibility(this: this, visible: boolean): void
             updateInstallButtonText(this: this): void
@@ -102,7 +103,7 @@ sc.GlobalInput.inject({
 
 sc.Control.inject({
     menuConfirm() {
-        if (!modmanager.gui.menu?.isVisible()) return this.parent()
+        if (!modmanager.gui.menu?.isInMenuStack()) return this.parent()
 
         /* remove ig.input.pressed('special') to prevent weird list jumping on space bar press */
         return this.autoControl
@@ -112,7 +113,7 @@ sc.Control.inject({
                   !ig.interact.isBlocked()
     },
     menuBack() {
-        if (modmanager.gui.menu?.hook.currentStateName != 'DEFAULT') return this.parent()
+        if (!modmanager.gui.menu?.isInMenuStack()) return this.parent()
 
         /* Prevent backspace from closing the menu, it happens accidentally when you try to search something */
         return this.autoControl
@@ -347,6 +348,9 @@ modmanager.gui.Menu = sc.ListInfoMenu.extend({
         this.addChildGui(this.changelogButton)
     },
 
+    isInMenuStack() {
+        return sc.menu.menuStack.includes(sc.MENU_SUBMENU.MODS)
+    },
     showModInstallDialog() {
         this.list.tabGroup._invokePressCallbacks(this.list.tabs[Lang.selectedModsTab], true)
         ModInstallDialogs.showModInstallDialog()
