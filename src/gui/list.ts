@@ -152,12 +152,14 @@ modmanager.gui.MenuList = sc.ListTabbedPane.extend({
         this.addObservers!()
 
         if (this.restoreLastPosition) {
-            const pos = this.restoreLastPosition.element
-            /* this can throw an error when the list has changed due to the user changing repositories */
-            try {
-                this.currentList.buttonGroup.unfocusCurrentButton()
-                this.currentList.buttonGroup.focusCurrentButton(pos.x, pos.y)
-            } catch (e) {}
+            if (ig.input.currentDevice == ig.INPUT_DEVICES.GAMEPAD) {
+                const pos = this.restoreLastPosition.element
+                /* this can throw an error when the list has changed due to the user changing repositories */
+                try {
+                    this.currentList.buttonGroup.unfocusCurrentButton()
+                    this.currentList.buttonGroup.focusCurrentButton(pos.x, pos.y)
+                } catch (e) {}
+            }
 
             this.currentList.setScrollY(this.restoreLastPosition.scrollY, true)
             this.restoreLastPosition = undefined

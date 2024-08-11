@@ -16,6 +16,7 @@
 - Prevent Simplify from installing when using CCLoader3
 - Fixed space being disabled in every menu, not just the mod manager
 - Fixed mod list being unresponsive after exiting out of the filters menu
+- Fixed the mod's options menu sometimes failing to open on keyboard and mouse
 
 ## [0.9.19] 2024-08-09
 
