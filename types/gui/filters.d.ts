@@ -4,6 +4,7 @@ declare global {
     namespace modmanager.gui {
         interface FiltersPopup extends ig.GuiElementBase {
             gfx: ig.Image;
+            buttonInteract: ig.ButtonInteractEntry;
             buttonGroup: sc.ButtonGroup;
             backButton: sc.ButtonGui;
             checkboxesGuis: {
@@ -11,6 +12,7 @@ declare global {
                 checkbox: modmanager.gui.FilterCheckox;
             }[];
             infoBar: sc.InfoBar;
+            onHide: () => void;
             getLangData(this: this, key: keyof typeof Lang.filters): {
                 name: string;
                 description: string;
@@ -21,7 +23,7 @@ declare global {
             hide(this: this): void;
         }
         interface FiltersPopupConstructor extends ImpactClass<FiltersPopup> {
-            new (): FiltersPopup;
+            new (onHide: FiltersPopup['onHide']): FiltersPopup;
         }
         var FiltersPopup: FiltersPopupConstructor;
         interface FilterCheckox extends sc.CheckboxGui {
@@ -32,7 +34,6 @@ declare global {
         var FilterCheckboxGui: FilterCheckoxConstructor;
     }
 }
-export declare const isGridLocalStorageId = "CCModManager-grid";
 type CheckboxConfig = {
     key: keyof typeof Lang.filters;
     default?: boolean;

@@ -1,6 +1,7 @@
-import { ModEntry } from '../types';
+import { ModEntry, ModEntryServer } from '../types';
 import './list';
 import './filters';
+import './changelog';
 import './options/mod-options-menu';
 declare global {
     namespace modmanager.gui {
@@ -29,6 +30,8 @@ declare global {
             filtersButton: sc.ButtonGui;
             filtersPopup: modmanager.gui.FiltersPopup;
             reposPopup: modmanager.gui.RepoAddPopup;
+            changelogButton: sc.ButtonGui;
+            changelogPopup?: modmanager.gui.Changelog;
             initInputField(this: this): void;
             initSortMenu(this: this): void;
             initInstallButton(this: this, bottomY: number): void;
@@ -38,6 +41,8 @@ declare global {
             initTestingToggleButton(this: this): void;
             initOpenRepositoryUrlButton(this: this): void;
             initModOptionsButton(this: this, bottomY: number): void;
+            initChangelogButton(this: this): void;
+            isInMenuStack(this: this): boolean;
             setBlackBarVisibility(this: this, visible: boolean): void;
             setAllVisibility(this: this, visible: boolean): void;
             updateInstallButtonText(this: this): void;
@@ -47,6 +52,7 @@ declare global {
             getCurrentlyFocusedModEntry(this: this): modmanager.gui.ListEntry | undefined;
             openModSettings(this: this, mod: ModEntry): void;
             openRepositoriesPopup(this: this): void;
+            openChangelogPopup(this: this, mod: ModEntryServer): void;
         }
         interface MenuConstructor extends ImpactClass<Menu> {
             new (): Menu;

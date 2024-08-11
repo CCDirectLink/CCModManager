@@ -13,12 +13,16 @@ export declare function registerOpts(): {
                 };
                 readonly repositoriesButton: {
                     readonly type: "BUTTON";
-                    readonly onPress: () => void;
+                    readonly onPress: (this: import("./mod-options").GuiOption) => void;
+                };
+                readonly resetRepositoriesButton: {
+                    readonly type: "BUTTON";
+                    readonly onPress: (this: import("./mod-options").GuiOption) => void;
                 };
                 readonly repositories: {
                     readonly type: "JSON_DATA";
                     readonly init: string[];
-                    readonly changeEvent: () => void;
+                    readonly changeEvent: (this: import("./mod-options").GuiOption) => void;
                 };
                 readonly testingOptInMods: {
                     readonly type: "JSON_DATA";
@@ -28,7 +32,29 @@ export declare function registerOpts(): {
                     readonly type: "CHECKBOX";
                     readonly init: false;
                     readonly hidden: true;
-                    readonly changeEvent: () => void;
+                    readonly changeEvent: (this: import("./mod-options").GuiOption) => void;
+                };
+            };
+            readonly advanced: {
+                readonly unpackCCMods: {
+                    readonly type: "CHECKBOX";
+                    readonly init: false;
+                };
+                readonly keepChromiumFlags: {
+                    readonly type: "CHECKBOX";
+                    readonly init: true;
+                };
+                readonly ignoreCCLoaderMajorVersion: {
+                    readonly type: "CHECKBOX";
+                    readonly init: false;
+                };
+                readonly clearCacheButton: {
+                    readonly type: "BUTTON";
+                    readonly onPress: (this: import("./mod-options").GuiOption) => void;
+                };
+                readonly reinstallAllMods: {
+                    readonly type: "BUTTON";
+                    readonly onPress: (this: import("./mod-options").GuiOption) => void;
                 };
             };
         };

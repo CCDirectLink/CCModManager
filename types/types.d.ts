@@ -1,5 +1,5 @@
 import type { Mod } from 'ultimate-crosscode-typedefs/modloader/mod';
-import type { InstallMethod, PackageDB, ValidTags } from 'ccmoddb/build/src/types';
+import type { InstallMethod, PackageDB, ValidTags, ReleasePage } from 'ccmoddb/build/src/types';
 export type Mod1 = Mod & {
     isCCModPacked: boolean;
     findAllAssets?(): void;
@@ -42,8 +42,6 @@ interface ModEntryBase extends ModEntryBaseBase {
     hasIcon: boolean;
     /** Copy of the dependencies from the mod manifest */
     dependencies: Record<string, string>;
-    /** GitHub star count, local mods have this set if they have a server counterpart */
-    stars?: number;
     /** True when the mod enabled state was changed, or the mod was updated */
     awaitingRestart?: boolean;
     /** Mod repository web link */
@@ -59,6 +57,10 @@ export interface ModEntryServer extends ModEntryBase {
     lastUpdateTimestamp?: number;
     /** Author list, may be empty */
     authors: string[];
+    /** GitHub star count, local mods have this set if they have a server counterpart */
+    stars?: number;
+    /** Represents the release page info fetched from the mods repository */
+    releasePages?: ReleasePage[];
     /** Mod tag list */
     tags: ValidTags[];
     /** The testing counterpart */
@@ -79,6 +81,8 @@ export interface ModEntryLocal extends ModEntryBase {
     path: string;
     /** Does the mod have a newer version available for installation */
     hasUpdate: boolean;
+    /** Has the mod been uninstalled in the current session */
+    uninstalled?: boolean;
     /** Never true for an ordinary mod, it's for stuff like CCLoader... Full list specified in local-mods.ts */
     disableUninstall?: boolean;
     /** Never true for an ordinary mod, it's for stuff like CCLoader... Full list specified in local-mods.ts */

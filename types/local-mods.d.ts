@@ -21,11 +21,18 @@ declare global {
         ccloader: string;
         crosscode: string;
     };
+    namespace modloader {
+        const _runtimeMod: Mod;
+    }
 }
 export declare class LocalMods {
     private static cache;
     private static cacheRecord;
-    private static localModFlags;
+    static localModFlags: Record<string, {
+        disableUninstall?: boolean;
+        disableDisabling?: boolean;
+        disableUpdate?: boolean;
+    }>;
     static initAll(): Promise<void>;
     static checkForUpdates(): void;
     static refreshOrigin(): Promise<void>;

@@ -326,7 +326,8 @@ function registerAndGetModOptions<T extends Options>(settings: ModOptionsSetting
                     const set = function (v: object | string | number, noEvent?: boolean) {
                         const str = typeof v === 'object' ? JSON.stringify(v) : v.toString()
                         localStorage.setItem(id, str)
-                        if (!noEvent && 'changeEvent' in option && option.changeEvent) option.changeEvent.bind(guiOption)()
+                        if (!noEvent && 'changeEvent' in option && option.changeEvent)
+                            option.changeEvent.bind(guiOption)()
                         if (
                             !noEvent &&
                             'updateMenuOnChange' in option &&

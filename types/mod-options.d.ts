@@ -2,7 +2,7 @@ export type Enum = Record<string, number>;
 /** Option that has state that can change */
 export interface OptionChangeable {
     restart?: boolean;
-    changeEvent?: () => void;
+    changeEvent?: (this: GuiOption) => void;
     updateMenuOnChange?: boolean;
 }
 /** A option entry */
@@ -54,7 +54,7 @@ interface INFO {
 }
 interface BUTTON {
     type: 'BUTTON';
-    onPress: () => void;
+    onPress: (this: GuiOption) => void;
 }
 interface JSON_DATA extends OptionChangeable {
     type: 'JSON_DATA';

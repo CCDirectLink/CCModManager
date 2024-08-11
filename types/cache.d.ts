@@ -20,4 +20,5 @@ export declare class FileCache {
     static checkDatabaseUrl(url: string): Promise<boolean>;
     static getDatabase(name: string, create: (database: NPDatabase) => void): Promise<void>;
     private static getCachedFile;
+    static deleteOnDiskCache(): Promise<void>;
 }
