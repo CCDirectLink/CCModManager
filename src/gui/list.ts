@@ -23,7 +23,7 @@ declare global {
             }[]
             currentSort: modmanager.gui.MENU_SORT_ORDER
             gridColumns: number
-            restoreLastPosition?: { tab: number; element: Vec2 }
+            restoreLastPosition?: { tab: number; element: Vec2; scrollY: number }
 
             updateColumnCount(this: this): void
             reloadFilters(this: this): void
@@ -54,6 +54,7 @@ declare global {
                 sort: modmanager.gui.MENU_SORT_ORDER
             ): void
             populateListFromMods(this: this, mods: ModEntry[], list: sc.ButtonListBox): void
+            savePosition(this: this): void
         }
         interface MenuListConstructor extends ImpactClass<MenuList> {
             new (): MenuList
@@ -157,6 +158,8 @@ modmanager.gui.MenuList = sc.ListTabbedPane.extend({
                 this.currentList.buttonGroup.unfocusCurrentButton()
                 this.currentList.buttonGroup.focusCurrentButton(pos.x, pos.y)
             } catch (e) {}
+
+            this.currentList.setScrollY(this.restoreLastPosition.scrollY, true)
             this.restoreLastPosition = undefined
         }
     },
@@ -316,6 +319,13 @@ modmanager.gui.MenuList = sc.ListTabbedPane.extend({
         } else {
             this.currentList.columns = 1
             this.currentList.buttonGroup.selectionType = ig.BUTTON_GROUP_SELECT_TYPE.HORIZONTAL
+        }
+    },
+    savePosition() {
+        this.restoreLastPosition = {
+            tab: this.currentTabIndex,
+            element: Vec2.create(this.currentList.buttonGroup.current),
+            scrollY: this.currentList.scrollbarV!.value,
         }
     },
 })

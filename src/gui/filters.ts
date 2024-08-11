@@ -31,7 +31,6 @@ declare global {
     }
 }
 
-export const isGridLocalStorageId = 'CCModManager-grid'
 type CheckboxConfig = { key: keyof typeof Lang.filters; default?: boolean } & (
     | { filterKey?: keyof Fliters }
     | { optsKey: 'isGrid' /* keyof typeof Opts */ }

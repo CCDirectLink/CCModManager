@@ -8,6 +8,7 @@
 
 - Decrease mod size
 - Prevent backspace from quitting the mod manager menu
+- Keep list scroll when entering the mod's options
 
 ### Fixed
 

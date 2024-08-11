@@ -55,6 +55,7 @@ export function registerOpts() {
                         init: false,
                         hidden: true,
                         changeEvent() {
+                            modmanager.gui.menu.list.restoreLastPosition = undefined
                             modmanager.gui.menu.list.updateColumnCount()
                         },
                     },

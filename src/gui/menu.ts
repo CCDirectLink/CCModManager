@@ -227,6 +227,7 @@ modmanager.gui.Menu = sc.ListInfoMenu.extend({
         this.filtersButton = new sc.ButtonGui('\\i[menu]' + Lang.filtersButton, 80, true, sc.BUTTON_TYPE.SMALL)
         this.filtersButton.setPos(480, bottomY)
         this.filtersButton.onButtonPress = () => {
+            this.list.savePosition()
             this.filtersPopup.show()
         }
         this.filtersButton.keepMouseFocus = true /* prevent the focus jumping all over the place on press */
@@ -538,10 +539,7 @@ modmanager.gui.Menu = sc.ListInfoMenu.extend({
             .find((b: ig.FocusGui) => b.focus) as modmanager.gui.ListEntry
     },
     openModSettings(mod) {
-        this.list.restoreLastPosition = {
-            tab: this.list.currentTabIndex,
-            element: Vec2.create(this.list.currentList.buttonGroup.current),
-        }
+        this.list.savePosition()
         sc.menu.pushMenu(sc.MENU_SUBMENU.MOD_OPTIONS)
         modmanager.gui.optionsMenu.updateEntries(mod)
     },
