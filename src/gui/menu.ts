@@ -223,7 +223,9 @@ modmanager.gui.Menu = sc.ListInfoMenu.extend({
         this.addChildGui(this.checkUpdatesButton)
     },
     initFiltersButton(bottomY) {
-        this.filtersPopup = new modmanager.gui.FiltersPopup()
+        this.filtersPopup = new modmanager.gui.FiltersPopup(() => {
+            this.list.show()
+        })
         this.filtersButton = new sc.ButtonGui('\\i[menu]' + Lang.filtersButton, 80, true, sc.BUTTON_TYPE.SMALL)
         this.filtersButton.setPos(480, bottomY)
         this.filtersButton.onButtonPress = () => {

@@ -11,6 +11,7 @@ declare global {
             backButton: sc.ButtonGui
             checkboxesGuis: { text: sc.TextGui; checkbox: modmanager.gui.FilterCheckox }[]
             infoBar: sc.InfoBar
+            onHide: () => void
 
             getLangData(this: this, key: keyof typeof Lang.filters): { name: string; description: string }
             setFilterValue(this: this, config: CheckboxConfig, state: boolean): void
@@ -19,7 +20,7 @@ declare global {
             hide(this: this): void
         }
         interface FiltersPopupConstructor extends ImpactClass<FiltersPopup> {
-            new (): FiltersPopup
+            new (onHide: FiltersPopup['onHide']): FiltersPopup
         }
         var FiltersPopup: FiltersPopupConstructor
 
@@ -113,7 +114,8 @@ modmanager.gui.FiltersPopup = ig.GuiElementBase.extend({
             return Opts[config.optsKey]
         } else return filters.tags?.includes(this.getLangData(config.key).name)
     },
-    init() {
+    init(onHide) {
+        this.onHide = onHide
         this.parent()
         this.hook.zIndex = 9999999
         this.hook.localAlpha = 0.8
@@ -214,5 +216,7 @@ modmanager.gui.FiltersPopup = ig.GuiElementBase.extend({
 
         ig.interact.removeEntry(this.buttonInteract)
         ig.interact.setBlockDelay(0.2)
+
+        this.onHide()
     },
 })
