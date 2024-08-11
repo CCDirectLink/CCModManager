@@ -154,12 +154,13 @@ export class ModInstaller {
 
             if (!dep) throw new Error(`Mod: ${mod.id} "${mod.name}" has a dependency missing: ${depName}`)
 
-            if (dep.id == 'ccloader') {
+            if (dep.id == 'ccloader' || dep.id == 'Simplify') {
                 const localVersion = LocalMods.getCCLoaderVersion()
                 const localMajor = semver.major(localVersion)
                 const serverMajor = semver.major(this.record['ccloader'].version)
 
                 if (
+                    dep.id == 'ccloader' &&
                     localMajor != serverMajor &&
                     !semver.satisfies(localVersion, reqVersionRange, { includePrerelease: true })
                 ) {
@@ -170,6 +171,16 @@ export class ModInstaller {
                         continue
                     } else {
                         throw new Error(msg)
+                    }
+                }
+
+                if (dep.id == 'Simplify' && localMajor != 2) {
+                    /* if this option is false, an error will get thrown when getModDependencies reaches CCLoader anyways */
+                    if (Opts.ignoreCCLoaderMajorVersion) {
+                        console.warn(
+                            `Mod: ${mod.id} "${mod.name}" depends on Simplify, which is CCLoader 2 specific. Major CCLoader installed: ${localMajor}. Removing Simplify from dependency list`
+                        )
+                        continue
                     }
                 }
             }

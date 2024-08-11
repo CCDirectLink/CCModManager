@@ -11,6 +11,7 @@
 ### Fixed
 
 - Prevent CCLoader downgrade attempts when using CCLoader3 and downloading a mod that requires CCLoader2
+- Prevent Simplify from installing when using CCLoader3
 
 ## [0.9.19] 2024-08-09
 
