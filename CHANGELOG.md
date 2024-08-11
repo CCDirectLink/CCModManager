@@ -9,6 +9,7 @@
 - Decrease mod size
 - Prevent backspace from quitting the mod manager menu
 - Keep list scroll when entering the mod's options
+- `onPress` and `changeEvent` functions on option entries: `this` is now bound to the option config
 
 ### Fixed
 

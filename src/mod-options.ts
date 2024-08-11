@@ -3,7 +3,7 @@ export type Enum = Record<string, number>
 /** Option that has state that can change */
 export interface OptionChangeable {
     restart?: boolean
-    changeEvent?: () => void
+    changeEvent?: (this: GuiOption) => void
     updateMenuOnChange?: boolean
 }
 
@@ -80,7 +80,7 @@ interface INFO {
 
 interface BUTTON {
     type: 'BUTTON'
-    onPress: () => void
+    onPress: (this: GuiOption) => void
 }
 
 interface JSON_DATA extends OptionChangeable {
@@ -326,7 +326,7 @@ function registerAndGetModOptions<T extends Options>(settings: ModOptionsSetting
                     const set = function (v: object | string | number, noEvent?: boolean) {
                         const str = typeof v === 'object' ? JSON.stringify(v) : v.toString()
                         localStorage.setItem(id, str)
-                        if (!noEvent && 'changeEvent' in option && option.changeEvent) option.changeEvent()
+                        if (!noEvent && 'changeEvent' in option && option.changeEvent) option.changeEvent.bind(guiOption)()
                         if (
                             !noEvent &&
                             'updateMenuOnChange' in option &&
@@ -370,7 +370,7 @@ export function modOptionsPoststart() {
                 if (!controlConfig.global && !isInGame) continue
                 const id = controlConfig.id.substring('keys-'.length)
                 if (controlConfig.pressEvent && ig.input.pressed(id)) {
-                    controlConfig.pressEvent()
+                    controlConfig.pressEvent.bind(controlConfig)()
                 }
                 if (controlConfig.holdEvent && ig.input.state(id)) {
                     controlConfig.holdEvent()
