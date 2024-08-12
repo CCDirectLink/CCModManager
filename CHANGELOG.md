@@ -3,6 +3,11 @@
 # Change Log
 
 ## [Unreleased]
+
+### Fixed
+
+- Fixed mod settings and testing buttons being unpresssable on gamepad when the gamepad bindings are changed
+
 ## [0.9.20] 2024-08-11
 
 ### Changed

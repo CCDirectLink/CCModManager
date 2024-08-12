@@ -307,7 +307,7 @@ modmanager.gui.Menu = sc.ListInfoMenu.extend({
         this.addChildGui(this.openRepositoryUrlButton)
     },
     initModOptionsButton(bottomY) {
-        this.modOptionsButton = new sc.ButtonGui('\\i[special]' + Lang.modSettings, 140, true, sc.BUTTON_TYPE.SMALL)
+        this.modOptionsButton = new sc.ButtonGui('\\i[spaceOrR2]' + Lang.modSettings, 140, true, sc.BUTTON_TYPE.SMALL)
         this.modOptionsButton.setPos(7, bottomY)
         this.modOptionsButton.doStateTransition('HIDDEN')
         this.modOptionsButton.onButtonPress = () => {
@@ -400,7 +400,7 @@ modmanager.gui.Menu = sc.ListInfoMenu.extend({
                 const serverMod = entry.mod.isLocal ? entry.mod.serverCounterpart : entry.mod
                 if (serverMod?.testingVersion) {
                     this.testingToggleButton.doStateTransition('DEFAULT')
-                    this.testingToggleButton.setText('\\i[quick] ' + Lang.testingButton)
+                    this.testingToggleButton.setText('\\i[shiftOrL2] ' + Lang.testingButton)
                 } else {
                     this.testingToggleButton.doStateTransition('HIDDEN')
                 }
@@ -461,14 +461,15 @@ modmanager.gui.Menu = sc.ListInfoMenu.extend({
         sc.menu.buttonInteract.addGlobalButton(this.uninstallButton, () => sc.control.menuHotkeyHelp2())
         sc.menu.buttonInteract.addGlobalButton(this.checkUpdatesButton, () => false)
         sc.menu.buttonInteract.addGlobalButton(this.filtersButton, () => sc.control.menu())
-        sc.menu.buttonInteract.addGlobalButton(this.testingToggleButton, () => sc.control.quickmenuPress())
+        sc.menu.buttonInteract.addGlobalButton(
+            this.testingToggleButton,
+            () => ig.input.pressed('quick') || ig.gamepad.isButtonPressed(ig.BUTTONS.LEFT_TRIGGER)
+        )
         sc.menu.buttonInteract.addGlobalButton(this.openRepositoryUrlButton, () => sc.control.leftPressed())
         sc.menu.buttonInteract.addGlobalButton(this.changelogButton, () => sc.control.rightPressed())
         sc.menu.buttonInteract.addGlobalButton(
             this.modOptionsButton,
-            () =>
-                ig.input.pressed('special') /* space bar */ ||
-                /* R2 press */ ig.gamepad.isButtonPressed(sc.control._getSpecialButton())
+            () => ig.input.pressed('special') /* space bar */ || ig.gamepad.isButtonPressed(ig.BUTTONS.RIGHT_TRIGGER)
         )
     },
     hideMenu(_afterSubmenu, nextSubmenu) {

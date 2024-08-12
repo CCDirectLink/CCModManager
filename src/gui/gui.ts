@@ -1,24 +1,6 @@
 import { Lang } from '../lang-manager.js'
+import { registerDynamicIcons, registerModManagerIcons } from './icons.js'
 import './menu.js'
-
-const iconsFont = new ig.Font('media/font/ccmodmanager-icons.png', 16, 16)
-const page = sc.fontsystem.font.iconSets.length
-sc.fontsystem.font.pushIconSet(iconsFont)
-const icons = [
-    'ccmodmanager-git',
-    'mod-icon',
-    'mod-icon-online',
-    'mod-icon-selected',
-    'mod-icon-enabled',
-    'mod-icon-disabled',
-    'ccmodmanager-testing-off',
-    'ccmodmanager-testing-on',
-] as const
-const mapping: Record<string, [number, number]> = {}
-for (let i = 0; i < icons.length; i++) {
-    mapping[icons[i]] = [page, i]
-}
-sc.fontsystem.font.setMapping(mapping)
 
 function enterModsMenu(direct: boolean) {
     if (direct) {
@@ -36,6 +18,9 @@ declare global {
         }
     }
 }
+
+registerModManagerIcons()
+registerDynamicIcons()
 
 sc.OptionsMenu.inject({
     init() {
