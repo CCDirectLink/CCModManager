@@ -22,7 +22,7 @@ export function registerModManagerIcons() {
 /* what the hell */
 export function registerDynamicIcons() {
     const kMy: Record<string, string> = {
-        spaceOrR2: 'gamepad-r2',
+        rightClickOrR2: 'gamepad-r2',
         shiftOrL2: 'gamepad-l2',
     }
     /** the current gamepad icon name to icon config */
@@ -40,7 +40,7 @@ export function registerDynamicIcons() {
             /* capture the local g variable */
             if (!g && mapping?.left && mapping.left[0] == 1 && mapping.left[1] == 0) {
                 g = mapping
-                mapping['spaceOrR2'] = [1, 16]
+                mapping['rightClickOrR2'] = [1, 6]
                 mapping['shiftOrL2'] = [1, 44]
             } else if (captureJ) {
                 j = mapping
@@ -76,7 +76,7 @@ export function registerDynamicIcons() {
     sc.OptionModel.inject({
         init() {
             this.parent()
-            
+
             /* trigger l capturing */
             sc.options = this
             sc.fontsystem.gamepadIcons = true

@@ -72,13 +72,13 @@
             {
                 "title": "\\c[3]Mod Manager - Keybindings\\c[0]",
                 "content": [
-                    "Press \\i[menu] to open the filters menu.\n Press \\i[left] to visit the mod repository page if available. \n Press \\i[right] to visit the mod's changelog if available. \n Some mods can be configured via their own options sub-menu. Press \\i[special] to access it."
+                    "Press \\i[menu] to open the filters menu.\n Press \\i[left] to visit the mod repository page if available. \n Press \\i[right] to visit the mod's changelog if available. \n Some mods can be configured via their own options sub-menu. Press \\i[rightClickOrR2] to access it."
                 ]
             },
             {
                 "title": "\\c[3]Mod Manager - Online\\c[0]",
                 "content": [
-                    "The \\c[3]Online\\c[0] tab contains all available mods you can install.\n To select or deselect a mod for installation, focus a mod and press \\i[key-throw] or \\i[gamepad-a].\n Install mods by pressing \\i[help4].\n Some mods have testing versions of them, which may be unstable and contain bugs. \n If the testing version is available, a beta letter icon (\\i[ccmodmanager-testing-on], \\i[ccmodmanager-testing-off]) will appear. \n Toggle it with \\i[quick]."
+                    "The \\c[3]Online\\c[0] tab contains all available mods you can install.\n To select or deselect a mod for installation, focus a mod and press \\i[key-throw] or \\i[gamepad-a].\n Install mods by pressing \\i[help4].\n Some mods have testing versions of them, which may be unstable and contain bugs. \n If the testing version is available, a beta letter icon (\\i[ccmodmanager-testing-on], \\i[ccmodmanager-testing-off]) will appear. \n Toggle it with \\i[shiftOrL2]."
                 ]
             },
             {

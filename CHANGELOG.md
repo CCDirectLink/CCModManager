@@ -4,6 +4,10 @@
 
 ## [Unreleased]
 
+### Changed
+
+- Mod options can now also be opened with mouse right click
+
 ### Fixed
 
 - Fixed mod settings and testing buttons being unpresssable on gamepad when the gamepad bindings are changed

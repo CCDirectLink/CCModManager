@@ -116,12 +116,14 @@ sc.Control.inject({
         if (!modmanager.gui.menu?.isInMenuStack()) return this.parent()
 
         /* Prevent backspace from closing the menu, it happens accidentally when you try to search something */
+        /* Prevent right clign from closing the menu, since we use it for clicking on mods */
+        // prettier-ignore
         return this.autoControl
             ? this.autoControl.get('menuBack')
             : ig.input.pressed('pause') ||
-                  // ig.input.pressed('back') ||
-                  ig.input.pressed('dash') ||
-                  ig.gamepad.isButtonPressed(ig.BUTTONS.FACE1)
+              ig.input.pressed('back') ||
+              (sc.menu.currentMenu == sc.MENU_SUBMENU.MODS ? false : ig.input.pressed('dash'))
+              || ig.gamepad.isButtonPressed(ig.BUTTONS.FACE1)
     },
 })
 
@@ -307,7 +309,12 @@ modmanager.gui.Menu = sc.ListInfoMenu.extend({
         this.addChildGui(this.openRepositoryUrlButton)
     },
     initModOptionsButton(bottomY) {
-        this.modOptionsButton = new sc.ButtonGui('\\i[spaceOrR2]' + Lang.modSettings, 140, true, sc.BUTTON_TYPE.SMALL)
+        this.modOptionsButton = new sc.ButtonGui(
+            '\\i[rightClickOrR2]' + Lang.modSettings,
+            140,
+            true,
+            sc.BUTTON_TYPE.SMALL
+        )
         this.modOptionsButton.setPos(7, bottomY)
         this.modOptionsButton.doStateTransition('HIDDEN')
         this.modOptionsButton.onButtonPress = () => {
@@ -554,6 +561,12 @@ modmanager.gui.Menu = sc.ListInfoMenu.extend({
         this.changelogPopup ??= new modmanager.gui.Changelog()
         this.changelogPopup.setMod(mod)
         this.changelogPopup.openMenu()
+    },
+    update() {
+        this.parent()
+        if (this.modOptionsButton.hook.currentStateName == 'DEFAULT' && ig.input.pressed('dash')) {
+            this.modOptionsButton.invokeButtonPress()
+        }
     },
 })
 
