@@ -6,7 +6,7 @@
 
 ### Added
 
-- Enforce the manual on all the poor souls
+- Enforce the manual on all souls
 
 ### Changed
 
