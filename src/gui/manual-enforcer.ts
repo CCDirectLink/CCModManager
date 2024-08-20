@@ -1,3 +1,4 @@
+import { Lang } from '../lang-manager'
 import { Opts } from '../options'
 
 export {}
@@ -26,7 +27,7 @@ modmanager.gui.ManualEnforcer = modmanager.gui.MultiPageButtonBoxGui.extend({
         let failuteToReadCount = 0
         this.parent(undefined, undefined, [
             {
-                name: `Yes, I've read the manual`,
+                name: Lang.help.enforcment.button,
                 onPress: _pageIndex => {
                     if (this.openendAt + enforceTimeSeconds * 1000 < Date.now()) {
                         this.blockClosing = false
@@ -39,11 +40,11 @@ modmanager.gui.ManualEnforcer = modmanager.gui.MultiPageButtonBoxGui.extend({
                         const button = this.userButtons![0]
                         // prettier-ignore
                         const text =
-                            failuteToReadCount == 0 ? "No you didn't"
-                          : failuteToReadCount == 1 ? 'Please, just read it'
-                          : failuteToReadCount == 2 ? "You successfully didn't read the manual 3 times. Are you proud of yourself?"
-                          : failuteToReadCount == 3 ? '...'
-                          : "That's it. You crossed the line."
+                            failuteToReadCount == 0 ? Lang.help.enforcment.fail0
+                          : failuteToReadCount == 1 ? Lang.help.enforcment.fail1
+                          : failuteToReadCount == 2 ? Lang.help.enforcment.fail2
+                          : failuteToReadCount == 3 ? Lang.help.enforcment.fail3
+                          : Lang.help.enforcment.fail4
                         sc.Dialogs.showErrorDialog(text, false, () => {
                             if (failuteToReadCount == 4) throw new Error('MANUAL_NOT_READ')
                             button.setActive(false)
