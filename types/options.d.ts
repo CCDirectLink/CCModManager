@@ -34,6 +34,10 @@ export declare function registerOpts(): {
                     readonly hidden: true;
                     readonly changeEvent: (this: import("./mod-options").GuiOption) => void;
                 };
+                readonly manualEnforcerRead: {
+                    readonly type: "JSON_DATA";
+                    readonly init: Record<string, boolean>;
+                };
             };
             readonly advanced: {
                 readonly unpackCCMods: {

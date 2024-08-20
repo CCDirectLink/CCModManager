@@ -1,8 +1,10 @@
 import { ModEntry, ModEntryServer } from '../types';
 import './list';
 import './filters';
+import './multipage-button-box';
 import './changelog';
 import './options/mod-options-menu';
+import './manual-enforcer';
 declare global {
     namespace modmanager.gui {
         enum MENU_SORT_ORDER {

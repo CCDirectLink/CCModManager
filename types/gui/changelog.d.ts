@@ -1,5 +1,4 @@
 import { ModEntryServer } from '../types';
-import './multipage-button-box';
 declare global {
     namespace modmanager.gui {
         interface Changelog extends modmanager.gui.MultiPageButtonBoxGui {
