@@ -59,6 +59,10 @@ export function registerOpts() {
                             modmanager.gui.menu.list.updateColumnCount()
                         },
                     },
+                    manualEnforcerRead: {
+                        type: 'JSON_DATA',
+                        init: {} as Record<string, boolean>,
+                    },
                 },
                 advanced: {
                     unpackCCMods: {

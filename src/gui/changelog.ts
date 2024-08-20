@@ -2,8 +2,6 @@ import { Lang } from '../lang-manager'
 import { ModEntryServer } from '../types'
 import { generateChangelogPage } from './changelog-page-generator'
 
-import './multipage-button-box'
-
 declare global {
     namespace modmanager.gui {
         interface Changelog extends modmanager.gui.MultiPageButtonBoxGui {

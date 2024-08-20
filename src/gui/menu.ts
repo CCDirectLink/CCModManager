@@ -6,8 +6,10 @@ import { LocalMods } from '../local-mods'
 import { Lang } from '../lang-manager'
 import './list'
 import './filters'
+import './multipage-button-box'
 import './changelog'
 import './options/mod-options-menu'
+import './manual-enforcer'
 
 import type * as _ from 'nax-ccuilib/src/headers/nax/input-field.d.ts'
 import type * as __ from 'nax-ccuilib/src/headers/nax/input-field-cursor.d.ts'
@@ -478,6 +480,8 @@ modmanager.gui.Menu = sc.ListInfoMenu.extend({
             this.modOptionsButton,
             () => ig.input.pressed('special') /* space bar */ || ig.gamepad.isButtonPressed(ig.BUTTONS.RIGHT_TRIGGER)
         )
+
+        new modmanager.gui.ManualEnforcer('ModManagerManual', Lang.help.title, Lang.help.pages)
     },
     hideMenu(_afterSubmenu, nextSubmenu) {
         this.parent()

@@ -4,6 +4,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Enforce the manual on all the poor souls
+
 ### Changed
 
 - Mod options can now also be opened with mouse right click
