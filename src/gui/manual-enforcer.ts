@@ -1,6 +1,8 @@
 import { Lang } from '../lang-manager'
 import { Opts } from '../options'
 
+import './multipage-button-box'
+
 export {}
 declare global {
     namespace modmanager.gui {

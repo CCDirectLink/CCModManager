@@ -1,3 +1,4 @@
+import './multipage-button-box';
 export {};
 declare global {
     namespace modmanager.gui {
