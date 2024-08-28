@@ -52,11 +52,8 @@ export class ModDB {
         Opts.repositories = Object.values(this.databases).map(db => this.minifyRepoURL(db.url))
     }
 
-    static async loadAllMods(callback: () => void = () => {}, prefferCache: boolean = false): Promise<void> {
-        if (prefferCache && this.modRecord) {
-            callback()
-            return
-        }
+    static async loadAllMods(prefferCache: boolean = false): Promise<void> {
+        if (prefferCache && this.modRecord) return
         this.modRecord = {}
         const promises: Promise<void>[] = []
         for (const dbName in ModDB.databases) {
@@ -67,7 +64,6 @@ export class ModDB {
                     new Promise(resolve => {
                         db.getMods(mods => {
                             ModDB.modRecord[dbName] = mods
-                            callback()
                             resolve()
                         })
                     })
@@ -133,10 +129,6 @@ export class ModDB {
     private static isDatabaseTesting(databaseName: string): boolean {
         return databaseName.includes('testing')
     }
-
-    // private static isModTesting(mod: ModEntryServer) {
-    //     return this.isDatabaseTesting(this.databases[mod.database])
-    // }
 
     static removeModDuplicatesAndResolveTesting(
         modsRecord: Record<string, ModEntryServer[]>

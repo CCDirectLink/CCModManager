@@ -98,9 +98,12 @@ export class LocalMods {
     }
 
     static async refreshOrigin() {
-        await this.initAll()
-        await Promise.all(this.cache.map(mod => ModDB.resolveLocalModOrigin(mod)))
-        this.checkForUpdates()
+        if (this.cache) {
+            await Promise.all(this.cache.map(mod => ModDB.resolveLocalModOrigin(mod)))
+            this.checkForUpdates()
+        } else {
+            await this.initAll()
+        }
     }
 
     static getAll() {

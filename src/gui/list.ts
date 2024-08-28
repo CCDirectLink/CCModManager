@@ -126,9 +126,11 @@ modmanager.gui.MenuList = sc.ListTabbedPane.extend({
         }
 
         if (!ig.isdemo) {
-            ModDB.loadAllMods(() => {
-                LocalMods.refreshOrigin().then(() => this.reloadEntries())
-            }, true)
+            ModDB.loadAllMods(true).then(() => {
+                LocalMods.refreshOrigin().then(() => {
+                    this.reloadEntries()
+                })
+            })
         } else {
             LocalMods.refreshOrigin().then(() => this.reloadEntries())
         }

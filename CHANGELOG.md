@@ -3,6 +3,11 @@
 # Change Log
 
 ## [Unreleased]
+
+### Fixed
+
+- Fixed CCLoader sometimes getting detected as not installed
+
 ## [0.9.21] 2024-08-20
 
 ### Added

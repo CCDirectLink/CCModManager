@@ -41,9 +41,10 @@ export function registerOpts() {
                         changeEvent() {
                             ModDB.loadDatabases(true)
 
-                            ModDB.loadAllMods(() => {
+                            ModDB.loadAllMods(false).then(() => {
+
                                 LocalMods.refreshOrigin()
-                            }, false)
+                            })
                         },
                     },
                     testingOptInMods: {
