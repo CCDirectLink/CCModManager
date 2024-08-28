@@ -4,6 +4,10 @@
 
 ## [Unreleased]
 
+### Changed
+
+- Remember the "Include local" and "Hide library mods" filter options across game restarts
+
 ### Fixed
 
 - Fixed CCLoader sometimes getting detected as not installed

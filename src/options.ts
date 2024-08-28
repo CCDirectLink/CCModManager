@@ -42,7 +42,6 @@ export function registerOpts() {
                             ModDB.loadDatabases(true)
 
                             ModDB.loadAllMods(false).then(() => {
-
                                 LocalMods.refreshOrigin()
                             })
                         },
@@ -56,8 +55,26 @@ export function registerOpts() {
                         init: false,
                         hidden: true,
                         changeEvent() {
-                            modmanager.gui.menu.list.restoreLastPosition = undefined
-                            modmanager.gui.menu.list.updateColumnCount()
+                            if (modmanager.gui.menu.list.currentList) {
+                                modmanager.gui.menu.list.restoreLastPosition = undefined
+                                modmanager.gui.menu.list.updateColumnCount()
+                            }
+                        },
+                    },
+                    hideLibraryMods: {
+                        type: 'CHECKBOX',
+                        init: true,
+                        hidden: true,
+                        changeEvent() {
+                            modmanager.gui.menu.list.filters['hideLibraryMods'] = Opts.hideLibraryMods
+                        },
+                    },
+                    includeLocalModsInOnline: {
+                        type: 'CHECKBOX',
+                        init: true,
+                        hidden: true,
+                        changeEvent() {
+                            modmanager.gui.menu.list.filters['includeLocal'] = Opts.includeLocalModsInOnline
                         },
                     },
                     manualEnforcerRead: {

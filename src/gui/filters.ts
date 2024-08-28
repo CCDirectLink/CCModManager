@@ -1,4 +1,3 @@
-import { Fliters } from '../filters'
 import { Lang } from '../lang-manager'
 import { Opts } from '../options'
 
@@ -33,14 +32,16 @@ declare global {
 }
 
 type CheckboxConfig = { key: keyof typeof Lang.filters; default?: boolean } & (
-    | { filterKey?: keyof Fliters }
-    | { optsKey: 'isGrid' /* keyof typeof Opts */ }
+    | {}
+    | {
+          optsKey: 'isGrid' | 'hideLibraryMods' | 'includeLocalModsInOnline' /* keyof typeof Opts */
+      }
 )
 
 const checkboxes: CheckboxConfig[] = [
     { key: 'gridView', optsKey: 'isGrid' },
-    { key: 'local', filterKey: 'includeLocal', default: true },
-    { key: 'hideLibrary', filterKey: 'hideLibraryMods', default: true },
+    { key: 'local', optsKey: 'includeLocalModsInOnline' },
+    { key: 'hideLibrary', optsKey: 'hideLibraryMods' },
     { key: 'tagQol' },
     { key: 'tagPlayerCharacter' },
     { key: 'tagPartyMember' },
@@ -90,9 +91,7 @@ modmanager.gui.FiltersPopup = ig.GuiElementBase.extend({
     },
     setFilterValue(config, state) {
         const filters = modmanager.gui.menu.list.filters
-        if ('filterKey' in config && config.filterKey) {
-            filters[config.filterKey] = state as any
-        } else if ('optsKey' in config) {
+        if ('optsKey' in config) {
             Opts[config.optsKey] = state
         } else {
             filters.tags ??= []
@@ -108,9 +107,7 @@ modmanager.gui.FiltersPopup = ig.GuiElementBase.extend({
     },
     getFilterValue(config) {
         const filters = modmanager.gui.menu.list.filters
-        if ('filterKey' in config && config.filterKey) {
-            return filters[config.filterKey] as boolean | undefined
-        } else if ('optsKey' in config) {
+        if ('optsKey' in config) {
             return Opts[config.optsKey]
         } else return filters.tags?.includes(this.getLangData(config.key).name)
     },
@@ -154,10 +151,18 @@ modmanager.gui.FiltersPopup = ig.GuiElementBase.extend({
             checkbox.setPos(x * (textW + spacingW) + offset.x, y * (textH + spacingH))
             checkbox.crossedeyesLabel = (config.key.startsWith('tag') ? `${Lang.tag}: ` : '') + lang.name
             checkbox.data = lang.description
+
+            let val: boolean | undefined
             if (config.default !== undefined) {
-                checkbox.setPressed(config.default)
-                this.setFilterValue(config, config.default)
+                val = config.default
+            } else if ('optsKey' in config) {
+                val = Opts[config.optsKey]
             }
+            if (val !== undefined) {
+                checkbox.setPressed(val)
+                this.setFilterValue(config, val)
+            }
+
             checkbox.onButtonPress = () => {
                 this.setFilterValue(config, checkbox.pressed)
             }
