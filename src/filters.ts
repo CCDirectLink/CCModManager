@@ -10,6 +10,7 @@ export interface Fliters {
     includeLocal?: boolean
     hideLibraryMods?: boolean
     tags?: string[]
+    hasOptions?: boolean
 }
 
 function doesFilterApply(filters: Fliters, mod: ModEntry): boolean {
@@ -28,6 +29,9 @@ function doesFilterApply(filters: Fliters, mod: ModEntry): boolean {
             if (!tags.includes(hasToHaveTag as ValidTags)) return false
         }
     }
+
+    if (filters.hasOptions && !modmanager.optionConfigs[mod.id]) return false
+
     return true
 }
 

@@ -53,6 +53,12 @@ declare global {
                 buttonGroup: sc.ButtonGroup,
                 sort: modmanager.gui.MENU_SORT_ORDER
             ): void
+            populateSettings(
+                this: this,
+                list: sc.ButtonListBox,
+                buttonGroup: sc.ButtonGroup,
+                sort: modmanager.gui.MENU_SORT_ORDER
+            ): void
             populateListFromMods(this: this, mods: ModEntry[], list: sc.ButtonListBox): void
             savePosition(this: this): void
         }
@@ -66,6 +72,7 @@ declare global {
             SELECTED: number
             ENABLED: number
             DISABLED: number
+            SETTINGS: number
         }
     }
 }
@@ -94,6 +101,7 @@ modmanager.gui.MenuList = sc.ListTabbedPane.extend({
             ...[
                 { name: Lang.enabledTab, populateFunc: this.populateEnabled, icon: 'mod-icon-enabled' },
                 { name: Lang.disabledTab, populateFunc: this.populateDisabled, icon: 'mod-icon-disabled' },
+                { name: Lang.modOptionsTab, populateFunc: this.populateSettings, icon: 'mod-icon-online' },
             ],
         ]
         if (!ig.isdemo) {
@@ -102,11 +110,13 @@ modmanager.gui.MenuList = sc.ListTabbedPane.extend({
                 SELECTED: 1,
                 ENABLED: 2,
                 DISABLED: 3,
+                SETTINGS: 4,
             }
         } else {
             modmanager.gui.MOD_MENU_TAB_INDEXES = {
                 ENABLED: 0,
                 DISABLED: 1,
+                SETTINGS: 2,
 
                 ONLINE: 1000,
                 SELECTED: 1000,
@@ -298,6 +308,11 @@ modmanager.gui.MenuList = sc.ListTabbedPane.extend({
     },
     populateDisabled(list, _, sort: modmanager.gui.MENU_SORT_ORDER) {
         const mods = createFuzzyFilteredModList(this.filters, LocalMods.getInactive())
+        this.sortModEntries(mods, sort)
+        this.populateListFromMods(mods, list)
+    },
+    populateSettings(list, _, sort: modmanager.gui.MENU_SORT_ORDER) {
+        const mods = createFuzzyFilteredModList({ ...this.filters, hasOptions: true }, LocalMods.getActive())
         this.sortModEntries(mods, sort)
         this.populateListFromMods(mods, list)
     },

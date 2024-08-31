@@ -4,9 +4,14 @@
 
 ## [Unreleased]
 
+### Added
+
+- Added a tab for mods that have a dedicated settings page
+
 ### Changed
 
 - Remember the "Include local" and "Hide library mods" filter options across game restarts
+- Make the manual enforcer less annoying
 
 ### Fixed
 

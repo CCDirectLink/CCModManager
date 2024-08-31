@@ -312,7 +312,7 @@ modmanager.gui.Menu = sc.ListInfoMenu.extend({
     },
     initModOptionsButton(bottomY) {
         this.modOptionsButton = new sc.ButtonGui(
-            '\\i[rightClickOrR2]' + Lang.modSettings,
+            '\\i[rightClickOrR2]' + Lang.modOptions,
             140,
             true,
             sc.BUTTON_TYPE.SMALL
