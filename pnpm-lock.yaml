@@ -51,8 +51,8 @@ importers:
         specifier: '=12.0.2'
         version: 12.0.2
       nax-ccuilib:
-        specifier: github:conorlawton/nax-ccuilib
-        version: https://codeload.github.com/conorlawton/nax-ccuilib/tar.gz/27d04077163f304e2c80ed269d7dae929e9e91f3
+        specifier: github:naxane/nax-ccuilib
+        version: https://codeload.github.com/naxane/nax-ccuilib/tar.gz/a2f6a6bc8e326a61fbb9d1eb7e83524a2af11789
       prettier:
         specifier: 3.2.4
         version: 3.2.4
@@ -937,9 +937,9 @@ packages:
   natural-compare@1.4.0:
     resolution: {integrity: sha512-OWND8ei3VtNC9h7V60qff3SVobHr996CTwgxubgyQYEpg290h9J0buyECNNJexkFm5sOajh5G116RYA1c8ZMSw==}
 
-  nax-ccuilib@https://codeload.github.com/conorlawton/nax-ccuilib/tar.gz/27d04077163f304e2c80ed269d7dae929e9e91f3:
-    resolution: {tarball: https://codeload.github.com/conorlawton/nax-ccuilib/tar.gz/27d04077163f304e2c80ed269d7dae929e9e91f3}
-    version: 1.2.4
+  nax-ccuilib@https://codeload.github.com/naxane/nax-ccuilib/tar.gz/a2f6a6bc8e326a61fbb9d1eb7e83524a2af11789:
+    resolution: {tarball: https://codeload.github.com/naxane/nax-ccuilib/tar.gz/a2f6a6bc8e326a61fbb9d1eb7e83524a2af11789}
+    version: 1.2.9
 
   normalize-path@3.0.0:
     resolution: {integrity: sha512-6eZs5Ls3WtCisHWp9S2GUy8dqkpGi4BVSz3GaqiE6ezub0512ESztXUwUB6C6IKbQkY2Pnb/mD4WYojCRwcwLA==}
@@ -2009,7 +2009,7 @@ snapshots:
 
   natural-compare@1.4.0: {}
 
-  nax-ccuilib@https://codeload.github.com/conorlawton/nax-ccuilib/tar.gz/27d04077163f304e2c80ed269d7dae929e9e91f3: {}
+  nax-ccuilib@https://codeload.github.com/naxane/nax-ccuilib/tar.gz/a2f6a6bc8e326a61fbb9d1eb7e83524a2af11789: {}
 
   normalize-path@3.0.0: {}
 
