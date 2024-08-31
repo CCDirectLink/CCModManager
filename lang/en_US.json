@@ -102,11 +102,7 @@
         ],
         "enforcment": {
             "button": "Yes, I've read the manual",
-            "fail0": "No you didn't",
-            "fail1": "Please, just read it",
-            "fail2": "You successfully didn't read the manual 3 times. Are you proud of yourself?",
-            "fail3": "...",
-            "fail4": "That's it. You crossed the line."
+            "fail": "Please, just read it"
         }
     },
     "onlineTab": "Online",
