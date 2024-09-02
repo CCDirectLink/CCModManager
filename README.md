@@ -5,6 +5,9 @@ Mod manager for the game CrossCode!
 Open the menu from the options menu and look for the `Mods` button.  
 Read the in-game manual in the help menu for usage instructions.  
 
+![Mod icon grid](https://github.com/user-attachments/assets/9eabd8e1-dbfc-4127-82cd-6a30cf45d1d3)
+
+
 ## Screenshots
 
 ![Screenshot of the Online tab sorted by the mod star count](https://github.com/CCDirectLink/CCModManager/assets/115574014/1ce0fb39-d993-46b2-b25f-0acbe8e7a0a2)
