@@ -11,6 +11,7 @@ export function registerModManagerIcons() {
         'mod-icon-disabled',
         'ccmodmanager-testing-off',
         'ccmodmanager-testing-on',
+        'mod-icon-settings',
     ] as const
     const mapping: Record<string, [number, number]> = {}
     for (let i = 0; i < icons.length; i++) {

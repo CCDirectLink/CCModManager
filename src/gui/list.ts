@@ -101,7 +101,7 @@ modmanager.gui.MenuList = sc.ListTabbedPane.extend({
             ...[
                 { name: Lang.enabledTab, populateFunc: this.populateEnabled, icon: 'mod-icon-enabled' },
                 { name: Lang.disabledTab, populateFunc: this.populateDisabled, icon: 'mod-icon-disabled' },
-                { name: Lang.modOptionsTab, populateFunc: this.populateSettings, icon: 'mod-icon-online' },
+                { name: Lang.modOptionsTab, populateFunc: this.populateSettings, icon: 'mod-icon-settings' },
             ],
         ]
         if (!ig.isdemo) {
