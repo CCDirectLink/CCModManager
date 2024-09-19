@@ -3,6 +3,11 @@
 # Change Log
 
 ## [Unreleased]
+
+### Changed
+
+- Update the mod repositories to the official (CCDirectLink/CCModDB) from the testing one (krypciak/CCModDB)
+
 ## [0.9.22] 2024-09-15
 
 ### Added
