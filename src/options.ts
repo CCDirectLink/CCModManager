@@ -3,7 +3,7 @@ import { ModInstallDialogs } from './gui/install-dialogs'
 import { Lang } from './lang-manager'
 import { LocalMods } from './local-mods'
 import { InstallQueue } from './mod-installer'
-import type { Options, Option } from './mod-options'
+import type { Option, Options } from './mod-options'
 import { ModDB } from './moddb'
 
 export let Opts: ReturnType<typeof modmanager.registerAndGetModOptions<ReturnType<typeof registerOpts>>>
@@ -37,7 +37,7 @@ export function registerOpts() {
 
                     repositories: {
                         type: 'JSON_DATA',
-                        init: ['@krypciak/CCModDB/stable', '@krypciak/CCModDB/testing'] as string[],
+                        init: ['@CCDirectLink/CCModDB/stable', '@CCDirectLink/CCModDB/testing'] as string[],
                         changeEvent() {
                             ModDB.loadDatabases(true)
 
