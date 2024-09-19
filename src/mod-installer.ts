@@ -277,6 +277,13 @@ export class ModInstaller {
     static async install(mods: ModEntryServer[]) {
         console.log('mods to install:', mods.map(mod => mod.id).join(', '))
 
+        const modsToUpdate: ModEntryServer[] = mods.filter(mod => mod.installStatus == 'update')
+        const ccloaderMod = modsToUpdate.find(m => m.id == 'ccloader')
+        if (ccloaderMod) {
+            modsToUpdate.erase(ccloaderMod)
+            await this.updateMod(ccloaderMod)
+        }
+
         const modsToInstall: ModEntryServer[] = mods.filter(
             mod => mod.installStatus == 'new' || mod.installStatus == 'dependency'
         )
@@ -284,7 +291,6 @@ export class ModInstaller {
         for (const mod of modsToInstall) {
             promises.push(this.downloadAndInstallMod(mod))
         }
-        const modsToUpdate: ModEntryServer[] = mods.filter(mod => mod.installStatus == 'update')
 
         for (const mod of modsToUpdate) {
             promises.push(this.updateMod(mod))

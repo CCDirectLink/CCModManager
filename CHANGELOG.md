@@ -8,6 +8,10 @@
 
 - Update the mod repositories to the official (CCDirectLink/CCModDB) from the testing one (krypciak/CCModDB)
 
+### Fixes
+
+- Force CCLoader to update first before any other mods
+
 ## [0.9.22] 2024-09-15
 
 ### Added
