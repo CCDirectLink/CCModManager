@@ -1,4 +1,3 @@
-import { Fliters } from '../filters';
 import { Lang } from '../lang-manager';
 declare global {
     namespace modmanager.gui {
@@ -37,9 +36,7 @@ declare global {
 type CheckboxConfig = {
     key: keyof typeof Lang.filters;
     default?: boolean;
-} & ({
-    filterKey?: keyof Fliters;
-} | {
-    optsKey: 'isGrid';
+} & ({} | {
+    optsKey: 'isGrid' | 'hideLibraryMods' | 'includeLocalModsInOnline';
 });
 export {};

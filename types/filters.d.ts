@@ -5,5 +5,6 @@ export interface Fliters {
     includeLocal?: boolean;
     hideLibraryMods?: boolean;
     tags?: string[];
+    hasOptions?: boolean;
 }
 export declare function createFuzzyFilteredModList<T extends ModEntry>(filters: Fliters, mods: T[]): T[];

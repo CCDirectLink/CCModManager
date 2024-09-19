@@ -34,6 +34,18 @@ export declare function registerOpts(): {
                     readonly hidden: true;
                     readonly changeEvent: (this: import("./mod-options").GuiOption) => void;
                 };
+                readonly hideLibraryMods: {
+                    readonly type: "CHECKBOX";
+                    readonly init: true;
+                    readonly hidden: true;
+                    readonly changeEvent: (this: import("./mod-options").GuiOption) => void;
+                };
+                readonly includeLocalModsInOnline: {
+                    readonly type: "CHECKBOX";
+                    readonly init: true;
+                    readonly hidden: true;
+                    readonly changeEvent: (this: import("./mod-options").GuiOption) => void;
+                };
                 readonly manualEnforcerRead: {
                     readonly type: "JSON_DATA";
                     readonly init: Record<string, boolean>;

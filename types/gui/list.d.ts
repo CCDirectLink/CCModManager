@@ -26,6 +26,7 @@ declare global {
             populateSelected(this: this, list: sc.ButtonListBox, buttonGroup: sc.ButtonGroup, sort: modmanager.gui.MENU_SORT_ORDER): void;
             populateEnabled(this: this, list: sc.ButtonListBox, buttonGroup: sc.ButtonGroup, sort: modmanager.gui.MENU_SORT_ORDER): void;
             populateDisabled(this: this, list: sc.ButtonListBox, buttonGroup: sc.ButtonGroup, sort: modmanager.gui.MENU_SORT_ORDER): void;
+            populateSettings(this: this, list: sc.ButtonListBox, buttonGroup: sc.ButtonGroup, sort: modmanager.gui.MENU_SORT_ORDER): void;
             populateListFromMods(this: this, mods: ModEntry[], list: sc.ButtonListBox): void;
             savePosition(this: this): void;
         }
@@ -38,6 +39,7 @@ declare global {
             SELECTED: number;
             ENABLED: number;
             DISABLED: number;
+            SETTINGS: number;
         };
     }
 }

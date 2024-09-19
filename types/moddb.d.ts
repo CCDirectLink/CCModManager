@@ -12,7 +12,7 @@ export declare class ModDB {
     static minifyRepoURL(url: string): string;
     static expandRepoURL(url: string): string;
     static saveDatabases(): void;
-    static loadAllMods(callback?: () => void, prefferCache?: boolean): Promise<void>;
+    static loadAllMods(prefferCache?: boolean): Promise<void>;
     static getHighestVersionMod<T extends ModEntry>(mods: T[]): T;
     static getLocalModOrigins(id: string): Promise<ModEntryServer[]>;
     static resolveLocalModOrigin(mod: ModEntryLocal): Promise<void>;
