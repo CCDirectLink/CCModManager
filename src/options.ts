@@ -39,6 +39,8 @@ export function registerOpts() {
                         type: 'JSON_DATA',
                         init: ['@CCDirectLink/CCModDB/stable', '@CCDirectLink/CCModDB/testing'] as string[],
                         changeEvent() {
+                            if (!ig.game) return
+
                             ModDB.loadDatabases(true)
 
                             ModDB.loadAllMods(false).then(() => {

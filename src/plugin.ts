@@ -29,11 +29,11 @@ export default class ModManager {
         initLibraries()
         this.lang = new LangManager()
         registerOpts()
-        // TODO: Remove later
-        if (Opts.repositories.includes('@krypciak'))
-            localStorage['ccmodmanager-repositories'] = JSON.stringify(
-                Opts.repositories.map(url => (url == '@krypciak' ? '@krypciak/CCModDB/stable' : url))
-            )
+
+        // set the repos to the official ones when updating v0.9.22 -> v1.0.0
+        if (Opts.repositories.includes('@krypciak/CCModDB/stable')) {
+            Opts.repositories = Opts.flatOpts.repositories.init
+        }
 
         FileCache.init()
         ModInstaller.init()
