@@ -21,6 +21,9 @@ Read the in-game manual in the help menu for usage instructions.
 
 Option types:
 - `CHECKBOX`
+
+![image](https://github.com/user-attachments/assets/bf8bcaf1-9a0e-41cf-8314-58273a1ef467)
+
 ```javascript
 {
     type: 'CHECKBOX',
@@ -34,6 +37,9 @@ Option types:
 ```
 
 - `BUTTON_GROUP`
+
+![image](https://github.com/user-attachments/assets/ec58b7a0-1d6a-4208-80fa-ba16996cff12)
+
 ```javascript
 {
     type: 'BUTTON_GROUP',
@@ -63,6 +69,9 @@ const myenum = {
 ```
 
 - `OBJECT_SLIDER`
+
+![image](https://github.com/user-attachments/assets/bc9d4b03-9741-405a-aec7-e439dcc8fc13)
+  
 ```javascript
 {
     // Creates a slider that displays values from 1 to 8
@@ -78,9 +87,11 @@ const myenum = {
 }
 ```
 
+![image](https://github.com/user-attachments/assets/9a457e1a-5be6-49ec-a468-55f5a65b4d47)
+
 ```javascript
 {
-    // Creates a slider that displays values from 1 to 8
+    // Creates a slider that displays values from 0% to 100%
     type: 'OBJECT_SLIDER',
     init: 0.5,
     min: 0,
@@ -93,6 +104,9 @@ const myenum = {
 }
 ```
 
+
+![image](https://github.com/user-attachments/assets/0a6c79c5-4bc0-4049-8ae8-77577169c4ad)
+
 ```javascript
 {
     // Creates a slider that displays values from 4 to 13 
@@ -103,7 +117,7 @@ const myenum = {
     step: 1,
     fill: true,
     customNumberDisplay(index) {
-        const num: number = this.min
+        const num = this.min
         return num + index
     },
     name: 'Number slider',
@@ -112,6 +126,9 @@ const myenum = {
 ```
 
 - `BUTTON`
+
+![image](https://github.com/user-attachments/assets/d77958cf-0f07-4458-88b3-186fb69b6b75)
+
 ```javascript
 {
     type: 'BUTTON',
@@ -124,6 +141,9 @@ const myenum = {
 ```
 
 - `INFO`
+
+![image](https://github.com/user-attachments/assets/3b2d99ca-4c1f-4747-bbfe-3535d00cf19b)
+
 ```javascript
 {
     type: 'INFO',
@@ -132,6 +152,9 @@ const myenum = {
 ```
 
 - `CONTROLS`
+  
+![image](https://github.com/user-attachments/assets/9ca704ba-84bb-496c-a74c-d6072bc7341a)
+
 ```javascript
 {
     type: 'CONTROLS',
@@ -163,8 +186,10 @@ const myenum = {
 }
 ```
 
+Full example:
 
-Javascript example:
+![image](https://github.com/user-attachments/assets/a8978378-4b2d-4b79-973f-0a10e0b100de)
+
 ```javascript
 // for typescript:
 // import type * as _ from 'ccmodmanager/types/plugin'
