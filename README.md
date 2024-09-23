@@ -27,7 +27,9 @@ Option types:
     init: true,
     /* optional */ changeEvent() {
         // code
-    }
+    },
+    name: 'Checkbox',
+    description: 'My least favorite button.',
 }
 ```
 
@@ -38,6 +40,8 @@ Option types:
     init: 0 /* option1 */,
     enum: { option1: 0, option2: 1 },
     buttonNames: ['Option 1', 'Option 2'],
+    name: 'Choice',
+    description: 'My (not really) favorite button group.',
 }
 ```
 
@@ -53,6 +57,8 @@ const myenum = {
     init: myenum.option1 /* option1 */,
     enum: myenum,
     buttonNames: ['Option 1', 'Option 2'],
+    name: 'Choice',
+    description: 'My beloved button group.',
 }
 ```
 
