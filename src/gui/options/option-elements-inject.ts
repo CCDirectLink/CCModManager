@@ -46,7 +46,8 @@ sc.OPTION_GUIS[sc.OPTION_TYPES.OBJECT_SLIDER].inject({
         if (!(this.base instanceof modmanager.gui.OptionsOptionRow)) return
 
         const value = optGet(this.base) as number
-        const index = this.entries.findIndex(v => v == value)
+        let index = this.entries.findIndex(v => v == value)
+        if (index == -1) index = 0
         this.slider.setValue(index)
         this.onChange(index)
     },
@@ -82,9 +83,9 @@ sc.OPTION_GUIS[sc.OPTION_TYPES.OBJECT_SLIDER].inject({
 
         const func = this.base.guiOption.customNumberDisplay
         if (func) {
-            const ret = func(this._lastVal)
-            if (this.currentNumber instanceof sc.TextGui) this.currentNumber.setText(ret as string)
-            else if (this.currentNumber instanceof sc.NumberGui) this.currentNumber.setNumber(ret as number)
+            const ret = func.bind(this.base.guiOption)(this._lastVal)
+            if (this.currentNumber instanceof sc.TextGui) this.currentNumber.setText(ret.toString())
+            else if (this.currentNumber instanceof sc.NumberGui) this.currentNumber.setNumber(Number(ret))
             return
         }
 
