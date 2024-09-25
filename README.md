@@ -29,7 +29,7 @@ Read the in-game manual in the help menu for usage instructions.
     /* optional */ changeEvent() {
         // code
     },
-    name: 'Checkbox',
+    name: 'My checkbox',
     description: 'My least favorite button.',
 }
 ```
@@ -44,7 +44,7 @@ Read the in-game manual in the help menu for usage instructions.
     init: 0 /* option1 */,
     enum: { option1: 0, option2: 1 },
     buttonNames: ['Option 1', 'Option 2'],
-    name: 'Choice',
+    name: 'My buttons',
     description: 'My (not really) favorite button group.',
 }
 ```
@@ -61,7 +61,7 @@ const myenum = {
     init: myenum.option1 /* option1 */,
     enum: myenum,
     buttonNames: ['Option 1', 'Option 2'],
-    name: 'Choice',
+    name: 'My buttons',
     description: 'My beloved button group.',
 }
 ```
