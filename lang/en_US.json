@@ -127,7 +127,7 @@
     "toUpdate": "Update:",
     "toInstall": "Install:",
     "install": "Install",
-    "updatesDetected": "Some mods have a new version. Do you want to update now?",
+    "updatesDetected": "Some mods have a new version. Do you want to review the updates now?",
     "upToDate": "Up to date.",
     "updatesFound": "Updated were found.",
     "askRestartInstall": "Installed successfully.\n The installed mods will start working after a restart.\n Do you want to restart?",
