@@ -263,7 +263,10 @@ const controlsToSet: (GuiOption & { type: 'CONTROLS' })[] = []
 modmanager.registerAndGetModOptions = registerAndGetModOptions
 function registerAndGetModOptions<T extends Options>(settings: ModOptionsSettings, options: T): OptsType<T> {
     const Opts: OptsType<T> = {} as any
-    Opts.flatOpts = {} as any
+    Object.defineProperty(Opts, 'flatOpts', {
+        enumerable: false,
+        value: {},
+    })
 
     const guiStructure: ModSettingsGuiStructure = {}
     modmanager.optionConfigs[settings.modId] = {
@@ -348,7 +351,7 @@ function registerAndGetModOptions<T extends Options>(settings: ModOptionsSetting
                         }
                     }
 
-                    Object.defineProperty(Opts, optKey, { get, set })
+                    Object.defineProperty(Opts, optKey, { get, set, enumerable: true })
 
                     if (get(true) === null) {
                         set(guiOption.init, true)
