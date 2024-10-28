@@ -4,6 +4,15 @@
 
 ## [Unreleased]
 ## [1.0.1] 2024-10-28
+
+### Changed 
+
+- Clarify the intent in the game start autoupdate prompt
+
+### Fixed
+
+- Fix mod list not loading in some very specific cases
+
 ## [1.0.0] 2024-09-19
 
 ### Changed
@@ -13,7 +22,6 @@
 ### Fixes
 
 - Force CCLoader to update first before any other mods
-- Fix mod list not loading in some very specific cases
 
 ## [0.9.22] 2024-09-15
 
