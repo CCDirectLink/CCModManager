@@ -12,6 +12,7 @@
 ### Fixes
 
 - Force CCLoader to update first before any other mods
+- Fix mod list not loading in some very specific cases
 
 ## [0.9.22] 2024-09-15
 

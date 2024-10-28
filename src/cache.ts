@@ -56,9 +56,17 @@ export class FileCache {
     static _isThereInternet: boolean | undefined
     static async isThereInternet(force: boolean = false): Promise<boolean> {
         if (force) FileCache._isThereInternet = undefined
-        return (FileCache._isThereInternet ??= await new Promise(resolve =>
-            dns.resolve('www.gnu.org', (err: any) => resolve(!err))
-        )) as boolean
+
+        return (FileCache._isThereInternet ??= await new Promise<boolean>(resolve => {
+            dns.lookup('one.one.one.one', (err: any) => {
+                if (err && err.code == 'ENOTFOUND') {
+                    resolve(false)
+                } else {
+                    resolve(true)
+                }
+                // dns.resolve('www.gnu.org', (err: any) => resolve(!err))
+            })
+        }))
     }
 
     static getDefaultModIconConfig() {
