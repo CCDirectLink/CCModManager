@@ -503,7 +503,7 @@ modmanager.gui.Menu = sc.ListInfoMenu.extend({
         if (
             LocalMods.getAll().some(mod => mod.awaitingRestart) ||
             Object.values(ModDB.databases).some(
-                db => db.active && Object.values(db.modRecord).some(mod => mod.awaitingRestart)
+                db => db.active && Object.values(db.modRecord ?? {}).some(mod => mod.awaitingRestart)
             )
         ) {
             sc.Dialogs.showYesNoDialog(Lang.modStatesChanged, sc.DIALOG_INFO_ICON.QUESTION, button => {
