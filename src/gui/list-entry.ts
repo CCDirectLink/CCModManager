@@ -305,7 +305,11 @@ modmanager.gui.ListEntry = ig.FocusGui.extend({
             ) {
                 if (mod.active) return this.tryDisableMod(mod)
                 else return this.tryEnableMod(mod)
-            } else throw new Error('wat?')
+            } else if (this.modList.currentTabIndex == modmanager.gui.MOD_MENU_TAB_INDEXES.SETTINGS) {
+                modmanager.gui.menu.modOptionsButton.onButtonPress()
+            } else {
+                throw new Error('wat?')
+            }
         } else if (mod.localCounterpart) {
             return this.toggleSelection()
         } else {

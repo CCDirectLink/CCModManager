@@ -3,6 +3,15 @@
 # Change Log
 
 ## [Unreleased]
+
+### Added
+
+- Left clicking a mod in the Settings tab opens the mod's settings menu
+
+### Fixed
+
+- Left clicking a mod in the Settings tab doesn't crash anymore
+
 ## [1.0.1] 2024-10-28
 
 ### Changed 
