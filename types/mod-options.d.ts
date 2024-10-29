@@ -1,19 +1,29 @@
 export type Enum = Record<string, number>;
 /** Option that has state that can change */
 export interface OptionChangeable {
+    /** Does the option require a game restart to take effect */
     restart?: boolean;
+    /** Option change callback */
     changeEvent?: (this: GuiOption) => void;
+    /** Redraw the menu on option change */
     updateMenuOnChange?: boolean;
+    /** Prevent the option from resetting the settings using the "Reset Settings" */
+    preventResettingToDefault?: boolean;
 }
 /** A option entry */
 export type Option = {
+    /** Option display name */
     name?: ig.LangLabel.Data;
+    /** Option description */
     description?: ig.LangLabel.Data;
+    /** Is the option hidden from the menu */
     hidden?: boolean | (() => boolean);
 } & (BUTTON_GROUP | ARRAY_SLIDER | OBJECT_SILDER | CHECKBOX | CONTROLS | INFO | BUTTON | JSON_DATA);
 type BUTTON_GROUP = OptionChangeable & {
     type: 'BUTTON_GROUP';
+    /** Initial option value */
     init: number;
+    /** Button display names */
     buttonNames?: string[];
 } & ({
     enum: Enum;
@@ -36,6 +46,8 @@ type OBJECT_SILDER = OptionChangeable & {
     snap?: boolean;
     fill?: boolean;
     showPercentage?: boolean;
+    /** Force the thumb width (values below 30 will be ignored) */
+    thumbWidth?: number;
     customNumberDisplay?: (index: number) => number | string;
 } & ({
     min: number;
@@ -68,6 +80,8 @@ interface CONTROLS {
     };
     pressEvent?: () => void;
     holdEvent?: () => void;
+    /** If false, the keybinding only works in-game
+     If true, the keybinding works everywhere */
     global?: boolean;
     data?: undefined;
 }

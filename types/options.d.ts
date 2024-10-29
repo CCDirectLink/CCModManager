@@ -49,6 +49,7 @@ export declare function registerOpts(): {
                 readonly manualEnforcerRead: {
                     readonly type: "JSON_DATA";
                     readonly init: Record<string, boolean>;
+                    readonly preventResettingToDefault: true;
                 };
             };
             readonly advanced: {
