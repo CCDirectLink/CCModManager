@@ -47,9 +47,12 @@ modmanager.gui.OptionsOptionRow = sc.OptionRow.extend({
         const x = this.hook.size.x - 175
         // prettier-ignore
         const optionType = sc.OPTION_TYPES[this.option.type] as | 0 | 1 | 2 | 3 | 4 | 5 /* <- all sc.OPTION_TYPES values expect sc.OPTION_TYPES.INFO */
-        const optionClass = sc.OPTION_GUIS[optionType]
+        let optionClass = sc.OPTION_GUIS[optionType]
+        if (this.option.type == 'OBJECT_SLIDER') {
+            optionClass = modmanager.gui.OptionsObjectSlider as any
+        }
         if (optionClass) {
-            const typeGui: ig.GuiElementBase = new optionClass(this as unknown as sc.OptionRow, x, rowGroup)
+            const typeGui: ig.GuiElementBase = new optionClass(this, x, rowGroup)
             this.typeGui = typeGui as any
             typeGui.setSize(x, 26)
             typeGui.setAlign(ig.GUI_ALIGN.X_LEFT, ig.GUI_ALIGN.Y_BOTTOM)

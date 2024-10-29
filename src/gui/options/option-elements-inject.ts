@@ -40,10 +40,45 @@ sc.OPTION_GUIS[sc.OPTION_TYPES.BUTTON_GROUP].inject({
     },
 })
 
-sc.OPTION_GUIS[sc.OPTION_TYPES.OBJECT_SLIDER].inject({
+declare global {
+    namespace modmanager.gui {
+        interface OptionsObjectSlider extends sc.OPTION_GUIS_DEFS.OBJECT_SLIDER {
+            base: modmanager.gui.OptionsOptionRow
+            currentNumber: sc.TextGui
+        }
+        interface OptionsObjectSliderConstructor extends ImpactClass<OptionsObjectSlider> {
+            new (optionRow: sc.OptionRow, x: number, rowGroup: sc.RowButtonGroup): OptionsObjectSlider
+        }
+        var OptionsObjectSlider: OptionsObjectSliderConstructor
+    }
+}
+modmanager.gui.OptionsObjectSlider = ig.GuiElementBase.extend({
+    entries: [],
+    _lastVal: -1,
     init(optionRow, x, rowGroup) {
-        this.parent(optionRow, x, rowGroup)
-        if (!(this.base instanceof modmanager.gui.OptionsOptionRow)) return
+        this.parent()
+        this.base = optionRow as modmanager.gui.OptionsOptionRow
+
+        if (this.base.guiOption.type != 'OBJECT_SLIDER') throw new Error('what')
+
+        const snap = (!('snap' in this.base.option) || this.base.option.snap) ?? true
+
+        const data = this.base.guiOption.data
+        this.entries = Object.values(data!)
+        x -= 4
+        this.showPercentage = this.base.guiOption.showPercentage
+
+        this.slider = new sc.OptionFocusSlider(this.onChange.bind(this), snap, this.base.guiOption.fill, rowGroup)
+        this.slider.setPreferredThumbSize(Math.floor(x / this.entries.length), 21)
+        this.slider.setPos(0, 0)
+        this.slider.setMinMaxValue(0, this.entries.length - 1)
+        this.slider.setSize(x - 4, 21, 9)
+        this.slider.data = this.base.optionDes
+        this.addChildGui(this.slider)
+        this.currentNumber = new sc.TextGui('')
+        this.currentNumber.setAlign(ig.GUI_ALIGN.X_CENTER, ig.GUI_ALIGN.Y_CENTER)
+        this.slider.thumb.addChildGui(this.currentNumber)
+        rowGroup.addFocusGui(this.slider, 0, this.base.row)
 
         const value = optGet(this.base) as number
         let index = this.entries.findIndex(v => v == value)
@@ -51,18 +86,34 @@ sc.OPTION_GUIS[sc.OPTION_TYPES.OBJECT_SLIDER].inject({
         this.slider.setValue(index)
         this.onChange(index)
     },
-    onChange(index) {
-        if (!(this.base instanceof modmanager.gui.OptionsOptionRow)) return this.parent(index)
+    updateNumberDisplay() {
+        if (this.base.guiOption.type != 'OBJECT_SLIDER') throw new Error('what')
 
-        if (index != this._lastVal) {
-            this._lastVal = index
-            this.updateNumberDisplay()
-            optSet(this.base, this.entries[index])
+        const func = this.base.guiOption.customNumberDisplay
+        if (func) {
+            let ret = func.bind(this.base.guiOption)(this._lastVal)
+            if (typeof ret == 'number') {
+                ret = ret.round(3)
+            }
+            this.currentNumber.setText(ret.toString())
+            return
+        }
+
+        if (this.showPercentage) {
+            const text = Math.round(this.entries[this._lastVal] * 100) + '%'
+            this.currentNumber.setText(text)
+        } else {
+            const num = this._lastVal + 1
+            this.currentNumber.setText(num.round(3).toString())
         }
     },
-    modelChanged(model, message, data) {
-        if (!(this.base instanceof modmanager.gui.OptionsOptionRow)) return this.parent(model, message, data)
-
+    onAttach() {
+        sc.Model.addObserver(sc.options, this)
+    },
+    onDetach() {
+        sc.Model.removeObserver(sc.options, this)
+    },
+    modelChanged(model, message) {
         if (model == sc.options && message == sc.OPTIONS_EVENT.OPTION_CHANGED) {
             const value = optGet(this.base) as number
             if (value != this.entries[this._lastVal]) {
@@ -72,24 +123,17 @@ sc.OPTION_GUIS[sc.OPTION_TYPES.OBJECT_SLIDER].inject({
             }
         }
     },
+    onChange(index) {
+        if (index != this._lastVal) {
+            this._lastVal = index
+            this.updateNumberDisplay()
+            optSet(this.base, this.entries[index])
+        }
+    },
     onLeftRight(direction) {
         const val = direction ? this._lastVal + 1 : this._lastVal - 1
         this.slider.setValue(val)
         this.onChange(this.slider.getValue())
-    },
-    updateNumberDisplay() {
-        if (!(this.base instanceof modmanager.gui.OptionsOptionRow)) return this.parent()
-        if (this.base.guiOption.type != 'OBJECT_SLIDER') throw new Error('what')
-
-        const func = this.base.guiOption.customNumberDisplay
-        if (func) {
-            const ret = func.bind(this.base.guiOption)(this._lastVal)
-            if (this.currentNumber instanceof sc.TextGui) this.currentNumber.setText(ret.toString())
-            else if (this.currentNumber instanceof sc.NumberGui) this.currentNumber.setNumber(Number(ret))
-            return
-        }
-
-        return this.parent()
     },
 })
 

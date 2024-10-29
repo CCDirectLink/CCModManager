@@ -79,7 +79,6 @@ const myenum = {
     max: 1.5,
     step: 0.1,
     fill: true,
-    showPercentage: false,
     name: 'Slider',
     description: 'My somewhat favorite slider.',
 }
@@ -220,7 +219,9 @@ const Opts = modmanager.registerAndGetModOptions(
                         description: 'Hello.',
                     },
                     mySlider: {
-                        // Creates a slider with the following values:
+                        // Creates a slider with the following text:
+                        // 1   2   3   4   5   6   7   8
+                        // that resolve to the following values:
                         // 0.8 0.9 1.0 1.1 1.2 1.3 1.4 1.5
                         type: 'OBJECT_SLIDER',
                         init: 1,
