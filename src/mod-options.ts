@@ -65,6 +65,8 @@ type OBJECT_SILDER = OptionChangeable & {
     snap?: boolean
     fill?: boolean
     showPercentage?: boolean
+    /** Force the thumb width (values below 30 will be ignored) */
+    thumbWidth?: number
 
     customNumberDisplay?: (index: number) => number | string
 } & (

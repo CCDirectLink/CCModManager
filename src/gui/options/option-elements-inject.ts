@@ -69,7 +69,12 @@ modmanager.gui.OptionsObjectSlider = ig.GuiElementBase.extend({
         this.showPercentage = this.base.guiOption.showPercentage
 
         this.slider = new sc.OptionFocusSlider(this.onChange.bind(this), snap, this.base.guiOption.fill, rowGroup)
-        this.slider.setPreferredThumbSize(Math.floor(x / this.entries.length), 21)
+
+        this.slider.setPreferredThumbSize(
+            Math.max(30, this.base.guiOption.thumbWidth ?? Math.floor(252 / this.entries.length)),
+            21
+        )
+
         this.slider.setPos(0, 0)
         this.slider.setMinMaxValue(0, this.entries.length - 1)
         this.slider.setSize(x - 4, 21, 9)

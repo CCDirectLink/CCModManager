@@ -7,7 +7,12 @@
 ### Added
 
 - Left clicking a mod in the Settings tab opens the mod's settings menu
-- Add "preventResettingToDefault" option on changeable options
+- Add "preventResettingToDefault" property on changeable options
+- Add "thumbWidth" property on OBJECT_SLIDER
+
+### Changed 
+
+- OBJECT_SLIDER thumb size now has a minimum of 30px
 
 ### Fixed
 
