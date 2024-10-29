@@ -13,6 +13,7 @@
 
 - Left clicking a mod in the Settings tab doesn't crash anymore
 - Fix crash when clicking the "Reset Settings" button in CCModManager's mod setting page
+- Fix top bar buttons like "Help" becoming uninteractable after resetting the mod's settings
 
 ## [1.0.1] 2024-10-28
 

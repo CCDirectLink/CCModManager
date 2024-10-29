@@ -230,6 +230,8 @@ modmanager.gui.OptionsMenu = sc.BaseMenu.extend({
         mainMenu.hotkeyBar.doStateTransition('DEFAULT', true)
         for (const button of mainMenu.hotkeyBar.hook.children) button.doStateTransition('DEFAULT', true)
 
+        sc.menu.commitHotkeys()
+
         ig.interact.setBlockDelay(0)
 
         /* refocus the last element, we need to find it first cuz it might have moved to a diffrent position */
