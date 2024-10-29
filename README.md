@@ -96,6 +96,7 @@ const myenum = {
     step: 0.1,
     fill: true,
     showPercentage: true,
+    thumbWidth: 50, // Force the thumb width to 50px
     name: 'Percentage slider',
     description: 'My (maybe) somewhat favorite slider.',
 }
