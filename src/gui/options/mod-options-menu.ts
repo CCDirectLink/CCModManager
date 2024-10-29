@@ -200,10 +200,10 @@ modmanager.gui.OptionsMenu = sc.BaseMenu.extend({
     },
     resetOptionsToDefault() {
         const options = modmanager.options[this.mod.id]
-        const optionsToReset = Object.getOwnPropertyNames(options).filter(e => e != 'flatOpts')
-        for (const optName of optionsToReset) {
+        for (const optName of Object.keys(options)) {
             const optConfig: GuiOption = options.flatOpts[optName]
             if (!('init' in optConfig)) throw new Error('what')
+            if ('preventResettingToDefault' in optConfig && optConfig.preventResettingToDefault) continue
             options[optName] = optConfig.init
         }
         this.reopenMenu()

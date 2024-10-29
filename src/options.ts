@@ -82,6 +82,7 @@ export function registerOpts() {
                     manualEnforcerRead: {
                         type: 'JSON_DATA',
                         init: {} as Record<string, boolean>,
+                        preventResettingToDefault: true,
                     },
                 },
                 advanced: {

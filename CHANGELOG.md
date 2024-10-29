@@ -7,6 +7,7 @@
 ### Added
 
 - Left clicking a mod in the Settings tab opens the mod's settings menu
+- Add "preventResettingToDefault" option on changeable options
 
 ### Fixed
 

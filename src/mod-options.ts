@@ -8,6 +8,8 @@ export interface OptionChangeable {
     changeEvent?: (this: GuiOption) => void
     /** Redraw the menu on option change */
     updateMenuOnChange?: boolean
+    /** Prevent the option from resetting the settings using the "Reset Settings" */
+    preventResettingToDefault?: boolean
 }
 
 /** A option entry */
