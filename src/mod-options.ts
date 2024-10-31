@@ -331,15 +331,22 @@ function registerAndGetModOptions<T extends Options>(settings: ModOptionsSetting
                 /* register gui option end */
 
                 if (guiOption.type == 'CONTROLS') controlsToSet.push(guiOption)
-
-                if (guiOption.type != 'CONTROLS' && guiOption.type != 'INFO' && guiOption.type != 'BUTTON') {
-                    const get = function (pure?: boolean) {
-                        let v = localStorage.getItem(id)!
-                        if (pure) return v
-                        if (option.type == 'CHECKBOX') return v == 'true'
-                        if (option.type == 'JSON_DATA') return JSON.parse(v)
-                        return Number(v)
+                else if (guiOption.type != 'INFO' && guiOption.type != 'BUTTON') {
+                    let get: () => any
+                    if (option.type == 'CHECKBOX') {
+                        get = function () {
+                            return localStorage.getItem(id) == 'true'
+                        }
+                    } else if (option.type == 'JSON_DATA') {
+                        get = function () {
+                            return JSON.parse(localStorage.getItem(id)!)
+                        }
+                    } else {
+                        get = function () {
+                            return Number(localStorage.getItem(id))
+                        }
                     }
+
                     const set = function (v: object | string | number, noEvent?: boolean) {
                         const str = typeof v === 'object' ? JSON.stringify(v) : v.toString()
                         localStorage.setItem(id, str)
@@ -357,7 +364,7 @@ function registerAndGetModOptions<T extends Options>(settings: ModOptionsSetting
 
                     Object.defineProperty(Opts, optKey, { get, set, enumerable: true })
 
-                    if (get(true) === null) {
+                    if (localStorage.getItem(id) === null) {
                         set(guiOption.init, true)
                     }
                 }
