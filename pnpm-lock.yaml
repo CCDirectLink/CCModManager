@@ -24,8 +24,8 @@ importers:
         specifier: ^6.21.0
         version: 6.21.0(eslint@8.57.0)(typescript@5.4.5)
       ccmoddb:
-        specifier: github:krypciak/CCModDB
-        version: https://codeload.github.com/krypciak/CCModDB/tar.gz/eae3b8693d362d5020091ae67c0ba6568ca7b372
+        specifier: github:CCDirectLink/CCModDB
+        version: https://codeload.github.com/CCDirectLink/CCModDB/tar.gz/733650957c04ef72de6da8f8f47772e5b3fc8215
       crosscode-demonizer:
         specifier: github:krypciak/crosscode-demonizer
         version: https://codeload.github.com/krypciak/crosscode-demonizer/tar.gz/d310002e3b2a8835ed977f1dda0c013dbcb006eb
@@ -550,8 +550,8 @@ packages:
     resolution: {integrity: sha512-Gmy6FhYlCY7uOElZUSbxo2UCDH8owEk996gkbrpsgGtrJLM3J7jGxl9Ic7Qwwj4ivOE5AWZWRMecDdF7hqGjFA==}
     engines: {node: '>=10'}
 
-  ccmoddb@https://codeload.github.com/krypciak/CCModDB/tar.gz/eae3b8693d362d5020091ae67c0ba6568ca7b372:
-    resolution: {tarball: https://codeload.github.com/krypciak/CCModDB/tar.gz/eae3b8693d362d5020091ae67c0ba6568ca7b372}
+  ccmoddb@https://codeload.github.com/CCDirectLink/CCModDB/tar.gz/733650957c04ef72de6da8f8f47772e5b3fc8215:
+    resolution: {tarball: https://codeload.github.com/CCDirectLink/CCModDB/tar.gz/733650957c04ef72de6da8f8f47772e5b3fc8215}
     version: 1.0.0
 
   chai@5.1.1:
@@ -1546,7 +1546,7 @@ snapshots:
 
   camelcase@6.3.0: {}
 
-  ccmoddb@https://codeload.github.com/krypciak/CCModDB/tar.gz/eae3b8693d362d5020091ae67c0ba6568ca7b372:
+  ccmoddb@https://codeload.github.com/CCDirectLink/CCModDB/tar.gz/733650957c04ef72de6da8f8f47772e5b3fc8215:
     dependencies:
       '@types/chai': 4.3.17
       '@types/mocha': 10.0.7
