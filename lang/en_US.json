@@ -66,7 +66,7 @@
         "pages": [
             {
                 "content": [
-                    "Welcome to the mod manager!\n There are 4 tabs:\n - \\c[3]Online\\c[0] - Search through all available mods.\n - \\c[3]Selected\\c[0] - Mods you selected to install.\n - \\c[3]Enabled\\c[0] - Mods that are installed and enabled.\n - \\c[3]Disabled\\c[0] - Mods that are installed and disabled.\n Select the mod sort method by pressing \\i[help3].\n If a mod title has a list icon (\\i[quest]) before it, that means it has available in the online repositories, and if it has a question mark (\\i[lore-others]), that means that it's not.\n If a mod title has a clock (\\i[stats-general]) before it, that means it's awaiting a restart.\n If a mod title has a news icon (\\i[item-news]) before it, that means it has an update available."
+                    "Welcome to the mod manager!\n There are 5 tabs:\n - \\c[3]Online\\c[0] - Search through all available mods.\n - \\c[3]Selected\\c[0] - Mods you selected to install.\n - \\c[3]Enabled\\c[0] - Mods that are installed and enabled.\n - \\c[3]Disabled\\c[0] - Mods that are installed and disabled.\n - \\c[3]Settings\\c[0] - Mods that have settings available are shown there.\n Select the mod sort method by pressing \\i[help3].\n If a mod title has a list icon (\\i[quest]) before it, that means it has available in the online repositories, and if it has a question mark (\\i[lore-others]), that means that it's not.\n If a mod title has a clock (\\i[stats-general]) before it, that means it's awaiting a restart.\n If a mod title has a news icon (\\i[item-news]) before it, that means it has an update available."
                 ]
             },
             {
@@ -97,6 +97,12 @@
                 "title": "\\c[3]Mod Manager - Disabled\\c[0]",
                 "content": [
                     "The \\c[3]Disabled\\c[0] tab contains all installed and disabled mods.\n Disabled mods have red names.\n Uninstall mods by pressing \\i[help2].\n To enable a mod, focus a mod and press \\i[key-throw] or \\i[gamepad-a]."
+                ]
+            },
+            {
+                "title": "\\c[3]Mod Manager - Settings\\c[0]",
+                "content": [
+                    "The \\c[3]Settings\\c[0] tab contains all mods that have settings available (NOTE: Some mods puts their options somewhere in the regular options menu instead, they will not be in this tab).\n Open the mod's settings page with \\i[rightClickOrR2]."
                 ]
             }
         ],
