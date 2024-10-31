@@ -17,7 +17,7 @@
 ### Fixed
 
 - Left clicking a mod in the Settings tab doesn't crash anymore
-- Fix crash when clicking the "Reset Settings" button in CCModManager's mod setting page
+- Fix crash when clicking the "Reset Settings" button some mod's setting page
 - Fix top bar buttons like "Help" becoming uninteractable after resetting the mod's settings
 - Fix OBJECT_SLIDER not working properly with floating point numbers
 
