@@ -13,6 +13,7 @@
 ### Changed 
 
 - OBJECT_SLIDER thumb size now has a minimum of 30px
+- On game start, all OBJECT_SLIDER values will be put in their bounds
 
 ### Fixed
 

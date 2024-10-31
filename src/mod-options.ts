@@ -367,6 +367,13 @@ function registerAndGetModOptions<T extends Options>(settings: ModOptionsSetting
                     if (localStorage.getItem(id) === null) {
                         set(guiOption.init, true)
                     }
+                    if (option.type == 'OBJECT_SLIDER' && 'min' in option) {
+                        const val = get()
+                        const valInBounds = Math.min(option.max, Math.max(option.min, val))
+                        if (val != valInBounds) {
+                            set(valInBounds)
+                        }
+                    }
                 }
             })
         })
