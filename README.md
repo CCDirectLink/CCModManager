@@ -84,7 +84,7 @@ const myenum = {
 }
 ```
 
-![image](https://github.com/user-attachments/assets/9a457e1a-5be6-49ec-a468-55f5a65b4d47)
+![image](https://github.com/user-attachments/assets/6d0fbfff-9629-4535-8e70-d4c370559416)
 
 ```javascript
 {
