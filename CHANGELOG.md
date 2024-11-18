@@ -3,6 +3,12 @@
 # Change Log
 
 ## [Unreleased]
+
+### Changed
+
+- For CCLoader3, the mod installation dir is now `modloader.config.modsDirs`
+
+
 ## [1.0.2] 2024-10-31
 
 ### Added

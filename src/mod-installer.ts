@@ -11,6 +11,7 @@ const crypto: typeof import('crypto') = (0, eval)('require("crypto")')
 import rimraf from 'rimraf'
 import { Opts } from './options'
 import { JSZip, semver } from './library-providers'
+import ModManager from './plugin'
 
 export class InstallQueue {
     private static queue: ModEntryServer[] = []
@@ -63,6 +64,7 @@ export class ModInstaller {
     static record: Record<string, ModEntryServer>
     static byNameRecord: Record<string, ModEntryServer>
     static virtualMods: Record<string, ModEntryLocalVirtual>
+    static modsDir: string
 
     static init() {
         const version = LocalMods.getCCVersion()
@@ -122,6 +124,13 @@ export class ModInstaller {
                 version,
                 isExtension: true,
             },
+        }
+
+        if (ModManager.mod.isCCL3) {
+            // @ts-expect-error missing ccloader3 typings :sob:
+            this.modsDir = modloader.config.modsDirs[0]
+        } else {
+            this.modsDir = `assets/mods/`
         }
     }
 
@@ -388,7 +397,7 @@ export class ModInstaller {
     }
 
     private static async installCCMod(data: ArrayBuffer, id: string) {
-        return fs.promises.writeFile(`assets/mods/${id}.ccmod`, new Uint8Array(data))
+        return fs.promises.writeFile(`${this.modsDir}/${id}.ccmod`, new Uint8Array(data))
     }
 
     private static checkSHA256(data: ArrayBuffer, extected: string): boolean {
@@ -402,7 +411,7 @@ export class ModInstaller {
         data: ArrayBuffer,
         id: string,
         source: string,
-        prefixPath: string = 'assets/mods'
+        prefixPath: string = this.modsDir
     ) {
         const zip = await JSZip.loadAsync(data)
 
