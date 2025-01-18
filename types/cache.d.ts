@@ -3,8 +3,6 @@ export declare class FileCache {
     private static cacheDir;
     private static inCache;
     private static cache;
-    static _isThereInternet: boolean | undefined;
-    static isThereInternet(force?: boolean): Promise<boolean>;
     static getDefaultModIconConfig(): {
         path: string;
         offsetX: number;

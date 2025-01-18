@@ -36,7 +36,7 @@ export declare function registerOpts(): {
                 };
                 readonly hideLibraryMods: {
                     readonly type: "CHECKBOX";
-                    readonly init: true;
+                    readonly init: false;
                     readonly hidden: true;
                     readonly changeEvent: (this: import("./mod-options").GuiOption) => void;
                 };
