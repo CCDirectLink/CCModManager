@@ -30,11 +30,6 @@ export default class ModManager {
         this.lang = new LangManager()
         registerOpts()
 
-        // set the repos to the official ones when updating v0.9.22 -> v1.0.0
-        if (Opts.repositories.includes('@krypciak/CCModDB/stable')) {
-            Opts.repositories = Opts.flatOpts.repositories.init
-        }
-
         FileCache.init()
         ModInstaller.init()
 
