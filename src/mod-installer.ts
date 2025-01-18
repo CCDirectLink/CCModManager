@@ -394,7 +394,9 @@ export class ModInstaller {
         if (installation.type == 'zip') {
             console.log(`downloading ${installation.url}`)
 
-            const resp = await fetch(installation.url)
+            const resp = await fetch(installation.url).catch(_ => {
+                throw new Error(Lang.errors.install.failedFetch)
+            })
 
             const { arrayBuffer, progressFunc } = this.downloadWithProgress(resp)
 

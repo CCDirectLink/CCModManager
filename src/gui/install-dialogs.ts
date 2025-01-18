@@ -153,12 +153,9 @@ export class ModInstallDialogs {
                     })
                 })
                 .catch(err => {
-                    FileCache.isThereInternet(true).then(isThereInternet => {
-                        if (!isThereInternet) err = Lang.noInternet
-                        sc.Dialogs.showErrorDialog(err)
-                        dialog.blockClosing = false
-                        dialog.closeMenu()
-                    })
+                    sc.Dialogs.showErrorDialog(err)
+                    dialog.blockClosing = false
+                    dialog.closeMenu()
                 })
         }
         dialog.openMenu()
@@ -192,7 +189,9 @@ export class ModInstallDialogs {
             return false
         }
         if (localMod.isGit) {
-            sc.Dialogs.showErrorDialog(Lang.errors.cannotUninstallGit.replace(/\[modName\]/, prepareModName(localMod.name)))
+            sc.Dialogs.showErrorDialog(
+                Lang.errors.cannotUninstallGit.replace(/\[modName\]/, prepareModName(localMod.name))
+            )
             return false
         }
         const deps = ModInstaller.getWhatDependsOnAMod(localMod).filter(mod => !mod.uninstalled)
@@ -238,7 +237,9 @@ export class ModInstallDialogs {
 
     static checkCanDisableMod(mod: ModEntryLocal): boolean {
         if (mod.disableDisabling) {
-            sc.Dialogs.showErrorDialog(Lang.errors.cannotDisableDisabled.replace(/\[modName\]/, prepareModName(mod.name)))
+            sc.Dialogs.showErrorDialog(
+                Lang.errors.cannotDisableDisabled.replace(/\[modName\]/, prepareModName(mod.name))
+            )
             return false
         }
         const deps = ModInstaller.getWhatDependsOnAMod(mod, true)

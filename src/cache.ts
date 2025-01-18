@@ -6,7 +6,6 @@ const fs: typeof import('fs') = (0, eval)("require('fs')")
 import type { IncomingMessage } from 'http'
 const http: typeof import('http') = (0, eval)("require('http')")
 const https: typeof import('https') = (0, eval)("require('https')")
-const dns: typeof import('dns') = (0, eval)("require('dns')")
 
 async function* getFilesRecursive(dir: string): AsyncIterable<string> {
     const dirents = await fs.promises.readdir(dir, { withFileTypes: true })
@@ -32,15 +31,15 @@ function getTag(head: IncomingMessage): string {
 }
 
 async function getETag(url: string): Promise<string> {
-    if (!(await FileCache.isThereInternet())) return 'nointernet'
     const uri = new URL(url)
     const { get } = uri.protocol === 'https:' ? https : http
 
-    const head: IncomingMessage = await new Promise((resolve, reject) =>
+    const head: IncomingMessage | undefined = await new Promise(resolve =>
         get(url, { method: 'HEAD' })
             .on('response', resp => resolve(resp))
-            .on('error', err => reject(err))
+            .on('error', _ => resolve(undefined))
     )
+    if (!head) return 'nointernet'
     if (head.statusCode == 404) throw new Error(`url not found 404: ${url}`)
     if (head.statusCode == 400) throw new Error(`url invalid request 400: ${url}`)
     if (head.statusCode == 301) throw new Error(`url invalid request 301: ${url}`)
@@ -52,22 +51,6 @@ export class FileCache {
 
     private static inCache: Set<string>
     private static cache: Record<string, any> = {}
-
-    static _isThereInternet: boolean | undefined
-    static async isThereInternet(force: boolean = false): Promise<boolean> {
-        if (force) FileCache._isThereInternet = undefined
-
-        return (FileCache._isThereInternet ??= await new Promise<boolean>(resolve => {
-            dns.lookup('one.one.one.one', (err: any) => {
-                if (err && err.code == 'ENOTFOUND') {
-                    resolve(false)
-                } else {
-                    resolve(true)
-                }
-                // dns.resolve('www.gnu.org', (err: any) => resolve(!err))
-            })
-        }))
-    }
 
     static getDefaultModIconConfig() {
         return {

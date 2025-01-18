@@ -188,7 +188,7 @@
         "cannotUninstallDisabled": "Uninstalling the mod: \\c[3][modName]\\c[0] is not allowed.",
         "cannotUninstallGit": "Uninstalling the mod: \\c[3][modName]\\c[0] is not allowed because it is a git repository.",
         "install": {
-            "noInternet": "No internet connection",
+            "failedFetch": "Failed to fetch files from the internet. Are you sure you have a working internet connection?",
             "missingExtension": "Mod \\c[3][modName] ([modId])\\c[0] has is missing an required extension: \\c[3][extensionName] ([extensionId])\\c[0]",
             "missingDependency": "Mod \\c[3][modName] ([modId])\\c[0] has is missing a required dependency: \\c[3][missingModId]\\c[0]",
             "differentCCLoaderMajor": "Mod \\c[3][modName] ([modId])\\c[0] depends on a differect major version of CCLoader than is installed. Installed: \\c[3][versionInstalled]\\c[0], expected: \\c[3][versionExpected]\\c[0]",
