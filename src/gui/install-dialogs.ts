@@ -185,18 +185,18 @@ export class ModInstallDialogs {
     static showModUninstallDialog(localMod: ModEntryLocal): boolean {
         if (localMod.disableUninstall) {
             sc.Dialogs.showErrorDialog(
-                Lang.cannotUninstallDisabled.replace(/\[modName\]/, prepareModName(localMod.name))
+                Lang.errors.cannotUninstallDisabled.replace(/\[modName\]/, prepareModName(localMod.name))
             )
             return false
         }
         if (localMod.isGit) {
-            sc.Dialogs.showErrorDialog(Lang.cannotUninstallGit.replace(/\[modName\]/, prepareModName(localMod.name)))
+            sc.Dialogs.showErrorDialog(Lang.errors.cannotUninstallGit.replace(/\[modName\]/, prepareModName(localMod.name)))
             return false
         }
         const deps = ModInstaller.getWhatDependsOnAMod(localMod).filter(mod => !mod.uninstalled)
         if (deps.length > 0) {
             sc.Dialogs.showErrorDialog(
-                Lang.cannotUninstall.replace(/\[modName\]/, prepareModName(localMod.name)) +
+                Lang.errors.cannotUninstall.replace(/\[modName\]/, prepareModName(localMod.name)) +
                     deps.map(mod => `- ${yellow}${prepareModName(mod.name)}${white}\n`).join('')
             )
             return false
@@ -236,13 +236,13 @@ export class ModInstallDialogs {
 
     static checkCanDisableMod(mod: ModEntryLocal): boolean {
         if (mod.disableDisabling) {
-            sc.Dialogs.showErrorDialog(Lang.cannotDisableDisabled.replace(/\[modName\]/, prepareModName(mod.name)))
+            sc.Dialogs.showErrorDialog(Lang.errors.cannotDisableDisabled.replace(/\[modName\]/, prepareModName(mod.name)))
             return false
         }
         const deps = ModInstaller.getWhatDependsOnAMod(mod, true)
         if (deps.length == 0) return true
         sc.Dialogs.showErrorDialog(
-            Lang.cannotDisable.replace(/\[modName\]/, prepareModName(mod.name)) +
+            Lang.errors.cannotDisable.replace(/\[modName\]/, prepareModName(mod.name)) +
                 deps.map(mod => `- ${yellow}${prepareModName(mod.name)}${white}\n`).join('')
         )
         return false

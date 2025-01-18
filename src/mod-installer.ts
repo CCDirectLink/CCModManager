@@ -1,7 +1,7 @@
 import { LocalMods } from './local-mods'
 import { ModDB } from './moddb'
 import { ModEntry, ModEntryLocal, ModEntryLocalVirtual, ModEntryServer } from './types'
-import { ModInstallDialogs } from './gui/install-dialogs'
+import { ModInstallDialogs, prepareModName } from './gui/install-dialogs'
 
 const fs: typeof import('fs') = (0, eval)("require('fs')")
 const path: typeof import('path') = (0, eval)("require('path')")
@@ -12,6 +12,7 @@ import rimraf from 'rimraf'
 import { Opts } from './options'
 import { JSZip, semver } from './library-providers'
 import ModManager from './plugin'
+import { Lang } from './lang-manager'
 
 export class InstallQueue {
     private static queue: ModEntryServer[] = []
@@ -152,16 +153,31 @@ export class ModInstaller {
         const deps: Record<string, DepEntry> = {}
         for (const depName in mod.dependencies) {
             const reqVersionRange = mod.dependencies[depName]
-            if (this.virtualMods[depName]) {
-                if (this.virtualMods[depName].isExtension && !ig.extensions.hasExtension(depName)) {
-                    throw new Error(`Mod: ${mod.id} "${mod.name}" has a dependant extension missing: ${this.virtualMods[depName].name} (${depName})`)
+
+            const virtMod = this.virtualMods[depName]
+            if (virtMod) {
+                if (virtMod.isExtension && !ig.extensions.hasExtension(depName)) {
+                    throw new Error(
+                        Lang.errors.install.missingExtension
+                            .replace(/\[modName\]/, prepareModName(mod.name))
+                            .replace(/\[modId\]/, mod.id)
+                            .replace(/\[extensionName\]/, prepareModName(virtMod.name))
+                            .replace(/\[extensionId\]/, virtMod.id)
+                    )
                 }
                 this.setOrAddNewer(deps, { id: depName } as any, reqVersionRange)
                 continue
             }
+
             const dep = this.getModByDepName(depName)
 
-            if (!dep) throw new Error(`Mod: ${mod.id} "${mod.name}" has a dependency missing: ${depName}`)
+            if (!dep)
+                throw new Error(
+                    Lang.errors.install.missingDependency
+                        .replace(/\[modName\]/, prepareModName(mod.name))
+                        .replace(/\[modId\]/, mod.id)
+                        .replace(/\[missingModId\]/, depName)
+                )
 
             if (dep.id == 'ccloader' || dep.id == 'Simplify') {
                 const localVersion = LocalMods.getCCLoaderVersion()
@@ -173,7 +189,11 @@ export class ModInstaller {
                     localMajor != serverMajor &&
                     !semver.satisfies(localVersion, reqVersionRange, { includePrerelease: true })
                 ) {
-                    const msg = `Mod: ${mod.id} "${mod.name}" depends on a different major version of CCLoader than is installed. Installed: ${localMajor}, expected: ${serverMajor}`
+                    const msg = Lang.errors.install.differentCCLoaderMajor
+                        .replace(/\[modName\]/, prepareModName(mod.name))
+                        .replace(/\[modId\]/, mod.id)
+                        .replace(/\[versionInstalled\]/, localMajor.toString())
+                        .replace(/\[versionExpected\]/, serverMajor.toString())
 
                     if (Opts.ignoreCCLoaderMajorVersion) {
                         console.warn(msg)
@@ -187,7 +207,10 @@ export class ModInstaller {
                     /* if this option is false, an error will get thrown when getModDependencies reaches CCLoader anyways */
                     if (Opts.ignoreCCLoaderMajorVersion) {
                         console.warn(
-                            `Mod: ${mod.id} "${mod.name}" depends on Simplify, which is CCLoader 2 specific. Major CCLoader installed: ${localMajor}. Removing Simplify from dependency list`
+                            Lang.errors.install.simplifyOnNonCCLoader2
+                                .replace(/\[modName\]/, prepareModName(mod.name))
+                                .replace(/\[modId\]/, mod.id)
+                                .replace(/\[version\]/, localMajor.toString())
                         )
                         continue
                     }
@@ -259,7 +282,10 @@ export class ModInstaller {
 
             if (!this.matchesVersionReqRanges(virtualMod, dep.versionReqRanges)) {
                 throw new Error(
-                    `${virtualMod.name} version does not meat the requirement: ${dep.versionReqRanges.join(', ')}`
+                    Lang.errors.install.virtualVersionRequirement
+                        .replace(/\[name\]/, prepareModName(virtualMod.name))
+                        .replace(/\[id]/, virtualMod.id)
+                        .replace(/\[req]/, dep.versionReqRanges.join(', '))
                 )
             }
             delete deps[virtualModId]
@@ -271,7 +297,11 @@ export class ModInstaller {
                 const { mod: serverMod, versionReqRanges } = deps[modId]
                 if (!this.matchesVersionReqRanges(serverMod, versionReqRanges))
                     throw new Error(
-                        `Dependency: ${serverMod.id} "${serverMod.name}" that cannot be resolved: version range: ${versionReqRanges.join(', ')} was not met. Database has only: ${serverMod.version}`
+                        Lang.errors.install.versionRequirement
+                            .replace(/\[name\]/, prepareModName(serverMod.name))
+                            .replace(/\[id]/, serverMod.id)
+                            .replace(/\[req]/, versionReqRanges.join(', '))
+                            .replace(/\[reqHas]/, serverMod.version)
                     )
             }
         }
@@ -374,7 +404,9 @@ export class ModInstaller {
 
             if (!this.checkSHA256(data, installation.hash.sha256))
                 throw new Error(
-                    `Mod: ${mod.id} "${mod.name}" sha256 digest mismatch. Contact mod developers in the modding discord.`
+                    Lang.errors.install.digestMismatch
+                        .replace(/\[modName\]/, prepareModName(mod.name))
+                        .replace(/\[modId\]/, mod.id)
                 )
 
             for (const { installing: func } of this.eventListeners) func && func(mod)
