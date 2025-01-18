@@ -6,6 +6,7 @@
 
 ### Changed
 
+- Library mods are now shown by default
 - For CCLoader3, the mod installation dir is now `modloader.config.modsDirs`
 
 

@@ -65,7 +65,7 @@ export function registerOpts() {
                     },
                     hideLibraryMods: {
                         type: 'CHECKBOX',
-                        init: true,
+                        init: false,
                         hidden: true,
                         changeEvent() {
                             modmanager.gui.menu.list.filters['hideLibraryMods'] = Opts.hideLibraryMods
