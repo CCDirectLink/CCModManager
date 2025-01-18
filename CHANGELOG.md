@@ -10,6 +10,9 @@
 - Also print the extension name when it's missing and a mod requires it
 - For CCLoader3, the mod installation dir is now `modloader.config.modsDirs`
 
+### Fixed
+
+- Close mod installation menu on error
 
 ## [1.0.2] 2024-10-31
 

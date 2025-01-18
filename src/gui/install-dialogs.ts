@@ -156,6 +156,8 @@ export class ModInstallDialogs {
                     FileCache.isThereInternet(true).then(isThereInternet => {
                         if (!isThereInternet) err = Lang.noInternet
                         sc.Dialogs.showErrorDialog(err)
+                        dialog.blockClosing = false
+                        dialog.closeMenu()
                     })
                 })
         }
