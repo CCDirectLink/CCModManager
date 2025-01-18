@@ -154,7 +154,7 @@ export class ModInstaller {
             const reqVersionRange = mod.dependencies[depName]
             if (this.virtualMods[depName]) {
                 if (this.virtualMods[depName].isExtension && !ig.extensions.hasExtension(depName)) {
-                    throw new Error(`Mod: ${mod.id} "${mod.name}" has a dependant extension missing: ${depName}`)
+                    throw new Error(`Mod: ${mod.id} "${mod.name}" has a dependant extension missing: ${this.virtualMods[depName].name} (${depName})`)
                 }
                 this.setOrAddNewer(deps, { id: depName } as any, reqVersionRange)
                 continue
