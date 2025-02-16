@@ -182,8 +182,8 @@
         "tagLibrary": { "name": "library", "description": "used by other mods" }
     },
     "errors": {
-        "cannotUninstall": "Cannot uninstall the mod: \\c[3][modName]\\c[0] because other mods depend on it:\n ",
-        "cannotDisable": "Cannot disable the mod: \\c[3][modName]\\c[0] because other mods depend on it:\n ",
+        "cannotUninstall": "Cannot uninstall the mod: \\c[3][modName]\\c[0] because other mods depend on it:\n",
+        "cannotDisable": "Cannot disable the mod: \\c[3][modName]\\c[0] because other mods depend on it:\n",
         "cannotDisableDisabled": "Disabling the mod: \\c[3][modName]\\c[0] is not allowed.",
         "cannotUninstallDisabled": "Uninstalling the mod: \\c[3][modName]\\c[0] is not allowed.",
         "cannotUninstallGit": "Uninstalling the mod: \\c[3][modName]\\c[0] is not allowed because it is a git repository.",
