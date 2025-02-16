@@ -13,7 +13,7 @@ export async function initLibraries() {
         // @ts-expect-error
         semver = window.semver
         // @ts-expect-error
-        await import('/ccloader/js/lib/jszip.min.js').catch()
+        await import('../../../ccloader/js/lib/jszip.min.js').catch()
         // @ts-expect-error
         JSZip = window.JSZip
     }
