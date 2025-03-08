@@ -7,8 +7,6 @@ const fs: typeof import('fs') = (0, eval)("require('fs')")
 const path: typeof import('path') = (0, eval)("require('path')")
 const crypto: typeof import('crypto') = (0, eval)('require("crypto")')
 
-// @ts-expect-error
-import rimraf from 'rimraf'
 import { Opts } from './options'
 import { JSZip, semver } from './library-providers'
 import ModManager from './plugin'
@@ -66,6 +64,8 @@ export class ModInstaller {
     static byNameRecord: Record<string, ModEntryServer>
     static virtualMods: Record<string, ModEntryLocalVirtual>
     static modsDir: string
+
+    private static rimraf: any
 
     static init() {
         const version = LocalMods.getCCVersion()
@@ -528,7 +528,9 @@ export class ModInstaller {
     }
 
     static async removeDirRecursive(path: string) {
-        return new Promise<void>(resolve => rimraf(path, fs, () => resolve()))
+        // @ts-expect-error
+        if (!ModInstaller.rimraf) ModInstaller.rimraf = (await import('rimraf')).default
+        return new Promise<void>(resolve => ModInstaller.rimraf(path, fs, () => resolve()))
     }
 
     static restartGame() {
