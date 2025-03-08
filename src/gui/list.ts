@@ -7,6 +7,7 @@ import './repo-add'
 import { InstallQueue } from '../mod-installer'
 import { Lang } from '../lang-manager'
 import { Opts } from '../options'
+import { isFullMode } from '../plugin'
 
 declare global {
     namespace modmanager.gui {
@@ -92,7 +93,7 @@ modmanager.gui.MenuList = sc.ListTabbedPane.extend({
         this.gridColumns = 3
 
         this.tabz = [
-            ...(!ig.isdemo
+            ...(isFullMode()
                 ? [
                       { name: Lang.onlineTab, populateFunc: this.populateOnline, icon: 'mod-icon-online' },
                       { name: Lang.selectedModsTab, populateFunc: this.populateSelected, icon: 'mod-icon-selected' },
@@ -104,7 +105,7 @@ modmanager.gui.MenuList = sc.ListTabbedPane.extend({
                 { name: Lang.modOptionsTab, populateFunc: this.populateSettings, icon: 'mod-icon-settings' },
             ],
         ]
-        if (!ig.isdemo) {
+        if (isFullMode()) {
             modmanager.gui.MOD_MENU_TAB_INDEXES = {
                 ONLINE: 0,
                 SELECTED: 1,
@@ -135,7 +136,7 @@ modmanager.gui.MenuList = sc.ListTabbedPane.extend({
             this.addTab(this.tabz[i].name, i, {})
         }
 
-        if (!ig.isdemo) {
+        if (isFullMode()) {
             ModDB.loadAllMods(true).then(() => {
                 LocalMods.refreshOrigin().then(() => {
                     this.reloadEntries()

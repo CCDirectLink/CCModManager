@@ -174,7 +174,9 @@ export class LocalMods {
             isLegacy: false /*duno how to check*/,
             hasIcon: !!mod.icons?.['24'],
             dependencies: mod.dependencies ?? {},
-            path: mod.baseDirectory.substring(0, mod.baseDirectory.length - 1),
+            path: mod.baseDirectory.endsWith('/')
+                ? mod.baseDirectory.substring(0, mod.baseDirectory.length - 1)
+                : mod.baseDirectory,
             repositoryUrl: mod.repository,
 
             active: !mod.disabled,

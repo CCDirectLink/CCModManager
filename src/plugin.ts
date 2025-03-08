@@ -13,6 +13,17 @@ import { Opts, registerOpts } from './options'
 import { modOptionsPoststart, modOptionsPrestart } from './mod-options'
 import { initLibraries } from './library-providers'
 
+export function isFullMode() {
+    return !ig.isdemo && ig.platform == ig.PLATFORM_TYPES.DESKTOP
+}
+export function openLink(url: string) {
+    if (ig.platform == ig.PLATFORM_TYPES.DESKTOP) {
+        nw.Shell.openExternal(url)
+    } else {
+        window.open(url, '_blank')?.focus()
+    }
+}
+
 export default class ModManager {
     static dir: string
     static mod: Mod1
@@ -38,7 +49,7 @@ export default class ModManager {
         sc.TitleScreenButtonGui.inject({
             show() {
                 this.parent()
-                if (!ig.isdemo && Opts.autoUpdate) {
+                if (isFullMode() && Opts.autoUpdate) {
                     ModDB.loadDatabases()
                     ModInstaller.checkAllLocalModsForUpdate()
                 }

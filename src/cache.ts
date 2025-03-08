@@ -33,6 +33,7 @@ function getTag(head: IncomingMessage): string {
 async function getETag(url: string): Promise<string> {
     const uri = new URL(url)
     const { get } = uri.protocol === 'https:' ? https : http
+    if (!get) return 'nointernet'
 
     const head: IncomingMessage | undefined = await new Promise(resolve =>
         get(url, { method: 'HEAD' })
@@ -67,12 +68,12 @@ export class FileCache {
         await fs.promises.mkdir(`${this.cacheDir}`, { recursive: true })
 
         this.inCache = new Set()
-        for await (const path of getFilesRecursive(this.cacheDir))
+        for await (const path of getFilesRecursive(this.cacheDir)) 
             this.inCache.add(path.substring('./assets/mod-data/CCModManager/cache/'.length))
     }
 
     static prepareDatabase(name: string) {
-        fs.mkdir(`${this.cacheDir}/${name}/icons`, { recursive: true }, () => {})
+        fs.promises.mkdir(`${this.cacheDir}/${name}/icons`, { recursive: true })
     }
 
     static async getIconConfig(mod: ModEntry): Promise<ModIconConfig> {
@@ -149,7 +150,7 @@ export class FileCache {
         const cached = this.cache[path]
         if (cached) return cached
         this.inCache.add(path)
-        let data = await fs.promises.readFile(`${this.cacheDir}/${path}`)
+        let data = await fs.promises.readFile(`${this.cacheDir}/${path}`, 'utf8')
         if (toJSON) data = JSON.parse(data.toString())
         this.cache[path] = data
         return data as T

@@ -1,4 +1,5 @@
 import { Lang } from '../lang-manager'
+import { openLink } from '../plugin'
 import { ModEntryServer } from '../types'
 import { generateChangelogPage } from './changelog-page-generator'
 
@@ -24,7 +25,7 @@ modmanager.gui.Changelog = modmanager.gui.MultiPageButtonBoxGui.extend({
                 name: Lang.visitReleasePage,
                 onPress(pageIndex) {
                     const url = self.mod.releasePages![pageIndex].url
-                    nw.Shell.openExternal(url)
+                    openLink(url)
                 },
             },
         ])

@@ -15,6 +15,7 @@ import type * as _ from 'nax-ccuilib/src/headers/nax/input-field.d.ts'
 import type * as __ from 'nax-ccuilib/src/headers/nax/input-field-cursor.d.ts'
 import type * as ___ from 'nax-ccuilib/src/headers/nax/input-field-type.d.ts'
 import type * as ____ from '../../node_modules/crossedeyes/src/tts/gather/checkbox-types.d'
+import { isFullMode, openLink } from '../plugin'
 
 declare global {
     namespace modmanager.gui {
@@ -187,7 +188,7 @@ modmanager.gui.Menu = sc.ListInfoMenu.extend({
                 .catch(err => sc.Dialogs.showErrorDialog(err))
         }
         this.installButton.submitSound = undefined
-        this.addChildGui(this.installButton)
+        if (isFullMode()) this.addChildGui(this.installButton)
     },
     initUninstallButton(bottomY) {
         this.uninstallButton = new sc.ButtonGui('\\i[help2]' + Lang.uninstall, 85, true, sc.BUTTON_TYPE.SMALL)
@@ -205,7 +206,8 @@ modmanager.gui.Menu = sc.ListInfoMenu.extend({
         }
         this.uninstallButton.submitSound = undefined
         this.uninstallButton.keepMouseFocus = true /* prevent the focus jumping all over the place on press */
-        this.addChildGui(this.uninstallButton)
+
+        if (isFullMode()) this.addChildGui(this.uninstallButton)
     },
     initCheckUpdatesButton(bottomY) {
         this.checkUpdatesButton = new sc.ButtonGui(Lang.checkUpdates, 100, true, sc.BUTTON_TYPE.SMALL)
@@ -224,7 +226,7 @@ modmanager.gui.Menu = sc.ListInfoMenu.extend({
         }
         this.checkUpdatesButton.submitSound = undefined
         this.checkUpdatesButton.keepMouseFocus = true /* prevent the focus jumping all over the place on press */
-        this.addChildGui(this.checkUpdatesButton)
+        if (isFullMode()) this.addChildGui(this.checkUpdatesButton)
     },
     initFiltersButton(bottomY) {
         this.filtersPopup = new modmanager.gui.FiltersPopup(() => {
@@ -301,7 +303,7 @@ modmanager.gui.Menu = sc.ListInfoMenu.extend({
                 const modEntry = this.getCurrentlyFocusedModEntry()!
                 const mod = modEntry.mod
                 if (!mod.repositoryUrl) return false
-                nw.Shell.openExternal(mod.repositoryUrl)
+                openLink(mod.repositoryUrl)
                 return true
             }
             sc.BUTTON_SOUND[tryPress() ? 'submit' : 'denied'].play()
@@ -381,7 +383,7 @@ modmanager.gui.Menu = sc.ListInfoMenu.extend({
     },
     setTabEvent() {
         /* handle install button */
-        if (this.list.currentTabIndex > modmanager.gui.MOD_MENU_TAB_INDEXES.SELECTED) {
+        if (!isFullMode() || this.list.currentTabIndex > modmanager.gui.MOD_MENU_TAB_INDEXES.SELECTED) {
             this.installButton.doStateTransition('HIDDEN')
             this.checkUpdatesButton.doStateTransition('HIDDEN')
         } else {
@@ -404,7 +406,8 @@ modmanager.gui.Menu = sc.ListInfoMenu.extend({
                 this.updateInstallButtonText()
             } else if (message == modmanager.gui.MENU_MESSAGES.ENTRY_FOCUSED) {
                 const entry = data as modmanager.gui.ListEntry
-                if (entry.mod.isLocal || entry.mod.localCounterpart) this.uninstallButton.setActive(true)
+                if (entry.mod.isLocal || (entry.mod.localCounterpart && isFullMode()))
+                    this.uninstallButton.setActive(true)
 
                 const serverMod = entry.mod.isLocal ? entry.mod.serverCounterpart : entry.mod
                 if (serverMod?.testingVersion) {
@@ -438,9 +441,11 @@ modmanager.gui.Menu = sc.ListInfoMenu.extend({
     setAllVisibility(visible) {
         const state = visible ? 'DEFAULT' : 'HIDDEN'
 
-        this.installButton.doStateTransition(state)
-        this.uninstallButton.doStateTransition(state)
-        this.checkUpdatesButton.doStateTransition(state)
+        if (!visible || isFullMode()) {
+            this.installButton.doStateTransition(state)
+            this.uninstallButton.doStateTransition(state)
+            this.checkUpdatesButton.doStateTransition(state)
+        }
         this.inputField.doStateTransition(state)
         this.filtersButton.doStateTransition(state)
         if (!visible) {
@@ -466,9 +471,11 @@ modmanager.gui.Menu = sc.ListInfoMenu.extend({
         /* this NOT is how it's supposed to work but it works so */
         sc.menu.buttonInteract.addGlobalButton(this.inputField as any, () => false)
 
-        sc.menu.buttonInteract.addGlobalButton(this.installButton, () => sc.control.menuHotkeyHelp4())
-        sc.menu.buttonInteract.addGlobalButton(this.uninstallButton, () => sc.control.menuHotkeyHelp2())
-        sc.menu.buttonInteract.addGlobalButton(this.checkUpdatesButton, () => false)
+        if (isFullMode()) {
+            sc.menu.buttonInteract.addGlobalButton(this.installButton, () => sc.control.menuHotkeyHelp4())
+            sc.menu.buttonInteract.addGlobalButton(this.uninstallButton, () => sc.control.menuHotkeyHelp2())
+            sc.menu.buttonInteract.addGlobalButton(this.checkUpdatesButton, () => false)
+        }
         sc.menu.buttonInteract.addGlobalButton(this.filtersButton, () => sc.control.menu())
         sc.menu.buttonInteract.addGlobalButton(
             this.testingToggleButton,
