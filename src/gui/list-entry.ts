@@ -1,4 +1,4 @@
-import { ModEntry, ModEntryLocal } from '../types'
+import { ModEntry, ModEntryLocal, ModImageConfig } from '../types'
 import { FileCache } from '../cache'
 import './list-entry-highlight'
 import { LocalMods } from '../local-mods'
@@ -28,6 +28,7 @@ declare global {
             modEntryActionButtons: sc.ButtonGui.Type & { ninepatch: ig.NinePatch }
             iconGui: ig.ImageGui
 
+            updateIcon(this: this, config: ModImageConfig): void
             tryDisableMod(this: this, mod: ModEntryLocal): string | undefined
             tryEnableMod(this: this, mod: ModEntryLocal): string | undefined
             toggleSelection(this: this, force?: boolean): string | undefined
@@ -74,13 +75,7 @@ modmanager.gui.ListEntry = ig.FocusGui.extend({
 
         sc.Model.addObserver(modmanager.gui.menu, this)
         const isGrid = Opts.isGrid
-        FileCache.getIconConfig(mod).then(config => {
-            const image = new ig.Image(config.path)
-            this.iconGui = new ig.ImageGui(image, config.offsetX, config.offsetY, config.sizeX, config.sizeY)
-            if (isGrid) this.iconGui.setPos(2, 2)
-            else this.iconGui.setPos(2, 8)
-            this.addChildGui(this.iconGui)
-        })
+        FileCache.getIconConfig(mod).then(config => this.updateIcon(config))
 
         const height = 42
         this.iconOffset = 25
@@ -175,6 +170,13 @@ modmanager.gui.ListEntry = ig.FocusGui.extend({
             }
         }
         this.updateHighlightWidth()
+    },
+    updateIcon(config) {
+        const image = new ig.Image(config.path)
+        this.iconGui = new ig.ImageGui(image, config.offsetX, config.offsetY, config.sizeX, config.sizeY)
+        if (Opts.isGrid) this.iconGui.setPos(2, 2)
+        else this.iconGui.setPos(2, 8)
+        this.addChildGui(this.iconGui)
     },
     getModName() {
         let icon: string = ''
