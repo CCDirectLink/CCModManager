@@ -24,6 +24,7 @@ export declare class ModInstaller {
     static byNameRecord: Record<string, ModEntryServer>;
     static virtualMods: Record<string, ModEntryLocalVirtual>;
     static modsDir: string;
+    private static rimraf;
     static init(): void;
     private static getModByDepName;
     private static setOrAddNewer;

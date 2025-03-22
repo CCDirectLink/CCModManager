@@ -1,4 +1,4 @@
-import { ModEntry, ModEntryLocal } from '../types';
+import { ModEntry, ModEntryLocal, ModImageConfig } from '../types';
 import './list-entry-highlight';
 declare global {
     namespace modmanager.gui {
@@ -26,6 +26,7 @@ declare global {
                 ninepatch: ig.NinePatch;
             };
             iconGui: ig.ImageGui;
+            updateIcon(this: this, config: ModImageConfig): void;
             tryDisableMod(this: this, mod: ModEntryLocal): string | undefined;
             tryEnableMod(this: this, mod: ModEntryLocal): string | undefined;
             toggleSelection(this: this, force?: boolean): string | undefined;
