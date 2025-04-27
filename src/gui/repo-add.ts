@@ -25,12 +25,6 @@ declare global {
     }
 }
 
-function setText(f: nax.ccuilib.InputField, text: string) {
-    f.textChild.setText(text)
-    f.value = text.split('')
-    f.updateCursorPos(text.length)
-}
-
 /* https://www.freecodecamp.org/news/check-if-a-javascript-string-is-a-url/ */
 function isValidUrl(urlString: string) {
     var urlPattern = new RegExp(
@@ -160,7 +154,7 @@ modmanager.gui.RepoAddPopup = ig.GuiElementBase.extend({
             const urlField = this.urlFields[i]
             const dbName = dbNames[i]
             const db = ModDB.databases[dbName]
-            setText(urlField, ModDB.minifyRepoURL(db.url))
+            urlField.setText?.(ModDB.minifyRepoURL(db.url))
             this.isOkTexts[i].setText(this.getTextOk())
         }
     },
@@ -180,7 +174,7 @@ modmanager.gui.RepoAddPopup = ig.GuiElementBase.extend({
             const urlField = this.urlFields[i]
             const url = urlField.getValueAsString()
             if (url) ModDB.addDatabase(new ModDB(url))
-            setText(urlField, '')
+            urlField.setText('')
             this.isOkTexts[i].setText('')
         }
         ModDB.saveDatabases()
