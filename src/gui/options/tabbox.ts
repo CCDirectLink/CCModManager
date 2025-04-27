@@ -56,7 +56,7 @@ declare global {
 
             onButtonTraversal(this: this): void
             _resetButtons(this: this, tabButton?: modmanager.gui.OptionsTabBox.TabButton, unfocus?: boolean): void
-            setCurrentTab(this: this, tabIndex: number): void
+            setCurrentTab(this: this, tabIndex: number, noSound?: boolean): void
 
             addObservers(this: this): void
             removeObservers(this: this): void
@@ -321,10 +321,10 @@ modmanager.gui.OptionsTabBox = ig.GuiElementBase.extend({
             if (unfocus) tab.focus = false
         }
     },
-    setCurrentTab(tabIndex) {
+    setCurrentTab(tabIndex, noSound) {
         const button = this.tabArray[tabIndex]
         if (this.prevPressed != button) {
-            sc.BUTTON_SOUND.submit.play()
+            if (!noSound) sc.BUTTON_SOUND.submit.play()
             this.prevPressed = button!
             button.setPressed(true)
 

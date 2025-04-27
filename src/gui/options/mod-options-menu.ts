@@ -4,7 +4,7 @@ import { LocalMods } from '../../local-mods'
 
 declare global {
     namespace modmanager {
-        function openModOptionsMenu(modId: string): void
+        function openModOptionsMenu(modId: string, tab?: number): void
     }
     namespace modmanager.gui {
         interface OptionsMenu extends sc.BaseMenu, sc.Model.Observer {
@@ -42,7 +42,7 @@ declare global {
     }
 }
 
-modmanager.openModOptionsMenu = (modId: string) => {
+modmanager.openModOptionsMenu = (modId: string, tab?: number) => {
     const record = LocalMods.getAllRecord()
     const mod = record[modId]
     if (!mod) throw new Error(`Mod: "${modId}" does not have options menu!`)
@@ -53,6 +53,7 @@ modmanager.openModOptionsMenu = (modId: string) => {
         sc.menu.pushMenu(sc.MENU_SUBMENU.MOD_OPTIONS)
     }
     modmanager.gui.optionsMenu.updateEntries(mod)
+    if (tab) modmanager.gui.optionsMenu.listBox.setCurrentTab(tab, true)
 }
 
 modmanager.gui.OptionsMenu = sc.BaseMenu.extend({
