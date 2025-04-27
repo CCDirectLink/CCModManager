@@ -28,6 +28,8 @@ declare global {
             modEntryActionButtons: sc.ButtonGui.Type & { ninepatch: ig.NinePatch }
             iconGui: ig.ImageGui
 
+            addObservers(this: this): void
+            removeObservers(this: this): void
             updateIcon(this: this, config: ModImageConfig): void
             tryDisableMod(this: this, mod: ModEntryLocal): string | undefined
             tryEnableMod(this: this, mod: ModEntryLocal): string | undefined
@@ -66,6 +68,7 @@ modmanager.gui.ListEntry = ig.FocusGui.extend({
 
     init(mod, modList) {
         this.parent()
+
         this.mod = mod
         this.modList = modList
 
@@ -73,7 +76,6 @@ modmanager.gui.ListEntry = ig.FocusGui.extend({
             mod = mod.testingVersion
         }
 
-        sc.Model.addObserver(modmanager.gui.menu, this)
         const isGrid = Opts.isGrid
         FileCache.getIconConfig(mod).then(config => this.updateIcon(config))
 
@@ -170,6 +172,12 @@ modmanager.gui.ListEntry = ig.FocusGui.extend({
             }
         }
         this.updateHighlightWidth()
+    },
+    onAttach() {
+        sc.Model.addObserver(modmanager.gui.menu, this)
+    },
+    onDetach() {
+        sc.Model.removeObserver(modmanager.gui.menu, this)
     },
     updateIcon(config) {
         const image = new ig.Image(config.path)

@@ -130,7 +130,6 @@ sc.Control.inject({
     },
 })
 
-let menuPurgeTimeoutId: NodeJS.Timeout
 modmanager.gui.Menu = sc.ListInfoMenu.extend({
     observers: [],
     init() {
@@ -460,7 +459,6 @@ modmanager.gui.Menu = sc.ListInfoMenu.extend({
         if (main?.topBar) main.topBar.doStateTransition(state)
     },
     showMenu() {
-        clearTimeout(menuPurgeTimeoutId)
         this.parent()
         sc.menu.pushBackCallback(() => this.onBackButtonPress())
         sc.menu.moveLeaSprite(0, 0, sc.MENU_LEA_STATE.HIDDEN)
@@ -490,7 +488,7 @@ modmanager.gui.Menu = sc.ListInfoMenu.extend({
 
         new modmanager.gui.ManualEnforcer('ModManagerManual', Lang.help.title, Lang.help.pages)
     },
-    hideMenu(_afterSubmenu, nextSubmenu) {
+    hideMenu() {
         this.parent()
         sc.menu.moveLeaSprite(0, 0, sc.MENU_LEA_STATE.LARGE)
         this.exitMenu()
@@ -520,15 +518,6 @@ modmanager.gui.Menu = sc.ListInfoMenu.extend({
             })
         }
 
-        if (nextSubmenu != sc.MENU_SUBMENU.MOD_OPTIONS) {
-            /* purging the menu immediately would disable the smooth fade out transition */
-            menuPurgeTimeoutId = setTimeout(() => {
-                const main = sc.menu.guiReference
-                main.removeChildGui(this)
-                this.removeObservers()
-                delete main.submenus[modsMenuId]
-            }, 1000)
-        }
     },
     onBackButtonPress() {
         sc.menu.popBackCallback()

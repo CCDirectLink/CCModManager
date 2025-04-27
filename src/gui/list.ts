@@ -78,7 +78,7 @@ declare global {
     }
 }
 
-export const modMenuListWidth = 552
+const modMenuListWidth = 552
 const modMenuListHeight = 240
 
 modmanager.gui.MenuList = sc.ListTabbedPane.extend({
@@ -206,8 +206,8 @@ modmanager.gui.MenuList = sc.ListTabbedPane.extend({
         return { skipSounds: true }
     },
     onContentCreation(index, settings) {
-        this.currentList && this.currentList.clear()
-        this.currentGroup && this.currentGroup.clear()
+        if (this.currentList) this.currentList.clear()
+        if (this.currentGroup) this.currentGroup.clear()
         return this.parent(index, settings)
     },
     onCreateListEntries(list, buttonGroup) {
