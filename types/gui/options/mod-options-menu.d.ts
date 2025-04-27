@@ -2,7 +2,7 @@ import { ModEntry } from '../../types';
 import { ModOptionsSettings } from '../../mod-options';
 declare global {
     namespace modmanager {
-        function openModOptionsMenu(modId: string): void;
+        function openModOptionsMenu(modId: string, tab?: number): void;
     }
     namespace modmanager.gui {
         interface OptionsMenu extends sc.BaseMenu, sc.Model.Observer {
