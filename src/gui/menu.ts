@@ -62,7 +62,6 @@ declare global {
             setBlackBarVisibility(this: this, visible: boolean): void
             setAllVisibility(this: this, visible: boolean): void
             updateInstallButtonText(this: this): void
-            onBackButtonPress(this: this): void
             setTabEvent(this: this): void
             showModInstallDialog(this: this): void
             getCurrentlyFocusedModEntry(this: this): modmanager.gui.ListEntry | undefined
@@ -458,10 +457,9 @@ modmanager.gui.Menu = sc.ListInfoMenu.extend({
         if (main?.info) main.info.doStateTransition(state)
         if (main?.topBar) main.topBar.doStateTransition(state)
     },
-    showMenu() {
-        this.parent()
-        sc.menu.pushBackCallback(() => this.onBackButtonPress())
-        sc.menu.moveLeaSprite(0, 0, sc.MENU_LEA_STATE.HIDDEN)
+    showMenu(previousMenu, prevSubmenu) {
+        this.parent(previousMenu, prevSubmenu)
+        if (prevSubmenu != sc.MENU_SUBMENU.OPTIONS) sc.menu.popBackCallback()
 
         this.setAllVisibility(true)
         this.setBlackBarVisibility(false)
@@ -490,8 +488,6 @@ modmanager.gui.Menu = sc.ListInfoMenu.extend({
     },
     hideMenu() {
         this.parent()
-        sc.menu.moveLeaSprite(0, 0, sc.MENU_LEA_STATE.LARGE)
-        this.exitMenu()
         this.setAllVisibility(false)
         this.setBlackBarVisibility(true)
 
@@ -517,11 +513,6 @@ modmanager.gui.Menu = sc.ListInfoMenu.extend({
                 }
             })
         }
-
-    },
-    onBackButtonPress() {
-        sc.menu.popBackCallback()
-        sc.menu.popMenu()
     },
     createHelpGui() {
         if (!this.helpGui) {

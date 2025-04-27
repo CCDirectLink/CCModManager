@@ -38,7 +38,6 @@ declare global {
     }
 }
 
-let menuPurgeTimeoutId: NodeJS.Timeout
 modmanager.gui.OptionsMenu = sc.BaseMenu.extend({
     init() {
         this.parent()
@@ -114,11 +113,14 @@ modmanager.gui.OptionsMenu = sc.BaseMenu.extend({
         this.listBox.removeObservers()
     },
     showMenu(previousMenu, prevSubmenu) {
-        clearTimeout(menuPurgeTimeoutId)
         this.parent(previousMenu, prevSubmenu)
 
         this.addObservers()
 
+        sc.menu.pushBackCallback(() => {
+            sc.menu.popBackCallback()
+            sc.menu.popMenu()
+        })
         sc.menu.moveLeaSprite(0, 0, sc.MENU_LEA_STATE.HIDDEN)
 
         sc.menu.buttonInteract.addGlobalButton(this.hotkeyHelp, () => sc.control.menuHotkeyHelp())
@@ -131,20 +133,12 @@ modmanager.gui.OptionsMenu = sc.BaseMenu.extend({
 
         this.removeObservers()
         sc.menu.moveLeaSprite(0, 0, sc.MENU_LEA_STATE.LARGE)
+        this.exitMenu()
 
         sc.menu.buttonInteract.removeGlobalButton(this.hotkeyHelp)
         sc.menu.buttonInteract.removeGlobalButton(this.hotkeyDefault)
 
-        sc.menu.popBackCallback()
-
         this.listBox.hideMenu()
-
-        /* purging the menu immediately would disable the smooth fade out transition */
-        menuPurgeTimeoutId = setTimeout(() => {
-            const mainMenu = sc.menu.guiReference
-            mainMenu.removeChildGui(this)
-            delete mainMenu.submenus[modOptionsMenuId]
-        }, 1000)
     },
     commitHotKeysToTopBar(longTransition) {
         if (this.getHelpMenuLangData()) sc.menu.addHotkey(() => this.hotkeyHelp)

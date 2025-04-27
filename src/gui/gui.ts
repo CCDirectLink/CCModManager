@@ -2,15 +2,6 @@ import { Lang } from '../lang-manager.js'
 import { registerDynamicIcons, registerModManagerIcons } from './icons.js'
 import './menu.js'
 
-function enterModsMenu(direct: boolean) {
-    if (direct) {
-        sc.menu.setDirectMode(true, sc.MENU_SUBMENU.MODS)
-        sc.model.enterMenu(true)
-    } else {
-        sc.menu.pushMenu(sc.MENU_SUBMENU.MODS)
-    }
-}
-
 declare global {
     namespace sc {
         interface OptionsMenu {
@@ -33,13 +24,14 @@ sc.OptionsMenu.inject({
             HIDDEN: { state: { offsetY: -this.modsButton.hook.size.y }, time: 0.2, timeFunction: KEY_SPLINES.LINEAR },
         }
         this.modsButton.onButtonPress = () => {
-            enterModsMenu(false)
+            sc.menu.pushMenu(sc.MENU_SUBMENU.MODS)
         }
     },
     showMenu() {
         this.parent()
         if (sc.menu.backCallbackStack.length >= 2) {
-            sc.menu.popBackCallback()
+            /* the options menu doesnt expect to get shown again,
+             * so it always adds a pop callback, and it needs to be removed */
             sc.menu.popBackCallback()
         }
     },
