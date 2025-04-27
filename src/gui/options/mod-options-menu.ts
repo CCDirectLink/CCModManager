@@ -1,7 +1,11 @@
 import { ModEntry } from '../../types'
 import { GuiOption, ModOptionsSettings } from '../../mod-options'
+import { LocalMods } from '../../local-mods'
 
 declare global {
+    namespace modmanager {
+        function openModOptionsMenu(modId: string): void
+    }
     namespace modmanager.gui {
         interface OptionsMenu extends sc.BaseMenu, sc.Model.Observer {
             mod: ModEntry
@@ -36,6 +40,19 @@ declare global {
             MOD_OPTIONS = 375943,
         }
     }
+}
+
+modmanager.openModOptionsMenu = (modId: string) => {
+    const record = LocalMods.getAllRecord()
+    const mod = record[modId]
+    if (!mod) throw new Error(`Mod: "${modId}" does not have options menu!`)
+    if (sc.menu.currentMenu == sc.MENU_SUBMENU.START) {
+        sc.menu.setDirectMode(true, sc.MENU_SUBMENU.MOD_OPTIONS)
+        sc.model.enterMenu(true)
+    } else {
+        sc.menu.pushMenu(sc.MENU_SUBMENU.MOD_OPTIONS)
+    }
+    modmanager.gui.optionsMenu.updateEntries(mod)
 }
 
 modmanager.gui.OptionsMenu = sc.BaseMenu.extend({
