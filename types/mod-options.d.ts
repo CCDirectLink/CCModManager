@@ -18,7 +18,7 @@ export type Option = {
     description?: ig.LangLabel.Data;
     /** Is the option hidden from the menu */
     hidden?: boolean | (() => boolean);
-} & (BUTTON_GROUP | ARRAY_SLIDER | OBJECT_SILDER | CHECKBOX | CONTROLS | INFO | BUTTON | JSON_DATA);
+} & (BUTTON_GROUP | ARRAY_SLIDER | OBJECT_SILDER | CHECKBOX | CONTROLS | INFO | BUTTON | JSON_DATA | INPUT_FIELD);
 type BUTTON_GROUP = OptionChangeable & {
     type: 'BUTTON_GROUP';
     /** Initial option value */
@@ -33,6 +33,15 @@ type BUTTON_GROUP = OptionChangeable & {
     group: string[];
     data: Record<string, number>;
 });
+interface INPUT_FIELD extends OptionChangeable {
+    type: 'INPUT_FIELD';
+    /** Initial option value */
+    init: string;
+    /** Input field height */
+    height?: number;
+    /** Validation function */
+    isValid?: (text: string) => boolean | Promise<boolean>;
+}
 interface ARRAY_SLIDER extends OptionChangeable {
     type: 'ARRAY_SLIDER';
     data: number[];
@@ -127,7 +136,7 @@ O extends keyof F = OmitNonChangeableToUnion<E>['key']> = {
     [K in O]: F[K];
 };
 export type OptsType<E extends Options, O extends Record<string, any> = OmitNonChangeable<E>> = {
-    [T in keyof O]: O[T]['type'] extends 'CHECKBOX' ? boolean : O[T]['type'] extends 'BUTTON_GROUP' ? O[T]['enum'][keyof O[T]['enum']] : O[T]['type'] extends 'JSON_DATA' ? Readonly<O[T]['init']> : number;
+    [T in keyof O]: O[T]['type'] extends 'CHECKBOX' ? boolean : O[T]['type'] extends 'BUTTON_GROUP' ? O[T]['enum'][keyof O[T]['enum']] : O[T]['type'] extends 'JSON_DATA' ? Readonly<O[T]['init']> : O[T]['type'] extends 'INPUT_FIELD' ? string : number;
 } & {
     flatOpts: FlatOpts<E>;
 };

@@ -35,3 +35,16 @@ declare global {
         var OptionsOptionButton: OptionsOptionButtonConstructor;
     }
 }
+declare global {
+    namespace modmanager.gui {
+        interface OptionsOptionInputField extends ig.GuiElementBase {
+            option: GuiOption;
+            inputField: nax.ccuilib.InputField;
+            isValidText?: sc.TextGui;
+        }
+        interface OptionsOptionInputFieldValidationConstructor extends ImpactClass<OptionsOptionInputField> {
+            new (option: GuiOption, y: number, rowGroup: sc.RowButtonGroup, width: number): OptionsOptionInputField;
+        }
+        var OptionsOptionInputField: OptionsOptionInputFieldValidationConstructor;
+    }
+}

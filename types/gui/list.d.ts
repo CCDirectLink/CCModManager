@@ -1,7 +1,6 @@
 import { ModEntry } from '../types';
 import { Fliters } from '../filters';
 import './list-entry';
-import './repo-add';
 declare global {
     namespace modmanager.gui {
         interface MenuList extends sc.ListTabbedPane, sc.Model.Observer {

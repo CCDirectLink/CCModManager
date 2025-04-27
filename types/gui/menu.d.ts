@@ -31,7 +31,6 @@ declare global {
             checkUpdatesButton: sc.ButtonGui;
             filtersButton: sc.ButtonGui;
             filtersPopup: modmanager.gui.FiltersPopup;
-            reposPopup: modmanager.gui.RepoAddPopup;
             changelogButton: sc.ButtonGui;
             changelogPopup?: modmanager.gui.Changelog;
             initInputField(this: this): void;

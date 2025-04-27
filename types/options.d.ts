@@ -1,3 +1,4 @@
+import { repoChangeEvent, repoIsValid } from './repo-add';
 export declare let Opts: ReturnType<typeof modmanager.registerAndGetModOptions<ReturnType<typeof registerOpts>>>;
 export declare function registerOpts(): {
     readonly general: {
@@ -10,19 +11,6 @@ export declare function registerOpts(): {
                 readonly autoUpdate: {
                     readonly type: "CHECKBOX";
                     readonly init: true;
-                };
-                readonly repositoriesButton: {
-                    readonly type: "BUTTON";
-                    readonly onPress: (this: import("./mod-options").GuiOption) => void;
-                };
-                readonly resetRepositoriesButton: {
-                    readonly type: "BUTTON";
-                    readonly onPress: (this: import("./mod-options").GuiOption) => void;
-                };
-                readonly repositories: {
-                    readonly type: "JSON_DATA";
-                    readonly init: string[];
-                    readonly changeEvent: (this: import("./mod-options").GuiOption) => void;
                 };
                 readonly testingOptInMods: {
                     readonly type: "JSON_DATA";
@@ -72,6 +60,67 @@ export declare function registerOpts(): {
                 readonly reinstallAllMods: {
                     readonly type: "BUTTON";
                     readonly onPress: (this: import("./mod-options").GuiOption) => void;
+                };
+            };
+        };
+    };
+    readonly repositories: {
+        readonly settings: {
+            readonly tabIcon: "interface";
+            readonly title: "Repositories";
+        };
+        readonly headers: {
+            readonly repositories: {
+                readonly inputFieldRepo0: {
+                    type: "INPUT_FIELD";
+                    init: string;
+                    changeEvent: typeof repoChangeEvent;
+                    isValid: typeof repoIsValid;
+                };
+                readonly inputFieldRepo1: {
+                    type: "INPUT_FIELD";
+                    init: string;
+                    changeEvent: typeof repoChangeEvent;
+                    isValid: typeof repoIsValid;
+                };
+                readonly inputFieldRepo2: {
+                    type: "INPUT_FIELD";
+                    init: string;
+                    changeEvent: typeof repoChangeEvent;
+                    isValid: typeof repoIsValid;
+                };
+                readonly inputFieldRepo3: {
+                    type: "INPUT_FIELD";
+                    init: string;
+                    changeEvent: typeof repoChangeEvent;
+                    isValid: typeof repoIsValid;
+                };
+                readonly inputFieldRepo4: {
+                    type: "INPUT_FIELD";
+                    init: string;
+                    changeEvent: typeof repoChangeEvent;
+                    isValid: typeof repoIsValid;
+                };
+                readonly inputFieldRepo5: {
+                    type: "INPUT_FIELD";
+                    init: string;
+                    changeEvent: typeof repoChangeEvent;
+                    isValid: typeof repoIsValid;
+                };
+                readonly inputFieldRepo6: {
+                    type: "INPUT_FIELD";
+                    init: string;
+                    changeEvent: typeof repoChangeEvent;
+                    isValid: typeof repoIsValid;
+                };
+                readonly resetRepositoriesButton: {
+                    readonly type: "BUTTON";
+                    readonly onPress: (this: import("./mod-options").GuiOption) => void;
+                };
+                readonly repositories: {
+                    readonly type: "JSON_DATA";
+                    readonly init: string[];
+                    readonly changeEvent: (this: import("./mod-options").GuiOption) => void;
                 };
             };
         };
