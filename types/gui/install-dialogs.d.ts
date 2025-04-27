@@ -5,5 +5,5 @@ export declare class ModInstallDialogs {
     static showAutoUpdateDialog(): void;
     static showModUninstallDialog(localMod: ModEntryLocal): boolean;
     static checkCanDisableMod(mod: ModEntryLocal): boolean;
-    static checkCanEnableMod(mod: ModEntryLocal): Promise<ModEntryLocal[] | undefined>;
+    static checkCanEnableMod(mod: ModEntryLocal, callback: (deps: ModEntryLocal[] | undefined) => void): void;
 }

@@ -43,4 +43,3 @@ declare global {
         };
     }
 }
-export declare const modMenuListWidth = 552;

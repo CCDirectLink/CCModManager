@@ -26,6 +26,8 @@ declare global {
                 ninepatch: ig.NinePatch;
             };
             iconGui: ig.ImageGui;
+            addObservers(this: this): void;
+            removeObservers(this: this): void;
             updateIcon(this: this, config: ModImageConfig): void;
             tryDisableMod(this: this, mod: ModEntryLocal): string | undefined;
             tryEnableMod(this: this, mod: ModEntryLocal): string | undefined;

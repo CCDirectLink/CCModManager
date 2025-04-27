@@ -48,7 +48,6 @@ declare global {
             setBlackBarVisibility(this: this, visible: boolean): void;
             setAllVisibility(this: this, visible: boolean): void;
             updateInstallButtonText(this: this): void;
-            onBackButtonPress(this: this): void;
             setTabEvent(this: this): void;
             showModInstallDialog(this: this): void;
             getCurrentlyFocusedModEntry(this: this): modmanager.gui.ListEntry | undefined;

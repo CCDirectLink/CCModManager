@@ -1,6 +1,9 @@
 import { ModEntry } from '../../types';
 import { ModOptionsSettings } from '../../mod-options';
 declare global {
+    namespace modmanager {
+        function openModOptionsMenu(modId: string): void;
+    }
     namespace modmanager.gui {
         interface OptionsMenu extends sc.BaseMenu, sc.Model.Observer {
             mod: ModEntry;
