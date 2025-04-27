@@ -224,7 +224,9 @@ modmanager.gui.OptionsOptionButton = ig.GuiElementBase.extend({
 
         this.button = new sc.ButtonGui(option.name)
         if (option.onPress) {
-            this.button.onButtonPress = option.onPress.bind(option)
+            this.button.onButtonPress = () => {
+                option.onPress.call(option)
+            }
         }
 
         // this.button.setPos(5, 8)
@@ -269,11 +271,12 @@ declare global {
         interface OptionsOptionInputField extends ig.GuiElementBase {
             option: GuiOption
             inputField: nax.ccuilib.InputField
+            isValidText?: sc.TextGui
         }
-        interface OptionsOptionInputFieldConstructor extends ImpactClass<OptionsOptionInputField> {
+        interface OptionsOptionInputFieldValidationConstructor extends ImpactClass<OptionsOptionInputField> {
             new (option: GuiOption, y: number, rowGroup: sc.RowButtonGroup, width: number): OptionsOptionInputField
         }
-        var OptionsOptionInputField: OptionsOptionInputFieldConstructor
+        var OptionsOptionInputField: OptionsOptionInputFieldValidationConstructor
     }
 }
 
@@ -283,22 +286,44 @@ modmanager.gui.OptionsOptionInputField = ig.GuiElementBase.extend({
         this.option = option
         if (option.type != 'INPUT_FIELD') throw new Error('how')
 
-        const height = option.height ?? 20
-        this.inputField = new nax.ccuilib.InputField(width, height)
+        this.inputField = new nax.ccuilib.InputField(width - 30, 20)
 
         const text = optGet(option) as string
         this.inputField.setText?.(text)
 
-        this.inputField.onCharacterInput = str => {
-            optSet(option, str)
-            if (option.changeEvent) option.changeEvent()
+        const revalidate = async (text: string) => {
+            if (!option.isValid) throw new Error('how')
+
+            this.isValidText!.setText('\\i[lore-others]')
+            const isValid = await option.isValid(text)
+
+            if (this.inputField.getValueAsString() == text) {
+                this.isValidText!.setText(isValid ? '\\i[quest-solve]' : '\\i[quest-elite]')
+                return isValid
+            } else return false
         }
 
-        // this.button.setPos(5, 8)
+        if (option.isValid) {
+            this.inputField.setPos(20 + 4, 0)
+            this.isValidText = new sc.TextGui('')
+            this.isValidText.setPos(3, 2)
+            this.addChildGui(this.isValidText)
+            revalidate(text)
+        }
+
+        this.inputField.onCharacterInput = str => {
+            if (option.isValid) {
+                revalidate(str).then(isValid => {
+                    if (isValid) optSet(option, str)
+                })
+            } else {
+                optSet(option, str)
+            }
+        }
+
         this.inputField.setAlign(ig.GUI_ALIGN.X_LEFT, ig.GUI_ALIGN.Y_CENTER)
 
         const backup = this.inputField.focusGained.bind(this.inputField)
-        // this.inputField.data = option.description
         this.inputField.focusGained = function (this: nax.ccuilib.InputField) {
             backup()
             sc.menu.setInfoText(option.description as string)

@@ -58,6 +58,8 @@ interface INPUT_FIELD extends OptionChangeable {
     init: string
     /** Input field height */
     height?: number
+    /** Validation function */
+    isValid?: (text: string) => boolean | Promise<boolean>
 }
 
 interface ARRAY_SLIDER extends OptionChangeable {
@@ -196,6 +198,7 @@ export type OptsType<E extends Options, O extends Record<string, any> = OmitNonC
           O[T]['type'] extends 'CHECKBOX' ? boolean
         : O[T]['type'] extends 'BUTTON_GROUP' ? O[T]['enum'][keyof O[T]['enum']]
         : O[T]['type'] extends 'JSON_DATA' ? Readonly<O[T]['init']>
+        : O[T]['type'] extends 'INPUT_FIELD' ? string
     
         : number
     } & { flatOpts: FlatOpts<E> }
