@@ -8,6 +8,10 @@
 
 - Added new mod option type `INPUT_FIELD`
 
+### Changed
+
+- Move repository adding from a popup to a separate tab in CCModManager's options
+
 ### Fixed
 
 - Improve browser compatibility

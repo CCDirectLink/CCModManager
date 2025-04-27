@@ -2,12 +2,11 @@ import { ModEntry } from '../types'
 import { ModDB } from '../moddb'
 import { Fliters, createFuzzyFilteredModList } from '../filters'
 import { LocalMods } from '../local-mods'
-import './list-entry'
-import './repo-add'
 import { InstallQueue } from '../mod-installer'
 import { Lang } from '../lang-manager'
 import { Opts } from '../options'
 import { isFullMode } from '../plugin'
+import './list-entry'
 
 declare global {
     namespace modmanager.gui {

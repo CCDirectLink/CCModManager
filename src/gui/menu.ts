@@ -43,7 +43,6 @@ declare global {
             checkUpdatesButton: sc.ButtonGui
             filtersButton: sc.ButtonGui
             filtersPopup: modmanager.gui.FiltersPopup
-            reposPopup: modmanager.gui.RepoAddPopup
             changelogButton: sc.ButtonGui
             changelogPopup?: modmanager.gui.Changelog
 
@@ -543,10 +542,6 @@ modmanager.gui.Menu = sc.ListInfoMenu.extend({
         this.list.savePosition()
         sc.menu.pushMenu(sc.MENU_SUBMENU.MOD_OPTIONS)
         modmanager.gui.optionsMenu.updateEntries(mod)
-    },
-    openRepositoriesPopup() {
-        this.reposPopup ??= new modmanager.gui.RepoAddPopup()
-        this.reposPopup.show()
     },
     openChangelogPopup(mod) {
         this.changelogPopup ??= new modmanager.gui.Changelog()

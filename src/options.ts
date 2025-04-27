@@ -1,5 +1,6 @@
 import { FileCache } from './cache'
 import { ModInstallDialogs } from './gui/install-dialogs'
+import { modDatabasesToInputFields, repoChangeEvent, repoIsValid } from './repo-add'
 import { Lang } from './lang-manager'
 import { LocalMods } from './local-mods'
 import { InstallQueue } from './mod-installer'
@@ -20,33 +21,6 @@ export function registerOpts() {
                     autoUpdate: {
                         type: 'CHECKBOX',
                         init: true,
-                    },
-                    repositoriesButton: {
-                        type: 'BUTTON',
-                        onPress() {
-                            modmanager.gui.menu.openRepositoriesPopup()
-                        },
-                    },
-                    resetRepositoriesButton: {
-                        type: 'BUTTON',
-                        onPress() {
-                            Opts.repositories = Opts.flatOpts.repositories.init
-                            sc.Dialogs.showInfoDialog(Lang.opts.resetRepositoriesButton.onclickPopup)
-                        },
-                    },
-
-                    repositories: {
-                        type: 'JSON_DATA',
-                        init: ['@CCDirectLink/CCModDB/stable', '@CCDirectLink/CCModDB/testing'] as string[],
-                        changeEvent() {
-                            if (!ig.game) return
-
-                            ModDB.loadDatabases(true)
-
-                            ModDB.loadAllMods(false).then(() => {
-                                LocalMods.refreshOrigin()
-                            })
-                        },
                     },
                     testingOptInMods: {
                         type: 'JSON_DATA',
@@ -123,6 +97,52 @@ export function registerOpts() {
                             InstallQueue.add(...reinstallableMods)
                             ModInstallDialogs.showModInstallDialog()
                         },
+                    },
+                },
+            },
+        },
+        repositories: {
+            settings: {
+                tabIcon: 'interface',
+                title: 'Repositories',
+            },
+            headers: {
+                repositories: {
+                    resetRepositoriesButton: {
+                        type: 'BUTTON',
+                        onPress() {
+                            Opts.repositories = Opts.flatOpts.repositories.init
+                            modDatabasesToInputFields()
+
+                            if (sc.menu?.currentMenu == sc.MENU_SUBMENU?.MOD_OPTIONS) {
+                                modmanager.gui.optionsMenu.reopenMenu()
+                            }
+                            sc.Dialogs.showInfoDialog(Lang.opts.resetRepositoriesButton.onclickPopup)
+                        },
+                    },
+
+                    repositories: {
+                        type: 'JSON_DATA',
+                        init: ['@CCDirectLink/CCModDB/stable', '@CCDirectLink/CCModDB/testing'] as string[],
+                        changeEvent() {
+                            if (!ig.game) return
+
+                            ModDB.loadDatabases(true)
+
+                            ModDB.loadAllMods(false).then(() => {
+                                LocalMods.refreshOrigin()
+                            })
+                        },
+                    },
+                    // prettier-ignore
+                    ...{
+                    inputFieldRepo0: { type: 'INPUT_FIELD', init: '', changeEvent: repoChangeEvent, isValid: repoIsValid },
+                    inputFieldRepo1: { type: 'INPUT_FIELD', init: '', changeEvent: repoChangeEvent, isValid: repoIsValid },
+                    inputFieldRepo2: { type: 'INPUT_FIELD', init: '', changeEvent: repoChangeEvent, isValid: repoIsValid },
+                    inputFieldRepo3: { type: 'INPUT_FIELD', init: '', changeEvent: repoChangeEvent, isValid: repoIsValid },
+                    inputFieldRepo4: { type: 'INPUT_FIELD', init: '', changeEvent: repoChangeEvent, isValid: repoIsValid },
+                    inputFieldRepo5: { type: 'INPUT_FIELD', init: '', changeEvent: repoChangeEvent, isValid: repoIsValid },
+                    inputFieldRepo6: { type: 'INPUT_FIELD', init: '', changeEvent: repoChangeEvent, isValid: repoIsValid },
                     },
                 },
             },

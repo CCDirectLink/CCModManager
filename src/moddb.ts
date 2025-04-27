@@ -2,6 +2,7 @@ import { ModEntry, ModEntryLocal, ModEntryServer, NPDatabase } from './types'
 import { FileCache } from './cache'
 import { Opts } from './options'
 import { semver } from './library-providers'
+import { modDatabasesToInputFields } from './repo-add'
 
 export class ModDB {
     private static databasesLoaded: boolean = false
@@ -26,6 +27,7 @@ export class ModDB {
         }
 
         ModDB.testingOptInModIds = new Set(Opts.testingOptInMods)
+        modDatabasesToInputFields()
     }
 
     static repoURLToFileName(url: string): string {
