@@ -1,4 +1,3 @@
-import { FileCache } from '../cache'
 import { Lang } from '../lang-manager'
 import { LocalMods } from '../local-mods'
 import { InstallQueue, ModInstaller, ModInstallerDownloadingProgress } from '../mod-installer'
@@ -129,11 +128,14 @@ export class ModInstallDialogs {
                 dialogUpdate()
             }
 
+            // @ts-ignore allow cc-instanceinator to hook sc.Dialogs.showYesNoDialog
+            sc.Dialogs.id = window.instanceinator?.id
+
             const toInstall = InstallQueue.values()
             ModInstaller.install(toInstall)
                 .then(() => {
                     InstallQueue.clear()
-                    modmanager.gui.menu &&
+                    if (modmanager.gui.menu)
                         sc.Model.notifyObserver(modmanager.gui.menu, modmanager.gui.MENU_MESSAGES.UPDATE_ENTRIES)
 
                     ModInstaller.eventListeners.splice(eventIndex, 1)
@@ -208,13 +210,20 @@ export class ModInstallDialogs {
             sc.DIALOG_INFO_ICON.QUESTION,
             [ig.lang.get('sc.gui.dialogs.yes'), ig.lang.get('sc.gui.dialogs.no')],
             button => {
+                // @ts-ignore allow cc-instanceinator to hook sc.Dialogs.showYesNoDialog
+                sc.Dialogs.id = window.instanceinator?.id
+
                 if (button.data == 0) {
                     ModInstaller.uninstallMod(localMod)
                         .then(() => {
                             localMod.awaitingRestart = true
                             localMod.active = false
                             localMod.uninstalled = true
-                            sc.Model.notifyObserver(modmanager.gui.menu, modmanager.gui.MENU_MESSAGES.UPDATE_ENTRIES)
+                            if (modmanager.gui.menu)
+                                sc.Model.notifyObserver(
+                                    modmanager.gui.menu,
+                                    modmanager.gui.MENU_MESSAGES.UPDATE_ENTRIES
+                                )
                             sc.BUTTON_SOUND.shop_cash.play()
                             sc.Dialogs.showYesNoDialog(
                                 Lang.askRestartUninstall,
@@ -251,24 +260,22 @@ export class ModInstallDialogs {
         return false
     }
 
-    static async checkCanEnableMod(mod: ModEntryLocal): Promise<ModEntryLocal[] | undefined> {
+    static checkCanEnableMod(mod: ModEntryLocal, callback: (deps: ModEntryLocal[] | undefined) => void) {
         const deps = LocalMods.findDeps(mod).filter(mod => !mod.active)
-        if (deps.length == 0) return []
+        if (deps.length == 0) return callback([])
 
-        return new Promise(resolve => {
-            sc.Dialogs.showYesNoDialog(
-                Lang.doYouWantToEnable
-                    .replace(/\[modName\]/, prepareModName(mod.name))
-                    .replace(/\[mods\]/, deps.map(mod => `- ${yellow}${prepareModName(mod.name)}${white}\n`).join('')),
-                sc.DIALOG_INFO_ICON.QUESTION,
-                button => {
-                    if (button.data == 0) {
-                        resolve(deps)
-                    } else {
-                        resolve(undefined)
-                    }
+        sc.Dialogs.showYesNoDialog(
+            Lang.doYouWantToEnable
+                .replace(/\[modName\]/, prepareModName(mod.name))
+                .replace(/\[mods\]/, deps.map(mod => `- ${yellow}${prepareModName(mod.name)}${white}\n`).join('')),
+            sc.DIALOG_INFO_ICON.QUESTION,
+            button => {
+                if (button.data == 0) {
+                    callback(deps)
+                } else {
+                    callback(undefined)
                 }
-            )
-        })
+            }
+        )
     }
 }

@@ -268,7 +268,7 @@ modmanager.gui.ListEntry = ig.FocusGui.extend({
         sc.Model.notifyObserver(modmanager.gui.menu, modmanager.gui.MENU_MESSAGES.ENTRY_UNFOCUSED, this)
     },
     tryEnableMod(mod: ModEntryLocal) {
-        ModInstallDialogs.checkCanEnableMod(mod).then(deps => {
+        ModInstallDialogs.checkCanEnableMod(mod, deps => {
             if (deps === undefined) return
             deps.push(mod)
             for (const mod of deps) {
