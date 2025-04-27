@@ -31,6 +31,7 @@ export type Option = {
     | INFO
     | BUTTON
     | JSON_DATA
+    | INPUT_FIELD
 )
 
 type BUTTON_GROUP = OptionChangeable & {
@@ -50,6 +51,14 @@ type BUTTON_GROUP = OptionChangeable & {
               data: Record<string, number>
           }
     )
+
+interface INPUT_FIELD extends OptionChangeable {
+    type: 'INPUT_FIELD'
+    /** Initial option value */
+    init: string
+    /** Input field height */
+    height?: number
+}
 
 interface ARRAY_SLIDER extends OptionChangeable {
     type: 'ARRAY_SLIDER'
@@ -340,6 +349,10 @@ function registerAndGetModOptions<T extends Options>(settings: ModOptionsSetting
                     } else if (option.type == 'JSON_DATA') {
                         get = function () {
                             return JSON.parse(localStorage.getItem(id)!)
+                        }
+                    } else if (option.type == 'INPUT_FIELD') {
+                        get = function () {
+                            return localStorage.getItem(id)!
                         }
                     } else {
                         get = function () {

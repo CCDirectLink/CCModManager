@@ -5,7 +5,11 @@ export {}
 declare global {
     namespace modmanager.gui {
         namespace OptionsTabBox {
-            type GuiOption = sc.OptionInfoBox | modmanager.gui.OptionsOptionRow | modmanager.gui.OptionsOptionButton
+            type GuiOption =
+                | sc.OptionInfoBox
+                | modmanager.gui.OptionsOptionRow
+                | modmanager.gui.OptionsOptionButton
+                | modmanager.gui.OptionsOptionInputField
         }
         interface OptionsTabBox extends ig.GuiElementBase, sc.Model.Observer {
             gfx: ig.Image
@@ -266,6 +270,8 @@ modmanager.gui.OptionsTabBox = ig.GuiElementBase.extend({
                     optionGui = new modmanager.gui.OptionsOptionInfoBox(option, 431)
                 } else if (option.type == 'BUTTON') {
                     optionGui = new modmanager.gui.OptionsOptionButton(option, optionI, this.rowButtonGroup, 431)
+                } else if (option.type == 'INPUT_FIELD') {
+                    optionGui = new modmanager.gui.OptionsOptionInputField(option, optionI, this.rowButtonGroup, 431)
                 } else {
                     optionGui = new modmanager.gui.OptionsOptionRow(option, optionI, this.rowButtonGroup, 431)
                 }

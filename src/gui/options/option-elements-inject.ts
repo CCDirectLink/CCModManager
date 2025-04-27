@@ -1,10 +1,10 @@
 import { GuiOption } from '../../mod-options'
 
-const optGet = (row: modmanager.gui.OptionsOptionRow): unknown => {
-    return modmanager.options[row.guiOption.modId][row.guiOption.baseId]
+const optGet = (guiOption: GuiOption): unknown => {
+    return modmanager.options[guiOption.modId][guiOption.baseId]
 }
-const optSet = (row: modmanager.gui.OptionsOptionRow, value: any) => {
-    modmanager.options[row.guiOption.modId][row.guiOption.baseId] = value
+const optSet = (guiOption: GuiOption, value: any) => {
+    modmanager.options[guiOption.modId][guiOption.baseId] = value
 }
 
 sc.OPTION_GUIS[sc.OPTION_TYPES.BUTTON_GROUP].inject({
@@ -12,7 +12,7 @@ sc.OPTION_GUIS[sc.OPTION_TYPES.BUTTON_GROUP].inject({
         this.base = optionRow
         if (!(this.base instanceof modmanager.gui.OptionsOptionRow)) return this.parent(optionRow, x, rowGroup)
 
-        const index = optGet(this.base) as number
+        const index = optGet(this.base.guiOption) as number
 
         const backup_ig_lang_get = ig.lang.get
         // @ts-expect-error
@@ -34,7 +34,7 @@ sc.OPTION_GUIS[sc.OPTION_TYPES.BUTTON_GROUP].inject({
         if (!(this.base instanceof modmanager.gui.OptionsOptionRow)) return this.parent(button)
         if (this._prevPressed != button) {
             this.resetButtons(button)
-            optSet(this.base, button.data.id)
+            optSet(this.base.guiOption, button.data.id)
             this._prevPressed = button
         }
     },
@@ -85,7 +85,7 @@ modmanager.gui.OptionsObjectSlider = ig.GuiElementBase.extend({
         this.slider.thumb.addChildGui(this.currentNumber)
         rowGroup.addFocusGui(this.slider, 0, this.base.row)
 
-        const value = optGet(this.base) as number
+        const value = optGet(this.base.guiOption) as number
         let index = this.entries.findIndex(v => v == value)
         if (index == -1) index = 0
         this.slider.setValue(index)
@@ -120,7 +120,7 @@ modmanager.gui.OptionsObjectSlider = ig.GuiElementBase.extend({
     },
     modelChanged(model, message) {
         if (model == sc.options && message == sc.OPTIONS_EVENT.OPTION_CHANGED) {
-            const value = optGet(this.base) as number
+            const value = optGet(this.base.guiOption) as number
             if (value != this.entries[this._lastVal]) {
                 this._lastVal = this.entries.indexOf(value)
                 this.slider.setValue(this._lastVal)
@@ -132,7 +132,7 @@ modmanager.gui.OptionsObjectSlider = ig.GuiElementBase.extend({
         if (index != this._lastVal) {
             this._lastVal = index
             this.updateNumberDisplay()
-            optSet(this.base, this.entries[index])
+            optSet(this.base.guiOption, this.entries[index])
         }
     },
     onLeftRight(direction) {
@@ -147,7 +147,7 @@ sc.OPTION_GUIS[sc.OPTION_TYPES.ARRAY_SLIDER].inject({
         this.parent(optionRow, x, rowGroup)
         if (!(this.base instanceof modmanager.gui.OptionsOptionRow)) return
 
-        const value = optGet(this.base) as number
+        const value = optGet(this.base.guiOption) as number
         this.slider.setValue(value * this.scale)
         this._lastVal = this.slider.getValue()
     },
@@ -156,7 +156,7 @@ sc.OPTION_GUIS[sc.OPTION_TYPES.ARRAY_SLIDER].inject({
 
         if (!(this.base instanceof modmanager.gui.OptionsOptionRow)) return
 
-        optSet(this.base, this._lastVal / this.scale)
+        optSet(this.base.guiOption, this._lastVal / this.scale)
     },
 })
 
@@ -166,12 +166,12 @@ sc.OPTION_GUIS[sc.OPTION_TYPES.CHECKBOX].inject({
 
         if (!(this.base instanceof modmanager.gui.OptionsOptionRow)) return
 
-        this.button.setPressed(optGet(this.base) as boolean)
+        this.button.setPressed(optGet(this.base.guiOption) as boolean)
     },
     onPressed(checkbox) {
         if (!(this.base instanceof modmanager.gui.OptionsOptionRow)) return this.parent(checkbox)
 
-        checkbox == this.button && optSet(this.base, checkbox.pressed)
+        checkbox == this.button && optSet(this.base.guiOption, checkbox.pressed)
     },
 })
 
@@ -261,5 +261,52 @@ sc.OPTION_GUIS[sc.OPTION_TYPES.CONTROLS].inject({
         this.parent(optionRow, x, rowGroup)
 
         ig.lang.get = backup_ig_lang_get
+    },
+})
+
+declare global {
+    namespace modmanager.gui {
+        interface OptionsOptionInputField extends ig.GuiElementBase {
+            option: GuiOption
+            inputField: nax.ccuilib.InputField
+        }
+        interface OptionsOptionInputFieldConstructor extends ImpactClass<OptionsOptionInputField> {
+            new (option: GuiOption, y: number, rowGroup: sc.RowButtonGroup, width: number): OptionsOptionInputField
+        }
+        var OptionsOptionInputField: OptionsOptionInputFieldConstructor
+    }
+}
+
+modmanager.gui.OptionsOptionInputField = ig.GuiElementBase.extend({
+    init(option, y, rowGroup, width) {
+        this.parent()
+        this.option = option
+        if (option.type != 'INPUT_FIELD') throw new Error('how')
+
+        const height = option.height ?? 20
+        this.inputField = new nax.ccuilib.InputField(width, height)
+
+        const text = optGet(option) as string
+        this.inputField.setText?.(text)
+
+        this.inputField.onCharacterInput = str => {
+            optSet(option, str)
+            if (option.changeEvent) option.changeEvent()
+        }
+
+        // this.button.setPos(5, 8)
+        this.inputField.setAlign(ig.GUI_ALIGN.X_LEFT, ig.GUI_ALIGN.Y_CENTER)
+
+        const backup = this.inputField.focusGained.bind(this.inputField)
+        // this.inputField.data = option.description
+        this.inputField.focusGained = function (this: nax.ccuilib.InputField) {
+            backup()
+            sc.menu.setInfoText(option.description as string)
+        }
+        this.setSize(width, this.inputField.hook.size.y)
+
+        this.addChildGui(this.inputField)
+
+        rowGroup.addFocusGui(this.inputField, 0, y)
     },
 })

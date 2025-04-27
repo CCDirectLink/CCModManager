@@ -4,6 +4,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Added new mod option type `INPUT_FIELD`
+
 ### Fixed
 
 - Improve browser compatibility
