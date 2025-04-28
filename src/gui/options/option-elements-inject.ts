@@ -309,6 +309,9 @@ modmanager.gui.OptionsOptionInputField = ig.GuiElementBase.extend({
             this.isValidText.setPos(3, 2)
             this.addChildGui(this.isValidText)
             revalidate(text)
+        } else {
+            this.inputField.setPos(12, 0)
+            this.inputField.setSize(this.inputField.hook.size.x + 10, this.inputField.hook.size.y)
         }
 
         this.inputField.onCharacterInput = str => {
