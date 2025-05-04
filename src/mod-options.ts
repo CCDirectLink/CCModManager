@@ -416,7 +416,7 @@ export function modOptionsPoststart() {
             const isInGame = sc.model.currentState == sc.GAME_MODEL_STATE.GAME && ig.interact.entries.length == 0
             for (const controlConfig of controlsToSet) {
                 if (!controlConfig.global && !isInGame) continue
-                const id = controlConfig.id.substring('keys-'.length)
+                const id = controlConfig.id.substring('keys-'.length) as ig.Input.KnownAction
                 if (controlConfig.pressEvent && ig.input.pressed(id)) {
                     controlConfig.pressEvent.bind(controlConfig)()
                 }

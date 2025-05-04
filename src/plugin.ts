@@ -69,7 +69,6 @@ export default class ModManager {
             window.nax.ccuilib ??= {}
             // @ts-expect-error
             await import('nax-ccuilib/src/ui/input-field-cursor.js')
-            // @ts-expect-error
             await import('nax-ccuilib/src/ui/input-field.js')
         }
     }
