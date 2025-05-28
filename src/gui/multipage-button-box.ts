@@ -103,7 +103,7 @@ modmanager.gui.MultiPageButtonBoxGui = sc.MultiPageBoxGui.extend({
 
         const negativeScrollContainerHeight = this.buttonConfigs ? 12 : 0
         sc.HelpScrollContainer.prototype.setSize = function (this: sc.HelpScrollContainer) {
-            backup.bind(this)(width + 1, height - 34 - negativeScrollContainerHeight)
+            backup.call(this, width + 1, height - 34 - negativeScrollContainerHeight)
         }
         this.parent(width)
         sc.HelpScrollContainer.prototype.setSize = backup

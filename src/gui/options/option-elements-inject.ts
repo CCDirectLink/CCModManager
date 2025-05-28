@@ -96,7 +96,7 @@ modmanager.gui.OptionsObjectSlider = ig.GuiElementBase.extend({
 
         const func = this.base.guiOption.customNumberDisplay
         if (func) {
-            let ret = func.bind(this.base.guiOption)(this._lastVal)
+            let ret = func.call(this.base.guiOption, this._lastVal)
             if (typeof ret == 'number') {
                 ret = ret.round(3)
             }
@@ -254,7 +254,7 @@ sc.OPTION_GUIS[sc.OPTION_TYPES.CONTROLS].inject({
         // @ts-expect-error
         ig.lang.get = (path: string, ...args) => {
             if (!(optionRow instanceof modmanager.gui.OptionsOptionRow)) throw new Error('what')
-            if (path == 'sc.gui.options.controls.none') return backup_ig_lang_get.bind(ig.lang)(path, ...args)
+            if (path == 'sc.gui.options.controls.none') return backup_ig_lang_get.call(ig.lang, path, ...args)
             if (path == 'sc.gui.options.controls.description') return optionRow.guiOption.description
             if (path.startsWith('sc.gui.options.controls.keys.')) return optionRow.guiOption.name
             throw new Error('what')

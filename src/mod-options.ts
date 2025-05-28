@@ -367,7 +367,7 @@ function registerAndGetModOptions<T extends Options>(settings: ModOptionsSetting
                         const str = typeof v === 'object' ? JSON.stringify(v) : v.toString()
                         localStorage.setItem(id, str)
                         if (!noEvent && 'changeEvent' in option && option.changeEvent)
-                            option.changeEvent.bind(guiOption)()
+                            option.changeEvent.call(guiOption)
                         if (
                             !noEvent &&
                             'updateMenuOnChange' in option &&
@@ -418,7 +418,7 @@ export function modOptionsPoststart() {
                 if (!controlConfig.global && !isInGame) continue
                 const id = controlConfig.id.substring('keys-'.length) as ig.Input.KnownAction
                 if (controlConfig.pressEvent && ig.input.pressed(id)) {
-                    controlConfig.pressEvent.bind(controlConfig)()
+                    controlConfig.pressEvent.call(controlConfig)
                 }
                 if (controlConfig.holdEvent && ig.input.state(id)) {
                     controlConfig.holdEvent()
