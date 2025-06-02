@@ -1,4 +1,4 @@
-import { GuiOption } from '../../mod-options'
+import type { GuiOption, InputFieldIsValidFunc } from '../../mod-options'
 
 const optGet = (guiOption: GuiOption): unknown => {
     return modmanager.options[guiOption.modId][guiOption.baseId]
@@ -268,34 +268,35 @@ sc.OPTION_GUIS[sc.OPTION_TYPES.CONTROLS].inject({
 
 declare global {
     namespace modmanager.gui {
-        interface OptionsOptionInputField extends ig.GuiElementBase {
-            option: GuiOption
+        interface InputFieldWrapper extends ig.GuiElementBase {
             inputField: nax.ccuilib.InputField
             isValidText?: sc.TextGui
         }
-        interface OptionsOptionInputFieldValidationConstructor extends ImpactClass<OptionsOptionInputField> {
-            new (option: GuiOption, y: number, rowGroup: sc.RowButtonGroup, width: number): OptionsOptionInputField
+        interface InputFieldWrapperConstructor extends ImpactClass<OptionsOptionInputField> {
+            new (
+                initialValue: string,
+                setValueFunc: (text: string) => void,
+                width: number,
+                isValid?: InputFieldIsValidFunc,
+                description?: string
+            ): OptionsOptionInputField
         }
-        var OptionsOptionInputField: OptionsOptionInputFieldValidationConstructor
+        var InputFieldWrapper: InputFieldWrapperConstructor
     }
 }
-
-modmanager.gui.OptionsOptionInputField = ig.GuiElementBase.extend({
-    init(option, y, rowGroup, width) {
+modmanager.gui.InputFieldWrapper = ig.GuiElementBase.extend({
+    init(initialValue, setValueFunc, width, isValidFunc, description) {
         this.parent()
-        this.option = option
-        if (option.type != 'INPUT_FIELD') throw new Error('how')
 
         this.inputField = new nax.ccuilib.InputField(width - 30, 20)
 
-        const text = optGet(option) as string
-        this.inputField.setText?.(text)
+        this.inputField.setText?.(initialValue)
 
         const revalidate = async (text: string) => {
-            if (!option.isValid) throw new Error('how')
+            if (!isValidFunc) throw new Error('how')
 
             this.isValidText!.setText('\\i[lore-others]')
-            const isValid = await option.isValid(text)
+            const isValid = await isValidFunc(text)
 
             if (this.inputField.getValueAsString() == text) {
                 this.isValidText!.setText(isValid ? '\\i[quest-solve]' : '\\i[quest-elite]')
@@ -303,37 +304,59 @@ modmanager.gui.OptionsOptionInputField = ig.GuiElementBase.extend({
             } else return false
         }
 
-        if (option.isValid) {
+        if (isValidFunc) {
             this.inputField.setPos(20 + 4, 0)
             this.isValidText = new sc.TextGui('')
             this.isValidText.setPos(3, 2)
             this.addChildGui(this.isValidText)
-            revalidate(text)
+            revalidate(initialValue)
         } else {
             this.inputField.setPos(12, 0)
             this.inputField.setSize(this.inputField.hook.size.x + 10, this.inputField.hook.size.y)
         }
 
         this.inputField.onCharacterInput = str => {
-            if (option.isValid) {
+            if (isValidFunc) {
                 revalidate(str).then(isValid => {
-                    if (isValid) optSet(option, str)
+                    if (isValid) setValueFunc(str)
                 })
             } else {
-                optSet(option, str)
+                setValueFunc(str)
             }
         }
 
         this.inputField.setAlign(ig.GUI_ALIGN.X_LEFT, ig.GUI_ALIGN.Y_CENTER)
 
-        const backup = this.inputField.focusGained.bind(this.inputField)
-        this.inputField.focusGained = function (this: nax.ccuilib.InputField) {
-            backup()
-            sc.menu.setInfoText(option.description as string)
+        if (description) {
+            const backup = this.inputField.focusGained.bind(this.inputField)
+            this.inputField.focusGained = function (this: nax.ccuilib.InputField) {
+                backup()
+                sc.menu.setInfoText(description)
+            }
         }
         this.setSize(width, this.inputField.hook.size.y)
 
         this.addChildGui(this.inputField)
+    },
+})
+
+declare global {
+    namespace modmanager.gui {
+        interface OptionsOptionInputField extends modmanager.gui.InputFieldWrapper {
+            option: GuiOption
+        }
+        interface OptionsOptionInputFieldConstructor extends ImpactClass<OptionsOptionInputField> {
+            new (option: GuiOption, y: number, rowGroup: sc.RowButtonGroup, width: number): OptionsOptionInputField
+        }
+        var OptionsOptionInputField: OptionsOptionInputFieldConstructor
+    }
+}
+
+modmanager.gui.OptionsOptionInputField = modmanager.gui.InputFieldWrapper.extend({
+    init(option, y, rowGroup, width) {
+        this.option = option
+        if (option.type != 'INPUT_FIELD') throw new Error('how')
+        this.parent(optGet(option) as string, text => optSet(option, text), width, option.isValid, option.description)
 
         rowGroup.addFocusGui(this.inputField, 0, y)
     },

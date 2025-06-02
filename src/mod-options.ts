@@ -52,6 +52,7 @@ type BUTTON_GROUP = OptionChangeable & {
           }
     )
 
+export type InputFieldIsValidFunc = (text: string) => boolean | Promise<boolean>
 interface INPUT_FIELD extends OptionChangeable {
     type: 'INPUT_FIELD'
     /** Initial option value */
@@ -59,7 +60,7 @@ interface INPUT_FIELD extends OptionChangeable {
     /** Input field height */
     height?: number
     /** Validation function */
-    isValid?: (text: string) => boolean | Promise<boolean>
+    isValid?: InputFieldIsValidFunc
 }
 
 interface ARRAY_SLIDER extends OptionChangeable {
