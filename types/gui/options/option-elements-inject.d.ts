@@ -1,4 +1,4 @@
-import { GuiOption } from '../../mod-options';
+import type { GuiOption, InputFieldIsValidFunc } from '../../mod-options';
 declare global {
     namespace modmanager.gui {
         interface OptionsObjectSlider extends sc.OPTION_GUIS_DEFS.OBJECT_SLIDER {
@@ -37,14 +37,24 @@ declare global {
 }
 declare global {
     namespace modmanager.gui {
-        interface OptionsOptionInputField extends ig.GuiElementBase {
-            option: GuiOption;
+        interface InputFieldWrapper extends ig.GuiElementBase {
             inputField: nax.ccuilib.InputField;
             isValidText?: sc.TextGui;
         }
-        interface OptionsOptionInputFieldValidationConstructor extends ImpactClass<OptionsOptionInputField> {
+        interface InputFieldWrapperConstructor extends ImpactClass<OptionsOptionInputField> {
+            new (initialValue: string, setValueFunc: (text: string) => void, width: number, isValid?: InputFieldIsValidFunc, description?: string): OptionsOptionInputField;
+        }
+        var InputFieldWrapper: InputFieldWrapperConstructor;
+    }
+}
+declare global {
+    namespace modmanager.gui {
+        interface OptionsOptionInputField extends modmanager.gui.InputFieldWrapper {
+            option: GuiOption;
+        }
+        interface OptionsOptionInputFieldConstructor extends ImpactClass<OptionsOptionInputField> {
             new (option: GuiOption, y: number, rowGroup: sc.RowButtonGroup, width: number): OptionsOptionInputField;
         }
-        var OptionsOptionInputField: OptionsOptionInputFieldValidationConstructor;
+        var OptionsOptionInputField: OptionsOptionInputFieldConstructor;
     }
 }
