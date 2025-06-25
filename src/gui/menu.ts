@@ -10,11 +10,9 @@ import './multipage-button-box'
 import './changelog'
 import './options/mod-options-menu'
 import './manual-enforcer'
+import './input-field/input-field'
 
-import type * as _ from 'nax-ccuilib/src/headers/nax/input-field.d.ts'
-import type * as __ from 'nax-ccuilib/src/headers/nax/input-field-cursor.d.ts'
-import type * as ___ from 'nax-ccuilib/src/headers/nax/input-field-type.d.ts'
-import type * as ____ from '../../node_modules/crossedeyes/src/tts/gather/checkbox-types.d'
+import type {} from 'crossedeyes/src/tts/gather/checkbox-types.d'
 import { isFullMode, openLink } from '../plugin'
 
 declare global {
@@ -34,7 +32,7 @@ declare global {
         }
         interface Menu extends sc.ListInfoMenu, sc.Model {
             list: MenuList
-            inputField: nax.ccuilib.InputField
+            inputField: modmanager.gui.InputField
             installButton: sc.ButtonGui
             uninstallButton: sc.ButtonGui
             testingToggleButton: sc.ButtonGui
@@ -152,7 +150,7 @@ modmanager.gui.Menu = sc.ListInfoMenu.extend({
     },
 
     initInputField() {
-        this.inputField = new nax.ccuilib.InputField(232, 20)
+        this.inputField = new modmanager.gui.InputField(232, 20)
         this.inputField.setPos(124, 2)
         this.inputField.onCharacterInput = str => {
             this.list.filters.name = str

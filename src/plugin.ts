@@ -3,15 +3,12 @@ import { LangManager } from './lang-manager'
 import { ModInstaller } from './mod-installer'
 import { ModDB } from './moddb'
 import { Mod1 } from './types'
-
-import type * as _ from 'crosscode-demonizer/src/demomod/types.d.ts'
-
-import './mod-options'
-
 import { Opts, registerOpts } from './options'
-
 import { modOptionsPoststart, modOptionsPrestart } from './mod-options'
 import { initLibraries } from './library-providers'
+
+import type {} from 'crosscode-demonizer/src/demomod/types.d.ts'
+import './mod-options'
 
 export function isFullMode() {
     return !ig.isdemo && ig.platform == ig.PLATFORM_TYPES.DESKTOP
@@ -61,15 +58,5 @@ export default class ModManager {
     async poststart() {
         modOptionsPoststart()
         this.lang.poststart()
-
-        if (!window.nax?.ccuilib?.InputField) {
-            // @ts-expect-error
-            window.nax ??= {}
-            // @ts-expect-error
-            window.nax.ccuilib ??= {}
-            // @ts-expect-error
-            await import('nax-ccuilib/src/ui/input-field-cursor.js')
-            await import('nax-ccuilib/src/ui/input-field.js')
-        }
     }
 }

@@ -269,7 +269,7 @@ sc.OPTION_GUIS[sc.OPTION_TYPES.CONTROLS].inject({
 declare global {
     namespace modmanager.gui {
         interface InputFieldWrapper extends ig.GuiElementBase {
-            inputField: nax.ccuilib.InputField
+            inputField: modmanager.gui.InputField
             isValidText?: sc.TextGui
         }
         interface InputFieldWrapperConstructor extends ImpactClass<OptionsOptionInputField> {
@@ -288,7 +288,7 @@ modmanager.gui.InputFieldWrapper = ig.GuiElementBase.extend({
     init(initialValue, setValueFunc, width, isValidFunc, description) {
         this.parent()
 
-        this.inputField = new nax.ccuilib.InputField(width - 30, 20)
+        this.inputField = new modmanager.gui.InputField(width - 30, 20)
 
         this.inputField.setText?.(initialValue)
 
@@ -329,7 +329,7 @@ modmanager.gui.InputFieldWrapper = ig.GuiElementBase.extend({
 
         if (description) {
             const backup = this.inputField.focusGained.bind(this.inputField)
-            this.inputField.focusGained = function (this: nax.ccuilib.InputField) {
+            this.inputField.focusGained = function (this: modmanager.gui.InputField) {
                 backup()
                 sc.menu.setInfoText(description)
             }
