@@ -38,7 +38,7 @@ declare global {
 declare global {
     namespace modmanager.gui {
         interface InputFieldWrapper extends ig.GuiElementBase {
-            inputField: nax.ccuilib.InputField;
+            inputField: modmanager.gui.InputField;
             isValidText?: sc.TextGui;
         }
         interface InputFieldWrapperConstructor extends ImpactClass<OptionsOptionInputField> {

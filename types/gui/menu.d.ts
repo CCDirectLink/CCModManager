@@ -5,6 +5,7 @@ import './multipage-button-box';
 import './changelog';
 import './options/mod-options-menu';
 import './manual-enforcer';
+import './input-field/input-field';
 declare global {
     namespace modmanager.gui {
         enum MENU_SORT_ORDER {
@@ -22,7 +23,7 @@ declare global {
         }
         interface Menu extends sc.ListInfoMenu, sc.Model {
             list: MenuList;
-            inputField: nax.ccuilib.InputField;
+            inputField: modmanager.gui.InputField;
             installButton: sc.ButtonGui;
             uninstallButton: sc.ButtonGui;
             testingToggleButton: sc.ButtonGui;
