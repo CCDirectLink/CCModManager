@@ -5,15 +5,13 @@ Mod manager for the game CrossCode!
 Open the menu from the options menu and look for the `Mods` button.  
 Read the in-game manual in the help menu for usage instructions.  
 
-![Mod icon grid](https://github.com/user-attachments/assets/9eabd8e1-dbfc-4127-82cd-6a30cf45d1d3)
-
+![Mod icon grid](https://github.com/user-attachments/assets/5733188c-7f71-44fe-803e-18165421dd21)
 
 ## Screenshots
 
-![Screenshot of the Online tab sorted by the mod star count](https://github.com/CCDirectLink/CCModManager/assets/115574014/1ce0fb39-d993-46b2-b25f-0acbe8e7a0a2)
-
-![Screenshot of the mod options submenu for the mod CrossedEyes](https://github.com/CCDirectLink/CCModManager/assets/115574014/af70c5d4-058f-4042-8fb7-b26bd279af10)
-
+![Screenshot of the Online tab sorted by the mod star count](https://github.com/user-attachments/assets/e824aa81-4840-4244-b456-9837ac0cec5c)
+![Screenshot of the Online tab with grid mode enabled](https://github.com/user-attachments/assets/efc5716a-7aeb-4a2a-9643-2d4a7fd6ee06)
+![Screenshot of the mod options submenu for the mod CCModManager](https://github.com/user-attachments/assets/ed49278d-f2dc-45b6-98c5-f3c91591589c)
 
 # For mod developers
 
