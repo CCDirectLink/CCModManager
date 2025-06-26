@@ -26,7 +26,7 @@ Read the in-game manual in the help menu for usage instructions.
 {
     type: 'CHECKBOX',
     init: true,
-    /* optional */ changeEvent() {
+    changeEvent() { /* optional */
         // code
     },
     name: 'My checkbox',
@@ -159,12 +159,12 @@ const myenum = {
     init: { key1: ig.KEY.I },
     // If false, the keybinding only works in-game
     // If true, the keybinding works everywhere
-    global: false,
-    pressEvent() {
+    global: false, /* optional, false by default */
+    pressEvent() { /* optional */
         // keybinding pressed! I will trigger only once
         // code
     },
-    holdEvent() {
+    holdEvent() { /* optional */
         // keybinding is pressed now! I will trigger every frame the key is pressed
         // code
     },
@@ -173,12 +173,38 @@ const myenum = {
 }
 ```
 
+### `INPUT_FIELD`
+
+```javascript
+{
+    type: 'INPUT_FIELD',
+    init: 'initial text',
+    changeEvent() { /* optional */
+        // code
+    }
+},
+```
+
+```javascript
+{
+    type: 'INPUT_FIELD',
+    init: 'crossthecodes 123',
+    changeEvent() { /* optional */
+        // code
+    },
+    isValid(text) {
+        return text.includes('crossthecodes')
+    }
+}
+},
+```
+
 ### `JSON_DATA`
 ```javascript
 {
     type: 'JSON_DATA',
     init: 123,
-    /* optional */ changeEvent() {
+    changeEvent() { /* optional */
         // code
     }
 }
@@ -190,7 +216,7 @@ const myenum = {
 
 ```javascript
 // for typescript:
-// import type * as _ from 'ccmodmanager/types/plugin'
+// import type {} from 'ccmodmanager/types/plugin'
 
 const Opts = modmanager.registerAndGetModOptions(
     {
