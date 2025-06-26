@@ -11,6 +11,7 @@
 ### Changed
 
 - Move repository adding from a popup to a separate tab in CCModManager's options
+- Move `nax.ccuilib.InputField` implementation from `nax-ccuilib` to here (now named `modmanager.gui.InputField`)
 
 ### Fixed
 
