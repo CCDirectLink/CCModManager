@@ -209,7 +209,7 @@ modmanager.gui.OptionsMenu = sc.BaseMenu.extend({
         const smb = sc.menu.guiReference.menuDisplay.hook.children
             .filter(h => h.gui instanceof sc.MainMenu.SubMenuBox)
             .last().gui as sc.MainMenu.SubMenuBox
-        smb.text.setText(this.mod.name)
+        smb.text.setText(modmanager.optionConfigs[this.mod.id].settings.title ?? this.mod.name)
     },
     resetOptionsToDefault() {
         const options = modmanager.options[this.mod.id]

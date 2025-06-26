@@ -18,6 +18,7 @@
 - Improve browser compatibility
 - Fix mod menu sometimes opening empty
 - Improve cc-instanceinator compatibility
+- Fix mod options menu title showing the mod title instead of the title defined when registering the mod
 
 ## [1.0.3] 2025-02-16
 
