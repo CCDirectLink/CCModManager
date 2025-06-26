@@ -17,8 +17,8 @@ Read the in-game manual in the help menu for usage instructions.
 
 # For mod developers
 
-## Option types
-### `CHECKBOX`
+# Option types
+## `CHECKBOX`
 
 ![image](https://github.com/user-attachments/assets/bf8bcaf1-9a0e-41cf-8314-58273a1ef467)
 
@@ -34,7 +34,7 @@ Read the in-game manual in the help menu for usage instructions.
 }
 ```
 
-### `BUTTON_GROUP`
+## `BUTTON_GROUP`
 
 ![image](https://github.com/user-attachments/assets/ec58b7a0-1d6a-4208-80fa-ba16996cff12)
 
@@ -66,7 +66,7 @@ const myenum = {
 }
 ```
 
-### `OBJECT_SLIDER`
+## `OBJECT_SLIDER`
 
 ![image](https://github.com/user-attachments/assets/bc9d4b03-9741-405a-aec7-e439dcc8fc13)
   
@@ -123,7 +123,7 @@ const myenum = {
 }
 ```
 
-### `BUTTON`
+## `BUTTON`
 
 ![image](https://github.com/user-attachments/assets/d77958cf-0f07-4458-88b3-186fb69b6b75)
 
@@ -138,7 +138,7 @@ const myenum = {
 }
 ```
 
-### `INFO`
+## `INFO`
 
 ![image](https://github.com/user-attachments/assets/3b2d99ca-4c1f-4747-bbfe-3535d00cf19b)
 
@@ -149,7 +149,7 @@ const myenum = {
 }
 ```
 
-### `CONTROLS`
+## `CONTROLS`
   
 ![image](https://github.com/user-attachments/assets/9ca704ba-84bb-496c-a74c-d6072bc7341a)
 
@@ -173,7 +173,9 @@ const myenum = {
 }
 ```
 
-### `INPUT_FIELD`
+## `INPUT_FIELD`
+
+![image](https://github.com/user-attachments/assets/e184bf00-7695-421f-be65-ddd795abccb3)
 
 ```javascript
 {
@@ -184,6 +186,8 @@ const myenum = {
     }
 },
 ```
+
+![image](https://github.com/user-attachments/assets/269bcf55-48eb-44c7-a133-02b290cdc84d)
 
 ```javascript
 {
@@ -199,7 +203,7 @@ const myenum = {
 },
 ```
 
-### `JSON_DATA`
+## `JSON_DATA`
 ```javascript
 {
     type: 'JSON_DATA',
@@ -212,7 +216,7 @@ const myenum = {
 
 ### Full example
 
-![image](https://github.com/user-attachments/assets/a8978378-4b2d-4b79-973f-0a10e0b100de)
+![image](https://github.com/user-attachments/assets/075ed3bc-8fa8-4b0c-87f0-64ee025913d7)
 
 ```javascript
 // for typescript:
