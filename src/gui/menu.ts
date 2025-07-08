@@ -312,11 +312,11 @@ modmanager.gui.Menu = (sc.ListInfoMenu ?? sc.SortableListMenu).extend({
     initModOptionsButton(bottomY) {
         this.modOptionsButton = new sc.ButtonGui(
             '\\i[rightClickOrR2]' + Lang.modOptions,
-            140,
+            110,
             true,
             sc.BUTTON_TYPE.SMALL
         )
-        this.modOptionsButton.setPos(7, bottomY)
+        this.modOptionsButton.setPos(32, bottomY)
         this.modOptionsButton.doStateTransition('HIDDEN')
         this.modOptionsButton.onButtonPress = () => {
             const tryPress = (): boolean => {
