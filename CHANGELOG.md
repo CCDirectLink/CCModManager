@@ -3,6 +3,11 @@
 # Change Log
 
 ## [Unreleased]
+
+### Fixed
+
+- Improve browser compatibility
+
 ## [1.0.4] 2025-06-26
 
 ### Added

@@ -3,9 +3,9 @@ import { ModDB } from './moddb'
 import { ModEntry, ModEntryLocal, ModEntryLocalVirtual, ModEntryServer } from './types'
 import { ModInstallDialogs, prepareModName } from './gui/install-dialogs'
 
-const fs: typeof import('fs') = (0, eval)("require('fs')")
-const path: typeof import('path') = (0, eval)("require('path')")
-const crypto: typeof import('crypto') = (0, eval)('require("crypto")')
+const fs: typeof import('fs') = window.require?.('fs')
+const path: typeof import('path') = window.require?.('path')
+const crypto: typeof import('crypto') = window.require?.('crypto')
 
 import { Opts } from './options'
 import { JSZip, semver } from './library-providers'
@@ -505,7 +505,7 @@ export class ModInstaller {
     }
 
     static async isDirGit(dirPath: string): Promise<boolean> {
-        if (!dirPath.trim()) return false
+        if (!dirPath.trim() || !fs) return false
         const stat = await fs.promises.stat(dirPath)
         if (!stat.isDirectory()) return false
         return await this.fileExists(path.join(dirPath, '.git'))
@@ -534,8 +534,8 @@ export class ModInstaller {
     }
 
     static restartGame() {
-        if ('chrome' in window) {
-            ;(window.chrome as any).runtime.reload()
+        if (window.chrome?.runtime?.reload) {
+            window.chrome.runtime.reload()
         } else {
             window.location.reload()
         }

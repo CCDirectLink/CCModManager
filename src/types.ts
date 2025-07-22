@@ -116,4 +116,8 @@ export type ModImageConfig = {
 declare global {
     /* hack to mute a random rimraf error :) */
     type StringDecoder = {}
+    
+    interface Window {
+         chrome: any
+    }
 }

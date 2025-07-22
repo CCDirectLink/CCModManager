@@ -90,7 +90,7 @@ export class ModDB {
                 await moddb.getMods(() => {})
                 modRecord = moddb.modRecord
             }
-            if (!modRecord) throw new Error('wat?')
+            if (!modRecord) continue
 
             const dbMod = modRecord[id]
             if (dbMod) matches.push(dbMod)

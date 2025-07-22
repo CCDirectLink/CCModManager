@@ -1,11 +1,11 @@
 import { ModInstaller } from './mod-installer'
 import { ModDB } from './moddb'
 import { ModEntry, ModImageConfig as ModIconConfig, NPDatabase } from './types'
-
-const fs: typeof import('fs') = (0, eval)("require('fs')")
 import type { IncomingMessage } from 'http'
-const http: typeof import('http') = (0, eval)("require('http')")
-const https: typeof import('https') = (0, eval)("require('https')")
+
+const fs: typeof import('fs') = window.require?.('fs')
+const http: typeof import('http') = window.require?.('http')
+const https: typeof import('https') = window.require?.('https')
 
 async function* getFilesRecursive(dir: string): AsyncIterable<string> {
     const dirents = await fs.promises.readdir(dir, { withFileTypes: true })
@@ -32,7 +32,8 @@ function getTag(head: IncomingMessage): string {
 
 async function getETag(url: string): Promise<string> {
     const uri = new URL(url)
-    const { get } = uri.protocol === 'https:' ? https : http
+    const lib = uri.protocol === 'https:' ? https : http
+    const get = lib?.get
     if (!get) return 'nointernet'
 
     const head: IncomingMessage | undefined = await new Promise(resolve =>
@@ -65,15 +66,17 @@ export class FileCache {
 
     static async init() {
         this.cacheDir = './assets/mod-data/CCModManager/cache'
-        await fs.promises.mkdir(`${this.cacheDir}`, { recursive: true })
 
         this.inCache = new Set()
-        for await (const path of getFilesRecursive(this.cacheDir)) 
+        if (!fs) return
+
+        await fs.promises.mkdir(`${this.cacheDir}`, { recursive: true })
+        for await (const path of getFilesRecursive(this.cacheDir))
             this.inCache.add(path.substring('./assets/mod-data/CCModManager/cache/'.length))
     }
 
     static prepareDatabase(name: string) {
-        fs.promises.mkdir(`${this.cacheDir}/${name}/icons`, { recursive: true })
+        fs?.promises.mkdir(`${this.cacheDir}/${name}/icons`, { recursive: true })
     }
 
     static async getIconConfig(mod: ModEntry): Promise<ModIconConfig> {
