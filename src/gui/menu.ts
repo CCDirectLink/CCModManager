@@ -115,7 +115,7 @@ sc.Control.inject({
         if (!modmanager.gui.menu?.isInMenuStack()) return this.parent()
 
         /* Prevent backspace from closing the menu, it happens accidentally when you try to search something */
-        /* Prevent right clign from closing the menu, since we use it for clicking on mods */
+        /* Prevent right click from closing the menu, since we use it for clicking on mods */
         // prettier-ignore
         return this.autoControl
             ? this.autoControl.get('menuBack')
@@ -126,7 +126,9 @@ sc.Control.inject({
     },
 })
 
-modmanager.gui.Menu = sc.ListInfoMenu.extend({
+// @ts-expect-error sc.SortableListMenu was renamed to sc.ListInfoMenu at some point
+// (game crashes on the speedrunner branch (v1.0.2-2) without this)
+modmanager.gui.Menu = (sc.ListInfoMenu ?? sc.SortableListMenu).extend({
     observers: [],
     init() {
         modmanager.gui.menu = this
