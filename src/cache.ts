@@ -1,11 +1,8 @@
 import { ModInstaller } from './mod-installer'
 import { ModDB } from './moddb'
 import { ModEntry, ModImageConfig as ModIconConfig, NPDatabase } from './types'
-import type { IncomingMessage } from 'http'
 
 const fs: typeof import('fs') = window.require?.('fs')
-const http: typeof import('http') = window.require?.('http')
-const https: typeof import('https') = window.require?.('https')
 
 async function* getFilesRecursive(dir: string): AsyncIterable<string> {
     const dirents = await fs.promises.readdir(dir, { withFileTypes: true })
@@ -19,33 +16,26 @@ async function* getFilesRecursive(dir: string): AsyncIterable<string> {
     }
 }
 
-function getTag(head: IncomingMessage): string {
-    switch (typeof head.headers.etag) {
-        case 'string':
-            return head.headers.etag
-        case 'object':
-            return head.headers.etag[0]
-        default:
-            return ''
-    }
-}
-
 async function getETag(url: string): Promise<string> {
-    const uri = new URL(url)
-    const lib = uri.protocol === 'https:' ? https : http
-    const get = lib?.get
-    if (!get) return 'nointernet'
+    try {
+        const response = await fetch(url, {
+            method: 'HEAD',
+            mode: 'cors',
+        })
 
-    const head: IncomingMessage | undefined = await new Promise(resolve =>
-        get(url, { method: 'HEAD' })
-            .on('response', resp => resolve(resp))
-            .on('error', _ => resolve(undefined))
-    )
-    if (!head) return 'nointernet'
-    if (head.statusCode == 404) throw new Error(`url not found 404: ${url}`)
-    if (head.statusCode == 400) throw new Error(`url invalid request 400: ${url}`)
-    if (head.statusCode == 301) throw new Error(`url invalid request 301: ${url}`)
-    return getTag(head)
+        if (!response.ok) {
+            if (response.status === 404) throw new Error(`url not found 404: ${url}`)
+            if (response.status === 400) throw new Error(`url invalid request 400: ${url}`)
+            if (response.status === 301) throw new Error(`url invalid request 301: ${url}`)
+            throw new Error(`HTTP error: ${response.status}`)
+        }
+
+        const etag = response.headers.get('etag')
+        return etag ? etag : ''
+    } catch (err) {
+        console.error(err)
+        return 'nointernet'
+    }
 }
 
 export class FileCache {
