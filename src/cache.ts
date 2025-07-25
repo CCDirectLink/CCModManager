@@ -99,7 +99,7 @@ export class FileCache {
         if (this.inCache.has(path)) return ccPath
 
         const url = `${ModDB.databases[mod.database].url}/${urlPath}`
-        const data = Buffer.from(await (await fetch(url)).arrayBuffer())
+        const data = new Uint8Array(await (await fetch(url)).arrayBuffer())
         await fs.promises.writeFile(`${this.cacheDir}/${path}`, data)
         this.inCache.add(path)
         return ccPath
