@@ -7,6 +7,9 @@
 ### Fixed
 
 - Improve browser compatibility
+- Improve menu opening performance
+- Fix mod icon loading sometimes throwing errors on CCLoader3
+- Improve compatibility with CrossCode v1.0.2-2 (speedrunner branch)
 
 ## [1.0.4] 2025-06-26
 
