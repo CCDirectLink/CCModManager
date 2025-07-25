@@ -13,7 +13,7 @@ declare global {
             onHide: () => void
 
             getLangData(this: this, key: keyof typeof Lang.filters): { name: string; description: string }
-            setFilterValue(this: this, config: CheckboxConfig, state: boolean): void
+            setFilterValue(this: this, config: CheckboxConfig, state: boolean, noReload?: boolean): void
             getFilterValue(this: this, config: CheckboxConfig): boolean | undefined
             show(this: this): void
             hide(this: this): void
@@ -89,7 +89,7 @@ modmanager.gui.FiltersPopup = ig.GuiElementBase.extend({
     getLangData(key) {
         return Lang.filters[key]
     },
-    setFilterValue(config, state) {
+    setFilterValue(config, state, noReload) {
         const filters = modmanager.gui.menu.list.filters
         if ('optsKey' in config) {
             Opts[config.optsKey] = state
@@ -99,11 +99,13 @@ modmanager.gui.FiltersPopup = ig.GuiElementBase.extend({
             if (state) filters.tags.push(name)
             else filters.tags.erase(name)
         }
-        modmanager.gui.menu.list.reloadFilters()
-        /* hack to get the popup button group on top again, because the main mod menu button group got pushed on top when sc.modMenu.list.reloadFilters() is called */
-        const arr: sc.ButtonGroup[] = sc.menu.buttonInteract.buttonGroupStack
-        const last: number = arr.length
-        ;[arr[last - 2], arr[last - 1]] = [arr[last - 1], arr[last - 2]]
+        if (!noReload) {
+            modmanager.gui.menu.list.reloadFilters()
+            /* hack to get the popup button group on top again, because the main mod menu button group got pushed on top when sc.modMenu.list.reloadFilters() is called */
+            const arr: sc.ButtonGroup[] = sc.menu.buttonInteract.buttonGroupStack
+            const last: number = arr.length
+            ;[arr[last - 2], arr[last - 1]] = [arr[last - 1], arr[last - 2]]
+        }
     },
     getFilterValue(config) {
         const filters = modmanager.gui.menu.list.filters
@@ -160,7 +162,7 @@ modmanager.gui.FiltersPopup = ig.GuiElementBase.extend({
             }
             if (val !== undefined) {
                 checkbox.setPressed(val)
-                this.setFilterValue(config, val)
+                this.setFilterValue(config, val, true)
             }
 
             checkbox.onButtonPress = () => {
