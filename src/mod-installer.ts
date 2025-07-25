@@ -5,7 +5,6 @@ import { ModInstallDialogs, prepareModName } from './gui/install-dialogs'
 
 const fs: typeof import('fs') = window.require?.('fs')
 const path: typeof import('path') = window.require?.('path')
-const crypto: typeof import('crypto') = window.require?.('crypto')
 
 import { Opts } from './options'
 import { JSZip, semver } from './library-providers'
@@ -404,7 +403,7 @@ export class ModInstaller {
 
             const data = await arrayBuffer
 
-            if (!this.checkSHA256(data, installation.hash.sha256))
+            if (!(await this.checkSHA256(data, installation.hash.sha256)))
                 throw new Error(
                     Lang.errors.install.digestMismatch
                         .replace(/\[modName\]/, prepareModName(mod.name))
@@ -434,11 +433,11 @@ export class ModInstaller {
         return fs.promises.writeFile(`${this.modsDir}/${id}.ccmod`, new Uint8Array(data))
     }
 
-    private static checkSHA256(data: ArrayBuffer, extected: string): boolean {
-        const hash = crypto.createHash('sha256')
-        hash.update(Buffer.from(data))
-        const result = hash.digest('hex')
-        return result == extected
+    private static async checkSHA256(data: ArrayBuffer, expected: string): Promise<boolean> {
+        const hashBuffer = await window.crypto.subtle.digest('SHA-256', data)
+        const hashArray = Array.from(new Uint8Array(hashBuffer))
+        const result = hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
+        return result == expected
     }
 
     private static async installModZip(
