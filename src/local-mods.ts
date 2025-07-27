@@ -234,7 +234,7 @@ export class LocalMods {
         return ModManager.mod.isCCL3 ? modloader.version.raw : versions.ccloader
     }
 
-    static findDeps(mod: ModEntryLocal): ModEntryLocal[] {
+    static findDeps(mod: ModEntryLocal): { deps: Set<ModEntryLocal>; missing: Set<string> } {
         const localModsByName = LocalMods.getAll().reduce(
             (acc, v) => {
                 acc[v.name] = v
@@ -248,12 +248,21 @@ export class LocalMods {
         }
 
         const deps: Set<ModEntryLocal> = new Set()
+        const missing: Set<string> = new Set()
+
         for (const depModName in mod.dependencies) {
             if (ModInstaller.virtualMods[depModName]) continue
             const depMod = getModDep(depModName)
-            deps.add(depMod)
-            for (const m of this.findDeps(depMod)) deps.add(m)
+            if (depMod) {
+                deps.add(depMod)
+
+                const { deps: retDeps, missing: retMissing } = this.findDeps(depMod)
+                for (const m of retDeps) deps.add(m)
+                for (const m of retMissing) missing.add(m)
+            } else {
+                missing.add(depModName)
+            }
         }
-        return [...deps]
+        return { deps, missing }
     }
 }

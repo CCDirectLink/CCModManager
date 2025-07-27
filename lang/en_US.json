@@ -187,6 +187,7 @@
         "cannotDisableDisabled": "Disabling the mod: \\c[3][modName]\\c[0] is not allowed.",
         "cannotUninstallDisabled": "Uninstalling the mod: \\c[3][modName]\\c[0] is not allowed.",
         "cannotUninstallGit": "Uninstalling the mod: \\c[3][modName]\\c[0] is not allowed because it is a git repository.",
+        "cannotEnableMissingDeps": "Cannot enable the mod: \\c[3][modName]\\c[0] because it depends on mods that aren't installed:\n",
         "install": {
             "failedFetch": "Failed to fetch files from the internet. Are you sure you have a working internet connection?",
             "missingExtension": "Mod \\c[3][modName] ([modId])\\c[0] has is missing an required extension: \\c[3][extensionName] ([extensionId])\\c[0]",

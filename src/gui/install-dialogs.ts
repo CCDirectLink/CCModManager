@@ -4,7 +4,11 @@ import { InstallQueue, ModInstaller, ModInstallerDownloadingProgress } from '../
 import { ModEntry, ModEntryLocal, ModEntryServer } from '../types'
 
 export function prepareModName(name: string) {
-    return name.replace(/\\c\[\d]/g, '')
+    return name.replace(/\\c\[\d]/g, '').trim()
+}
+
+function getModListStr(mods: { name: string }[]) {
+    return mods.map(mod => `- ${yellow}${prepareModName(mod.name)}${white}\n`).join('')
 }
 
 const white = '\\c[0]'
@@ -199,8 +203,7 @@ export class ModInstallDialogs {
         const deps = ModInstaller.getWhatDependsOnAMod(localMod).filter(mod => !mod.uninstalled)
         if (deps.length > 0) {
             sc.Dialogs.showErrorDialog(
-                Lang.errors.cannotUninstall.replace(/\[modName\]/, prepareModName(localMod.name)) +
-                    deps.map(mod => `- ${yellow}${prepareModName(mod.name)}${white}\n`).join('')
+                Lang.errors.cannotUninstall.replace(/\[modName\]/, prepareModName(localMod.name)) + getModListStr(deps)
             )
             return false
         }
@@ -254,28 +257,40 @@ export class ModInstallDialogs {
         const deps = ModInstaller.getWhatDependsOnAMod(mod, true)
         if (deps.length == 0) return true
         sc.Dialogs.showErrorDialog(
-            Lang.errors.cannotDisable.replace(/\[modName\]/, prepareModName(mod.name)) +
-                deps.map(mod => `- ${yellow}${prepareModName(mod.name)}${white}\n`).join('')
+            Lang.errors.cannotDisable.replace(/\[modName\]/, prepareModName(mod.name)) + getModListStr(deps)
         )
         return false
     }
 
-    static checkCanEnableMod(mod: ModEntryLocal, callback: (deps: ModEntryLocal[] | undefined) => void) {
-        const deps = LocalMods.findDeps(mod).filter(mod => !mod.active)
-        if (deps.length == 0) return callback([])
+    static async checkCanEnableMod(mod: ModEntryLocal): Promise<Set<ModEntryLocal> | undefined> {
+        const { deps, missing } = LocalMods.findDeps(mod)
+        if (missing.size > 0) {
+            sc.Dialogs.showErrorDialog(
+                Lang.errors.cannotEnableMissingDeps.replace(/\[modName\]/, prepareModName(mod.name)) +
+                    getModListStr([...missing].map(id => ({ name: id })))
+            )
+            return undefined
+        }
 
-        sc.Dialogs.showYesNoDialog(
-            Lang.doYouWantToEnable
-                .replace(/\[modName\]/, prepareModName(mod.name))
-                .replace(/\[mods\]/, deps.map(mod => `- ${yellow}${prepareModName(mod.name)}${white}\n`).join('')),
-            sc.DIALOG_INFO_ICON.QUESTION,
-            button => {
-                if (button.data == 0) {
-                    callback(deps)
-                } else {
-                    callback(undefined)
+        const toEnableArr = [...deps].filter(mod => !mod.active)
+        const toEnable = new Set(toEnableArr)
+
+        if (toEnable.size == 0) return toEnable
+
+        return new Promise<Set<ModEntryLocal> | undefined>(resolve => {
+            sc.Dialogs.showYesNoDialog(
+                Lang.doYouWantToEnable
+                    .replace(/\[modName\]/, prepareModName(mod.name))
+                    .replace(/\[mods\]/, getModListStr(toEnableArr)),
+                sc.DIALOG_INFO_ICON.QUESTION,
+                button => {
+                    if (button.data == 0) {
+                        resolve(toEnable)
+                    } else {
+                        resolve(undefined)
+                    }
                 }
-            }
-        )
+            )
+        })
     }
 }

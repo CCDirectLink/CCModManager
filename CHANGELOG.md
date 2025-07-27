@@ -10,6 +10,7 @@
 - Improve menu opening performance
 - Fix mod icon loading sometimes throwing errors on CCLoader3
 - Improve compatibility with CrossCode v1.0.2-2 (speedrunner branch)
+- Fix game crash when trying to enable a mod that has missing dependencies
 
 ## [1.0.4] 2025-06-26
 
