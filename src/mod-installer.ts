@@ -158,9 +158,9 @@ export class ModInstaller {
                 if (virtMod.isExtension && !ig.extensions.hasExtension(depName)) {
                     throw new Error(
                         Lang.errors.install.missingExtension
-                            .replace(/\[modName\]/, prepareModName(mod.name))
+                            .replace(/\[modName\]/, prepareModName(mod))
                             .replace(/\[modId\]/, mod.id)
-                            .replace(/\[extensionName\]/, prepareModName(virtMod.name))
+                            .replace(/\[extensionName\]/, prepareModName(virtMod))
                             .replace(/\[extensionId\]/, virtMod.id)
                     )
                 }
@@ -173,7 +173,7 @@ export class ModInstaller {
             if (!dep)
                 throw new Error(
                     Lang.errors.install.missingDependency
-                        .replace(/\[modName\]/, prepareModName(mod.name))
+                        .replace(/\[modName\]/, prepareModName(mod))
                         .replace(/\[modId\]/, mod.id)
                         .replace(/\[missingModId\]/, depName)
                 )
@@ -189,7 +189,7 @@ export class ModInstaller {
                     !semver.satisfies(localVersion, reqVersionRange, { includePrerelease: true })
                 ) {
                     const msg = Lang.errors.install.differentCCLoaderMajor
-                        .replace(/\[modName\]/, prepareModName(mod.name))
+                        .replace(/\[modName\]/, prepareModName(mod))
                         .replace(/\[modId\]/, mod.id)
                         .replace(/\[versionInstalled\]/, localMajor.toString())
                         .replace(/\[versionExpected\]/, serverMajor.toString())
@@ -207,7 +207,7 @@ export class ModInstaller {
                     if (Opts.ignoreCCLoaderMajorVersion) {
                         console.warn(
                             Lang.errors.install.simplifyOnNonCCLoader2
-                                .replace(/\[modName\]/, prepareModName(mod.name))
+                                .replace(/\[modName\]/, prepareModName(mod))
                                 .replace(/\[modId\]/, mod.id)
                                 .replace(/\[version\]/, localMajor.toString())
                         )
@@ -282,7 +282,7 @@ export class ModInstaller {
             if (!this.matchesVersionReqRanges(virtualMod, dep.versionReqRanges)) {
                 throw new Error(
                     Lang.errors.install.virtualVersionRequirement
-                        .replace(/\[name\]/, prepareModName(virtualMod.name))
+                        .replace(/\[name\]/, prepareModName(virtualMod))
                         .replace(/\[id]/, virtualMod.id)
                         .replace(/\[req]/, dep.versionReqRanges.join(', '))
                 )
@@ -297,7 +297,7 @@ export class ModInstaller {
                 if (!this.matchesVersionReqRanges(serverMod, versionReqRanges))
                     throw new Error(
                         Lang.errors.install.versionRequirement
-                            .replace(/\[name\]/, prepareModName(serverMod.name))
+                            .replace(/\[name\]/, prepareModName(serverMod))
                             .replace(/\[id]/, serverMod.id)
                             .replace(/\[req]/, versionReqRanges.join(', '))
                             .replace(/\[reqHas]/, serverMod.version)
@@ -406,7 +406,7 @@ export class ModInstaller {
             if (!(await this.checkSHA256(data, installation.hash.sha256)))
                 throw new Error(
                     Lang.errors.install.digestMismatch
-                        .replace(/\[modName\]/, prepareModName(mod.name))
+                        .replace(/\[modName\]/, prepareModName(mod))
                         .replace(/\[modId\]/, mod.id)
                 )
 

@@ -138,7 +138,7 @@
     "askRestartInstall": "Installed successfully.\n The installed mods will start working after a restart.\n Do you want to restart?",
     "askRestartUninstall": "Uninstalled successfully.\n The mod will actually stop working after a restart.\n Do you want to restart?",
     "modStatesChanged": "Mod states have been changed, they will take effect after a game restart.\n Do you want to restart now?",
-    "doYouWantToEnable": "The mod: \\c[3][modName]\\c[0] depends on these disabled mods:\n [mods]Do you also want to enable them?",
+    "doYouWantToEnable": "The mod: \\c[3][modName]\\c[0] depends on these disabled mods:\n[mods]Do you also want to enable them?",
     "tag": "Tag",
     "filters": {
         "gridView": { "name": "Grid view", "description": "Makes the mod list a grid" },

@@ -206,7 +206,7 @@ modmanager.gui.ListEntry = ig.FocusGui.extend({
             icon += `\\i[ccmodmanager-testing-${ModDB.isModTestingOptIn(serverMod.id) ? 'on' : 'off'}]`
         }
 
-        return { icon, text: prepareModName(this.mod.name) }
+        return { icon, text: prepareModName(this.mod) }
     },
     setNameText(color?: COLOR) {
         color ??= this.textColor

@@ -3,12 +3,12 @@ import { LocalMods } from '../local-mods'
 import { InstallQueue, ModInstaller, ModInstallerDownloadingProgress } from '../mod-installer'
 import { ModEntry, ModEntryLocal, ModEntryServer } from '../types'
 
-export function prepareModName(name: string) {
-    return name.replace(/\\c\[\d]/g, '').trim()
+export function prepareModName(mod: { name: string }) {
+    return mod.name.replace(/\\c\[\d]/g, '').trim()
 }
 
 function getModListStr(mods: { name: string }[]) {
-    return mods.map(mod => `- ${yellow}${prepareModName(mod.name)}${white}\n`).join('')
+    return mods.map(mod => `- ${yellow}${prepareModName(mod)}${white}\n`).join('')
 }
 
 const white = '\\c[0]'
@@ -26,7 +26,7 @@ export class ModInstallDialogs {
             return mods
                 .map(mod => {
                     const localVersion = LocalMods.getAllRecord()[mod.id]?.version
-                    return `- ${yellow}${prepareModName(mod.name)}${white} ${localVersion ? `${localVersion} -> ` : ''}${mod.version}\n`
+                    return `- ${yellow}${prepareModName(mod)}${white} ${localVersion ? `${localVersion} -> ` : ''}${mod.version}\n`
                 })
                 .join('')
         }
@@ -190,24 +190,22 @@ export class ModInstallDialogs {
     static showModUninstallDialog(localMod: ModEntryLocal): boolean {
         if (localMod.disableUninstall) {
             sc.Dialogs.showErrorDialog(
-                Lang.errors.cannotUninstallDisabled.replace(/\[modName\]/, prepareModName(localMod.name))
+                Lang.errors.cannotUninstallDisabled.replace(/\[modName\]/, prepareModName(localMod))
             )
             return false
         }
         if (localMod.isGit) {
-            sc.Dialogs.showErrorDialog(
-                Lang.errors.cannotUninstallGit.replace(/\[modName\]/, prepareModName(localMod.name))
-            )
+            sc.Dialogs.showErrorDialog(Lang.errors.cannotUninstallGit.replace(/\[modName\]/, prepareModName(localMod)))
             return false
         }
         const deps = ModInstaller.getWhatDependsOnAMod(localMod).filter(mod => !mod.uninstalled)
         if (deps.length > 0) {
             sc.Dialogs.showErrorDialog(
-                Lang.errors.cannotUninstall.replace(/\[modName\]/, prepareModName(localMod.name)) + getModListStr(deps)
+                Lang.errors.cannotUninstall.replace(/\[modName\]/, prepareModName(localMod)) + getModListStr(deps)
             )
             return false
         }
-        const str = Lang.areYouSureYouWantToUninstall.replace(/\[modName\]/, prepareModName(localMod.name))
+        const str = Lang.areYouSureYouWantToUninstall.replace(/\[modName\]/, prepareModName(localMod))
         sc.Dialogs.showChoiceDialog(
             str,
             sc.DIALOG_INFO_ICON.QUESTION,
@@ -249,15 +247,13 @@ export class ModInstallDialogs {
 
     static checkCanDisableMod(mod: ModEntryLocal): boolean {
         if (mod.disableDisabling) {
-            sc.Dialogs.showErrorDialog(
-                Lang.errors.cannotDisableDisabled.replace(/\[modName\]/, prepareModName(mod.name))
-            )
+            sc.Dialogs.showErrorDialog(Lang.errors.cannotDisableDisabled.replace(/\[modName\]/, prepareModName(mod)))
             return false
         }
         const deps = ModInstaller.getWhatDependsOnAMod(mod, true)
         if (deps.length == 0) return true
         sc.Dialogs.showErrorDialog(
-            Lang.errors.cannotDisable.replace(/\[modName\]/, prepareModName(mod.name)) + getModListStr(deps)
+            Lang.errors.cannotDisable.replace(/\[modName\]/, prepareModName(mod)) + getModListStr(deps)
         )
         return false
     }
@@ -266,7 +262,7 @@ export class ModInstallDialogs {
         const { deps, missing } = LocalMods.findDeps(mod)
         if (missing.size > 0) {
             sc.Dialogs.showErrorDialog(
-                Lang.errors.cannotEnableMissingDeps.replace(/\[modName\]/, prepareModName(mod.name)) +
+                Lang.errors.cannotEnableMissingDeps.replace(/\[modName\]/, prepareModName(mod)) +
                     getModListStr([...missing].map(id => ({ name: id })))
             )
             return undefined
@@ -280,7 +276,7 @@ export class ModInstallDialogs {
         return new Promise<Set<ModEntryLocal> | undefined>(resolve => {
             sc.Dialogs.showYesNoDialog(
                 Lang.doYouWantToEnable
-                    .replace(/\[modName\]/, prepareModName(mod.name))
+                    .replace(/\[modName\]/, prepareModName(mod))
                     .replace(/\[mods\]/, getModListStr(toEnableArr)),
                 sc.DIALOG_INFO_ICON.QUESTION,
                 button => {
