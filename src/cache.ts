@@ -41,8 +41,8 @@ async function getETag(url: string): Promise<string> {
 export class FileCache {
     private static cacheDir: string
 
-    private static inCache: Set<string>
-    private static cache: Record<string, any> = {}
+    private static existsOnDisk: Set<string>
+    private static readingPromises: Record<string, Promise<any>>
 
     static getDefaultModIconConfig() {
         return {
@@ -57,12 +57,14 @@ export class FileCache {
     static async init() {
         this.cacheDir = './assets/mod-data/CCModManager/cache'
 
-        this.inCache = new Set()
+        this.existsOnDisk = new Set()
+        this.readingPromises = {}
         if (!fs) return
 
         await fs.promises.mkdir(`${this.cacheDir}`, { recursive: true })
-        for await (const path of getFilesRecursive(this.cacheDir))
-            this.inCache.add(path.substring('./assets/mod-data/CCModManager/cache/'.length))
+        for await (const path of getFilesRecursive(this.cacheDir)) {
+            this.existsOnDisk.add(path)
+        }
     }
 
     static prepareDatabase(name: string) {
@@ -83,24 +85,23 @@ export class FileCache {
     }
 
     private static async getIcon(mod: ModEntry): Promise<string> {
-        const urlPath = `icons/${mod.id}.png`
-        const path = `${mod.database}/${urlPath}`
-        const ccPath: string = `${this.cacheDir.substring('./assets/'.length)}/${path}`
-        if (this.inCache.has(path)) return ccPath
+        const urlPathSuffix = `icons/${mod.id}.png`
+        const url = `${ModDB.databases[mod.database].url}/${urlPathSuffix}`
+        const ccPath: string = `${this.cacheDir}/${mod.database}/${urlPathSuffix}`
+        const imgPath = ccPath.substring('./assets/'.length)
 
-        const url = `${ModDB.databases[mod.database].url}/${urlPath}`
-        const data = new Uint8Array(await (await fetch(url)).arrayBuffer())
-        await fs.promises.writeFile(`${this.cacheDir}/${path}`, data)
-        this.inCache.add(path)
-        return ccPath
-    }
+        if (this.existsOnDisk.has(ccPath)) {
+            return imgPath
+        } else {
+            return (this.readingPromises[ccPath] ??= (async () => {
+                const data = new Uint8Array(await (await fetch(url)).arrayBuffer())
 
-    private static async downloadAndWriteDatabase(path: string, url: string, eTag: string) {
-        const data: NPDatabase = (this.cache[path] = await (await fetch(url)).json())
-        data.eTag = eTag
-        fs.promises.writeFile(`${this.cacheDir}/${path}`, JSON.stringify(data))
-        this.inCache.add(path)
-        return data
+                await fs.promises.writeFile(ccPath, data)
+                this.existsOnDisk.add(ccPath)
+
+                return imgPath
+            })())
+        }
     }
 
     static async checkDatabaseUrl(url: string): Promise<boolean> {
@@ -113,40 +114,29 @@ export class FileCache {
         }
     }
 
-    static async getDatabase(name: string, create: (database: NPDatabase) => void): Promise<void> {
-        const path = `${name}/db.json`
+    static async getDatabase(name: string): Promise<NPDatabase> {
         const url = `${ModDB.databases[name].url}/npDatabase.min.json`
+        const ccPath = `${this.cacheDir}/${name}/db.json`
 
-        const cachedPromise = this.getCachedFile<NPDatabase>(path, true)
-        let eTag!: string
-        const eTagPromise = getETag(url).then(async newEtag => {
-            eTag = newEtag
-            const cached = await cachedPromise
-            if (eTag != 'nointernet' && cached && cached.eTag != eTag) {
-                const data = await this.downloadAndWriteDatabase(path, url, eTag)
-                create(data)
+        const etag = await getETag(url)
+
+        if (this.existsOnDisk.has(ccPath)) {
+            const readFile = async () => {
+                return JSON.parse(await fs.promises.readFile(ccPath, 'utf8'))
             }
-        })
+            const data: NPDatabase = await (this.readingPromises[ccPath] ??= readFile())
 
-        const cached = await cachedPromise
-        if (cached) return create(cached)
+            if (etag == 'nointernet' || etag == data.eTag) return data
+        }
 
-        await eTagPromise
-        if (!eTag) throw new Error('eTag unset somehow')
-        if (eTag == 'nointernet') return
-        const data = await this.downloadAndWriteDatabase(path, url, eTag)
-        create(data)
-    }
+        return (this.readingPromises[ccPath] ??= (async () => {
+            const data: NPDatabase = await (await fetch(url)).json()
+            data.eTag = etag
 
-    private static async getCachedFile<T>(path: string, toJSON: boolean = false): Promise<T | undefined> {
-        if (!this.inCache.has(path)) return
-        const cached = this.cache[path]
-        if (cached) return cached
-        this.inCache.add(path)
-        let data = await fs.promises.readFile(`${this.cacheDir}/${path}`, 'utf8')
-        if (toJSON) data = JSON.parse(data.toString())
-        this.cache[path] = data
-        return data as T
+            await fs.promises.writeFile(ccPath, JSON.stringify(data))
+
+            return data
+        })())
     }
 
     static async deleteOnDiskCache() {

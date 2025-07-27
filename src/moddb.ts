@@ -62,13 +62,11 @@ export class ModDB {
             const db = ModDB.databases[dbName]
             if (db.active) {
                 this.modRecord[dbName] = []
+
                 promises.push(
-                    new Promise(resolve => {
-                        db.getMods(mods => {
-                            ModDB.modRecord[dbName] = mods
-                            resolve()
-                        })
-                    })
+                    (async () => {
+                        ModDB.modRecord[dbName] = Object.values(await db.getMods())
+                    })()
                 )
             }
         }
@@ -85,12 +83,9 @@ export class ModDB {
         const matches: ModEntryServer[] = []
         for (const dbName in this.databases) {
             const moddb = this.databases[dbName]
-            let modRecord = moddb.modRecord
-            if (!modRecord) {
-                await moddb.getMods(() => {})
-                modRecord = moddb.modRecord
-            }
-            if (!modRecord) continue
+
+            const modRecord = (moddb.modRecord ??= await moddb.getMods())
+            if (!modRecord) throw new Error('wat?')
 
             const dbMod = modRecord[id]
             if (dbMod) matches.push(dbMod)
@@ -228,12 +223,12 @@ export class ModDB {
         }
     }
 
-    async getMods(callback: (mods: ModEntryServer[]) => void): Promise<void> {
-        const create = (database: NPDatabase) => {
-            this.database = database
-            this.createModEntriesFromDatabase(this.name)
-            callback(Object.values(this.modRecord))
-        }
-        await FileCache.getDatabase(this.name, create)
+    async getMods(): Promise<Record<string, ModEntryServer>> {
+        const database = await FileCache.getDatabase(this.name)
+
+        this.database = database
+        this.createModEntriesFromDatabase(this.name)
+
+        return this.modRecord
     }
 }
