@@ -33,7 +33,6 @@ async function getETag(url: string): Promise<string> {
         const etag = response.headers.get('etag')
         return etag ? etag : ''
     } catch (err) {
-        console.error(err)
         return 'nointernet'
     }
 }
@@ -107,8 +106,7 @@ export class FileCache {
     static async checkDatabaseUrl(url: string): Promise<boolean> {
         url = `${url}/npDatabase.min.json`
         try {
-            await getETag(url)
-            return true
+            return (await getETag(url)) != 'nointernet'
         } catch {
             return false
         }
