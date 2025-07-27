@@ -155,6 +155,14 @@ export class ModInstallDialogs {
 
             sc.BUTTON_SOUND.shop_cash.play()
 
+            for (const mod of toInstall) {
+                const { deps } = LocalMods.findDeps(mod)
+                const inactiveDependencies = [...deps].filter(mod => !mod.active)
+                if (inactiveDependencies.length > 0) {
+                    await ModInstallDialogs.showEnableModDialog(mod as unknown as ModEntryLocal)
+                }
+            }
+
             if ((await ModInstallDialogs.showYesNoDialog(Lang.askRestartInstall, sc.DIALOG_INFO_ICON.QUESTION)) == 0) {
                 ModInstaller.restartGame()
             } else {
@@ -242,7 +250,22 @@ export class ModInstallDialogs {
         return false
     }
 
-    static async checkCanEnableMod(mod: ModEntryLocal): Promise<Set<ModEntryLocal> | undefined> {
+    static async showEnableModDialog(mod: ModEntryLocal) {
+        const deps = await ModInstallDialogs.checkCanEnableMod(mod)
+        if (deps === undefined) return
+        deps.add(mod)
+        for (const mod of deps) {
+            mod.awaitingRestart = !mod.awaitingRestart
+            sc.Model.notifyObserver(modmanager.gui.menu, modmanager.gui.MENU_MESSAGES.ENTRY_UPDATE_COLOR, {
+                mod,
+                color: 2,
+            })
+            sc.BUTTON_SOUND.toggle_on.play()
+            LocalMods.setModActive(mod, true)
+        }
+    }
+
+    static async checkCanEnableMod(mod: ModEntry): Promise<Set<ModEntryLocal> | undefined> {
         const { deps, missing } = LocalMods.findDeps(mod)
         if (missing.size > 0) {
             sc.Dialogs.showErrorDialog(

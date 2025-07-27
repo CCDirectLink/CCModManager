@@ -1,7 +1,7 @@
 import { Mod } from 'ultimate-crosscode-typedefs/modloader/mod'
 import { FileCache } from './cache'
 import ModManager from './plugin'
-import { ModEntryLocal, ModEntryServer } from './types'
+import { ModEntry, ModEntryLocal, ModEntryServer } from './types'
 import { ModDB } from './moddb'
 import { ModInstaller } from './mod-installer'
 
@@ -33,6 +33,7 @@ declare global {
 export class LocalMods {
     private static cache: ModEntryLocal[]
     private static cacheRecord: Record<string, ModEntryLocal>
+    private static cacheRecordByName: Record<string, ModEntryLocal>
 
     static localModFlags: Record<
         string,
@@ -72,8 +73,10 @@ export class LocalMods {
         all.push(...(await this.createVirtualLocalMods()))
 
         this.cacheRecord = {}
+        this.cacheRecordByName = {}
         for (const mod of all) {
             this.cacheRecord[mod.id] = mod
+            this.cacheRecordByName[mod.name] = mod
         }
         for (const id in this.localModFlags) {
             const mod = this.cacheRecord[id]
@@ -234,35 +237,25 @@ export class LocalMods {
         return ModManager.mod.isCCL3 ? modloader.version.raw : versions.ccloader
     }
 
-    static findDeps(mod: ModEntryLocal): { deps: Set<ModEntryLocal>; missing: Set<string> } {
-        const localModsByName = LocalMods.getAll().reduce(
-            (acc, v) => {
-                acc[v.name] = v
-                return acc
-            },
-            {} as Record<string, ModEntryLocal>
-        )
-        const localMods = LocalMods.cacheRecord
-        function getModDep(str: string) {
-            return localMods[str] ?? localModsByName[str]
-        }
-
-        const deps: Set<ModEntryLocal> = new Set()
-        const missing: Set<string> = new Set()
-
+    static findDeps(
+        mod: ModEntry,
+        deps: Set<ModEntryLocal> = new Set(),
+        missing: Set<string> = new Set()
+    ): { deps: Set<ModEntryLocal>; missing: Set<string> } {
         for (const depModName in mod.dependencies) {
             if (ModInstaller.virtualMods[depModName]) continue
-            const depMod = getModDep(depModName)
+
+            const depMod = this.cacheRecord[depModName] ?? this.cacheRecordByName[depModName]
+
             if (depMod) {
                 deps.add(depMod)
 
-                const { deps: retDeps, missing: retMissing } = this.findDeps(depMod)
-                for (const m of retDeps) deps.add(m)
-                for (const m of retMissing) missing.add(m)
+                this.findDeps(depMod, deps, missing)
             } else {
                 missing.add(depModName)
             }
         }
+
         return { deps, missing }
     }
 }

@@ -268,19 +268,8 @@ modmanager.gui.ListEntry = ig.FocusGui.extend({
         sc.Model.notifyObserver(modmanager.gui.menu, modmanager.gui.MENU_MESSAGES.ENTRY_UNFOCUSED, this)
     },
     tryEnableMod(mod: ModEntryLocal) {
-        ModInstallDialogs.checkCanEnableMod(mod).then(deps => {
-            if (deps === undefined) return
-            deps.add(mod)
-            for (const mod of deps) {
-                mod.awaitingRestart = !mod.awaitingRestart
-                sc.Model.notifyObserver(modmanager.gui.menu, modmanager.gui.MENU_MESSAGES.ENTRY_UPDATE_COLOR, {
-                    mod,
-                    color: COLOR.GREEN,
-                })
-                sc.BUTTON_SOUND.toggle_on.play()
-                LocalMods.setModActive(mod, true)
-                this.updateHighlightWidth()
-            }
+        ModInstallDialogs.showEnableModDialog(mod).then(() => {
+            this.updateHighlightWidth()
         })
         return 'Enabled'
     },

@@ -11,6 +11,7 @@
 - Fix mod icon loading sometimes throwing errors on CCLoader3
 - Improve compatibility with CrossCode v1.0.2-2 (speedrunner branch)
 - Fix game crash when trying to enable a mod that has missing dependencies
+- Show a prompt to enable installed mod dependencies when they are disabled after installation
 
 ## [1.0.4] 2025-06-26
 
