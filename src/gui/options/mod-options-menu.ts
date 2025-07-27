@@ -1,6 +1,7 @@
 import { ModEntry } from '../../types'
 import { GuiOption, ModOptionsSettings } from '../../mod-options'
 import { LocalMods } from '../../local-mods'
+import { ModInstallDialogs } from '../install-dialogs'
 
 declare global {
     namespace modmanager {
@@ -112,11 +113,11 @@ modmanager.gui.OptionsMenu = sc.BaseMenu.extend({
             },
         }
         this.hotkeyDefault.onButtonPress = () => {
-            sc.Dialogs.showYesNoDialog(ig.lang.get('sc.gui.dialogs.resetAsk'), sc.DIALOG_INFO_ICON.WARNING, button => {
-                if (button.data == 0) {
-                    this.resetOptionsToDefault()
+            ModInstallDialogs.showYesNoDialog(ig.lang.get('sc.gui.dialogs.resetAsk'), sc.DIALOG_INFO_ICON.WARNING).then(
+                index => {
+                    if (index == 0) this.resetOptionsToDefault()
                 }
-            })
+            )
         }
     },
     initListBox() {

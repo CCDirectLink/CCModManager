@@ -506,10 +506,8 @@ modmanager.gui.Menu = (sc.ListInfoMenu ?? sc.SortableListMenu).extend({
                 db => db.active && Object.values(db.modRecord ?? {}).some(mod => mod.awaitingRestart)
             )
         ) {
-            sc.Dialogs.showYesNoDialog(Lang.modStatesChanged, sc.DIALOG_INFO_ICON.QUESTION, button => {
-                if (button.data == 0) {
-                    ModInstaller.restartGame()
-                }
+            ModInstallDialogs.showYesNoDialog(Lang.modStatesChanged, sc.DIALOG_INFO_ICON.QUESTION).then(index => {
+                if (index == 0) ModInstaller.restartGame()
             })
         }
     },
