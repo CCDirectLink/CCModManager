@@ -4,7 +4,7 @@ import { InstallQueue, ModInstaller, ModInstallerDownloadingProgress } from '../
 import { ModEntry, ModEntryLocal, ModEntryServer } from '../types'
 
 export function prepareModName(mod: { name: string }) {
-    return mod.name.replace(/\\c\[\d]/g, '').trim()
+    return mod.name.replace(/\\c\[\d]/g, '').replace(/\\i\[[a-zA-Z0-9-_]*\]/g, '').trim()
 }
 
 function getModListStr(mods: { name: string }[]) {
