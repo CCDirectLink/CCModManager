@@ -2,14 +2,14 @@ import { LocalMods } from './local-mods'
 import { ModDB } from './moddb'
 import { ModEntry, ModEntryLocal, ModEntryLocalVirtual, ModEntryServer } from './types'
 import { ModInstallDialogs, prepareModName } from './gui/install-dialogs'
+import { Opts } from './options'
+import ModManager from './plugin'
+import { Lang } from './lang-manager'
+import { semver } from './library-providers'
+import { Unzipped, unzip } from 'fflate/browser'
 
 const fs: typeof import('fs') = window.require?.('fs')
 const path: typeof import('path') = window.require?.('path')
-
-import { Opts } from './options'
-import { JSZip, semver } from './library-providers'
-import ModManager from './plugin'
-import { Lang } from './lang-manager'
 
 export class InstallQueue {
     private static queue: ModEntryServer[] = []
@@ -446,24 +446,32 @@ export class ModInstaller {
         source: string,
         prefixPath: string = this.modsDir
     ) {
-        const zip = await JSZip.loadAsync(data)
+        const unzipped = await new Promise<Unzipped>((resolve, reject) => {
+            unzip(new Uint8Array(data), (err, unzipped) => {
+                if (err) reject(err)
+                else resolve(unzipped)
+            })
+        })
+
+        const files = Object.entries(unzipped)
+            .map(([zipRelativePath, data]) => {
+                const relative = path.relative(source, zipRelativePath)
+                if (relative.startsWith('../')) return
+
+                let filepath = path.join(prefixPath, id, relative)
+                if (zipRelativePath.endsWith('/')) filepath += '/'
+                return { filepath, data }
+            })
+            .filter(Boolean) as { filepath: string; data: Uint8Array }[]
+
+        for (const { filepath } of files) {
+            if (filepath.endsWith('/')) {
+                await fs.promises.mkdir(filepath)
+            }
+        }
 
         await Promise.all(
-            Object.values(zip.files)
-                .filter(file => !file.dir)
-                .map(async file => {
-                    const data = await file.async('uint8array')
-                    const relative = path.relative(source, file.name)
-                    if (relative.startsWith('..' + path.sep)) {
-                        return
-                    }
-
-                    const filepath = path.join(prefixPath, id, relative)
-                    try {
-                        await fs.promises.mkdir(path.dirname(filepath), { recursive: true })
-                    } catch {}
-                    await fs.promises.writeFile(filepath, data)
-                })
+            files.map(({ filepath, data }) => !filepath.endsWith('/') && fs.promises.writeFile(filepath, data))
         )
     }
 
