@@ -7,6 +7,12 @@ const optSet = (guiOption: GuiOption, value: any) => {
     modmanager.options[guiOption.modId][guiOption.baseId] = value
 }
 
+function attachIgnore(this: { base: sc.OptionRow; parent?: () => void }) {
+    if (!(this.base instanceof modmanager.gui.OptionsOptionRow)) return this.parent!()
+    /* theres no need to listen to sc.OPTIONS_EVENT.OPTION_CHANGED since sc.options.set does
+     * not reffer to ccmodmanager options */
+}
+
 sc.OPTION_GUIS[sc.OPTION_TYPES.BUTTON_GROUP].inject({
     init(optionRow, x, rowGroup) {
         this.base = optionRow
@@ -38,6 +44,7 @@ sc.OPTION_GUIS[sc.OPTION_TYPES.BUTTON_GROUP].inject({
             this._prevPressed = button
         }
     },
+    onAttach: attachIgnore,
 })
 
 declare global {
@@ -112,22 +119,6 @@ modmanager.gui.OptionsObjectSlider = ig.GuiElementBase.extend({
             this.currentNumber.setText(num.round(3).toString())
         }
     },
-    onAttach() {
-        sc.Model.addObserver(sc.options, this)
-    },
-    onDetach() {
-        sc.Model.removeObserver(sc.options, this)
-    },
-    modelChanged(model, message) {
-        if (model == sc.options && message == sc.OPTIONS_EVENT.OPTION_CHANGED) {
-            const value = optGet(this.base.guiOption) as number
-            if (value != this.entries[this._lastVal]) {
-                this._lastVal = this.entries.indexOf(value)
-                this.slider.setValue(this._lastVal)
-                this.updateNumberDisplay()
-            }
-        }
-    },
     onChange(index) {
         if (index != this._lastVal) {
             this._lastVal = index
@@ -158,6 +149,7 @@ sc.OPTION_GUIS[sc.OPTION_TYPES.ARRAY_SLIDER].inject({
 
         optSet(this.base.guiOption, this._lastVal / this.scale)
     },
+    onAttach: attachIgnore,
 })
 
 sc.OPTION_GUIS[sc.OPTION_TYPES.CHECKBOX].inject({
@@ -173,6 +165,7 @@ sc.OPTION_GUIS[sc.OPTION_TYPES.CHECKBOX].inject({
 
         checkbox == this.button && optSet(this.base.guiOption, checkbox.pressed)
     },
+    onAttach: attachIgnore,
 })
 
 declare global {

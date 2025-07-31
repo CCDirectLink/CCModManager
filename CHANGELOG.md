@@ -16,6 +16,7 @@
 - Improve compatibility with CrossCode v1.0.2-2 (speedrunner branch)
 - Fix game crash when trying to enable a mod that has missing dependencies
 - Show a prompt to enable installed mod dependencies when they are disabled after installation
+- Fix an error message being printed when in mod options menu that contains an `OBJECT_SLIDER` and resizing a window
 
 ## [1.0.4] 2025-06-26
 
