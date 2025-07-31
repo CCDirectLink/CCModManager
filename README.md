@@ -128,8 +128,10 @@ const myenum = {
 ```javascript
 {
     type: 'BUTTON',
-    onPress() {
+    onPress(button) {
         // code
+        // you can update the button text as you please
+        button.setText("hi!!")
     },
     name: 'Button',
     description: 'My favorite button.',

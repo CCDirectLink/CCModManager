@@ -4,6 +4,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Added `button: sc.ButtonGui` to `onPress` of `BUTTON` option
+
 ### Fixed
 
 - Improve browser compatibility
