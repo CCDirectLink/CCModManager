@@ -1,4 +1,4 @@
-import { ModEntryLocal } from './types';
+import { ModEntry, ModEntryLocal } from './types';
 type CCL2Mod = {
     baseDirectory: string;
     dependencies?: Record<string, string>;
@@ -28,6 +28,7 @@ declare global {
 export declare class LocalMods {
     private static cache;
     private static cacheRecord;
+    private static cacheRecordByName;
     static localModFlags: Record<string, {
         disableUninstall?: boolean;
         disableDisabling?: boolean;
@@ -47,6 +48,9 @@ export declare class LocalMods {
     private static convertCCL3Mod;
     static getCCVersion(): string;
     static getCCLoaderVersion(): string;
-    static findDeps(mod: ModEntryLocal): ModEntryLocal[];
+    static findDeps(mod: ModEntry, deps?: Set<ModEntryLocal>, missing?: Set<string>): {
+        deps: Set<ModEntryLocal>;
+        missing: Set<string>;
+    };
 }
 export {};

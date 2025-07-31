@@ -1,8 +1,8 @@
 import { ModEntry, ModImageConfig as ModIconConfig, NPDatabase } from './types';
 export declare class FileCache {
     private static cacheDir;
-    private static inCache;
-    private static cache;
+    private static existsOnDisk;
+    private static readingPromises;
     static getDefaultModIconConfig(): {
         path: string;
         offsetX: number;
@@ -14,9 +14,7 @@ export declare class FileCache {
     static prepareDatabase(name: string): void;
     static getIconConfig(mod: ModEntry): Promise<ModIconConfig>;
     private static getIcon;
-    private static downloadAndWriteDatabase;
     static checkDatabaseUrl(url: string): Promise<boolean>;
-    static getDatabase(name: string, create: (database: NPDatabase) => void): Promise<void>;
-    private static getCachedFile;
+    static getDatabase(name: string): Promise<NPDatabase>;
     static deleteOnDiskCache(): Promise<void>;
 }

@@ -16,7 +16,7 @@ declare global {
                 name: string;
                 description: string;
             };
-            setFilterValue(this: this, config: CheckboxConfig, state: boolean): void;
+            setFilterValue(this: this, config: CheckboxConfig, state: boolean, noReload?: boolean): void;
             getFilterValue(this: this, config: CheckboxConfig): boolean | undefined;
             show(this: this): void;
             hide(this: this): void;

@@ -26,5 +26,5 @@ export declare class ModDB {
     constructor(url: string, active?: boolean, prepare?: boolean);
     isUrlValid(): Promise<boolean>;
     private createModEntriesFromDatabase;
-    getMods(callback: (mods: ModEntryServer[]) => void): Promise<void>;
+    getMods(): Promise<Record<string, ModEntryServer>>;
 }

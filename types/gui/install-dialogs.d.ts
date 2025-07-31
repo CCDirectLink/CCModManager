@@ -1,9 +1,13 @@
-import { ModEntryLocal } from '../types';
-export declare function prepareModName(name: string): string;
+import { ModEntry, ModEntryLocal } from '../types';
+export declare function prepareModName(mod: {
+    name: string;
+}): string;
 export declare class ModInstallDialogs {
     static showModInstallDialog(): void;
     static showAutoUpdateDialog(): void;
     static showModUninstallDialog(localMod: ModEntryLocal): boolean;
     static checkCanDisableMod(mod: ModEntryLocal): boolean;
-    static checkCanEnableMod(mod: ModEntryLocal, callback: (deps: ModEntryLocal[] | undefined) => void): void;
+    static showEnableModDialog(mod: ModEntryLocal): Promise<void>;
+    static checkCanEnableMod(mod: ModEntry): Promise<Set<ModEntryLocal> | undefined>;
+    static showYesNoDialog(text: sc.TextLike, icon?: Nullable<sc.DIALOG_INFO_ICON>): Promise<number>;
 }
