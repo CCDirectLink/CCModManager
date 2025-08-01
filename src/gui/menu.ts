@@ -174,7 +174,7 @@ modmanager.gui.Menu = (sc.ListInfoMenu ?? sc.SortableListMenu).extend({
     initInstallButton(bottomY) {
         this.installButton = new sc.ButtonGui('', 128, true, sc.BUTTON_TYPE.SMALL)
         this.updateInstallButtonText()
-        this.installButton.setPos(152, bottomY)
+        this.installButton.setPos(146, bottomY)
         this.installButton.onButtonPress = () => {
             if (this.list.currentTabIndex == modmanager.gui.MOD_MENU_TAB_INDEXES.SELECTED) sc.BUTTON_SOUND.submit.play()
             ModInstaller.findDepsDatabase(InstallQueue.values(), ModDB.modRecord)
@@ -207,8 +207,8 @@ modmanager.gui.Menu = (sc.ListInfoMenu ?? sc.SortableListMenu).extend({
         if (isFullMode()) this.addChildGui(this.uninstallButton)
     },
     initCheckUpdatesButton(bottomY) {
-        this.checkUpdatesButton = new sc.ButtonGui(Lang.checkUpdates, 100, true, sc.BUTTON_TYPE.SMALL)
-        this.checkUpdatesButton.setPos(285, bottomY)
+        this.checkUpdatesButton = new sc.ButtonGui(Lang.checkUpdates, 108, true, sc.BUTTON_TYPE.SMALL)
+        this.checkUpdatesButton.setPos(278, bottomY)
         this.checkUpdatesButton.onButtonPress = () => {
             if (this.list.currentTabIndex == modmanager.gui.MOD_MENU_TAB_INDEXES.SELECTED) sc.BUTTON_SOUND.submit.play()
             ModInstaller.appendToUpdateModsToQueue().then(hasUpdated => {
@@ -312,11 +312,11 @@ modmanager.gui.Menu = (sc.ListInfoMenu ?? sc.SortableListMenu).extend({
     initModOptionsButton(bottomY) {
         this.modOptionsButton = new sc.ButtonGui(
             '\\i[rightClickOrR2]' + Lang.modOptions,
-            140,
+            110,
             true,
             sc.BUTTON_TYPE.SMALL
         )
-        this.modOptionsButton.setPos(7, bottomY)
+        this.modOptionsButton.setPos(32, bottomY)
         this.modOptionsButton.doStateTransition('HIDDEN')
         this.modOptionsButton.onButtonPress = () => {
             const tryPress = (): boolean => {
