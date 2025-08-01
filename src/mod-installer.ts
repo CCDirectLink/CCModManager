@@ -466,7 +466,7 @@ export class ModInstaller {
 
         for (const { filepath } of files) {
             if (filepath.endsWith('/')) {
-                await fs.promises.mkdir(filepath)
+                await fs.promises.mkdir(filepath, { recursive: true })
             }
         }
 
