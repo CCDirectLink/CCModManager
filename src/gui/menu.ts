@@ -106,7 +106,7 @@ sc.Control.inject({
 
         /* remove ig.input.pressed('special') to prevent weird list jumping on space bar press */
         return this.autoControl
-            ? ig.input.currentDevice == ig.INPUT_DEVICES.GAMEPAD && this.autoControl.get('menuConfirm')
+            ? ig.input.currentDevice == ig.INPUT_DEVICES.GAMEPAD && !!this.autoControl.get('menuConfirm')
             : (ig.input.pressed('confirm') ||
                   /* ig.input.pressed('special') || */ ig.gamepad.isButtonPressed(ig.BUTTONS.FACE0)) &&
                   !ig.interact.isBlocked()
@@ -118,7 +118,7 @@ sc.Control.inject({
         /* Prevent right click from closing the menu, since we use it for clicking on mods */
         // prettier-ignore
         return this.autoControl
-            ? this.autoControl.get('menuBack')
+            ? !!this.autoControl.get('menuBack')
             : ig.input.pressed('pause') ||
               ig.input.pressed('back') ||
               (sc.menu.currentMenu == sc.MENU_SUBMENU.MODS ? false : ig.input.pressed('dash'))
