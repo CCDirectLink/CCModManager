@@ -2,7 +2,7 @@ import { ModEntry } from '../types'
 import { ModDB } from '../moddb'
 import { Fliters, createFuzzyFilteredModList } from '../filters'
 import { LocalMods } from '../local-mods'
-import { InstallQueue } from '../mod-installer'
+import { InstallQueue, ModInstaller } from '../mod-installer'
 import { Lang } from '../lang-manager'
 import { Opts } from '../options'
 import { isFullMode } from '../plugin'
@@ -293,6 +293,7 @@ modmanager.gui.MenuList = sc.ListTabbedPane.extend({
     populateOnline(list, _, sort: modmanager.gui.MENU_SORT_ORDER) {
         let mods = Object.values(ModDB.removeModDuplicatesAndResolveTesting(ModDB.modRecord))
         mods = createFuzzyFilteredModList(this.filters, mods)
+        mods = mods.filter(mod => !ModInstaller.virtualMods[mod.id])
         this.sortModEntries(mods, sort)
         this.populateListFromMods(mods, list)
     },

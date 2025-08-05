@@ -17,6 +17,7 @@
 - Fix game crash when trying to enable a mod that has missing dependencies
 - Show a prompt to enable installed mod dependencies when they are disabled after installation
 - Fix an error message being printed when in mod options menu that contains an `OBJECT_SLIDER` and resizing a window
+- Don't install library mods that are built into CCLoader3 (`input-api`, `extension-assert-preloader`, `nax-module-cache`) 
 
 ## [1.0.4] 2025-06-26
 
