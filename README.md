@@ -15,7 +15,11 @@ Read the in-game manual in the help menu for usage instructions.
 
 # For mod developers
 
+You can define custom options pages for your own mod.  
+See full example below.  
+
 # Option types
+
 ## `CHECKBOX`
 
 ![image](https://github.com/user-attachments/assets/bf8bcaf1-9a0e-41cf-8314-58273a1ef467)
@@ -112,9 +116,10 @@ const myenum = {
     max: 13,
     step: 1,
     fill: true,
+    // note: when using typescript, you need to specify
+    // the return type of this function manually
     customNumberDisplay(index) {
-        const num = this.min
-        return num + index
+        return this.min + index
     },
     name: 'Number slider',
     description: 'My (definitely) somewhat favorite slider.',
@@ -178,9 +183,25 @@ const myenum = {
 ![image](https://github.com/user-attachments/assets/e184bf00-7695-421f-be65-ddd795abccb3)
 
 ```javascript
+// Without name
 {
     type: 'INPUT_FIELD',
+    name: '',
     init: 'initial text',
+    changeEvent() { /* optional */
+        // code
+    }
+},
+```
+
+// IMAGE HERE
+
+```javascript
+// With name
+{
+    type: 'INPUT_FIELD',
+    name: 'favorite food',
+    init: 'bricks',
     changeEvent() { /* optional */
         // code
     }
@@ -190,8 +211,10 @@ const myenum = {
 ![image](https://github.com/user-attachments/assets/269bcf55-48eb-44c7-a133-02b290cdc84d)
 
 ```javascript
+// Without name
 {
     type: 'INPUT_FIELD',
+    name: '',
     init: 'crossthecodes 123',
     changeEvent() { /* optional */
         // code
@@ -203,6 +226,25 @@ const myenum = {
 },
 ```
 
+// IMAGE HERE
+
+```javascript
+// With name
+{
+    type: 'INPUT_FIELD',
+    name: 'favorite plushie',
+    init: 'lea',
+    changeEvent() { /* optional */
+        // code
+    },
+    isValid(text) {
+        return text == 'lea'
+    }
+}
+},
+```
+
+
 ## `JSON_DATA`
 ```javascript
 {
@@ -213,6 +255,28 @@ const myenum = {
     }
 }
 ```
+
+## Name padding
+
+On any option with a name visible, you can set the `noNamePadding` field to `true` to disable the padding.  
+For example:  
+
+// IMAGE HERE
+
+```javascript
+{
+    type: 'CHECKBOX',
+    init: true,
+    name: 'My checkbox',
+    noNamePadding: true,
+    description: "It's initialized as true by default.",
+}
+```
+
+Here's the whole page with `noNamePadding` set to `true`:  
+
+// IMAGE HERE
+
 
 ### Full example
 
@@ -300,6 +364,7 @@ const Opts = modmanager.registerAndGetModOptions(
                     },
                     myInputField: {
                         type: 'INPUT_FIELD',
+                        name: '',
                         init: 'initial text',
                         changeEvent() {
                             /* optional */
@@ -308,6 +373,7 @@ const Opts = modmanager.registerAndGetModOptions(
                     },
                     myValidatedInputField: {
                         type: 'INPUT_FIELD',
+                        name: '',
                         init: 'crossthecodes 123',
                         changeEvent() {
                             /* optional */
