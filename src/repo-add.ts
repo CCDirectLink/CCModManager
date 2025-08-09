@@ -2,18 +2,15 @@ import { ModDB } from './moddb'
 import { Option } from './mod-options'
 import { Opts } from './options'
 
-/* https://www.freecodecamp.org/news/check-if-a-javascript-string-is-a-url/ */
 function isValidUrl(urlString: string) {
-    var urlPattern = new RegExp(
-        '^(https?:\\/\\/)?' + // validate protocol
-            '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // validate domain name
-            '((\\d{1,3}\\.){3}\\d{1,3}))' + // validate OR ip (v4) address
-            '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' + // validate port and path
-            '(\\?[;&a-z\\d%_.~+=-]*)?' + // validate query string
-            '(\\#[-a-z\\d_]*)?$',
-        'i'
-    ) // validate fragment locator
-    return !!urlPattern.test(urlString)
+    if (urlString.includes('@') || urlString.includes('#')) return false
+    if (urlString.startsWith('https://')) urlString = urlString.substring('https://'.length)
+    if (urlString.startsWith('http://')) urlString = urlString.substring('http://'.length)
+
+    const firstIndexOfSlash = urlString.indexOf('/')
+    const host = firstIndexOfSlash == -1 ? urlString : urlString.substring(0, firstIndexOfSlash)
+
+    return host.length > 1 && (host == 'localhost' || host.includes('.'))
 }
 
 function inputFieldKeys() {

@@ -192,7 +192,6 @@ export class ModDB {
     }
 
     async isUrlValid(): Promise<boolean> {
-        if (this.name.startsWith('http')) return false
         return FileCache.checkDatabaseUrl(this.url)
     }
 

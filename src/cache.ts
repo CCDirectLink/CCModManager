@@ -106,6 +106,9 @@ export class FileCache {
     static async checkDatabaseUrl(url: string): Promise<boolean> {
         url = `${url}/npDatabase.min.json`
         try {
+            /* an error will be thrown if the url is invalid */
+            new URL(url)
+
             return (await getETag(url)) != 'nointernet'
         } catch {
             return false
