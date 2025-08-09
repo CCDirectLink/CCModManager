@@ -281,7 +281,7 @@ modmanager.gui.InputFieldWrapper = ig.GuiElementBase.extend({
     init(initialValue, setValueFunc, width, isValidFunc, description) {
         this.parent()
 
-        this.inputField = new modmanager.gui.InputField(width - 30, 20)
+        this.inputField = new modmanager.gui.InputField(width - 30 + (isValidFunc ? 0 : 10), 20)
 
         this.inputField.setText?.(initialValue)
 
@@ -305,7 +305,6 @@ modmanager.gui.InputFieldWrapper = ig.GuiElementBase.extend({
             revalidate(initialValue)
         } else {
             this.inputField.setPos(12, 0)
-            this.inputField.setSize(this.inputField.hook.size.x + 10, this.inputField.hook.size.y)
         }
 
         this.inputField.onCharacterInput = str => {

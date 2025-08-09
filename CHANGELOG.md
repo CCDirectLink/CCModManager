@@ -19,6 +19,7 @@
 - Fix an error message being printed when in mod options menu that contains an `OBJECT_SLIDER` and resizing a window
 - Don't install library mods that are built into CCLoader3 (`input-api`, `extension-assert-preloader`, `nax-module-cache`) 
 - Fix game freeze when inputting large nonsense repository url
+- Fix focus highlight of `INPUT_FIELD` without validation being shorter than the input field
 
 ## [1.0.4] 2025-06-26
 
