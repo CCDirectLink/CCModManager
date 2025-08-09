@@ -37,4 +37,3 @@ declare global {
 import './tabbox';
 import './option-row';
 import './tabbutton';
-import './option-elements-inject';

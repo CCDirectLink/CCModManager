@@ -3,9 +3,6 @@ import { ModEntry } from '../../types';
 export {};
 declare global {
     namespace modmanager.gui {
-        namespace OptionsTabBox {
-            type GuiOption = sc.OptionInfoBox | modmanager.gui.OptionsOptionRow | modmanager.gui.OptionsOptionButton | modmanager.gui.OptionsOptionInputField;
-        }
         interface OptionsTabBox extends ig.GuiElementBase, sc.Model.Observer {
             gfx: ig.Image;
             mod: ModEntry;
@@ -17,7 +14,7 @@ declare global {
             tabs: Record<string, modmanager.gui.OptionsTabBox.TabButton>;
             tabArray: modmanager.gui.OptionsTabBox.TabButton[];
             tabGroup: sc.ButtonGroup;
-            rows: modmanager.gui.OptionsTabBox.GuiOption[];
+            rows: modmanager.gui.OptionsOptionRow[];
             rowButtonGroup: sc.RowButtonGroup;
             tabContent: {
                 buttonGroup: Nullable<modmanager.gui.OptionsTabBox['rowButtonGroup']>;
