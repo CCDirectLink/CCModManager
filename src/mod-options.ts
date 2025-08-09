@@ -307,7 +307,6 @@ function registerAndGetModOptions<T extends Options>(settings: ModOptionsSetting
         ObjectEntriesT(headers).forEach(([headerKey, optionEntries]) => {
             const guiStructureHeader = (guiStructureCategory.headers[headerKey] ??= {})
 
-            let isFirstOption: boolean = true
             ;(ObjectEntriesT(optionEntries) as [keyof FlatOpts<T>, Option][]).forEach(([optKey, option], optKeyI) => {
                 const id = (option.type == 'CONTROLS' ? 'keys-' : '') + `${settings.modId}-${optKey as string}`
 
@@ -319,10 +318,9 @@ function registerAndGetModOptions<T extends Options>(settings: ModOptionsSetting
                     cat: catKey,
                     init: 'init' in option ? option.init : undefined,
                     header: headerKey,
-                    hasDivider: isFirstOption,
+                    hasDivider: optKeyI == 0,
                     ...languageGetter(catKey, headerKey, optKey as string, option),
                 })
-                if (guiOption.type != 'INFO') isFirstOption = false
 
                 // @ts-expect-error
                 Opts.flatOpts[optKey] = guiOption
