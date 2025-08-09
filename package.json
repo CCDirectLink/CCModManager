@@ -27,7 +27,7 @@
         "marked": "=12.0.2",
         "prettier": "3.2.4",
         "rimraf": "^3.0.2",
-        "typescript": "^5.4.5",
+        "typescript": "^5.9.2",
         "ultimate-crosscode-typedefs": "github:krypciak/ultimate-crosscode-typedefs"
     }
 }

@@ -1,0 +1,31 @@
+import { ModOptionsOptionConstructor, ModOptionsOptionElement } from './all'
+
+declare global {
+    namespace modmanager.gui.Options {
+        interface CONTROLS extends sc.OPTION_GUIS_DEFS.CONTROLS, ModOptionsOptionElement {
+            currentNumber: sc.TextGui
+        }
+        interface CONTROLS_CONSTRUCTOR extends ImpactClass<CONTROLS>, ModOptionsOptionConstructor<CONTROLS> {}
+        var CONTROLS: CONTROLS_CONSTRUCTOR
+    }
+}
+modmanager.gui.Options.CONTROLS = sc.OPTION_GUIS[sc.OPTION_TYPES.CONTROLS].extend({
+    init(optionRow, width, rowGroup) {
+        const backup_ig_lang_get = ig.lang.get
+        // @ts-expect-error
+        ig.lang.get = (path: string, ...args) => {
+            if (!(optionRow instanceof modmanager.gui.OptionsOptionRow)) throw new Error('what')
+            if (path == 'sc.gui.options.controls.none') return backup_ig_lang_get.call(ig.lang, path, ...args)
+            if (path == 'sc.gui.options.controls.description') return optionRow.guiOption.description
+            if (path.startsWith('sc.gui.options.controls.keys.')) return optionRow.guiOption.name
+            throw new Error('what')
+        }
+
+        this.parent(optionRow, width, rowGroup)
+
+        ig.lang.get = backup_ig_lang_get
+    },
+    getNameGuiInfo() {
+        return { has: true, padding: true }
+    },
+})

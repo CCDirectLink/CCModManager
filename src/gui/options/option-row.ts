@@ -1,16 +1,6 @@
 import type { GuiOption } from '../../mod-options'
-import './option-elements-inject'
-
-const optionClassList: PartialRecord<GuiOption['type'], { hasNameGui: boolean; clazz: any }> = {
-    INFO: { hasNameGui: false, clazz: modmanager.gui.OptionsOptionInfoBox },
-    BUTTON: { hasNameGui: false, clazz: modmanager.gui.OptionsOptionButton },
-    INPUT_FIELD: { hasNameGui: false, clazz: modmanager.gui.OptionsOptionInputField },
-
-    OBJECT_SLIDER: { hasNameGui: true, clazz: modmanager.gui.OptionsObjectSlider },
-    BUTTON_GROUP: { hasNameGui: true, clazz: sc.OPTION_GUIS[sc.OPTION_TYPES.BUTTON_GROUP] },
-    CHECKBOX: { hasNameGui: true, clazz: sc.OPTION_GUIS[sc.OPTION_TYPES.CHECKBOX] },
-    CONTROLS: { hasNameGui: true, clazz: sc.OPTION_GUIS[sc.OPTION_TYPES.CONTROLS] },
-}
+import { ModOptionsOptionElement } from './option-elements/all'
+import './option-elements/all'
 
 declare global {
     namespace modmanager.gui {
@@ -42,7 +32,10 @@ modmanager.gui.OptionsOptionRow = sc.OptionRow.extend({
         this.optionDes = option.description
         this.row = row
 
-        const { hasNameGui, clazz } = optionClassList[option.type] ?? { hasNameGui: true, clazz: undefined }
+        const clazz = modmanager.gui.Options[option.type as Exclude<typeof option.type, 'ARRAY_SLIDER' | 'JSON_DATA'>]
+        const { has: hasNameGui, padding: nameGuiPadding } = (
+            clazz.prototype as ModOptionsOptionElement
+        ).getNameGuiInfo()
 
         const baseX = 5
         let optionX = baseX
@@ -68,7 +61,7 @@ modmanager.gui.OptionsOptionRow = sc.OptionRow.extend({
         }
 
         if (clazz) {
-            const typeGui: ig.GuiElementBase = new clazz(this, optionWidth, rowGroup, width)
+            const typeGui: ig.GuiElementBase = new clazz(this, optionWidth, rowGroup)
             this.typeGui = typeGui as any
             typeGui.setSize(optionWidth, Math.max(26, typeGui.hook.size.y))
             typeGui.setAlign(ig.GUI_ALIGN.X_LEFT, ig.GUI_ALIGN.Y_BOTTOM)
