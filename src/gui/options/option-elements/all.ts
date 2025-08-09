@@ -15,7 +15,7 @@ import './object-slider'
 export interface ModOptionsOptionElement {
     guiOption: GuiOption
 
-    getNameGuiInfo(this: this): { has: boolean; padding?: boolean }
+    getNameGuiInfo(this: this): { has: boolean }
 }
 
 export interface ModOptionsOptionConstructor<T extends ModOptionsOptionElement> {

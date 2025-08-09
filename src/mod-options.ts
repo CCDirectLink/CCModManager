@@ -17,6 +17,8 @@ export interface OptionChangeable {
 export type Option = {
     /** Option display name */
     name?: ig.LangLabel.Data
+    /** Whether to add padding after the name */
+    noNamePadding?: boolean
     /** Option description */
     description?: ig.LangLabel.Data
 

@@ -33,20 +33,22 @@ modmanager.gui.OptionsOptionRow = sc.OptionRow.extend({
         this.row = row
 
         const clazz = modmanager.gui.Options[option.type as Exclude<typeof option.type, 'ARRAY_SLIDER' | 'JSON_DATA'>]
-        const { has: hasNameGui, padding: nameGuiPadding } = (
-            clazz.prototype as ModOptionsOptionElement
-        ).getNameGuiInfo()
+        let { has: hasNameGui } = (clazz.prototype as ModOptionsOptionElement).getNameGuiInfo()
+        hasNameGui &&= !!option.name
+
+        const nameGuiPadding: boolean = !option.noNamePadding
 
         const baseX = 5
-        let optionX = baseX
+        let x = baseX
         let optionWidth = width
 
         if (hasNameGui) {
             this.nameGui = new sc.TextGui(option.name)
             this.nameGui.setPos(baseX, 4)
             this.addChildGui(this.nameGui)
+            x += nameGuiPadding ? 171 : this.nameGui.hook.size.x + 9
 
-            const colorGui = new ig.ColorGui('#545454', 166, 1)
+            const colorGui = new ig.ColorGui('#545454', x - 9, 1)
             colorGui.setAlign(ig.GUI_ALIGN.X_LEFT, ig.GUI_ALIGN.Y_BOTTOM)
             colorGui.setPos(0, 4)
             this.addChildGui(colorGui)
@@ -56,8 +58,7 @@ modmanager.gui.OptionsOptionRow = sc.OptionRow.extend({
             imageGui.setPos(colorGui.hook.size.x, 3)
             this.addChildGui(imageGui)
 
-            optionWidth -= 175
-            optionX = 175
+            optionWidth -= x - baseX
         }
 
         if (clazz) {
@@ -65,12 +66,12 @@ modmanager.gui.OptionsOptionRow = sc.OptionRow.extend({
             this.typeGui = typeGui as any
             typeGui.setSize(optionWidth, Math.max(26, typeGui.hook.size.y))
             typeGui.setAlign(ig.GUI_ALIGN.X_LEFT, ig.GUI_ALIGN.Y_BOTTOM)
-            typeGui.setPos(optionX, 0)
+            typeGui.setPos(x, 0)
             this.addChildGui(this.typeGui)
             this.setSize(width, typeGui.hook.size.y)
         } else {
             const textGui = new sc.TextGui('Missing Option Type: ' + this.option.type)
-            textGui.setPos(optionX, 4)
+            textGui.setPos(x, 4)
             this.addChildGui(textGui)
         }
 

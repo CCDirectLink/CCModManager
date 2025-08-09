@@ -19,7 +19,7 @@ modmanager.gui.Options.CHECKBOX = sc.OPTION_GUIS[sc.OPTION_TYPES.CHECKBOX].exten
         this.button.setPressed(optGet(this.guiOption) as boolean)
     },
     getNameGuiInfo() {
-        return { has: true, padding: true }
+        return { has: true }
     },
     onPressed(checkbox) {
         checkbox == this.button && optSet(this.guiOption, checkbox.pressed)

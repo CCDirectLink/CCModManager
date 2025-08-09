@@ -34,7 +34,7 @@ modmanager.gui.Options.BUTTON_GROUP = sc.OPTION_GUIS[sc.OPTION_TYPES.BUTTON_GROU
         sc.options.get = backup_sc_options_get
     },
     getNameGuiInfo() {
-        return { has: true, padding: true }
+        return { has: true }
     },
     onPressed(button) {
         if (this._prevPressed != button) {

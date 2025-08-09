@@ -26,6 +26,6 @@ modmanager.gui.Options.CONTROLS = sc.OPTION_GUIS[sc.OPTION_TYPES.CONTROLS].exten
         ig.lang.get = backup_ig_lang_get
     },
     getNameGuiInfo() {
-        return { has: true, padding: true }
+        return { has: true }
     },
 })

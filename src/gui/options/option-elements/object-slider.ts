@@ -53,7 +53,7 @@ modmanager.gui.Options.OBJECT_SLIDER = ig.GuiElementBase.extend({
         this.onChange(index)
     },
     getNameGuiInfo() {
-        return { has: true, padding: true }
+        return { has: true }
     },
     updateNumberDisplay() {
         if (this.guiOption.type != 'OBJECT_SLIDER') throw new Error('what')

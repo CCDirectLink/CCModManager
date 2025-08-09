@@ -23,7 +23,8 @@ modmanager.gui.InputFieldWrapper = ig.GuiElementBase.extend({
     init(initialValue, setValueFunc, width, isValidFunc, description) {
         this.parent()
 
-        this.inputField = new modmanager.gui.InputField(width - 30 + (isValidFunc ? 0 : 10), 20)
+        const xOffsetWhenIsValidFunc = 20 + 4
+        this.inputField = new modmanager.gui.InputField(width - 30 + (isValidFunc ? 0 : xOffsetWhenIsValidFunc - 2), 20)
 
         this.inputField.setText?.(initialValue)
 
@@ -40,13 +41,13 @@ modmanager.gui.InputFieldWrapper = ig.GuiElementBase.extend({
         }
 
         if (isValidFunc) {
-            this.inputField.setPos(20 + 4, 0)
+            this.inputField.setPos(xOffsetWhenIsValidFunc, 0)
             this.isValidText = new sc.TextGui('')
             this.isValidText.setPos(3, 2)
             this.addChildGui(this.isValidText)
             revalidate(initialValue)
         } else {
-            this.inputField.setPos(12, 0)
+            this.inputField.setPos(2, 0)
         }
 
         this.inputField.onCharacterInput = str => {
@@ -92,6 +93,6 @@ modmanager.gui.Options.INPUT_FIELD = modmanager.gui.InputFieldWrapper.extend({
         rowGroup.addFocusGui(this.inputField, 0, optionRow.row)
     },
     getNameGuiInfo() {
-        return { has: false }
+        return { has: true }
     },
 })
