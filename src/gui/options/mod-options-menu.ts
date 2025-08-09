@@ -261,4 +261,3 @@ sc.SUB_MENU_INFO[sc.MENU_SUBMENU.MOD_OPTIONS] = {
 import './tabbox'
 import './option-row'
 import './tabbutton'
-import './option-elements-inject'

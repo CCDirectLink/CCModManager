@@ -1,4 +1,16 @@
 import type { GuiOption } from '../../mod-options'
+import './option-elements-inject'
+
+const optionClassList: PartialRecord<GuiOption['type'], { hasNameGui: boolean; clazz: any }> = {
+    INFO: { hasNameGui: false, clazz: modmanager.gui.OptionsOptionInfoBox },
+    BUTTON: { hasNameGui: false, clazz: modmanager.gui.OptionsOptionButton },
+    INPUT_FIELD: { hasNameGui: false, clazz: modmanager.gui.OptionsOptionInputField },
+
+    OBJECT_SLIDER: { hasNameGui: true, clazz: modmanager.gui.OptionsObjectSlider },
+    BUTTON_GROUP: { hasNameGui: true, clazz: sc.OPTION_GUIS[sc.OPTION_TYPES.BUTTON_GROUP] },
+    CHECKBOX: { hasNameGui: true, clazz: sc.OPTION_GUIS[sc.OPTION_TYPES.CHECKBOX] },
+    CONTROLS: { hasNameGui: true, clazz: sc.OPTION_GUIS[sc.OPTION_TYPES.CONTROLS] },
+}
 
 declare global {
     namespace modmanager.gui {
@@ -10,7 +22,7 @@ declare global {
                 option: GuiOption,
                 row: number,
                 rowGroup: sc.RowButtonGroup,
-                width?: number,
+                width: number,
                 height?: number
             ): OptionsOptionRow
         }
@@ -18,10 +30,10 @@ declare global {
     }
 }
 modmanager.gui.OptionsOptionRow = sc.OptionRow.extend({
-    init(option, row, rowGroup, width, height) {
+    init(option, row, rowGroup, width, height = 26) {
         ig.GuiElementBase.prototype.init.call(this)
 
-        this.setSize(width || 400, height || 26)
+        this.setSize(width, height)
         this._rowGroup = rowGroup
         this.local = false
         this.option = option as unknown as sc.OptionDefinition
@@ -30,47 +42,58 @@ modmanager.gui.OptionsOptionRow = sc.OptionRow.extend({
         this.optionDes = option.description
         this.row = row
 
-        this.nameGui = new sc.TextGui(option.name)
-        this.nameGui.setPos(5, 4)
-        this.addChildGui(this.nameGui)
+        const { hasNameGui, clazz } = optionClassList[option.type] ?? { hasNameGui: true, clazz: undefined }
 
-        const colorGui = new ig.ColorGui('#545454', 166, 1)
-        colorGui.setAlign(ig.GUI_ALIGN.X_LEFT, ig.GUI_ALIGN.Y_BOTTOM)
-        colorGui.setPos(0, 4)
-        this.addChildGui(colorGui)
+        const baseX = 5
+        let optionX = baseX
+        let optionWidth = width
 
-        const imageGui = new ig.ImageGui(this.gfx, 32, 416, 8, 8)
-        imageGui.setAlign(ig.GUI_ALIGN.X_LEFT, ig.GUI_ALIGN.Y_BOTTOM)
-        imageGui.setPos(colorGui.hook.size.x, 3)
-        this.addChildGui(imageGui)
+        if (hasNameGui) {
+            this.nameGui = new sc.TextGui(option.name)
+            this.nameGui.setPos(baseX, 4)
+            this.addChildGui(this.nameGui)
 
-        const x = this.hook.size.x - 175
-        // prettier-ignore
-        const optionType = sc.OPTION_TYPES[this.option.type] as | 0 | 1 | 2 | 3 | 4 | 5 /* <- all sc.OPTION_TYPES values expect sc.OPTION_TYPES.INFO */
-        let optionClass = sc.OPTION_GUIS[optionType]
-        if (this.option.type == 'OBJECT_SLIDER') {
-            optionClass = modmanager.gui.OptionsObjectSlider as any
+            const colorGui = new ig.ColorGui('#545454', 166, 1)
+            colorGui.setAlign(ig.GUI_ALIGN.X_LEFT, ig.GUI_ALIGN.Y_BOTTOM)
+            colorGui.setPos(0, 4)
+            this.addChildGui(colorGui)
+
+            const imageGui = new ig.ImageGui(this.gfx, 32, 416, 8, 8)
+            imageGui.setAlign(ig.GUI_ALIGN.X_LEFT, ig.GUI_ALIGN.Y_BOTTOM)
+            imageGui.setPos(colorGui.hook.size.x, 3)
+            this.addChildGui(imageGui)
+
+            optionWidth -= 175
+            optionX = 175
         }
-        if (optionClass) {
-            const typeGui: ig.GuiElementBase = new optionClass(this, x, rowGroup)
+
+        if (clazz) {
+            const typeGui: ig.GuiElementBase = new clazz(this, optionWidth, rowGroup, width)
             this.typeGui = typeGui as any
-            typeGui.setSize(x, 26)
+            typeGui.setSize(optionWidth, Math.max(26, typeGui.hook.size.y))
             typeGui.setAlign(ig.GUI_ALIGN.X_LEFT, ig.GUI_ALIGN.Y_BOTTOM)
-            typeGui.setPos(175, 0)
+            typeGui.setPos(optionX, 0)
             this.addChildGui(this.typeGui)
+            this.setSize(width, typeGui.hook.size.y)
         } else {
             const textGui = new sc.TextGui('Missing Option Type: ' + this.option.type)
-            textGui.setPos(175, 4)
+            textGui.setPos(optionX, 4)
             this.addChildGui(textGui)
         }
+
         if (this.option.hasDivider) {
             this.divider = true
-            this.hook.size.y = this.hook.size.y + 17
+            this.hook.size.y += 17
             const textGui = new sc.TextGui(option.header, { font: sc.fontsystem.tinyFont })
             textGui.setPos(2, 6)
             this.addChildGui(textGui)
-            this.nameGui.setPos(5, 21)
+            this.nameGui?.setPos(baseX, 21)
         }
         this.hook.setMouseRecord(true)
+    },
+    updateDrawables(renderer) {
+        /* fix divider y getting set based of the height instead of just being a predefined value */
+        /*                                    change here vv */
+        if (this.divider) renderer.addColor('#545454', 0, 14, this.hook.size.x + 2, 1)
     },
 })

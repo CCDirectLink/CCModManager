@@ -8,6 +8,10 @@
 
 - Added `button: sc.ButtonGui` to `onPress` of `BUTTON` option
 
+### Changed
+
+- Added spacing between `INPUT_FIELD` and `INFO` 
+
 ### Fixed
 
 - Improve browser compatibility
@@ -20,6 +24,7 @@
 - Don't install library mods that are built into CCLoader3 (`input-api`, `extension-assert-preloader`, `nax-module-cache`) 
 - Fix game freeze when inputting large nonsense repository url
 - Fix focus highlight of `INPUT_FIELD` without validation being shorter than the input field
+- Fixed `INPUT_FIELD`, `BUTTON` and `INFO` mod option types eating their header
 
 ## [1.0.4] 2025-06-26
 

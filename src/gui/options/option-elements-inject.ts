@@ -14,9 +14,9 @@ function attachIgnore(this: { base: sc.OptionRow; parent?: () => void }) {
 }
 
 sc.OPTION_GUIS[sc.OPTION_TYPES.BUTTON_GROUP].inject({
-    init(optionRow, x, rowGroup) {
+    init(optionRow, width, rowGroup) {
         this.base = optionRow
-        if (!(this.base instanceof modmanager.gui.OptionsOptionRow)) return this.parent(optionRow, x, rowGroup)
+        if (!(this.base instanceof modmanager.gui.OptionsOptionRow)) return this.parent(optionRow, width, rowGroup)
 
         const index = optGet(this.base.guiOption) as number
 
@@ -31,7 +31,7 @@ sc.OPTION_GUIS[sc.OPTION_TYPES.BUTTON_GROUP].inject({
         const backup_sc_options_get = sc.options.get
         sc.options.get = () => index
 
-        this.parent(optionRow, x, rowGroup)
+        this.parent(optionRow, width, rowGroup)
 
         ig.lang.get = backup_ig_lang_get
         sc.options.get = backup_sc_options_get
@@ -54,7 +54,7 @@ declare global {
             currentNumber: sc.TextGui
         }
         interface OptionsObjectSliderConstructor extends ImpactClass<OptionsObjectSlider> {
-            new (optionRow: sc.OptionRow, x: number, rowGroup: sc.RowButtonGroup): OptionsObjectSlider
+            new (optionRow: sc.OptionRow, width: number, rowGroup: sc.RowButtonGroup): OptionsObjectSlider
         }
         var OptionsObjectSlider: OptionsObjectSliderConstructor
     }
@@ -62,7 +62,7 @@ declare global {
 modmanager.gui.OptionsObjectSlider = ig.GuiElementBase.extend({
     entries: [],
     _lastVal: -1,
-    init(optionRow, x, rowGroup) {
+    init(optionRow, width, rowGroup) {
         this.parent()
         this.base = optionRow as modmanager.gui.OptionsOptionRow
 
@@ -72,7 +72,7 @@ modmanager.gui.OptionsObjectSlider = ig.GuiElementBase.extend({
 
         const data = this.base.guiOption.data
         this.entries = Object.values(data!)
-        x -= 4
+        width -= 4
         this.showPercentage = this.base.guiOption.showPercentage
 
         this.slider = new sc.OptionFocusSlider(this.onChange.bind(this), snap, this.base.guiOption.fill, rowGroup)
@@ -84,7 +84,7 @@ modmanager.gui.OptionsObjectSlider = ig.GuiElementBase.extend({
 
         this.slider.setPos(0, 0)
         this.slider.setMinMaxValue(0, this.entries.length - 1)
-        this.slider.setSize(x - 4, 21, 9)
+        this.slider.setSize(width - 4, 21, 9)
         this.slider.data = this.base.optionDes
         this.addChildGui(this.slider)
         this.currentNumber = new sc.TextGui('')
@@ -134,8 +134,8 @@ modmanager.gui.OptionsObjectSlider = ig.GuiElementBase.extend({
 })
 
 sc.OPTION_GUIS[sc.OPTION_TYPES.ARRAY_SLIDER].inject({
-    init(optionRow, x, rowGroup) {
-        this.parent(optionRow, x, rowGroup)
+    init(optionRow, width, rowGroup) {
+        this.parent(optionRow, width, rowGroup)
         if (!(this.base instanceof modmanager.gui.OptionsOptionRow)) return
 
         const value = optGet(this.base.guiOption) as number
@@ -153,8 +153,8 @@ sc.OPTION_GUIS[sc.OPTION_TYPES.ARRAY_SLIDER].inject({
 })
 
 sc.OPTION_GUIS[sc.OPTION_TYPES.CHECKBOX].inject({
-    init(optionRow, x, rowGroup) {
-        this.parent(optionRow, x, rowGroup)
+    init(optionRow, width, rowGroup) {
+        this.parent(optionRow, width, rowGroup)
 
         if (!(this.base instanceof modmanager.gui.OptionsOptionRow)) return
 
@@ -175,25 +175,30 @@ declare global {
             box: sc.CenterBoxGui
         }
         interface OptionsOptionInfoBoxConstructor extends ImpactClass<OptionsOptionInfoBox> {
-            new (option: GuiOption, width: number): OptionsOptionInfoBox
+            new (optionRow: sc.OptionRow, width: number, rowGroup: sc.RowButtonGroup): OptionsOptionInfoBox
         }
         var OptionsOptionInfoBox: OptionsOptionInfoBoxConstructor
     }
 }
 
 modmanager.gui.OptionsOptionInfoBox = ig.GuiElementBase.extend({
-    init(option, width) {
+    init(optionRow, width, _rowGroup) {
         this.parent()
+
+        const option = (optionRow as modmanager.gui.OptionsOptionRow).guiOption
+
         this.text = new sc.TextGui(option.name, { maxWidth: width - 36, font: sc.fontsystem.smallFont })
+        const height = this.text.hook.size.y
+
         const element = new ig.GuiElementBase()
-        element.setSize(width - 36, this.text.hook.size.y)
+        element.setSize(width - 36, height)
         element.addChildGui(this.text)
         this.box = new sc.CenterBoxGui(element, true)
         this.box.setAlign(ig.GUI_ALIGN.X_CENTER, ig.GUI_ALIGN.Y_TOP)
         this.box.setPos(1, 0)
         this.addChildGui(this.box)
-        this.setSize(width ?? 400, this.box.hook.size.y - 5)
-    },
+        this.setSize(width, this.box.hook.size.y - 5)
+    }
 })
 
 declare global {
@@ -203,15 +208,17 @@ declare global {
             button: sc.ButtonGui
         }
         interface OptionsOptionButtonConstructor extends ImpactClass<OptionsOptionButton> {
-            new (option: GuiOption, y: number, rowGroup: sc.RowButtonGroup, width: number): OptionsOptionButton
+            new (optionRow: sc.OptionRow, width: number, rowGroup: sc.RowButtonGroup): OptionsOptionButton
         }
         var OptionsOptionButton: OptionsOptionButtonConstructor
     }
 }
 
 modmanager.gui.OptionsOptionButton = ig.GuiElementBase.extend({
-    init(option, y, rowGroup, width) {
+    init(optionRow, _width, rowGroup) {
         this.parent()
+
+        const option = (optionRow as modmanager.gui.OptionsOptionRow).guiOption
         this.option = option
         if (option.type != 'BUTTON') throw new Error('how')
 
@@ -231,17 +238,15 @@ modmanager.gui.OptionsOptionButton = ig.GuiElementBase.extend({
             backup()
             sc.menu.setInfoText(this.data as string)
         }
-        this.setSize(width, this.button.hook.size.y)
 
         this.addChildGui(this.button)
-
-        rowGroup.addFocusGui(this.button, 0, y)
+        rowGroup.addFocusGui(this.button, 0, optionRow.row)
     },
 })
 
 sc.OPTION_GUIS[sc.OPTION_TYPES.CONTROLS].inject({
-    init(optionRow, x, rowGroup) {
-        if (!(optionRow instanceof modmanager.gui.OptionsOptionRow)) return this.parent(optionRow, x, rowGroup)
+    init(optionRow, width, rowGroup) {
+        if (!(optionRow instanceof modmanager.gui.OptionsOptionRow)) return this.parent(optionRow, width, rowGroup)
 
         const backup_ig_lang_get = ig.lang.get
         // @ts-expect-error
@@ -253,7 +258,7 @@ sc.OPTION_GUIS[sc.OPTION_TYPES.CONTROLS].inject({
             throw new Error('what')
         }
 
-        this.parent(optionRow, x, rowGroup)
+        this.parent(optionRow, width, rowGroup)
 
         ig.lang.get = backup_ig_lang_get
     },
@@ -338,18 +343,19 @@ declare global {
             option: GuiOption
         }
         interface OptionsOptionInputFieldConstructor extends ImpactClass<OptionsOptionInputField> {
-            new (option: GuiOption, y: number, rowGroup: sc.RowButtonGroup, width: number): OptionsOptionInputField
+            new (optionRow: sc.OptionRow, width: number, rowGroup: sc.RowButtonGroup): OptionsOptionInputField
         }
         var OptionsOptionInputField: OptionsOptionInputFieldConstructor
     }
 }
 
 modmanager.gui.OptionsOptionInputField = modmanager.gui.InputFieldWrapper.extend({
-    init(option, y, rowGroup, width) {
+    init(optionRow, width, rowGroup) {
+        const option = (optionRow as modmanager.gui.OptionsOptionRow).guiOption
         this.option = option
         if (option.type != 'INPUT_FIELD') throw new Error('how')
         this.parent(optGet(option) as string, text => optSet(option, text), width, option.isValid, option.description)
 
-        rowGroup.addFocusGui(this.inputField, 0, y)
+        rowGroup.addFocusGui(this.inputField, 0, optionRow.row)
     },
 })
