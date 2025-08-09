@@ -187,6 +187,7 @@ const myenum = {
 {
     type: 'INPUT_FIELD',
     name: '',
+    description: 'boring text, carry on',
     init: 'initial text',
     changeEvent() { /* optional */
         // code
@@ -201,6 +202,7 @@ const myenum = {
 {
     type: 'INPUT_FIELD',
     name: 'favorite food',
+    description: 'whats your favorite food??',
     init: 'bricks',
     changeEvent() { /* optional */
         // code
@@ -216,6 +218,7 @@ const myenum = {
     type: 'INPUT_FIELD',
     name: '',
     init: 'crossthecodes 123',
+    description: 'how to cross the codes',
     changeEvent() { /* optional */
         // code
     },
@@ -260,8 +263,6 @@ const myenum = {
 
 On any option with a name visible, you can set the `noNamePadding` field to `true` to disable the padding.  
 For example:  
-
-
 
 ```javascript
 {
@@ -364,6 +365,7 @@ const Opts = modmanager.registerAndGetModOptions(
                     myInputField: {
                         type: 'INPUT_FIELD',
                         name: '',
+                        description: 'boring text, carry on',
                         init: 'initial text',
                         changeEvent() {
                             /* optional */
@@ -373,6 +375,7 @@ const Opts = modmanager.registerAndGetModOptions(
                     myValidatedInputField: {
                         type: 'INPUT_FIELD',
                         name: '',
+                        description: 'how to cross the codes',
                         init: 'crossthecodes 123',
                         changeEvent() {
                             /* optional */
