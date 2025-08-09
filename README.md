@@ -194,7 +194,7 @@ const myenum = {
 },
 ```
 
-// IMAGE HERE
+![image](https://github.com/user-attachments/assets/4c94b4f4-d96a-4f0f-b587-3c9a81f2703f)
 
 ```javascript
 // With name
@@ -226,7 +226,7 @@ const myenum = {
 },
 ```
 
-// IMAGE HERE
+![image](https://github.com/user-attachments/assets/e9635ce8-d412-460f-84dc-32574fa052d3)
 
 ```javascript
 // With name
@@ -261,7 +261,7 @@ const myenum = {
 On any option with a name visible, you can set the `noNamePadding` field to `true` to disable the padding.  
 For example:  
 
-// IMAGE HERE
+
 
 ```javascript
 {
@@ -275,8 +275,7 @@ For example:
 
 Here's the whole page with `noNamePadding` set to `true`:  
 
-// IMAGE HERE
-
+![image](https://github.com/user-attachments/assets/7d96b23e-f2c5-4574-8678-83c129bc26bc)
 
 ### Full example
 
