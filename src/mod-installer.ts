@@ -7,7 +7,6 @@ import ModManager from './plugin'
 import { Lang } from './lang-manager'
 import { semver } from './library-providers'
 import { Unzipped, unzip } from 'fflate/browser'
-import { SemVer } from 'semver'
 
 const fs: typeof import('fs') = window.require?.('fs')
 const path: typeof import('path') = window.require?.('path')
@@ -128,7 +127,6 @@ export class ModInstaller {
         }
 
         if (ModManager.mod.isCCL3) {
-            // @ts-expect-error missing ccloader3 typings :sob:
             this.modsDir = modloader.config.modsDirs[0]
 
             for (const [id, version] of modloader.virtualPackages.entries()) {
