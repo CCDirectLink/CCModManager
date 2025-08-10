@@ -6,7 +6,6 @@
 
 ### Added
 
-- Added `button: sc.ButtonGui` to `onPress` of `BUTTON` option
 - Added new mod option field `noNamePadding` that disables the padding after the option name
 - `INPUT_FIELD` can now have a name
 

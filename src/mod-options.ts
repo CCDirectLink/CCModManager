@@ -106,7 +106,7 @@ interface INFO {
 
 interface BUTTON {
     type: 'BUTTON'
-    onPress: (this: GuiOption, button: sc.ButtonGui) => void
+    onPress: (this: GuiOption) => void
 }
 
 interface JSON_DATA extends OptionChangeable {

@@ -21,7 +21,7 @@ modmanager.gui.Options.BUTTON = ig.GuiElementBase.extend({
         this.button = new sc.ButtonGui(option.name)
         if (option.onPress) {
             this.button.onButtonPress = () => {
-                option.onPress.call(option, this.button)
+                option.onPress.call(option)
             }
         }
 
