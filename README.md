@@ -150,7 +150,8 @@ const myenum = {
 ```javascript
 {
     type: 'INFO',
-    name: 'Hello to all!\n<-- New line.'
+    name: 'Hello to all!\n<-- New line.',
+    description: '',
 }
 ```
 
@@ -339,6 +340,7 @@ const Opts = modmanager.registerAndGetModOptions(
                     myInfo: {
                         type: 'INFO',
                         name: 'Hello!',
+                        description: '',
                     },
                     myKeybinding: {
                         type: 'CONTROLS',
