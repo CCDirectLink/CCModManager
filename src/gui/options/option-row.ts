@@ -1,20 +1,20 @@
-import type { GuiOption } from '../../mod-options'
+import type { GuiOption, OptionVisibleTypes } from '../../mod-options'
 import { ModOptionsOptionElement } from './option-elements/all'
 import './option-elements/all'
 
 declare global {
     namespace modmanager.gui {
-        interface OptionsOptionRow extends sc.OptionRow {
-            guiOption: GuiOption
+        interface OptionsOptionRow<T extends OptionVisibleTypes = OptionVisibleTypes> extends sc.OptionRow {
+            guiOption: GuiOption<T>
         }
         interface OptionsOptionRowConstructor extends ImpactClass<OptionsOptionRow> {
-            new (
-                option: GuiOption,
+            new <T extends OptionVisibleTypes>(
+                option: GuiOption<T>,
                 row: number,
                 rowGroup: sc.RowButtonGroup,
                 width: number,
                 height?: number
-            ): OptionsOptionRow
+            ): OptionsOptionRow<T>
         }
         var OptionsOptionRow: OptionsOptionRowConstructor
     }
@@ -32,8 +32,8 @@ modmanager.gui.OptionsOptionRow = sc.OptionRow.extend({
         this.optionDes = option.description
         this.row = row
 
-        const clazz = modmanager.gui.Options[option.type as Exclude<typeof option.type, 'ARRAY_SLIDER' | 'JSON_DATA'>]
-        let { has: hasNameGui } = (clazz.prototype as ModOptionsOptionElement).getNameGuiInfo()
+        const clazz = modmanager.gui.Options[option.type as OptionVisibleTypes]
+        let { has: hasNameGui } = (clazz.prototype as ModOptionsOptionElement<any>).getNameGuiInfo()
         hasNameGui &&= !!option.name
 
         const nameGuiPadding: boolean = !option.noNamePadding
@@ -62,7 +62,7 @@ modmanager.gui.OptionsOptionRow = sc.OptionRow.extend({
         }
 
         if (clazz) {
-            const typeGui: ig.GuiElementBase = new clazz(this, optionWidth, rowGroup)
+            const typeGui: ig.GuiElementBase = new clazz(this as any, optionWidth, rowGroup)
             this.typeGui = typeGui as any
             typeGui.setSize(optionWidth, Math.max(26, typeGui.hook.size.y))
             typeGui.setAlign(ig.GUI_ALIGN.X_LEFT, ig.GUI_ALIGN.Y_BOTTOM)

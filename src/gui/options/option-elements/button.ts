@@ -2,10 +2,10 @@ import { ModOptionsOptionConstructor, ModOptionsOptionElement } from './all'
 
 declare global {
     namespace modmanager.gui.Options {
-        interface BUTTON extends ig.GuiElementBase, ModOptionsOptionElement {
+        interface BUTTON extends ig.GuiElementBase, ModOptionsOptionElement<'BUTTON'> {
             button: sc.ButtonGui
         }
-        interface BUTTON_CONSTRUCTOR extends ImpactClass<BUTTON>, ModOptionsOptionConstructor<BUTTON> {}
+        interface BUTTON_CONSTRUCTOR extends ImpactClass<BUTTON>, ModOptionsOptionConstructor<BUTTON, 'BUTTON'> {}
         var BUTTON: BUTTON_CONSTRUCTOR
     }
 }
@@ -14,21 +14,19 @@ modmanager.gui.Options.BUTTON = ig.GuiElementBase.extend({
     init(optionRow, _width, rowGroup) {
         this.parent()
 
-        const option = (optionRow as modmanager.gui.OptionsOptionRow).guiOption
-        this.guiOption = option
-        if (option.type != 'BUTTON') throw new Error('how')
+        this.guiOption = optionRow.guiOption
 
-        this.button = new sc.ButtonGui(option.name)
-        if (option.onPress) {
+        this.button = new sc.ButtonGui(this.guiOption.name)
+        if (this.guiOption.onPress) {
             this.button.onButtonPress = () => {
-                option.onPress.call(option)
+                this.guiOption.onPress.call(this.guiOption)
             }
         }
 
         this.button.setAlign(ig.GUI_ALIGN.X_LEFT, ig.GUI_ALIGN.Y_CENTER)
 
         const backup = this.button.focusGained.bind(this.button)
-        this.button.data = option.description
+        this.button.data = this.guiOption.description
         this.button.focusGained = function (this: sc.ButtonGui) {
             backup()
             sc.menu.setInfoText(this.data as string)

@@ -1,4 +1,4 @@
-import { GuiOption } from '../../../mod-options'
+import { GuiOption, OptionVisibleTypes } from '../../../mod-options'
 
 declare global {
     namespace modmanager.gui.Options {}
@@ -12,14 +12,14 @@ import './info'
 import './input-field'
 import './object-slider'
 
-export interface ModOptionsOptionElement {
-    guiOption: GuiOption
+export interface ModOptionsOptionElement<T extends OptionVisibleTypes> {
+    guiOption: GuiOption<T>
 
     getNameGuiInfo(this: this): { has: boolean }
 }
 
-export interface ModOptionsOptionConstructor<T extends ModOptionsOptionElement> {
-    new (optionRow: modmanager.gui.OptionsOptionRow, width: number, rowGroup: sc.RowButtonGroup): T
+export interface ModOptionsOptionConstructor<E extends ModOptionsOptionElement<T>, T extends OptionVisibleTypes> {
+    new (optionRow: modmanager.gui.OptionsOptionRow<T>, width: number, rowGroup: sc.RowButtonGroup): E
 }
 
 export function optGet(guiOption: GuiOption): unknown {

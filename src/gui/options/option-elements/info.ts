@@ -2,11 +2,11 @@ import { ModOptionsOptionConstructor, ModOptionsOptionElement } from './all'
 
 declare global {
     namespace modmanager.gui.Options {
-        interface INFO extends ig.GuiElementBase, ModOptionsOptionElement {
+        interface INFO extends ig.GuiElementBase, ModOptionsOptionElement<'INFO'> {
             text: sc.TextGui
             box: sc.CenterBoxGui
         }
-        interface INFO_CONSTRUCTOR extends ImpactClass<INFO>, ModOptionsOptionConstructor<INFO> {}
+        interface INFO_CONSTRUCTOR extends ImpactClass<INFO>, ModOptionsOptionConstructor<INFO, 'INFO'> {}
         var INFO: INFO_CONSTRUCTOR
     }
 }
@@ -15,7 +15,7 @@ modmanager.gui.Options.INFO = ig.GuiElementBase.extend({
     init(optionRow, width, _rowGroup) {
         this.parent()
 
-        this.guiOption = (optionRow as modmanager.gui.OptionsOptionRow).guiOption
+        this.guiOption = optionRow.guiOption
 
         this.text = new sc.TextGui(this.guiOption.name, { maxWidth: width - 36, font: sc.fontsystem.smallFont })
         const height = this.text.hook.size.y

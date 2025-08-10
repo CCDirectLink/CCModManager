@@ -75,19 +75,25 @@ modmanager.gui.InputFieldWrapper = ig.GuiElementBase.extend({
 
 declare global {
     namespace modmanager.gui.Options {
-        interface INPUT_FIELD extends modmanager.gui.InputFieldWrapper, ModOptionsOptionElement {}
-        interface INPUT_FIELD_CONSTRUCTOR extends ImpactClass<INPUT_FIELD>, ModOptionsOptionConstructor<INPUT_FIELD> {}
+        interface INPUT_FIELD extends modmanager.gui.InputFieldWrapper, ModOptionsOptionElement<'INPUT_FIELD'> {}
+        interface INPUT_FIELD_CONSTRUCTOR
+            extends ImpactClass<INPUT_FIELD>,
+                ModOptionsOptionConstructor<INPUT_FIELD, 'INPUT_FIELD'> {}
         var INPUT_FIELD: INPUT_FIELD_CONSTRUCTOR
     }
 }
 
 modmanager.gui.Options.INPUT_FIELD = modmanager.gui.InputFieldWrapper.extend({
     init(optionRow, width, rowGroup) {
-        const option = (optionRow as modmanager.gui.OptionsOptionRow).guiOption
-        this.guiOption = option
-        if (option.type != 'INPUT_FIELD') throw new Error('how')
+        this.guiOption = optionRow.guiOption
 
-        this.parent(optGet(option) as string, text => optSet(option, text), width, option.isValid, option.description)
+        this.parent(
+            optGet(this.guiOption) as string,
+            text => optSet(this.guiOption, text),
+            width,
+            this.guiOption.isValid,
+            this.guiOption.description
+        )
 
         rowGroup.addFocusGui(this.inputField, 0, optionRow.row)
     },

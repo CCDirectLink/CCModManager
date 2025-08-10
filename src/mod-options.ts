@@ -1,7 +1,25 @@
 export type Enum = Record<string, number>
 
+export type OptionVisibleTypes = keyof typeof modmanager.gui.Options
+export type OptionTypes = OptionVisibleTypes | 'JSON_DATA'
+export type OptionInstanceType<T extends OptionVisibleTypes> = InstanceType<(typeof modmanager.gui.Options)[T]>
+
+/** A option entry */
+export interface OptionBase<T extends OptionTypes> {
+    type: T
+    /** Option display name */
+    name?: ig.LangLabel.Data
+    /** Whether to add padding after the name */
+    noNamePadding?: boolean
+    /** Option description */
+    description?: ig.LangLabel.Data
+
+    /** Is the option hidden from the menu */
+    hidden?: T extends OptionVisibleTypes ? boolean | (() => boolean) : never
+}
+
 /** Option that has state that can change */
-export interface OptionChangeable {
+export interface OptionChangeable<T extends OptionTypes> extends OptionBase<T> {
     /** Does the option require a game restart to take effect */
     restart?: boolean
     /** Option change callback */
@@ -12,21 +30,9 @@ export interface OptionChangeable {
     preventResettingToDefault?: boolean
 }
 
-/** A option entry */
 // prettier-ignore
-export type Option = {
-    /** Option display name */
-    name?: ig.LangLabel.Data
-    /** Whether to add padding after the name */
-    noNamePadding?: boolean
-    /** Option description */
-    description?: ig.LangLabel.Data
-
-    /** Is the option hidden from the menu */
-    hidden?: boolean | (() => boolean)
-} & (
+export type Option<T extends OptionTypes = OptionTypes> = {type: T} & (
     | BUTTON_GROUP
-    | ARRAY_SLIDER
     | OBJECT_SILDER
     | CHECKBOX
     | CONTROLS
@@ -36,8 +42,7 @@ export type Option = {
     | INPUT_FIELD
 )
 
-type BUTTON_GROUP = OptionChangeable & {
-    type: 'BUTTON_GROUP'
+type BUTTON_GROUP = OptionChangeable<'BUTTON_GROUP'> & {
     /** Initial option value */
     init: number
     /** Button display names */
@@ -55,8 +60,7 @@ type BUTTON_GROUP = OptionChangeable & {
     )
 
 export type InputFieldIsValidFunc = (text: string) => boolean | Promise<boolean>
-interface INPUT_FIELD extends OptionChangeable {
-    type: 'INPUT_FIELD'
+interface INPUT_FIELD extends OptionChangeable<'INPUT_FIELD'> {
     /** Initial option value */
     init: string
     /** Input field height */
@@ -65,16 +69,7 @@ interface INPUT_FIELD extends OptionChangeable {
     isValid?: InputFieldIsValidFunc
 }
 
-interface ARRAY_SLIDER extends OptionChangeable {
-    type: 'ARRAY_SLIDER'
-    data: number[]
-    init: number
-    snap?: boolean
-    fill?: boolean
-}
-
-type OBJECT_SILDER = OptionChangeable & {
-    type: 'OBJECT_SLIDER'
+type OBJECT_SILDER = OptionChangeable<'OBJECT_SLIDER'> & {
     init: number
     snap?: boolean
     fill?: boolean
@@ -95,26 +90,21 @@ type OBJECT_SILDER = OptionChangeable & {
           }
     )
 
-interface CHECKBOX extends OptionChangeable {
-    type: 'CHECKBOX'
+interface CHECKBOX extends OptionChangeable<'CHECKBOX'> {
     init: boolean
 }
 
-interface INFO {
-    type: 'INFO'
-}
+interface INFO extends OptionBase<'INFO'> {}
 
-interface BUTTON {
-    type: 'BUTTON'
+interface BUTTON extends OptionBase<'BUTTON'> {
     onPress: () => void
 }
 
-interface JSON_DATA extends OptionChangeable {
-    type: 'JSON_DATA'
+interface JSON_DATA extends OptionChangeable<'JSON_DATA'> {
     init: any
 }
 
-interface CONTROLS {
+interface CONTROLS extends OptionBase<'CONTROLS'> {
     type: 'CONTROLS'
     init: { key1: ig.KEY; key2?: ig.KEY }
 
@@ -128,7 +118,7 @@ interface CONTROLS {
 }
 /* options types end */
 
-export type GuiOption = Option & {
+export type GuiOption<T extends OptionTypes = OptionTypes> = Option<T> & {
     id: string
     baseId: string
     modId: string
@@ -259,7 +249,7 @@ export type ModSettingsGuiStructure = Record<string, ModSettingsGuiStructureCate
 export type ModSettingsGuiStructureCategorySettings = CategorySettings
 export type ModSettingsGuiStructureCategory = {
     settings: ModSettingsGuiStructureCategorySettings
-    headers: Record<string, Record<string, GuiOption>>
+    headers: Record<string, Record<string, GuiOption<OptionTypes>>>
 }
 
 /* stolen from game.compiled.js because it hasn't executed yet */
@@ -277,7 +267,7 @@ modmanager.gui = {} as any
 modmanager.options = {}
 modmanager.optionConfigs = {}
 
-const controlsToSet: (GuiOption & { type: 'CONTROLS' })[] = []
+const controlsToSet: GuiOption<'CONTROLS'>[] = []
 
 modmanager.registerAndGetModOptions = registerAndGetModOptions
 function registerAndGetModOptions<T extends Options>(settings: ModOptionsSettings, options: T): OptsType<T> {
