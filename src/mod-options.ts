@@ -16,6 +16,10 @@ export interface OptionBase<T extends OptionTypes> {
 
     /** Is the option hidden from the menu */
     hidden?: T extends OptionVisibleTypes ? boolean | (() => boolean) : never
+    /** Gets called after the option gets shown */
+    onInit?: T extends OptionVisibleTypes ? (gui: OptionInstanceType<T>) => void : never
+    /** Gets called after the option gets hidden */
+    onDeinit?: T extends OptionVisibleTypes ? (gui: OptionInstanceType<T>) => void : never
 }
 
 /** Option that has state that can change */

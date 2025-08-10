@@ -84,10 +84,18 @@ modmanager.gui.OptionsOptionRow = sc.OptionRow.extend({
             this.nameGui?.setPos(baseX, 21)
         }
         this.hook.setMouseRecord(true)
+
+        // @ts-expect-error
+        option.onInit?.call(option, this.typeGui)
     },
     updateDrawables(renderer) {
         /* fix divider y getting set based of the height instead of just being a predefined value */
         /*                                    change here vv */
         if (this.divider) renderer.addColor('#545454', 0, 14, this.hook.size.x + 2, 1)
+    },
+    hide() {
+        this.parent()
+        // @ts-expect-error
+        this.guiOption.onDeinit?.call(this.guiOption, this.typeGui)
     },
 })

@@ -38,6 +38,7 @@ declare global {
             updateEntries(this: this, mod: ModEntry): void
             createTabs(this: this): void
 
+            hideRows(this: this): void
             showMenu(this: this): void
             hideMenu(this: this): void
             _createOptionList(this: this, category: string): void
@@ -344,6 +345,9 @@ modmanager.gui.OptionsTabBox = ig.GuiElementBase.extend({
     hideMenu() {
         sc.menu.buttonInteract.removeParallelGroup(this.tabGroup)
 
+        for (const content of this.tabContent) {
+            for (const row of content.rows ?? []) row.hide()
+        }
         this.list.deactivate()
         this.keyBinder.remove()
         sc.keyBinderGui = null

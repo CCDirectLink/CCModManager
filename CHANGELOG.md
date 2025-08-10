@@ -8,6 +8,7 @@
 
 - Added new mod option field `noNamePadding` that disables the padding after the option name
 - `INPUT_FIELD` can now have a name
+- Added optional `onInit` and `onDeinit` functions to visible mod options
 
 ### Changed
 
