@@ -253,7 +253,7 @@ modmanager.gui.OptionsTabBox = ig.GuiElementBase.extend({
 
                 if (option.type == 'JSON_DATA') continue
 
-                if (option.hidden && (typeof option.hidden === 'boolean' || option.hidden())) {
+                if (option.hidden && (typeof option.hidden === 'boolean' || option.hidden.call(option))) {
                     continue
                 }
 

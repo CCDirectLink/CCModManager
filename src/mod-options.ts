@@ -5,7 +5,7 @@ export interface OptionChangeable {
     /** Does the option require a game restart to take effect */
     restart?: boolean
     /** Option change callback */
-    changeEvent?: (this: GuiOption) => void
+    changeEvent?: () => void
     /** Redraw the menu on option change */
     updateMenuOnChange?: boolean
     /** Prevent the option from resetting the settings using the "Reset Settings" */
@@ -106,7 +106,7 @@ interface INFO {
 
 interface BUTTON {
     type: 'BUTTON'
-    onPress: (this: GuiOption) => void
+    onPress: () => void
 }
 
 interface JSON_DATA extends OptionChangeable {
@@ -422,7 +422,7 @@ export function modOptionsPoststart() {
                     controlConfig.pressEvent.call(controlConfig)
                 }
                 if (controlConfig.holdEvent && ig.input.state(id)) {
-                    controlConfig.holdEvent()
+                    controlConfig.holdEvent.call(controlConfig)
                 }
             }
         },
