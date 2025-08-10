@@ -1,12 +1,12 @@
-import type { GuiOption } from '../../mod-options';
+import type { GuiOption, OptionVisibleTypes } from '../../mod-options';
 import './option-elements/all';
 declare global {
     namespace modmanager.gui {
-        interface OptionsOptionRow extends sc.OptionRow {
-            guiOption: GuiOption;
+        interface OptionsOptionRow<T extends OptionVisibleTypes = OptionVisibleTypes> extends sc.OptionRow {
+            guiOption: GuiOption<T>;
         }
         interface OptionsOptionRowConstructor extends ImpactClass<OptionsOptionRow> {
-            new (option: GuiOption, row: number, rowGroup: sc.RowButtonGroup, width: number, height?: number): OptionsOptionRow;
+            new <T extends OptionVisibleTypes>(option: GuiOption<T>, row: number, rowGroup: sc.RowButtonGroup, width: number, height?: number): OptionsOptionRow<T>;
         }
         var OptionsOptionRow: OptionsOptionRowConstructor;
     }

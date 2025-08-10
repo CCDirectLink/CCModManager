@@ -1,17 +1,10 @@
 export type Enum = Record<string, number>;
-/** Option that has state that can change */
-export interface OptionChangeable {
-    /** Does the option require a game restart to take effect */
-    restart?: boolean;
-    /** Option change callback */
-    changeEvent?: (this: GuiOption) => void;
-    /** Redraw the menu on option change */
-    updateMenuOnChange?: boolean;
-    /** Prevent the option from resetting the settings using the "Reset Settings" */
-    preventResettingToDefault?: boolean;
-}
+export type OptionVisibleTypes = keyof typeof modmanager.gui.Options;
+export type OptionTypes = OptionVisibleTypes | 'JSON_DATA';
+export type OptionInstanceType<T extends OptionVisibleTypes> = InstanceType<(typeof modmanager.gui.Options)[T]>;
 /** A option entry */
-export type Option = {
+export interface OptionBase<T extends OptionTypes> {
+    type: T;
     /** Option display name */
     name?: ig.LangLabel.Data;
     /** Whether to add padding after the name */
@@ -19,10 +12,27 @@ export type Option = {
     /** Option description */
     description?: ig.LangLabel.Data;
     /** Is the option hidden from the menu */
-    hidden?: boolean | (() => boolean);
-} & (BUTTON_GROUP | ARRAY_SLIDER | OBJECT_SILDER | CHECKBOX | CONTROLS | INFO | BUTTON | JSON_DATA | INPUT_FIELD);
-type BUTTON_GROUP = OptionChangeable & {
-    type: 'BUTTON_GROUP';
+    hidden?: T extends OptionVisibleTypes ? boolean | (() => boolean) : never;
+    /** Gets called after the option gets shown */
+    onInit?: T extends OptionVisibleTypes ? (gui: OptionInstanceType<T>) => void : never;
+    /** Gets called after the option gets hidden */
+    onDeinit?: T extends OptionVisibleTypes ? (gui: OptionInstanceType<T>) => void : never;
+}
+/** Option that has state that can change */
+export interface OptionChangeable<T extends OptionTypes> extends OptionBase<T> {
+    /** Does the option require a game restart to take effect */
+    restart?: boolean;
+    /** Option change callback */
+    changeEvent?: () => void;
+    /** Redraw the menu on option change */
+    updateMenuOnChange?: boolean;
+    /** Prevent the option from resetting the settings using the "Reset Settings" */
+    preventResettingToDefault?: boolean;
+}
+export type Option<T extends OptionTypes = OptionTypes> = {
+    type: T;
+} & (BUTTON_GROUP | OBJECT_SILDER | CHECKBOX | CONTROLS | INFO | BUTTON | JSON_DATA | INPUT_FIELD);
+type BUTTON_GROUP = OptionChangeable<'BUTTON_GROUP'> & {
     /** Initial option value */
     init: number;
     /** Button display names */
@@ -36,8 +46,7 @@ type BUTTON_GROUP = OptionChangeable & {
     data: Record<string, number>;
 });
 export type InputFieldIsValidFunc = (text: string) => boolean | Promise<boolean>;
-interface INPUT_FIELD extends OptionChangeable {
-    type: 'INPUT_FIELD';
+interface INPUT_FIELD extends OptionChangeable<'INPUT_FIELD'> {
     /** Initial option value */
     init: string;
     /** Input field height */
@@ -45,15 +54,7 @@ interface INPUT_FIELD extends OptionChangeable {
     /** Validation function */
     isValid?: InputFieldIsValidFunc;
 }
-interface ARRAY_SLIDER extends OptionChangeable {
-    type: 'ARRAY_SLIDER';
-    data: number[];
-    init: number;
-    snap?: boolean;
-    fill?: boolean;
-}
-type OBJECT_SILDER = OptionChangeable & {
-    type: 'OBJECT_SLIDER';
+type OBJECT_SILDER = OptionChangeable<'OBJECT_SLIDER'> & {
     init: number;
     snap?: boolean;
     fill?: boolean;
@@ -69,22 +70,18 @@ type OBJECT_SILDER = OptionChangeable & {
 } | {
     data: Record<string, number>;
 });
-interface CHECKBOX extends OptionChangeable {
-    type: 'CHECKBOX';
+interface CHECKBOX extends OptionChangeable<'CHECKBOX'> {
     init: boolean;
 }
-interface INFO {
-    type: 'INFO';
+interface INFO extends OptionBase<'INFO'> {
 }
-interface BUTTON {
-    type: 'BUTTON';
-    onPress: (this: GuiOption, button: sc.ButtonGui) => void;
+interface BUTTON extends OptionBase<'BUTTON'> {
+    onPress: () => void;
 }
-interface JSON_DATA extends OptionChangeable {
-    type: 'JSON_DATA';
+interface JSON_DATA extends OptionChangeable<'JSON_DATA'> {
     init: any;
 }
-interface CONTROLS {
+interface CONTROLS extends OptionBase<'CONTROLS'> {
     type: 'CONTROLS';
     init: {
         key1: ig.KEY;
@@ -97,7 +94,7 @@ interface CONTROLS {
     global?: boolean;
     data?: undefined;
 }
-export type GuiOption = Option & {
+export type GuiOption<T extends OptionTypes = OptionTypes> = Option<T> & {
     id: string;
     baseId: string;
     modId: string;
@@ -177,7 +174,7 @@ export type ModSettingsGuiStructure = Record<string, ModSettingsGuiStructureCate
 export type ModSettingsGuiStructureCategorySettings = CategorySettings;
 export type ModSettingsGuiStructureCategory = {
     settings: ModSettingsGuiStructureCategorySettings;
-    headers: Record<string, Record<string, GuiOption>>;
+    headers: Record<string, Record<string, GuiOption<OptionTypes>>>;
 };
 export declare const ObjectKeysT: <K extends string | number | symbol, V>(object: Record<K, V>) => K[];
 export declare const ObjectEntriesT: <K extends string | number | symbol, V>(object: {

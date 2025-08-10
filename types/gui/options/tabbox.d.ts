@@ -32,6 +32,7 @@ declare global {
             initBackgroundColor(this: this): void;
             updateEntries(this: this, mod: ModEntry): void;
             createTabs(this: this): void;
+            hideRows(this: this): void;
             showMenu(this: this): void;
             hideMenu(this: this): void;
             _createOptionList(this: this, category: string): void;

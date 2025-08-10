@@ -14,9 +14,9 @@ declare global {
 }
 declare global {
     namespace modmanager.gui.Options {
-        interface INPUT_FIELD extends modmanager.gui.InputFieldWrapper, ModOptionsOptionElement {
+        interface INPUT_FIELD extends modmanager.gui.InputFieldWrapper, ModOptionsOptionElement<'INPUT_FIELD'> {
         }
-        interface INPUT_FIELD_CONSTRUCTOR extends ImpactClass<INPUT_FIELD>, ModOptionsOptionConstructor<INPUT_FIELD> {
+        interface INPUT_FIELD_CONSTRUCTOR extends ImpactClass<INPUT_FIELD>, ModOptionsOptionConstructor<INPUT_FIELD, 'INPUT_FIELD'> {
         }
         var INPUT_FIELD: INPUT_FIELD_CONSTRUCTOR;
     }

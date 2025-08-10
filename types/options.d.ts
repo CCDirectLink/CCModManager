@@ -20,19 +20,19 @@ export declare function registerOpts(): {
                     readonly type: "CHECKBOX";
                     readonly init: false;
                     readonly hidden: true;
-                    readonly changeEvent: (this: import("./mod-options").GuiOption) => void;
+                    readonly changeEvent: () => void;
                 };
                 readonly hideLibraryMods: {
                     readonly type: "CHECKBOX";
                     readonly init: false;
                     readonly hidden: true;
-                    readonly changeEvent: (this: import("./mod-options").GuiOption) => void;
+                    readonly changeEvent: () => void;
                 };
                 readonly includeLocalModsInOnline: {
                     readonly type: "CHECKBOX";
                     readonly init: true;
                     readonly hidden: true;
-                    readonly changeEvent: (this: import("./mod-options").GuiOption) => void;
+                    readonly changeEvent: () => void;
                 };
                 readonly manualEnforcerRead: {
                     readonly type: "JSON_DATA";
@@ -55,11 +55,11 @@ export declare function registerOpts(): {
                 };
                 readonly clearCacheButton: {
                     readonly type: "BUTTON";
-                    readonly onPress: (this: import("./mod-options").GuiOption) => void;
+                    readonly onPress: () => void;
                 };
                 readonly reinstallAllMods: {
                     readonly type: "BUTTON";
-                    readonly onPress: (this: import("./mod-options").GuiOption) => void;
+                    readonly onPress: () => void;
                 };
             };
         };
@@ -115,12 +115,12 @@ export declare function registerOpts(): {
                 };
                 readonly resetRepositoriesButton: {
                     readonly type: "BUTTON";
-                    readonly onPress: (this: import("./mod-options").GuiOption) => void;
+                    readonly onPress: () => void;
                 };
                 readonly repositories: {
                     readonly type: "JSON_DATA";
                     readonly init: string[];
-                    readonly changeEvent: (this: import("./mod-options").GuiOption) => void;
+                    readonly changeEvent: () => void;
                 };
             };
         };
