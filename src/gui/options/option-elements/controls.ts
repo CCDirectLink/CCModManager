@@ -14,7 +14,6 @@ modmanager.gui.Options.CONTROLS = sc.OPTION_GUIS[sc.OPTION_TYPES.CONTROLS].exten
         const backup_ig_lang_get = ig.lang.get
         // @ts-expect-error
         ig.lang.get = (path: string, ...args) => {
-            if (!(optionRow instanceof modmanager.gui.OptionsOptionRow)) throw new Error('what')
             if (path == 'sc.gui.options.controls.none') return backup_ig_lang_get.call(ig.lang, path, ...args)
             if (path == 'sc.gui.options.controls.description') return optionRow.guiOption.description
             if (path.startsWith('sc.gui.options.controls.keys.')) return optionRow.guiOption.name

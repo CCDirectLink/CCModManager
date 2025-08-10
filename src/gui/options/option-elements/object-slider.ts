@@ -17,36 +17,34 @@ modmanager.gui.Options.OBJECT_SLIDER = ig.GuiElementBase.extend({
     init(optionRow, width, rowGroup) {
         this.parent()
 
-        this.guiOption = (optionRow as modmanager.gui.OptionsOptionRow).guiOption
-        this.base = optionRow as modmanager.gui.OptionsOptionRow
+        this.base = optionRow
 
-        if (this.guiOption.type != 'OBJECT_SLIDER') throw new Error('what')
+        const option = (optionRow as modmanager.gui.OptionsOptionRow).guiOption
+        this.guiOption = option
+        if (option.type != 'OBJECT_SLIDER') throw new Error('what')
 
-        const snap = (!('snap' in this.base.option) || this.base.option.snap) ?? true
+        const snap = option.snap ?? true
 
-        const data = this.guiOption.data
+        const data = option.data
         this.entries = Object.values(data!)
         width -= 4
-        this.showPercentage = this.guiOption.showPercentage
+        this.showPercentage = option.showPercentage
 
-        this.slider = new sc.OptionFocusSlider(this.onChange.bind(this), snap, this.guiOption.fill, rowGroup)
+        this.slider = new sc.OptionFocusSlider(this.onChange.bind(this), snap, option.fill, rowGroup)
 
-        this.slider.setPreferredThumbSize(
-            Math.max(30, this.guiOption.thumbWidth ?? Math.floor(252 / this.entries.length)),
-            21
-        )
+        this.slider.setPreferredThumbSize(Math.max(30, option.thumbWidth ?? Math.floor(252 / this.entries.length)), 21)
 
         this.slider.setPos(0, 0)
         this.slider.setMinMaxValue(0, this.entries.length - 1)
         this.slider.setSize(width - 4, 21, 9)
-        this.slider.data = this.base.optionDes
+        this.slider.data = option.description
         this.addChildGui(this.slider)
         this.currentNumber = new sc.TextGui('')
         this.currentNumber.setAlign(ig.GUI_ALIGN.X_CENTER, ig.GUI_ALIGN.Y_CENTER)
         this.slider.thumb.addChildGui(this.currentNumber)
         rowGroup.addFocusGui(this.slider, 0, this.base.row)
 
-        const value = optGet(this.guiOption) as number
+        const value = optGet(option) as number
         let index = this.entries.findIndex(v => v == value)
         if (index == -1) index = 0
         this.slider.setValue(index)

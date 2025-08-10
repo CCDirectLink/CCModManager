@@ -29,10 +29,8 @@ modmanager.gui.InputFieldWrapper = ig.GuiElementBase.extend({
         this.inputField.setText?.(initialValue)
 
         const revalidate = async (text: string) => {
-            if (!isValidFunc) throw new Error('how')
-
             this.isValidText!.setText('\\i[lore-others]')
-            const isValid = await isValidFunc(text)
+            const isValid = await isValidFunc!(text)
 
             if (this.inputField.getValueAsString() == text) {
                 this.isValidText!.setText(isValid ? '\\i[quest-solve]' : '\\i[quest-elite]')
@@ -88,6 +86,7 @@ modmanager.gui.Options.INPUT_FIELD = modmanager.gui.InputFieldWrapper.extend({
         const option = (optionRow as modmanager.gui.OptionsOptionRow).guiOption
         this.guiOption = option
         if (option.type != 'INPUT_FIELD') throw new Error('how')
+
         this.parent(optGet(option) as string, text => optSet(option, text), width, option.isValid, option.description)
 
         rowGroup.addFocusGui(this.inputField, 0, optionRow.row)

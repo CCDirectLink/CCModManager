@@ -13,17 +13,16 @@ declare global {
 modmanager.gui.Options ??= {} as any
 modmanager.gui.Options.BUTTON_GROUP = sc.OPTION_GUIS[sc.OPTION_TYPES.BUTTON_GROUP].extend({
     init(optionRow, width, rowGroup) {
-        this.guiOption = (optionRow as modmanager.gui.OptionsOptionRow).guiOption
+        const option = (optionRow as modmanager.gui.OptionsOptionRow).guiOption
+        this.guiOption = option
+        if (option.type != 'BUTTON_GROUP') throw new Error('what')
 
-        const index = optGet(this.guiOption) as number
+        const index = optGet(option) as number
 
         const backup_ig_lang_get = ig.lang.get
         // @ts-expect-error
         ig.lang.get = (): string[] => {
-            if (!(optionRow instanceof modmanager.gui.OptionsOptionRow)) throw new Error('what')
-            if (optionRow.guiOption.type != 'BUTTON_GROUP') throw new Error('what')
-
-            return optionRow.guiOption.buttonNames ?? []
+            return option.buttonNames ?? []
         }
         const backup_sc_options_get = sc.options.get
         sc.options.get = () => index
