@@ -133,13 +133,13 @@ const myenum = {
 ```javascript
 {
     type: 'BUTTON',
+    name: 'Button',
+    description: 'My favorite button.',
     onPress(button) {
         // code
         // you can update the button text as you please
         button.setText("hi!!")
     },
-    name: 'Button',
-    description: 'My favorite button.',
 }
 ```
 
@@ -260,6 +260,27 @@ const myenum = {
 }
 ```
 
+## `onInit` and `onDeinit`
+
+Each visible option has the optional functions `onInit` and `onDeinit`.  
+For example:  
+```javascript
+{
+    type: 'BUTTON',
+    name: 'Button',
+    description: 'My favorite button.',
+    onPress() {
+        console.log('Button presssed!')
+    },
+    onInit(gui) {
+        gui.button.setText("(evil) Button")
+    },
+    onDeinit(gui) {
+        console.log("the evil button will return someday!")
+    }
+},
+```
+
 ## Name padding
 
 On any option with a name visible, you can set the `noNamePadding` field to `true` to disable the padding.  
@@ -331,11 +352,11 @@ const Opts = modmanager.registerAndGetModOptions(
                     },
                     myButton: {
                         type: 'BUTTON',
+                        name: 'Button',
+                        description: 'My favorite button.',
                         onPress() {
                             console.log('Button presssed!')
                         },
-                        name: 'Button',
-                        description: 'My favorite button.',
                     },
                     myInfo: {
                         type: 'INFO',
