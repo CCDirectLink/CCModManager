@@ -519,8 +519,6 @@ modmanager.gui.Menu = (sc.ListInfoMenu ?? sc.SortableListMenu).extend({
                 Lang.help.pages,
                 () => {
                     this.showMenu()
-                    sc.menu.popBackCallback()
-                    sc.menu.popBackCallback()
                 },
                 true
             )
