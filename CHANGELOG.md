@@ -28,6 +28,8 @@
 - Fix focus highlight of `INPUT_FIELD` without validation being shorter than the input field
 - Fixed `INPUT_FIELD`, `BUTTON` and `INFO` mod option types eating their header
 - Fix menu stack getting popped too many times on opening the mod manager help menu resulting in the game being stuck in the mod manager menu
+- Fix mod tags and authors not showing up on mod that aren't in the database
+- Fix mod tags overflowing out of bounds when they are too long
 
 ## [1.0.4] 2025-06-26
 

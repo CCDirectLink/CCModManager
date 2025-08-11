@@ -121,11 +121,13 @@ modmanager.gui.ListEntry = ig.FocusGui.extend({
         if (!isGrid) {
             const tags = serverMod?.tags ?? localMod?.tags
             if (tags) {
+                const tagsLength = tags.join(', ').length
                 const str = tags.map(a => `\\c[0]${a}\\c[0]`).join(', ')
+                const useTinyFont = tagsLength > 100
                 this.tags = new sc.TextGui(str, {
-                    font: sc.fontsystem.smallFont,
-                    maxWidth: 130 + (str.length > 100 ? 60 : 0),
-                    linePadding: -4,
+                    font: useTinyFont ? sc.fontsystem.tinyFont : sc.fontsystem.smallFont,
+                    maxWidth: 130 + (tagsLength > 50 ? 60 : 0),
+                    linePadding: useTinyFont ? 0 : -4,
                 })
                 this.tags.setAlign(ig.GUI_ALIGN.X_RIGHT, ig.GUI_ALIGN.Y_TOP)
                 this.tags.setPos(4, 15)
