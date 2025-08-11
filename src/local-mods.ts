@@ -4,6 +4,7 @@ import ModManager from './plugin'
 import { ModEntry, ModEntryLocal, ModEntryServer } from './types'
 import { ModDB } from './moddb'
 import { ModInstaller } from './mod-installer'
+import type { ValidTags } from 'ccmoddb/build/src/types'
 
 type CCL2Mod = {
     baseDirectory: string
@@ -16,6 +17,8 @@ type CCL2Mod = {
     icons?: { '24'?: string }
     repository?: string
     homepage?: string
+    tags?: ValidTags[]
+    authors?: string[] | string
 
     active?: boolean
 }
@@ -166,6 +169,7 @@ export class LocalMods {
     }
 
     private static convertCCL2Mod(mod: CCL2Mod): ModEntryLocal {
+        const authors = mod.authors
         return {
             database: 'LOCAL',
             isLocal: true,
@@ -181,6 +185,8 @@ export class LocalMods {
                 ? mod.baseDirectory.substring(0, mod.baseDirectory.length - 1)
                 : mod.baseDirectory,
             repositoryUrl: mod.repository,
+            authors: authors ? (typeof authors === 'string' ? [authors] : authors) : [],
+            tags: mod.tags ?? [],
 
             active: !mod.disabled,
             iconConfig: mod.icons?.['24']
@@ -197,6 +203,8 @@ export class LocalMods {
     }
 
     private static convertCCL3Mod(mod: Mod): ModEntryLocal {
+        // @ts-expect-error
+        const authors: string[] | string = mod.authors
         const active = mod == modloader._runtimeMod ? true : (sc.options.get(`modEnabled-${mod.id}`) as boolean)
         return {
             database: 'LOCAL',
@@ -214,6 +222,9 @@ export class LocalMods {
             }, {}),
             path: mod.baseDirectory.substring(0, mod.baseDirectory.length - 1),
             repositoryUrl: mod.manifest.repository,
+            authors: authors ? (typeof authors === 'string' ? [authors] : authors) : [],
+            // @ts-expect-error
+            tags: mod.tags ?? [],
 
             active,
             iconConfig: mod.manifest.icons?.['24']

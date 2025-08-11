@@ -51,13 +51,13 @@ export function createFuzzyFilteredModList<T extends ModEntry>(filters: Fliters,
                 let mod: ModEntryServer | undefined = origMod.isLocal ? origMod.serverCounterpart : origMod
 
                 let author: number = 0
-                if (mod) {
+                if (mod?.authors) {
                     const res = fuzzysort.go(filters.name!, mod.authors)
                     author = res[0]?.score.map(-1000000, 0, 0, 1000) || 0
                 }
 
                 let tag: number = 0
-                if (mod) {
+                if (mod?.tags) {
                     const res = fuzzysort.go(filters.name!, mod.tags)
                     tag = res[0]?.score.map(-1000000, 0, 0, 1000) || 0
                 }

@@ -119,8 +119,8 @@ modmanager.gui.ListEntry = ig.FocusGui.extend({
         this.addChildGui(this.nameIconPrefixesText)
 
         if (!isGrid) {
-            if (serverMod?.tags) {
-                const tags = serverMod.tags
+            const tags = serverMod?.tags ?? localMod?.tags
+            if (tags) {
                 const str = tags.map(a => `\\c[0]${a}\\c[0]`).join(', ')
                 this.tags = new sc.TextGui(str, {
                     font: sc.fontsystem.smallFont,
@@ -140,8 +140,8 @@ modmanager.gui.ListEntry = ig.FocusGui.extend({
             this.description.setPos(4 + this.iconOffset, 14)
             this.addChildGui(this.description)
 
-            if (serverMod?.authors) {
-                const authors = serverMod.authors
+            const authors = serverMod?.authors ?? localMod?.authors
+            if (authors && authors.length > 0) {
                 const str = `by ${authors.map(a => `\\c[3]${a}\\c[0]`).join(', ')}`
                 this.authors = new sc.TextGui(str, { font: sc.fontsystem.smallFont, linePadding: -1 })
                 this.addChildGui(this.authors)
@@ -167,7 +167,8 @@ modmanager.gui.ListEntry = ig.FocusGui.extend({
 
             if (serverMod?.stars !== undefined) {
                 this.starCount = new sc.TextGui(`${serverMod.stars}\\i[save-star]`)
-                this.starCount.setPos(496 - this.starCount.hook.size.x, 0)
+                this.starCount.setAlign(ig.GUI_ALIGN_X.RIGHT, ig.GUI_ALIGN_Y.TOP)
+                this.starCount.setPos(53, 0)
                 this.addChildGui(this.starCount)
             }
         }
@@ -238,7 +239,9 @@ modmanager.gui.ListEntry = ig.FocusGui.extend({
                 const spaceLeft =
                     this.hook.size.x -
                     this.authors.hook.pos.x -
-                    (this.hook.size.x - (this.starCount?.hook.pos.x ?? this.versionText.hook.pos.x))
+                    (this.starCount
+                        ? this.starCount.hook.pos.x + this.starCount.hook.size.x
+                        : this.versionText.hook.pos.x + this.versionText.hook.size.x)
                 const freeSpace = spaceLeft - this.authors.hook.size.x
                 if (freeSpace <= 0) {
                     this.authors.setFont(sc.fontsystem.tinyFont)
