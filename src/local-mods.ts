@@ -259,9 +259,11 @@ export class LocalMods {
             const depMod = this.cacheRecord[depModName] ?? this.cacheRecordByName[depModName]
 
             if (depMod) {
-                deps.add(depMod)
+                if (!deps.has(depMod)) {
+                    deps.add(depMod)
 
-                this.findDeps(depMod, deps, missing)
+                    this.findDeps(depMod, deps, missing)
+                }
             } else {
                 missing.add(depModName)
             }
