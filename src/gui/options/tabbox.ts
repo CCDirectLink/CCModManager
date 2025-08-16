@@ -345,8 +345,8 @@ modmanager.gui.OptionsTabBox = ig.GuiElementBase.extend({
     hideMenu() {
         sc.menu.buttonInteract.removeParallelGroup(this.tabGroup)
 
-        for (const content of this.tabContent) {
-            for (const row of content.rows ?? []) row.hide()
+        for (const key in this.tabContent) {
+            for (const row of this.tabContent[key].rows ?? []) row.hide()
         }
         this.list.deactivate()
         this.keyBinder.remove()
