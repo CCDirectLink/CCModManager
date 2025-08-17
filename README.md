@@ -15,6 +15,19 @@ Read the in-game manual in the help menu for usage instructions.
 
 # For mod developers
 
+## Badge
+
+You can attach this image at the top of your mod's `README.md`:
+
+![CCModManager badge](./icon/badge.png)
+
+Markdown code:
+```markdown
+[![CCModManager badge](https://raw.githubusercontent.com/CCDirectLink/CCModManager/refs/heads/master/icon/badge.png)](https://github.com/CCDirectLink/CCModManager)
+```
+
+# Custom mod options
+
 You can define custom options pages for your own mod.  
 See full example below.  
 

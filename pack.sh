@@ -14,7 +14,7 @@ for file in $(find . -iname '*.json') $(find . -iname '*.json.patch') $(find . -
     jq '.' ../$file -c > $file
 done
 cp ../ccmod.json .
-rm -rf icon/icon240.png
+rm -rf icon/icon240.png icon/badge.png
 LIST="$(find . -name '*.kra') $(find . -name '*~')"
 rm -rf $LIST
 zip -r "../$NAME" .
