@@ -295,9 +295,6 @@ export class ModInstallDialogs {
     }
 
     static showYesNoDialog(text: sc.TextLike, icon?: Nullable<sc.DIALOG_INFO_ICON>): Promise<number> {
-        // @ts-ignore allow cc-instanceinator to hook sc.Dialogs.showYesNoDialog
-        sc.Dialogs.id = window.instanceinator?.id
-
         return new Promise<number>(resolve => {
             sc.Dialogs.showYesNoDialog(text, icon, button => resolve(button.data))
         })
