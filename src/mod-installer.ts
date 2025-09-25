@@ -391,6 +391,9 @@ export class ModInstaller {
             const resp = await fetch(installation.url).catch(_ => {
                 throw new Error(Lang.errors.install.failedFetch)
             })
+            if (resp.status >= 400) {
+                throw new Error(Lang.errors.install.failedFetch)
+            }
 
             const { arrayBuffer, progressFunc } = this.downloadWithProgress(resp)
 

@@ -3,6 +3,12 @@
 # Change Log
 
 ## [Unreleased]
+
+
+## Fixed
+
+- Throw failed to fetch error instead of digest mismatch error when mod download response has a status code >=400
+
 ## [1.1.0] 2025-08-17
 
 ### Added
