@@ -21,6 +21,7 @@ async function getETag(url: string): Promise<string> {
         const response = await fetch(url, {
             method: 'HEAD',
             mode: 'cors',
+            cache: 'no-store',
         })
 
         if (!response.ok) {
