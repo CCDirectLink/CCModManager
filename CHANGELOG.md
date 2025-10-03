@@ -6,7 +6,7 @@
 ## [1.1.1] 2025-10-03
 
 
-## Fixed
+### Fixed
 
 - Fix mod updates not getting detected due to browser caching
 - Throw failed to fetch error instead of digest mismatch error when mod download response has a status code >=400
