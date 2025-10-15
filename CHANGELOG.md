@@ -7,6 +7,7 @@
 ### Fixed
 
 - Fix mod updates not getting detected sometimes
+- Do not ask to enable mod dependencies after auto update
 
 ## [1.1.1] 2025-10-03
 

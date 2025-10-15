@@ -19,7 +19,7 @@ const green = '\\c[2]'
 const yellow = '\\c[3]'
 
 export class ModInstallDialogs {
-    static showModInstallDialog() {
+    static showModInstallDialog(autoupdate?: boolean) {
         const deps = InstallQueue.values().filter(mod => mod.installStatus == 'dependency')
         const toInstall = InstallQueue.values().filter(mod => mod.installStatus == 'new')
         const toUpdate = InstallQueue.values().filter(mod => mod.installStatus == 'update')
@@ -155,11 +155,13 @@ export class ModInstallDialogs {
 
             sc.BUTTON_SOUND.shop_cash.play()
 
-            for (const mod of toInstall) {
-                const { deps } = LocalMods.findDeps(mod)
-                const inactiveDependencies = [...deps].filter(mod => !mod.active)
-                if (inactiveDependencies.length > 0) {
-                    await ModInstallDialogs.showEnableModDialog(mod as unknown as ModEntryLocal)
+            if (!autoupdate) {
+                for (const mod of toInstall) {
+                    const { deps } = LocalMods.findDeps(mod)
+                    const inactiveDependencies = [...deps].filter(mod => !mod.active)
+                    if (inactiveDependencies.length > 0) {
+                        await ModInstallDialogs.showEnableModDialog(mod as unknown as ModEntryLocal)
+                    }
                 }
             }
 
@@ -186,7 +188,7 @@ export class ModInstallDialogs {
             [ig.lang.get('sc.gui.dialogs.yes'), ig.lang.get('sc.gui.dialogs.no')],
             button => {
                 if (button.data == 0) {
-                    this.showModInstallDialog()
+                    this.showModInstallDialog(true)
                 } else {
                     InstallQueue.clear()
                 }
