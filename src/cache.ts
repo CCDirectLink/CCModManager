@@ -31,8 +31,10 @@ async function getETag(url: string): Promise<string> {
             throw new Error(`HTTP error: ${response.status}`)
         }
 
-        const etag = response.headers.get('etag')
-        return etag ? etag : ''
+        /* old versions of nwjs dont report etag??
+         * so just pick a random one to re-fetch each time */
+        const etag = response.headers.get('etag') || `${Math.random()}`
+        return etag
     } catch (err) {
         return 'nointernet'
     }
@@ -90,18 +92,17 @@ export class FileCache {
         const ccPath: string = `${this.cacheDir}/${mod.database}/${urlPathSuffix}`
         const imgPath = ccPath.substring('./assets/'.length)
 
-        if (this.existsOnDisk.has(ccPath)) {
-            return imgPath
-        } else {
-            return (this.readingPromises[ccPath] ??= (async () => {
-                const data = new Uint8Array(await (await fetch(url)).arrayBuffer())
+        if (!this.existsOnDisk.has(ccPath)) {
+            const fetchAndWrite = async () => {
+                const data = new Uint8Array(await (await fetch(url, { cache: 'no-store' })).arrayBuffer())
 
                 await fs.promises.writeFile(ccPath, data)
                 this.existsOnDisk.add(ccPath)
-
-                return imgPath
-            })())
+                delete this.readingPromises[ccPath]
+            }
+            await (this.readingPromises[ccPath] ??= fetchAndWrite())
         }
+        return imgPath
     }
 
     static async checkDatabaseUrl(url: string): Promise<boolean> {
@@ -124,7 +125,9 @@ export class FileCache {
 
         if (this.existsOnDisk.has(ccPath)) {
             const readFile = async () => {
-                return JSON.parse(await fs.promises.readFile(ccPath, 'utf8'))
+                const json = JSON.parse(await fs.promises.readFile(ccPath, 'utf8'))
+                delete this.readingPromises[ccPath]
+                return json
             }
             const data: NPDatabase = await (this.readingPromises[ccPath] ??= readFile())
 
@@ -132,10 +135,12 @@ export class FileCache {
         }
 
         return (this.readingPromises[ccPath] ??= (async () => {
-            const data: NPDatabase = await (await fetch(url)).json()
+            const data: NPDatabase = await (await fetch(url, { cache: 'no-store' })).json()
             data.eTag = etag
 
             await fs.promises.writeFile(ccPath, JSON.stringify(data))
+            this.existsOnDisk.add(ccPath)
+            delete this.readingPromises[ccPath]
 
             return data
         })())
