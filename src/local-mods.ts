@@ -6,7 +6,7 @@ import { ModDB } from './moddb'
 import { ModInstaller } from './mod-installer'
 import type { ValidTags } from 'ccmoddb/build/src/types'
 
-type CCL2Mod = {
+interface CCL2Mod {
     baseDirectory: string
     dependencies?: Record<string, string>
     disabled: boolean
@@ -19,6 +19,7 @@ type CCL2Mod = {
     homepage?: string
     tags?: ValidTags[]
     authors?: string[] | string
+    assets?: string[]
 
     active?: boolean
 }

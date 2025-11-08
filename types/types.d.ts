@@ -46,6 +46,10 @@ interface ModEntryBase extends ModEntryBaseBase {
     awaitingRestart?: boolean;
     /** Mod repository web link */
     repositoryUrl?: string;
+    /** Author list, may be empty */
+    authors?: string[];
+    /** Mod tag list */
+    tags?: ValidTags[];
 }
 export interface ModEntryServer extends ModEntryBase {
     isLocal: false;
@@ -55,14 +59,10 @@ export interface ModEntryServer extends ModEntryBase {
     installation: InstallMethod[];
     /** UNIX timestamp of the last commit of the primary git branch of the repostory provided by "repositoryUrl", fetched by CCModDB */
     lastUpdateTimestamp?: number;
-    /** Author list, may be empty */
-    authors: string[];
     /** GitHub star count, local mods have this set if they have a server counterpart */
     stars?: number;
     /** Represents the release page info fetched from the mods repository */
     releasePages?: ReleasePage[];
-    /** Mod tag list */
-    tags: ValidTags[];
     /** The testing counterpart */
     testingVersion?: ModEntryServer;
     dependenciesCached?: Record<string, {

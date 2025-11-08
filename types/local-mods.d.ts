@@ -1,5 +1,6 @@
 import { ModEntry, ModEntryLocal } from './types';
-type CCL2Mod = {
+import type { ValidTags } from 'ccmoddb/build/src/types';
+interface CCL2Mod {
     baseDirectory: string;
     dependencies?: Record<string, string>;
     disabled: boolean;
@@ -12,8 +13,11 @@ type CCL2Mod = {
     };
     repository?: string;
     homepage?: string;
+    tags?: ValidTags[];
+    authors?: string[] | string;
+    assets?: string[];
     active?: boolean;
-};
+}
 declare global {
     var activeMods: CCL2Mod[];
     var inactiveMods: CCL2Mod[];

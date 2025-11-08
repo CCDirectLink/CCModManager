@@ -3,7 +3,7 @@ export declare function prepareModName(mod: {
     name: string;
 }): string;
 export declare class ModInstallDialogs {
-    static showModInstallDialog(): void;
+    static showModInstallDialog(autoupdate?: boolean): void;
     static showAutoUpdateDialog(): void;
     static showModUninstallDialog(localMod: ModEntryLocal): boolean;
     static checkCanDisableMod(mod: ModEntryLocal): boolean;
