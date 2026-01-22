@@ -3,6 +3,11 @@
 # Change Log
 
 ## [Unreleased]
+
+### Fixed
+
+- Fix error when installing a mod that depends on a testing dependency
+
 ## [1.1.2] 2025-10-15
 
 ### Fixed

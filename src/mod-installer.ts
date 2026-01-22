@@ -143,7 +143,9 @@ export class ModInstaller {
     }
 
     private static getModByDepName(depName: string): ModEntryServer | undefined {
-        return this.record[depName] || this.byNameRecord[depName]
+        let mod = this.record[depName] || this.byNameRecord[depName]
+        if (mod?.testingVersion && ModDB.isModTestingOptIn(mod.id)) mod = mod.testingVersion
+        return mod
     }
 
     private static setOrAddNewer(record: Record<string, DepEntry>, mod: ModEntryServer, ...reqVersionRange: string[]) {
