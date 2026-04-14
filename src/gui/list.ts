@@ -204,10 +204,10 @@ modmanager.gui.MenuList = sc.ListTabbedPane.extend({
         sc.BUTTON_SOUND.submit.play()
         return { skipSounds: true }
     },
-    onContentCreation(index, settings) {
+    onContentCreation() {
         if (this.currentList) this.currentList.clear()
         if (this.currentGroup) this.currentGroup.clear()
-        return this.parent(index, settings)
+        return this.parent()
     },
     onCreateListEntries(list, buttonGroup) {
         if (Opts.isGrid) {
