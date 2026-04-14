@@ -151,6 +151,7 @@ modmanager.gui.FiltersPopup = ig.GuiElementBase.extend({
             const y = (i / tagsW).floor()
             const checkbox = new modmanager.gui.FilterCheckboxGui()
             checkbox.setPos(x * (textW + spacingW) + offset.x, y * (textH + spacingH))
+            // @ts-expect-error from crossedeyes mod
             checkbox.crossedeyesLabel = (config.key.startsWith('tag') ? `${Lang.tag}: ` : '') + lang.name
             checkbox.data = lang.description
 

@@ -26,9 +26,6 @@ importers:
       crosscode-demonizer:
         specifier: github:krypciak/crosscode-demonizer
         version: https://codeload.github.com/krypciak/crosscode-demonizer/tar.gz/d310002e3b2a8835ed977f1dda0c013dbcb006eb
-      crossedeyes:
-        specifier: github:CCDirectLink/CrossedEyes
-        version: https://codeload.github.com/CCDirectLink/CrossedEyes/tar.gz/e36616b0e5e2af0966e872ae22fee6614e50575e
       esbuild:
         specifier: ^0.28.0
         version: 0.28.0
@@ -346,10 +343,6 @@ packages:
     resolution: {tarball: https://codeload.github.com/krypciak/crosscode-demonizer/tar.gz/d310002e3b2a8835ed977f1dda0c013dbcb006eb}
     version: 1.0.0
 
-  crossedeyes@https://codeload.github.com/CCDirectLink/CrossedEyes/tar.gz/e36616b0e5e2af0966e872ae22fee6614e50575e:
-    resolution: {tarball: https://codeload.github.com/CCDirectLink/CrossedEyes/tar.gz/e36616b0e5e2af0966e872ae22fee6614e50575e}
-    version: 0.6.2
-
   debug@4.3.6:
     resolution: {integrity: sha512-O/09Bd4Z1fBrU4VzkhFqVgpPzaGbw6Sm9FEkBT1A/YBXQFGuuSxa1dN2nxgxS34JmKXqYx8CZAwEVoJFImUXIg==}
     engines: {node: '>=6.0'}
@@ -655,8 +648,6 @@ snapshots:
   concat-map@0.0.1: {}
 
   crosscode-demonizer@https://codeload.github.com/krypciak/crosscode-demonizer/tar.gz/d310002e3b2a8835ed977f1dda0c013dbcb006eb: {}
-
-  crossedeyes@https://codeload.github.com/CCDirectLink/CrossedEyes/tar.gz/e36616b0e5e2af0966e872ae22fee6614e50575e: {}
 
   debug@4.3.6:
     dependencies:

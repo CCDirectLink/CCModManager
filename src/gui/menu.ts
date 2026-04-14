@@ -12,7 +12,6 @@ import './options/mod-options-menu'
 import './manual-enforcer'
 import './input-field/input-field'
 
-import type {} from 'crossedeyes/src/tts/gather/checkbox-types.d'
 import { isFullMode, openLink } from '../plugin'
 
 declare global {

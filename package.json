@@ -16,7 +16,6 @@
         "@types/semver": "^7.5.8",
         "ccmoddb": "github:CCDirectLink/CCModDB",
         "crosscode-demonizer": "github:krypciak/crosscode-demonizer",
-        "crossedeyes": "github:CCDirectLink/CrossedEyes",
         "esbuild": "^0.28.0",
         "fflate": "^0.8.2",
         "fuzzysort": "^2.0.4",
