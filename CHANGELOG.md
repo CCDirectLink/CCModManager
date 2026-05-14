@@ -3,6 +3,11 @@
 # Change Log
 
 ## [Unreleased]
+
+### Added
+
+- Add title screen button for opening the mods menu
+
 ## [1.1.3] 2026-01-22
 
 ### Fixed

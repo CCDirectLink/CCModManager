@@ -42,6 +42,7 @@ declare global {
             filtersPopup: modmanager.gui.FiltersPopup
             changelogButton: sc.ButtonGui
             changelogPopup?: modmanager.gui.Changelog
+            runNextFrame: (() => void)[]
 
             initInputField(this: this): void
             initSortMenu(this: this): void
@@ -134,6 +135,8 @@ modmanager.gui.Menu = (sc.ListInfoMenu ?? sc.SortableListMenu).extend({
         ModDB.loadDatabases()
         this.parent(new modmanager.gui.MenuList())
         this.list.setPos(9, 23)
+
+        this.runNextFrame = []
 
         this.initSortMenu()
         const bottomY = 285
@@ -359,7 +362,7 @@ modmanager.gui.Menu = (sc.ListInfoMenu ?? sc.SortableListMenu).extend({
     },
 
     isInMenuStack() {
-        return sc.menu.menuStack.includes(sc.MENU_SUBMENU.MODS)
+        return sc.menu.directMenu == sc.MENU_SUBMENU.MODS || sc.menu.menuStack.includes(sc.MENU_SUBMENU.MODS)
     },
     showModInstallDialog() {
         this.list.tabGroup._invokePressCallbacks(this.list.tabs[Lang.selectedModsTab], true)
@@ -460,7 +463,6 @@ modmanager.gui.Menu = (sc.ListInfoMenu ?? sc.SortableListMenu).extend({
         if (prevSubmenu != sc.MENU_SUBMENU.OPTIONS) sc.menu.popBackCallback()
 
         this.setAllVisibility(true)
-        this.setBlackBarVisibility(false)
 
         /* this NOT is how it's supposed to work but it works so */
         sc.menu.buttonInteract.addGlobalButton(this.inputField as any, () => false)
@@ -482,9 +484,12 @@ modmanager.gui.Menu = (sc.ListInfoMenu ?? sc.SortableListMenu).extend({
             () => ig.input.pressed('special') /* space bar */ || ig.gamepad.isButtonPressed(ig.BUTTONS.RIGHT_TRIGGER)
         )
 
-        new modmanager.gui.ManualEnforcer('ModManagerManual', Lang.help.title, Lang.help.pages)
+        this.runNextFrame.push(() => {
+            this.setBlackBarVisibility(false)
+            new modmanager.gui.ManualEnforcer('ModManagerManual', Lang.help.title, Lang.help.pages)
+        })
     },
-    hideMenu() {
+    exitMenu() {
         this.parent()
         this.setAllVisibility(false)
         this.setBlackBarVisibility(true)
@@ -545,9 +550,13 @@ modmanager.gui.Menu = (sc.ListInfoMenu ?? sc.SortableListMenu).extend({
     },
     update() {
         this.parent()
+
         if (this.modOptionsButton.hook.currentStateName == 'DEFAULT' && ig.input.pressed('dash')) {
             this.modOptionsButton.invokeButtonPress()
         }
+
+        for (const func of this.runNextFrame) func()
+        this.runNextFrame = []
     },
 })
 

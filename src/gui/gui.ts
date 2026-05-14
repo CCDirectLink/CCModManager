@@ -1,6 +1,7 @@
 import { Lang } from '../lang-manager'
 import { registerDynamicIcons, registerModManagerIcons } from './icons'
 import './menu'
+import './title-screen-button'
 
 declare global {
     namespace sc {
