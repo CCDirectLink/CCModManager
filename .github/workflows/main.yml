@@ -25,17 +25,22 @@ jobs:
                   node-version: latest
                   cache: 'pnpm'
 
+            - name: Install semver
+              run: |
+                  npm i -g semver
+
             - name: Check commit message
               id: check_commit_message
               run: |
                   version=$(git log --format=%B -n 1 ${{ github.sha }})
-                  version=${version:2}
-                  if [[ ! "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z-]+)?$ ]]; then
+                  version=${version:1}
+                  version_numeric="$(semver "${version:1}")"
+                  if [[ $? = 1 ]]; then
                     echo "Commit name doesnt match semver format"
                     exit 1
                   fi
                   echo "VERSION=$version" >> $GITHUB_ENV
-                  echo "VERSION_NUMERIC=$version" >> $GITHUB_ENV
+                  echo "VERSION_NUMERIC=$version_numeric" >> $GITHUB_ENV
                   echo "$VERSION" "$version"
 
                   # Check if the version string contains a hyphen followed by non-empty characters
@@ -47,14 +52,12 @@ jobs:
 
             - name: Update package.json and ccmod.json
               run: |
-                  escaped_version=$(echo "$VERSION_NUMERIC" | sed 's/[[\.*^$/&]/\\&/g')
-                  sed -i "s/\"version\": \".*\"/\"version\": \"${escaped_version}\"/" package.json ccmod.json
+                  sed -i "s/\"version\": \".*\"/\"version\": \"${VERSION_NUMERIC}\"/" package.json ccmod.json
                   git add package.json ccmod.json
 
             - name: Update CHANGELOG.md
               run: |
-                  escaped_version=$(echo "$VERSION_NUMERIC" | sed 's/[[\.*^$/&]/\\&/g')
-                  sed -i "/\[Unreleased\]/a ## [${escaped_version}] newDateHere" ./CHANGELOG.md
+                  sed -i "/\[Unreleased\]/a ## [$VERSION_NUMERIC] newDateHere" ./CHANGELOG.md
                   sed -i "s/newDateHere/$(date '+%Y-%m-%d')/g" ./CHANGELOG.md
                   if [ $IS_PREREALESE = false ]; then 
                     git add ./CHANGELOG.md
@@ -62,15 +65,11 @@ jobs:
 
             - name: Commit changes
               run: |
-                  if [ -n "${GITHUB_ACTOR_EMAIL}" ]; then
-                    git config --global user.email "${GITHUB_ACTOR_EMAIL}"
-                  else
-                    git config --global user.email "actions@github.com"
-                  fi
+                  git config --global user.email "${GITHUB_ACTOR_EMAIL}"
                   git config --global user.name "${GITHUB_ACTOR}"
                   git config --global --add safe.directory "$GITHUB_WORKSPACE"
                   git commit -m "$VERSION"
-                  git push origin HEAD:master
+                  git push origin HEAD:main
 
             - name: Get Changelog Entry
               id: changelog_reader
