@@ -46,7 +46,7 @@ export default class ModManager {
         FileCache.init()
         ModInstaller.init()
 
-        await import('./gui/gui.js')
+        await import('./gui/gui')
 
         sc.TitleScreenButtonGui.inject({
             show() {

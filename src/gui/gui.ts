@@ -1,6 +1,6 @@
-import { Lang } from '../lang-manager.js'
-import { registerDynamicIcons, registerModManagerIcons } from './icons.js'
-import './menu.js'
+import { Lang } from '../lang-manager'
+import { registerDynamicIcons, registerModManagerIcons } from './icons'
+import './menu'
 
 declare global {
     namespace sc {
