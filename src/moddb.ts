@@ -224,6 +224,7 @@ export class ModDB {
 
     async getMods(): Promise<Record<string, ModEntryServer>> {
         const database = await FileCache.getDatabase(this.name)
+        if (!database) return {}
 
         this.database = database
         this.createModEntriesFromDatabase(this.name)

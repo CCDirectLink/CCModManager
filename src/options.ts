@@ -79,9 +79,13 @@ export function registerOpts() {
                     clearCacheButton: {
                         type: 'BUTTON',
                         onPress() {
-                            FileCache.deleteOnDiskCache().then(() => {
-                                sc.Dialogs.showInfoDialog(Lang.opts.clearCacheButton.onclickPopup)
-                            })
+                            FileCache.deleteOnDiskCache()
+                                .then(() => {
+                                    sc.Dialogs.showInfoDialog(Lang.opts.clearCacheButton.onclickPopup)
+                                })
+                                .catch(e => {
+                                    sc.Dialogs.showErrorDialog(e)
+                                })
                         },
                     },
                     reinstallAllMods: {

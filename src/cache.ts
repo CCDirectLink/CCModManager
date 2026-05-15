@@ -86,6 +86,29 @@ export class FileCache {
         return this.getDefaultModIconConfig()
     }
 
+    private static async saveFile(path: string, data: unknown) {
+        await fs.promises.writeFile(path, data)
+        this.existsOnDisk.add(path)
+    }
+
+    private static async fetchAndWriteIcon(url: string, ccPath: string) {
+        let data: Uint8Array | undefined
+        try {
+            const resp = await fetch(url, { cache: 'no-store' })
+            const buffer = await resp.arrayBuffer()
+            data = new Uint8Array(buffer)
+        } catch (e) {
+            console.warn(`ccmodmanager: failed to fetch icon: ${url}`, e)
+        }
+        if (data) {
+            try {
+                await this.saveFile(ccPath, data)
+            } catch (e) {
+                console.warn(`ccmodmanager: failed to save mod icon: ${ccPath}`, e)
+            }
+        }
+    }
+
     private static async getIcon(mod: ModEntry): Promise<string> {
         const urlPathSuffix = `icons/${mod.id}.png`
         const url = `${ModDB.databases[mod.database].url}/${urlPathSuffix}`
@@ -93,14 +116,8 @@ export class FileCache {
         const imgPath = ccPath.substring('./assets/'.length)
 
         if (!this.existsOnDisk.has(ccPath)) {
-            const fetchAndWrite = async () => {
-                const data = new Uint8Array(await (await fetch(url, { cache: 'no-store' })).arrayBuffer())
-
-                await fs.promises.writeFile(ccPath, data)
-                this.existsOnDisk.add(ccPath)
-                delete this.readingPromises[ccPath]
-            }
-            await (this.readingPromises[ccPath] ??= fetchAndWrite())
+            await (this.readingPromises[ccPath] ??= this.fetchAndWriteIcon(url, ccPath))
+            delete this.readingPromises[ccPath]
         }
         return imgPath
     }
@@ -117,33 +134,80 @@ export class FileCache {
         }
     }
 
-    static async getDatabase(name: string): Promise<NPDatabase> {
+    private static isJsonDatabase(json: unknown): json is NPDatabase {
+        if (!json || typeof json !== 'object' || Array.isArray(json)) return false
+        for (const v of Object.values(json)) {
+            if (typeof v != 'object') continue
+            if (!('installation' in v) || !('metadataCCMod' in v)) return false
+        }
+        return true
+    }
+
+    private static async readDatabaseFromDisk(ccPath: string): Promise<NPDatabase | undefined> {
+        try {
+            const str = await fs.promises.readFile(ccPath, 'utf8')
+            const json = JSON.parse(str)
+            if (!this.isJsonDatabase(json)) throw new Error('json is not a valid database')
+
+            return json
+        } catch (e) {
+            console.error(`ccmodmanager: failed to read database: ${ccPath}`, e)
+            return
+        }
+    }
+
+    private static async fetchDatabase(
+        name: string,
+        url: string,
+        ccPath: string,
+        etag: string
+    ): Promise<NPDatabase | undefined> {
+        let data: any
+        try {
+            const resp = await fetch(url, { cache: 'no-store' })
+            data = await resp.json()
+        } catch (e) {
+            console.error(`ccmodmanager: failed to fetch database: ${name}`, e)
+            return
+        }
+
+        if (!this.isJsonDatabase(data)) {
+            console.error(`ccmodmanager: failed to fetch database: ${name}, json is not a valid database`)
+            return
+        }
+        data.eTag = etag
+
+        try {
+            const str = JSON.stringify(data)
+            await this.saveFile(ccPath, str)
+        } catch (e) {
+            console.warn(`ccmodmanager: failed to save database: ${name}`, e)
+        }
+
+        return data
+    }
+
+    static async getDatabase(name: string): Promise<NPDatabase | undefined> {
         const url = `${ModDB.databases[name].url}/npDatabase.min.json`
         const ccPath = `${this.cacheDir}/${name}/db.json`
 
         const etag = await getETag(url)
 
         if (this.existsOnDisk.has(ccPath)) {
-            const readFile = async () => {
-                const json = JSON.parse(await fs.promises.readFile(ccPath, 'utf8'))
-                delete this.readingPromises[ccPath]
-                return json
-            }
-            const data: NPDatabase = await (this.readingPromises[ccPath] ??= readFile())
-
-            if (etag == 'nointernet' || etag == data.eTag) return data
-        }
-
-        return (this.readingPromises[ccPath] ??= (async () => {
-            const data: NPDatabase = await (await fetch(url, { cache: 'no-store' })).json()
-            data.eTag = etag
-
-            await fs.promises.writeFile(ccPath, JSON.stringify(data))
-            this.existsOnDisk.add(ccPath)
+            const database: NPDatabase | undefined = await (this.readingPromises[ccPath] ??=
+                this.readDatabaseFromDisk(ccPath))
             delete this.readingPromises[ccPath]
 
-            return data
-        })())
+            if (!database) {
+                this.existsOnDisk.delete(ccPath)
+            } else {
+                if (etag == 'nointernet' || etag == database.eTag) return database
+            }
+        }
+
+        const database = await (this.readingPromises[ccPath] ??= this.fetchDatabase(name, url, ccPath, etag))
+        delete this.readingPromises[ccPath]
+        return database
     }
 
     static async deleteOnDiskCache() {
