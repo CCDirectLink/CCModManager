@@ -1,10 +1,13 @@
 import { Lang } from '../lang-manager'
+import { Opts } from '../options'
 
 export {}
 declare global {
     namespace sc {
         interface TitleScreenButtonGui {
             modsButton: sc.ButtonGui
+
+            showModsButton(this: this): void
         }
     }
 }
@@ -38,10 +41,26 @@ sc.TitleScreenButtonGui.inject({
     },
     show() {
         this.parent()
-        this.modsButton.doStateTransition('DEFAULT')
+        this.showModsButton()
+    },
+    showModsButton() {
+        if (Opts.showTitleScreenButton) {
+            this.modsButton.doStateTransition('DEFAULT')
+        } else {
+            this.modsButton.doStateTransition('HIDDEN', true)
+        }
     },
     hide(skipTransition) {
         this.parent(skipTransition)
         this.modsButton.doStateTransition('HIDDEN')
+    },
+})
+
+sc.TitleScreenGui.inject({
+    modelChanged(model, message, data) {
+        this.parent(model, message, data)
+        if (model == sc.menu && message == sc.MENU_EVENT.EXIT_MENU) {
+            this.buttons.showModsButton()
+        }
     },
 })

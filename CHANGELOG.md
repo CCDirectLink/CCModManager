@@ -7,6 +7,7 @@
 ### Added
 
 - Add title screen button for opening the mods menu
+- Add option for showing/hiding the title screen button
 
 ## [1.1.3] 2026-01-22
 

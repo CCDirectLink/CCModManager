@@ -4,6 +4,10 @@
             "name": "Enable auto update",
             "description": "When a mod update is found, a pop-up will show up when the game starts asking to update."
         },
+        "showTitleScreenButton": {
+            "name": "Show title screen button",
+            "description": "Display a button on the title screen that opens the mod manager menu."
+        },
         "repositoriesButton": {
             "name": "Repositories",
             "description": "Edit mod repository links."

@@ -22,6 +22,10 @@ export function registerOpts() {
                         type: 'CHECKBOX',
                         init: true,
                     },
+                    showTitleScreenButton: {
+                        type: 'CHECKBOX',
+                        init: true,
+                    },
                     testingOptInMods: {
                         type: 'JSON_DATA',
                         init: [] as string[],
