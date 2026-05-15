@@ -514,10 +514,11 @@ modmanager.gui.Menu = (sc.ListInfoMenu ?? sc.SortableListMenu).extend({
         sc.menu.buttonInteract.removeGlobalButton(this.changelogButton)
 
         if (
-            LocalMods.getAll().some(mod => mod.awaitingRestart) ||
-            Object.values(ModDB.databases).some(
-                db => db.active && Object.values(db.modRecord ?? {}).some(mod => mod.awaitingRestart)
-            )
+            sc.menu.menuStack.last() != sc.MENU_SUBMENU.MOD_OPTIONS &&
+            (LocalMods.getAll().some(mod => mod.awaitingRestart) ||
+                Object.values(ModDB.databases).some(
+                    db => db.active && Object.values(db.modRecord ?? {}).some(mod => mod.awaitingRestart)
+                ))
         ) {
             ModInstallDialogs.showYesNoDialog(Lang.modStatesChanged, sc.DIALOG_INFO_ICON.QUESTION).then(index => {
                 if (index == 0) ModInstaller.restartGame()

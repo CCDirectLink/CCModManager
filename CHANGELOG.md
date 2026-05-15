@@ -20,6 +20,7 @@
 - Fix crashes and improve stability on slow internet
 - Improve fetch failure handling
 - Improve database file corruption handling
+- Don't prompt for game restart after state change when entering mod options menu
 
 ## [1.1.3] 2026-01-22
 
