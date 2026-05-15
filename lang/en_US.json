@@ -51,13 +51,13 @@
                 {
                     "title": "Option: \\c[3]Enable autoupdate\\c[0]",
                     "content": [
-                        "When it's on, after the game starts the mod manager will check if there are any mods to update.\n If it finds any, it will display a pop-up message asking if you want to update."
+                        "When it's on, after the game starts the mod manager will check if there are any mods to update.\nIf it finds any, it will display a pop-up message asking if you want to update."
                     ]
                 },
                 {
                     "title": "Option: \\c[3]Repositories\\c[0]",
                     "content": [
-                        "You can add custom repositories by clicking the \\c[3]Repositories\\c[0] button.\n A popup will show up with input fields where you can type the repository URL's.\n Repositories tell the mod manager what mods are available for installation."
+                        "You can add custom repositories by clicking the \\c[3]Repositories\\c[0] button.\nA popup will show up with input fields where you can type the repository URL's.\nRepositories tell the mod manager what mods are available for installation."
                     ]
                 }
             ]
@@ -66,43 +66,43 @@
         "pages": [
             {
                 "content": [
-                    "Welcome to the mod manager!\n There are 5 tabs:\n - \\c[3]Online\\c[0] - Search through all available mods.\n - \\c[3]Selected\\c[0] - Mods you selected to install.\n - \\c[3]Enabled\\c[0] - Mods that are installed and enabled.\n - \\c[3]Disabled\\c[0] - Mods that are installed and disabled.\n - \\c[3]Settings\\c[0] - Mods that have settings available are shown there.\n Select the mod sort method by pressing \\i[help3].\n If a mod title has a list icon (\\i[quest]) before it, that means it has available in the online repositories, and if it has a question mark (\\i[lore-others]), that means that it's not.\n If a mod title has a clock (\\i[stats-general]) before it, that means it's awaiting a restart.\n If a mod title has a news icon (\\i[item-news]) before it, that means it has an update available."
+                    "Welcome to the mod manager!\nThere are 5 tabs:\n- \\c[3]Online\\c[0] - Search through all available mods.\n- \\c[3]Selected\\c[0] - Mods you selected to install.\n- \\c[3]Enabled\\c[0] - Mods that are installed and enabled.\n- \\c[3]Disabled\\c[0] - Mods that are installed and disabled.\n- \\c[3]Settings\\c[0] - Mods that have settings available are shown there.\nSelect the mod sort method by pressing \\i[help3].\nIf a mod title has a list icon (\\i[quest]) before it, that means it has available in the online repositories, and if it has a question mark (\\i[lore-others]), that means that it's not.\nIf a mod title has a clock (\\i[stats-general]) before it, that means it's awaiting a restart.\nIf a mod title has a news icon (\\i[item-news]) before it, that means it has an update available."
                 ]
             },
             {
                 "title": "\\c[3]Mod Manager - Keybindings\\c[0]",
                 "content": [
-                    "Press \\i[menu] to open the filters menu.\\n It also contains a toggle for a more compact layout for the mod's pages.\n Press \\i[left] to visit the mod repository page if available. \n Press \\i[right] to visit the mod's changelog if available. \n Some mods can be configured via their own options sub-menu. Press \\i[rightClickOrR2] to access it."
+                    "Press \\i[menu] to open the filters menu.\\nIt also contains a toggle for a more compact layout for the mod's pages.\nPress \\i[left] to visit the mod repository page if available. \nPress \\i[right] to visit the mod's changelog if available. \nSome mods can be configured via their own options sub-menu. Press \\i[rightClickOrR2] to access it."
                 ]
             },
             {
                 "title": "\\c[3]Mod Manager - Online\\c[0]",
                 "content": [
-                    "The \\c[3]Online\\c[0] tab contains all available mods you can install.\n To select or deselect a mod for installation, focus a mod and press \\i[key-throw] or \\i[gamepad-a].\n Install mods by pressing \\i[help4].\n Some mods have testing versions of them, which may be unstable and contain bugs. \n If the testing version is available, a beta letter icon (\\i[ccmodmanager-testing-on], \\i[ccmodmanager-testing-off]) will appear. \n Toggle it with \\i[shiftOrL2]."
+                    "The \\c[3]Online\\c[0] tab contains all available mods you can install.\nTo select or deselect a mod for installation, focus a mod and press \\i[key-throw] or \\i[gamepad-a].\nInstall mods by pressing \\i[help4].\nSome mods have testing versions of them, which may be unstable and contain bugs. \nIf the testing version is available, a beta letter icon (\\i[ccmodmanager-testing-on], \\i[ccmodmanager-testing-off]) will appear. \nToggle it with \\i[shiftOrL2]."
                 ]
             },
             {
                 "title": "\\c[3]Mod Manager - Selected\\c[0]",
                 "content": [
-                    "The \\c[3]Selected\\c[0] tab contains all mods selected for installation.\n Selected mods have yellow names.\n To select or deselect a mod for installation, focus a mod and press \\i[key-throw] or \\i[gamepad-a].\n Install mods by pressing \\i[help4].\n "
+                    "The \\c[3]Selected\\c[0] tab contains all mods selected for installation.\nSelected mods have yellow names.\nTo select or deselect a mod for installation, focus a mod and press \\i[key-throw] or \\i[gamepad-a].\nInstall mods by pressing \\i[help4].\n"
                 ]
             },
             {
                 "title": "\\c[3]Mod Manager - Enabled\\c[0]",
                 "content": [
-                    "The \\c[3]Enabled\\c[0] tab contains all installed and enabled mods.\n Enabled mods have green names.\n Uninstall mods by pressing \\i[help2].\n To disable a mod, focus a mod and press \\i[key-throw] or \\i[gamepad-a]."
+                    "The \\c[3]Enabled\\c[0] tab contains all installed and enabled mods.\nEnabled mods have green names.\nUninstall mods by pressing \\i[help2].\nTo disable a mod, focus a mod and press \\i[key-throw] or \\i[gamepad-a]."
                 ]
             },
             {
                 "title": "\\c[3]Mod Manager - Disabled\\c[0]",
                 "content": [
-                    "The \\c[3]Disabled\\c[0] tab contains all installed and disabled mods.\n Disabled mods have red names.\n Uninstall mods by pressing \\i[help2].\n To enable a mod, focus a mod and press \\i[key-throw] or \\i[gamepad-a]."
+                    "The \\c[3]Disabled\\c[0] tab contains all installed and disabled mods.\nDisabled mods have red names.\nUninstall mods by pressing \\i[help2].\nTo enable a mod, focus a mod and press \\i[key-throw] or \\i[gamepad-a]."
                 ]
             },
             {
                 "title": "\\c[3]Mod Manager - Settings\\c[0]",
                 "content": [
-                    "The \\c[3]Settings\\c[0] tab contains all mods that have settings available (NOTE: Some mods puts their options somewhere in the regular options menu instead, they will not be in this tab).\n Open the mod's settings page with \\i[rightClickOrR2]."
+                    "The \\c[3]Settings\\c[0] tab contains all mods that have settings available (NOTE: Some mods puts their options somewhere in the regular options menu instead, they will not be in this tab).\nOpen the mod's settings page with \\i[rightClickOrR2]."
                 ]
             }
         ],
@@ -127,7 +127,7 @@
     "changelogButton": "Changelog",
     "visitReleasePage": "Visit release page",
     "noModsSelected": "No mods selected",
-    "areYouSureYouWantToUninstall": "Are you sure you want to uninstall the mod:\n - \\c[3][modName]\\c[0]",
+    "areYouSureYouWantToUninstall": "Are you sure you want to uninstall the mod:\n- \\c[3][modName]\\c[0]",
     "dependencies": "Dependencies:",
     "toUpdate": "Update:",
     "toInstall": "Install:",
@@ -135,9 +135,9 @@
     "updatesDetected": "Some mods have a new version. Do you want to review the updates now?",
     "upToDate": "Up to date.",
     "updatesFound": "Updated were found.",
-    "askRestartInstall": "Installed successfully.\n The installed mods will start working after a restart.\n Do you want to restart?",
-    "askRestartUninstall": "Uninstalled successfully.\n The mod will actually stop working after a restart.\n Do you want to restart?",
-    "modStatesChanged": "Mod states have been changed, they will take effect after a game restart.\n Do you want to restart now?",
+    "askRestartInstall": "Installed successfully.\nThe installed mods will start working after a restart.\nDo you want to restart?",
+    "askRestartUninstall": "Uninstalled successfully.\nThe mod will actually stop working after a restart.\nDo you want to restart?",
+    "modStatesChanged": "Mod states have been changed, they will take effect after a game restart.\nDo you want to restart now?",
     "doYouWantToEnable": "The mod: \\c[3][modName]\\c[0] depends on these disabled mods:\n[mods]Do you also want to enable them?",
     "tag": "Tag",
     "filters": {
