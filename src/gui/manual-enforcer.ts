@@ -7,7 +7,9 @@ export {}
 declare global {
     namespace modmanager.gui {
         interface ManualEnforcer extends modmanager.gui.MultiPageButtonBoxGui {
+            id: string
             openendAt: number
+            waitSeconds: number
         }
         interface ManualEnforcerConstructor extends ImpactClass<ManualEnforcer> {
             new (
@@ -23,30 +25,18 @@ declare global {
 }
 
 modmanager.gui.ManualEnforcer = modmanager.gui.MultiPageButtonBoxGui.extend({
-    init(id, manualTitle, manualContent, forceShowEvenIfRead, enforceTimeSeconds = 5) {
+    init(id, manualTitle, manualContent, forceShowEvenIfRead, enforceTimeSeconds = 0.5) {
         if (Opts.manualEnforcerRead[id] && !forceShowEvenIfRead) return
+
+        this.openendAt = Date.now()
+        this.waitSeconds = enforceTimeSeconds
+        this.id = id
 
         this.parent(undefined, undefined, [
             {
-                name: Lang.help.enforcment.button,
+                name: Lang.close,
                 onPress: _pageIndex => {
-                    if (this.openendAt + enforceTimeSeconds * 1000 < Date.now()) {
-                        this.blockClosing = false
-                        this.closeMenu()
-                        Opts.manualEnforcerRead = {
-                            ...Opts.manualEnforcerRead,
-                            [id]: true,
-                        }
-                    } else {
-                        const button = this.userButtons![0]
-                        const text = Lang.help.enforcment.fail
-                        sc.Dialogs.showErrorDialog(text, false, () => {
-                            button.setActive(false)
-                            this.openendAt = Date.now()
-
-                            setTimeout(() => button.setActive(true), enforceTimeSeconds * 1000)
-                        })
-                    }
+                    this.closeMenu()
                 },
             },
         ])
@@ -54,6 +44,23 @@ modmanager.gui.ManualEnforcer = modmanager.gui.MultiPageButtonBoxGui.extend({
         this.blockClosing = true
 
         this.openMenu()
-        this.openendAt = Date.now()
+    },
+    closeMenu() {
+        this.parent()
+
+        Opts.manualEnforcerRead = {
+            ...Opts.manualEnforcerRead,
+            [this.id]: true,
+        }
+    },
+    update() {
+        this.parent()
+        const button = this.userButtons![0]
+        if (Date.now() > this.openendAt + this.waitSeconds * 1000) {
+            button.setActive(true)
+            this.blockClosing = false
+        } else {
+            button.setActive(false)
+        }
     },
 })

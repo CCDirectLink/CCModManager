@@ -42,6 +42,7 @@
     "mods": "Mods",
     "titleScreenButton": "Mod Manager",
 
+    "close": "Close",
     "sort": {
         "stars": "Stars",
         "lastUpdated": "Last updated",
@@ -110,11 +111,7 @@
                     "The \\c[3]Settings\\c[0] tab contains all mods that have settings available (NOTE: Some mods puts their options somewhere in the regular options menu instead, they will not be in this tab).\nOpen the mod's settings page with \\i[rightClickOrR2]."
                 ]
             }
-        ],
-        "enforcment": {
-            "button": "Yes, I've read the manual",
-            "fail": "Please, just read it"
-        }
+        ]
     },
     "onlineTab": "Online",
     "selectedModsTab": "Selected",

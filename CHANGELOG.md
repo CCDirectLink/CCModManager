@@ -9,6 +9,15 @@
 - Add title screen button for opening the mods menu
 - Add option for showing/hiding the title screen button
 
+### Changed
+
+- Decrease manual wait time before close button is active
+- Remove 'Please, read it' manual popup
+
+### Fixed
+
+- Fix invalid new line spacing when reopening manuals
+
 ## [1.1.3] 2026-01-22
 
 ### Fixed
