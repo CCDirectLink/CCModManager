@@ -43,6 +43,7 @@ modmanager.gui.MultiPageButtonBoxGui = sc.MultiPageBoxGui.extend({
         this.setDefaultHeaderText(defaultHeaderText)
 
         if (partitionPages) {
+            pages = JSON.parse(JSON.stringify(pages))
             /* split the lines into arrays of max 3 lines,
              * the scroll box does not reneder loooong entries */
             for (const page of pages) {
