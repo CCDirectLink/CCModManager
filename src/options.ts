@@ -5,7 +5,7 @@ import { Lang } from './lang-manager'
 import { LocalMods } from './local-mods'
 import { InstallQueue } from './mod-installer'
 import type { Option, Options } from './mod-options'
-import { ModDB } from './moddb'
+import { loadEverything } from './plugin'
 
 export let Opts: ReturnType<typeof modmanager.registerAndGetModOptions<ReturnType<typeof registerOpts>>>
 
@@ -135,11 +135,7 @@ export function registerOpts() {
                         changeEvent() {
                             if (!ig.game) return
 
-                            ModDB.loadDatabases(true)
-
-                            ModDB.loadAllMods(false).then(() => {
-                                LocalMods.refreshOrigin()
-                            })
+                            loadEverything(true)
                         },
                     },
                     // prettier-ignore

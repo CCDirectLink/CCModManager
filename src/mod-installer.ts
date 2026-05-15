@@ -233,13 +233,10 @@ export class ModInstaller {
 
     static async findDepsDatabase(
         mods: ModEntryServer[],
-        modRecords: Record<string, ModEntryServer[]>,
+        modRecord: Record<string, ModEntryServer>,
         includeInstalled: boolean = false
     ): Promise<ModEntryServer[]> {
-        /* resolve local mod origin */
-        LocalMods.initAll()
-
-        this.record = ModDB.removeModDuplicatesAndResolveTesting(modRecords)
+        this.record = modRecord
         this.byNameRecord = {}
         for (const modId in this.record) {
             const mod = this.record[modId]
@@ -559,18 +556,13 @@ export class ModInstaller {
     }
 
     static async appendToUpdateModsToQueue(): Promise<boolean> {
-        await ModDB.loadAllMods()
-        ModDB.removeModDuplicatesAndResolveTesting(ModDB.modRecord)
-        await LocalMods.initAll()
-        await LocalMods.refreshOrigin()
-
         const mods: ModEntryLocal[] = LocalMods.getAll().filter(mod => mod.hasUpdate && !mod.isGit)
         // prettier-ignore
         const serverMods = mods
             .map(mod => mod.serverCounterpart!)
             .map(mod => (mod.testingVersion && ModDB.isModTestingOptIn(mod.id) ? mod.testingVersion : mod))
         InstallQueue.add(...serverMods)
-        InstallQueue.add(...(await this.findDepsDatabase(serverMods, ModDB.modRecord)))
+        InstallQueue.add(...(await this.findDepsDatabase(serverMods, ModDB.uniqueModRecord)))
         for (const mod of serverMods) mod.installStatus = 'update'
 
         return mods.length > 0

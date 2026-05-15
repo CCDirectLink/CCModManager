@@ -8,8 +8,8 @@ export class ModDB {
     private static databasesLoaded: boolean = false
 
     static databases: Record<string, ModDB>
-
     static modRecord: Record<string, ModEntryServer[]>
+    static uniqueModRecord: Record<string, ModEntryServer> = {}
 
     private static testingOptInModIds: Set<string>
 
@@ -54,8 +54,10 @@ export class ModDB {
         Opts.repositories = Object.values(this.databases).map(db => this.minifyRepoURL(db.url))
     }
 
-    static async loadAllMods(prefferCache: boolean = false): Promise<void> {
-        if (prefferCache && this.modRecord) return
+    static async loadAllMods(force?: boolean): Promise<string[]> {
+        const uncheckedDatabases: string[] = []
+        if (!force && this.modRecord) return uncheckedDatabases
+
         this.modRecord = {}
         const promises: Promise<void>[] = []
         for (const dbName in ModDB.databases) {
@@ -65,12 +67,17 @@ export class ModDB {
 
                 promises.push(
                     (async () => {
-                        ModDB.modRecord[dbName] = Object.values(await db.getMods())
+                        const checked = await db.getMods()
+                        if (!checked) uncheckedDatabases.push(dbName)
+                        if (db.modRecord) {
+                            ModDB.modRecord[dbName] = Object.values(db.modRecord)
+                        }
                     })()
                 )
             }
         }
         await Promise.all(promises)
+        return uncheckedDatabases
     }
 
     static getHighestVersionMod<T extends ModEntry>(mods: T[]): T {
@@ -79,22 +86,19 @@ export class ModDB {
         )
     }
 
-    static async getLocalModOrigins(id: string): Promise<ModEntryServer[]> {
+    static getLocalModOrigins(id: string): ModEntryServer[] {
         const matches: ModEntryServer[] = []
         for (const dbName in this.databases) {
             const moddb = this.databases[dbName]
 
-            const modRecord = (moddb.modRecord ??= await moddb.getMods())
-            if (!modRecord) throw new Error('wat?')
-
-            const dbMod = modRecord[id]
+            const dbMod = moddb.modRecord?.[id]
             if (dbMod) matches.push(dbMod)
         }
         return matches
     }
 
-    static async resolveLocalModOrigin(mod: ModEntryLocal) {
-        const serverMods = await this.getLocalModOrigins(mod.id)
+    static resolveLocalModOrigin(mod: ModEntryLocal) {
+        const serverMods = this.getLocalModOrigins(mod.id)
         if (serverMods.length == 0) return
         let highestVerMod: ModEntryServer = serverMods[0]
         for (const serverMod of serverMods) {
@@ -127,9 +131,7 @@ export class ModDB {
         return databaseName.includes('testing')
     }
 
-    static removeModDuplicatesAndResolveTesting(
-        modsRecord: Record<string, ModEntryServer[]>
-    ): Record<string, ModEntryServer> {
+    static removeModDuplicatesAndResolveTesting(modsRecord: Record<string, ModEntryServer[]>) {
         const uniqueMods: Record<string /*modid */, ModEntryServer> = {}
 
         const testingDbs: string[] = []
@@ -174,7 +176,7 @@ export class ModDB {
             }
         }
 
-        return uniqueMods
+        this.uniqueModRecord = uniqueMods
     }
 
     name: string
@@ -222,13 +224,13 @@ export class ModDB {
         }
     }
 
-    async getMods(): Promise<Record<string, ModEntryServer>> {
-        const database = await FileCache.getDatabase(this.name)
-        if (!database) return {}
+    async getMods(): Promise<boolean> {
+        const res = await FileCache.getDatabase(this.name)
+        if (!res.database) return res.checked
 
-        this.database = database
+        this.database = res.database
         this.createModEntriesFromDatabase(this.name)
 
-        return this.modRecord
+        return res.checked
     }
 }

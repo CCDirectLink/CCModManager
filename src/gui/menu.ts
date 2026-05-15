@@ -12,7 +12,7 @@ import './options/mod-options-menu'
 import './manual-enforcer'
 import './input-field/input-field'
 
-import { isFullMode, openLink } from '../plugin'
+import { isFullMode, loadEverything, openLink } from '../plugin'
 
 declare global {
     namespace modmanager.gui {
@@ -132,7 +132,7 @@ modmanager.gui.Menu = (sc.ListInfoMenu ?? sc.SortableListMenu).extend({
     observers: [],
     init() {
         modmanager.gui.menu = this
-        ModDB.loadDatabases()
+        loadEverything()
         this.parent(new modmanager.gui.MenuList())
         this.list.setPos(9, 23)
 
@@ -179,7 +179,7 @@ modmanager.gui.Menu = (sc.ListInfoMenu ?? sc.SortableListMenu).extend({
         this.installButton.setPos(146, bottomY)
         this.installButton.onButtonPress = () => {
             if (this.list.currentTabIndex == modmanager.gui.MOD_MENU_TAB_INDEXES.SELECTED) sc.BUTTON_SOUND.submit.play()
-            ModInstaller.findDepsDatabase(InstallQueue.values(), ModDB.modRecord)
+            ModInstaller.findDepsDatabase(InstallQueue.values(), ModDB.uniqueModRecord)
                 .then(mods => {
                     InstallQueue.add(...mods)
                     this.showModInstallDialog()
@@ -213,15 +213,24 @@ modmanager.gui.Menu = (sc.ListInfoMenu ?? sc.SortableListMenu).extend({
         this.checkUpdatesButton.setPos(278, bottomY)
         this.checkUpdatesButton.onButtonPress = () => {
             if (this.list.currentTabIndex == modmanager.gui.MOD_MENU_TAB_INDEXES.SELECTED) sc.BUTTON_SOUND.submit.play()
-            ModInstaller.appendToUpdateModsToQueue().then(hasUpdated => {
-                if (hasUpdated) {
-                    sc.Model.notifyObserver(modmanager.gui.menu, modmanager.gui.MENU_MESSAGES.UPDATE_ENTRIES)
-                    this.list.tabGroup._invokePressCallbacks(this.list.tabs[Lang.selectedModsTab], true)
-                    sc.Dialogs.showInfoDialog(Lang.updatesFound)
-                } else {
-                    sc.Dialogs.showInfoDialog(Lang.upToDate)
+            ;(async () => {
+                try {
+                    const uncheckedDatabases = await loadEverything(true)
+                    if (uncheckedDatabases?.length ?? 0 > 0) {
+                        throw new Error(`Failed to load databases: ${uncheckedDatabases?.join(', ')}`)
+                    }
+                    const hasUpdated = await ModInstaller.appendToUpdateModsToQueue()
+                    if (hasUpdated) {
+                        sc.Model.notifyObserver(modmanager.gui.menu, modmanager.gui.MENU_MESSAGES.UPDATE_ENTRIES)
+                        this.list.tabGroup._invokePressCallbacks(this.list.tabs[Lang.selectedModsTab], true)
+                        sc.Dialogs.showInfoDialog(Lang.updatesFound)
+                    } else {
+                        sc.Dialogs.showInfoDialog(Lang.upToDate)
+                    }
+                } catch (e) {
+                    sc.Dialogs.showErrorDialog(Lang.errors.install.failedFetch + `\n${e}`)
                 }
-            })
+            })()
         }
         this.checkUpdatesButton.submitSound = undefined
         this.checkUpdatesButton.keepMouseFocus = true /* prevent the focus jumping all over the place on press */

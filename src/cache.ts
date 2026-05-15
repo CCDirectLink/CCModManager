@@ -187,7 +187,7 @@ export class FileCache {
         return data
     }
 
-    static async getDatabase(name: string): Promise<NPDatabase | undefined> {
+    static async getDatabase(name: string): Promise<{ database?: NPDatabase; checked: boolean }> {
         const url = `${ModDB.databases[name].url}/npDatabase.min.json`
         const ccPath = `${this.cacheDir}/${name}/db.json`
 
@@ -201,13 +201,21 @@ export class FileCache {
             if (!database) {
                 this.existsOnDisk.delete(ccPath)
             } else {
-                if (etag == 'nointernet' || etag == database.eTag) return database
+                if (etag == 'nointernet') return { database, checked: false }
+                if (etag == database.eTag) return { database, checked: true }
             }
         }
 
-        const database = await (this.readingPromises[ccPath] ??= this.fetchDatabase(name, url, ccPath, etag))
+        if (etag == 'nointernet') return { checked: false }
+
+        const database: NPDatabase = await (this.readingPromises[ccPath] ??= this.fetchDatabase(
+            name,
+            url,
+            ccPath,
+            etag
+        ))
         delete this.readingPromises[ccPath]
-        return database
+        return { database, checked: true }
     }
 
     static async deleteOnDiskCache() {

@@ -6,6 +6,7 @@ import { Mod1 } from './types'
 import { Opts, registerOpts } from './options'
 import { modOptionsPoststart, modOptionsPrestart } from './mod-options'
 import { initLibraries } from './library-providers'
+import { LocalMods } from './local-mods'
 
 import type {} from 'crosscode-demonizer/src/demomod/types.d.ts'
 import './mod-options'
@@ -18,6 +19,39 @@ export function openLink(url: string) {
         nw.Shell.openExternal(url)
     } else {
         window.open(url, '_blank')?.focus()
+    }
+}
+
+let loadEverythingPromise: Promise<string[] | undefined> | undefined
+let loadEverythingRunning = false
+export async function loadEverything(force?: boolean) {
+    if (!loadEverythingPromise) {
+        return (loadEverythingPromise = _loadEverything(force))
+    }
+    if (loadEverythingRunning) await loadEverythingPromise
+    if (force) {
+        return (loadEverythingPromise = _loadEverything(force))
+    }
+}
+async function _loadEverything(force?: boolean) {
+    loadEverythingRunning = true
+    try {
+        LocalMods.init()
+
+        ModDB.loadDatabases(force)
+        let uncheckedDatabases: string[] | undefined
+        if (isFullMode()) {
+            uncheckedDatabases = await ModDB.loadAllMods(force)
+            await LocalMods.initAfterDatabaseLoaded()
+            ModDB.removeModDuplicatesAndResolveTesting(ModDB.modRecord)
+        }
+        modmanager.gui.menu?.list?.reloadEntries()
+
+        return uncheckedDatabases
+    } catch (e) {
+        throw e
+    } finally {
+        loadEverythingRunning = false
     }
 }
 
@@ -52,8 +86,9 @@ export default class ModManager {
             show() {
                 this.parent()
                 if (isFullMode() && Opts.autoUpdate) {
-                    ModDB.loadDatabases()
-                    ModInstaller.checkAllLocalModsForUpdate()
+                    loadEverything().then(() => {
+                        ModInstaller.checkAllLocalModsForUpdate()
+                    })
                 }
             },
         })

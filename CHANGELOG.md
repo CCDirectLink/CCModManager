@@ -17,6 +17,9 @@
 ### Fixed
 
 - Fix invalid new line spacing when reopening manuals
+- Fix crashes and improve stability on slow internet
+- Improve fetch failure handling
+- Improve database file corruption handling
 
 ## [1.1.3] 2026-01-22
 

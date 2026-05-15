@@ -44,7 +44,7 @@ declare global {
 }
 
 modmanager.openModOptionsMenu = async (modId: string, tab?: number) => {
-    await LocalMods.initAll()
+    LocalMods.init()
     const record = LocalMods.getAllRecord()
     const mod = record[modId]
     if (!mod) throw new Error(`Mod: "${modId}" does not have options menu!`)

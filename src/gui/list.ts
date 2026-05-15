@@ -134,16 +134,6 @@ modmanager.gui.MenuList = sc.ListTabbedPane.extend({
         for (let i = 0; i < this.tabz.length; i++) {
             this.addTab(this.tabz[i].name, i, {})
         }
-
-        if (isFullMode()) {
-            ModDB.loadAllMods(true).then(() => {
-                LocalMods.refreshOrigin().then(() => {
-                    this.reloadEntries()
-                })
-            })
-        } else {
-            LocalMods.refreshOrigin().then(() => this.reloadEntries())
-        }
     },
     show() {
         this.parent()
@@ -291,7 +281,7 @@ modmanager.gui.MenuList = sc.ListTabbedPane.extend({
         }
     },
     populateOnline(list, _, sort: modmanager.gui.MENU_SORT_ORDER) {
-        let mods = Object.values(ModDB.removeModDuplicatesAndResolveTesting(ModDB.modRecord))
+        let mods = Object.values(ModDB.uniqueModRecord)
         mods = createFuzzyFilteredModList(this.filters, mods)
         mods = mods.filter(mod => !ModInstaller.virtualMods[mod.id])
         this.sortModEntries(mods, sort)

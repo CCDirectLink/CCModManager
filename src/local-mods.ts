@@ -63,7 +63,7 @@ export class LocalMods {
         },
     }
 
-    static async initAll() {
+    static init() {
         if (this.cache) return
 
         let all: ModEntryLocal[]
@@ -72,13 +72,15 @@ export class LocalMods {
         } else {
             all = [...window.activeMods.map(this.convertCCL2Mod), ...window.inactiveMods.map(this.convertCCL2Mod)]
         }
+
         this.cache = all
+        this.updateCacheRecord()
+    }
 
-        all.push(...(await this.createVirtualLocalMods()))
-
+    private static updateCacheRecord() {
         this.cacheRecord = {}
         this.cacheRecordByName = {}
-        for (const mod of all) {
+        for (const mod of this.cache) {
             this.cacheRecord[mod.id] = mod
             this.cacheRecordByName[mod.name] = mod
         }
@@ -86,15 +88,19 @@ export class LocalMods {
             const mod = this.cacheRecord[id]
             if (mod) ig.merge(mod, this.localModFlags[id])
         }
+    }
 
-        await Promise.all([
-            ...all.map(mod => ModDB.resolveLocalModOrigin(mod)),
-            ...all.map(mod =>
-                ModInstaller.isDirGit(mod.path).then(isGit => {
-                    mod.isGit = isGit
-                })
-            ),
-        ])
+    static async initAfterDatabaseLoaded() {
+        this.cache.push(...this.createVirtualLocalMods())
+        this.updateCacheRecord()
+
+        for (const mod of this.cache) ModDB.resolveLocalModOrigin(mod)
+        await Promise.all(
+            this.cache.map(async mod => {
+                const isGit = await ModInstaller.isDirGit(mod.path)
+                mod.isGit = isGit
+            })
+        )
         this.checkForUpdates()
     }
 
@@ -104,23 +110,14 @@ export class LocalMods {
         }
     }
 
-    static async refreshOrigin() {
-        if (this.cache) {
-            await Promise.all(this.cache.map(mod => ModDB.resolveLocalModOrigin(mod)))
-            this.checkForUpdates()
-        } else {
-            await this.initAll()
-        }
-    }
-
     static getAll() {
         if (!this.cache) throw new Error('Local mods accessed before cached!')
         return this.cache
     }
 
-    private static async createVirtualLocalMods(): Promise<ModEntryLocal[]> {
+    private static createVirtualLocalMods(): ModEntryLocal[] {
         const mods: ModEntryLocal[] = []
-        const ccloader = (await ModDB.getLocalModOrigins('ccloader'))[0]
+        const ccloader = ModDB.getLocalModOrigins('ccloader')[0]
         if (ccloader) mods.push(this.convertServerToLocal(ccloader, this.getCCLoaderVersion(), '', true))
         return mods
     }
