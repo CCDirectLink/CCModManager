@@ -258,7 +258,7 @@ modmanager.gui.Menu = (sc.ListInfoMenu ?? sc.SortableListMenu).extend({
         )
         this.testingToggleButton.setAlign(ig.GUI_ALIGN.X_RIGHT, ig.GUI_ALIGN.Y_TOP)
         this.testingToggleButton.setPos(264, 22)
-        this.testingToggleButton.doStateTransition('HIDDEN')
+        this.testingToggleButton.doStateTransition('HIDDEN', true)
         this.testingToggleButton.onButtonPress = () => {
             if (this.testingToggleButton.hook.currentStateName == 'DEFAULT') {
                 const modEntry = this.getCurrentlyFocusedModEntry()!
@@ -304,7 +304,7 @@ modmanager.gui.Menu = (sc.ListInfoMenu ?? sc.SortableListMenu).extend({
         )
         this.openRepositoryUrlButton.setAlign(ig.GUI_ALIGN.X_RIGHT, ig.GUI_ALIGN.Y_TOP)
         this.openRepositoryUrlButton.setPos(10, 22)
-        this.openRepositoryUrlButton.doStateTransition('HIDDEN')
+        this.openRepositoryUrlButton.doStateTransition('HIDDEN', true)
         this.openRepositoryUrlButton.onButtonPress = () => {
             const tryPress = (): boolean => {
                 if (this.openRepositoryUrlButton.hook.currentStateName != 'DEFAULT') return false
@@ -328,7 +328,7 @@ modmanager.gui.Menu = (sc.ListInfoMenu ?? sc.SortableListMenu).extend({
             sc.BUTTON_TYPE.SMALL
         )
         this.modOptionsButton.setPos(7, bottomY)
-        this.modOptionsButton.doStateTransition('HIDDEN')
+        this.modOptionsButton.doStateTransition('HIDDEN', true)
         this.modOptionsButton.onButtonPress = () => {
             const tryPress = (): boolean => {
                 if (this.modOptionsButton.hook.currentStateName != 'DEFAULT') return false
@@ -350,7 +350,7 @@ modmanager.gui.Menu = (sc.ListInfoMenu ?? sc.SortableListMenu).extend({
         this.changelogButton = new sc.ButtonGui('\\i[right]' + Lang.changelogButton, 100, true, sc.BUTTON_TYPE.SMALL)
         this.changelogButton.setAlign(ig.GUI_ALIGN.X_RIGHT, ig.GUI_ALIGN.Y_TOP)
         this.changelogButton.setPos(155, 22)
-        this.changelogButton.doStateTransition('HIDDEN')
+        this.changelogButton.doStateTransition('HIDDEN', true)
         this.changelogButton.onButtonPress = () => {
             const tryPress = (): boolean => {
                 if (this.changelogButton.hook.currentStateName != 'DEFAULT') return false
