@@ -69,7 +69,7 @@ jobs:
                   git config --global user.name "${GITHUB_ACTOR}"
                   git config --global --add safe.directory "$GITHUB_WORKSPACE"
                   git commit -m "$VERSION"
-                  git push origin HEAD:main
+                  git push origin HEAD:master
 
             - name: Get Changelog Entry
               id: changelog_reader
