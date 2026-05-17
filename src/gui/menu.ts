@@ -29,6 +29,9 @@ declare global {
             ENTRY_UNFOCUSED,
             ENTRY_UPDATE_COLOR,
         }
+
+        var onceDeclinedRestartAfterMenuExit: boolean | undefined
+
         interface Menu extends sc.ListInfoMenu, sc.Model {
             list: MenuList
             inputField: modmanager.gui.InputField
@@ -514,6 +517,7 @@ modmanager.gui.Menu = (sc.ListInfoMenu ?? sc.SortableListMenu).extend({
         sc.menu.buttonInteract.removeGlobalButton(this.changelogButton)
 
         if (
+            !modmanager.gui.onceDeclinedRestartAfterMenuExit &&
             sc.menu.menuStack.last() != sc.MENU_SUBMENU.MOD_OPTIONS &&
             (LocalMods.getAll().some(mod => mod.awaitingRestart) ||
                 Object.values(ModDB.databases).some(
@@ -522,6 +526,7 @@ modmanager.gui.Menu = (sc.ListInfoMenu ?? sc.SortableListMenu).extend({
         ) {
             ModInstallDialogs.showYesNoDialog(Lang.modStatesChanged, sc.DIALOG_INFO_ICON.QUESTION).then(index => {
                 if (index == 0) ModInstaller.restartGame()
+                else modmanager.gui.onceDeclinedRestartAfterMenuExit = true
             })
         }
     },

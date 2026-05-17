@@ -13,6 +13,7 @@
 
 - Decrease manual wait time before close button is active
 - Remove 'Please, read it' manual popup
+- Don't ask for restart on menu exit once declined
 
 ### Fixed
 
