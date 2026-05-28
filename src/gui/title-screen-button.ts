@@ -52,7 +52,7 @@ sc.TitleScreenButtonGui.inject({
     },
     hide(skipTransition) {
         this.parent(skipTransition)
-        this.modsButton.doStateTransition('HIDDEN')
+        this.modsButton.doStateTransition('HIDDEN', skipTransition)
     },
 })
 
