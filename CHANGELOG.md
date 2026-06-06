@@ -3,6 +3,12 @@
 # Change Log
 
 ## [Unreleased]
+
+### Fixed
+
+- Fix title screen button poping up for a split second when entering title screen from game
+- Fix title screen button gamepad focus logic
+
 ## [1.2.0] 2026-05-17
 
 ### Added

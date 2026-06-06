@@ -12,12 +12,32 @@ declare global {
     }
 }
 
+function fixTitleScreenButtonOrdering(this: sc.TitleScreenButtonGui) {
+    if (ig.platform == ig.PLATFORM_TYPES.DESKTOP) {
+        const exitButton = this.buttons[0]
+        if (this.buttonGroup?.elements?.[0]?.[5] == exitButton) {
+            const enterBonusCodeButton = this.buttonGroup.removeFocusGui(1, 4)
+            if (enterBonusCodeButton) {
+                this.buttonGroup.addFocusGui(enterBonusCodeButton, 1, 5)
+            }
+            const twitterButton = this.buttonGroup.removeFocusGui(2, 4)
+            if (twitterButton) {
+                this.buttonGroup.addFocusGui(twitterButton, 2, 5)
+            }
+        }
+    }
+}
+
 sc.TitleScreenButtonGui.inject({
     init() {
         this.parent()
 
+        fixTitleScreenButtonOrdering.call(this)
+
         // Get the first button in the second column so we can position our button above it.
-        const lastButton = this.buttonGroup.elements[1].find(Boolean)!.hook
+        const lastButtonIndex = this.buttonGroup.elements[1].findIndex(Boolean)
+        const lastButton = this.buttonGroup.elements[1][lastButtonIndex]?.hook
+        if (!lastButton) return // should never happen, but just in case
 
         const text = Lang.titleScreenButton
         const onClick = () => {
@@ -32,7 +52,7 @@ sc.TitleScreenButtonGui.inject({
         button.hook.transitions = lastButton.transitions
         button.doStateTransition('HIDDEN', true)
 
-        this.buttonGroup.insertFocusGui(button, 1, 0)
+        this.buttonGroup.addFocusGui(button, 1, lastButtonIndex - 1)
         this.insertChildGui(button, 0)
 
         button.onButtonPress = onClick
