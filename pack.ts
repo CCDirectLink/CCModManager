@@ -49,7 +49,7 @@ await Promise.all([
     //
     addGlob('{LICENSE,plugin.js,ccmod.json}'),
     addGlob('icon/icon.png'),
-    addGlob('{assets,lang}/**/*', true),
+    addGlob('assets/**/*', true),
 ])
 await Promise.all(tasks)
 
