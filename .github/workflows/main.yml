@@ -14,10 +14,9 @@ jobs:
             - uses: actions/checkout@v4
 
             - name: Install pnpm
-              uses: pnpm/action-setup@v3
+              uses: pnpm/action-setup@v6
               with:
                   version: latest
-                  run_install: false
 
             - name: Install Node.js
               uses: actions/setup-node@v4
@@ -84,8 +83,11 @@ jobs:
                   git tag -a "$VERSION" -m "Version $VERSION"
                   git push origin "$VERSION"
 
+            - name: Install node dependencies
+              run: pnpm install
+
             - name: Run pack.sh
-              run: ./pack.sh
+              run: pnpm run pack
 
             - name: Create release
               id: create_release
