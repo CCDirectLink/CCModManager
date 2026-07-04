@@ -1,4 +1,4 @@
-import { GuiOption, OptionVisibleTypes } from '../../../mod-options';
+import type { GuiOption, OptionVisibleTypes } from '../../../mod-options';
 declare global {
     namespace modmanager.gui.Options { }
 }

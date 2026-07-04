@@ -1,4 +1,4 @@
-import { ModOptionsOptionConstructor, ModOptionsOptionElement } from './all';
+import { type ModOptionsOptionConstructor, type ModOptionsOptionElement } from './all';
 declare global {
     namespace modmanager.gui.Options {
         interface CHECKBOX extends sc.OPTION_GUIS_DEFS.CHECKBOX, ModOptionsOptionElement<'CHECKBOX'> {

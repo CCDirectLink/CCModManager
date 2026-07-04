@@ -1,4 +1,4 @@
-import { ModEntry, ModEntryLocal, ModEntryLocalVirtual, ModEntryServer } from './types';
+import type { ModEntry, ModEntryLocal, ModEntryLocalVirtual, ModEntryServer } from './types';
 export declare class InstallQueue {
     private static queue;
     static changeUpdate(): void;
@@ -30,7 +30,7 @@ export declare class ModInstaller {
     private static setOrAddNewer;
     private static getModDependencies;
     private static matchesVersionReqRanges;
-    static findDepsDatabase(mods: ModEntryServer[], modRecords: Record<string, ModEntryServer[]>, includeInstalled?: boolean): Promise<ModEntryServer[]>;
+    static findDepsDatabase(mods: ModEntryServer[], modRecord: Record<string, ModEntryServer>, includeInstalled?: boolean): Promise<ModEntryServer[]>;
     static install(mods: ModEntryServer[]): Promise<void>;
     private static updateMod;
     private static downloadWithProgress;

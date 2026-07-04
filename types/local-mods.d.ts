@@ -1,4 +1,4 @@
-import { ModEntry, ModEntryLocal } from './types';
+import type { ModEntry, ModEntryLocal } from './types';
 import type { ValidTags } from 'ccmoddb/build/src/types';
 interface CCL2Mod {
     baseDirectory: string;
@@ -38,9 +38,10 @@ export declare class LocalMods {
         disableDisabling?: boolean;
         disableUpdate?: boolean;
     }>;
-    static initAll(): Promise<void>;
+    static init(): void;
+    private static updateCacheRecord;
+    static initAfterDatabaseLoaded(): Promise<void>;
     static checkForUpdates(): void;
-    static refreshOrigin(): Promise<void>;
     static getAll(): ModEntryLocal[];
     private static createVirtualLocalMods;
     private static convertServerToLocal;

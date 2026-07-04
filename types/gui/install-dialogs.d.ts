@@ -1,4 +1,4 @@
-import { ModEntry, ModEntryLocal } from '../types';
+import type { ModEntry, ModEntryLocal } from '../types';
 export declare function prepareModName(mod: {
     name: string;
 }): string;

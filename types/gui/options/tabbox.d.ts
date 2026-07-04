@@ -1,5 +1,5 @@
 import type { ModSettingsGui } from '../../mod-options';
-import { ModEntry } from '../../types';
+import type { ModEntry } from '../../types';
 export {};
 declare global {
     namespace modmanager.gui {

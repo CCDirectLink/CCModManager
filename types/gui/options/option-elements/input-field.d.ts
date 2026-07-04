@@ -1,5 +1,5 @@
-import { InputFieldIsValidFunc } from '../../../mod-options';
-import { ModOptionsOptionConstructor, ModOptionsOptionElement } from './all';
+import type { InputFieldIsValidFunc } from '../../../mod-options';
+import { type ModOptionsOptionConstructor, type ModOptionsOptionElement } from './all';
 declare global {
     namespace modmanager.gui {
         interface InputFieldWrapper extends ig.GuiElementBase {

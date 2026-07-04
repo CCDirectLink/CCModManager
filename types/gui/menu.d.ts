@@ -1,4 +1,4 @@
-import { ModEntry, ModEntryServer } from '../types';
+import type { ModEntry, ModEntryServer } from '../types';
 import './list';
 import './filters';
 import './multipage-button-box';
@@ -21,6 +21,7 @@ declare global {
             ENTRY_UNFOCUSED,
             ENTRY_UPDATE_COLOR
         }
+        var onceDeclinedRestartAfterMenuExit: boolean | undefined;
         interface Menu extends sc.ListInfoMenu, sc.Model {
             list: MenuList;
             inputField: modmanager.gui.InputField;
@@ -34,6 +35,7 @@ declare global {
             filtersPopup: modmanager.gui.FiltersPopup;
             changelogButton: sc.ButtonGui;
             changelogPopup?: modmanager.gui.Changelog;
+            runNextFrame: (() => void)[];
             initInputField(this: this): void;
             initSortMenu(this: this): void;
             initInstallButton(this: this, bottomY: number): void;

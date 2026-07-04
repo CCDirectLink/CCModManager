@@ -1,4 +1,4 @@
-import { ModOptionsOptionConstructor, ModOptionsOptionElement } from './all';
+import { type ModOptionsOptionConstructor, type ModOptionsOptionElement } from './all';
 declare global {
     namespace modmanager.gui.Options {
         interface BUTTON_GROUP extends sc.OPTION_GUIS_DEFS.BUTTON_GROUP, ModOptionsOptionElement<'BUTTON_GROUP'> {

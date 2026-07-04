@@ -1,4 +1,4 @@
-import { ModOptionsOptionConstructor, ModOptionsOptionElement } from './all';
+import type { ModOptionsOptionConstructor, ModOptionsOptionElement } from './all';
 declare global {
     namespace modmanager.gui.Options {
         interface INFO extends ig.GuiElementBase, ModOptionsOptionElement<'INFO'> {

@@ -1,5 +1,5 @@
-import { ModEntry } from '../../types';
-import { ModOptionsSettings } from '../../mod-options';
+import type { ModEntry } from '../../types';
+import type { ModOptionsSettings } from '../../mod-options';
 declare global {
     namespace modmanager {
         function openModOptionsMenu(modId: string, tab?: number): void;

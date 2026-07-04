@@ -1,10 +1,10 @@
-import { ModEntry } from '../types';
-import { Fliters } from '../filters';
+import type { ModEntry } from '../types';
+import { type Filters } from '../filters';
 import './list-entry';
 declare global {
     namespace modmanager.gui {
         interface MenuList extends sc.ListTabbedPane, sc.Model.Observer {
-            filters: Fliters;
+            filters: Filters;
             tabz: {
                 name: string;
                 icon: string;

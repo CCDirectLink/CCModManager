@@ -1,4 +1,4 @@
-import { ModEntry, ModImageConfig as ModIconConfig, NPDatabase } from './types';
+import type { ModEntry, ModImageConfig as ModIconConfig, NPDatabase } from './types';
 export declare class FileCache {
     private static cacheDir;
     private static existsOnDisk;
@@ -13,8 +13,16 @@ export declare class FileCache {
     static init(): Promise<void>;
     static prepareDatabase(name: string): void;
     static getIconConfig(mod: ModEntry): Promise<ModIconConfig>;
+    private static saveFile;
+    private static fetchAndWriteIcon;
     private static getIcon;
     static checkDatabaseUrl(url: string): Promise<boolean>;
-    static getDatabase(name: string): Promise<NPDatabase>;
+    private static isJsonDatabase;
+    private static readDatabaseFromDisk;
+    private static fetchDatabase;
+    static getDatabase(name: string): Promise<{
+        database?: NPDatabase;
+        checked: boolean;
+    }>;
     static deleteOnDiskCache(): Promise<void>;
 }

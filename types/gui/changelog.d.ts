@@ -1,4 +1,4 @@
-import { ModEntryServer } from '../types';
+import type { ModEntryServer } from '../types';
 declare global {
     namespace modmanager.gui {
         interface Changelog extends modmanager.gui.MultiPageButtonBoxGui {

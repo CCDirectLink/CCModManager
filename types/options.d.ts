@@ -12,6 +12,10 @@ export declare function registerOpts(): {
                     readonly type: "CHECKBOX";
                     readonly init: true;
                 };
+                readonly showTitleScreenButton: {
+                    readonly type: "CHECKBOX";
+                    readonly init: true;
+                };
                 readonly testingOptInMods: {
                     readonly type: "JSON_DATA";
                     readonly init: string[];

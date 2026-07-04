@@ -1,4 +1,4 @@
-import { ModOptionsOptionConstructor, ModOptionsOptionElement } from './all';
+import { type ModOptionsOptionConstructor, type ModOptionsOptionElement } from './all';
 declare global {
     namespace modmanager.gui.Options {
         interface OBJECT_SLIDER extends sc.OPTION_GUIS_DEFS.OBJECT_SLIDER, ModOptionsOptionElement<'OBJECT_SLIDER'> {

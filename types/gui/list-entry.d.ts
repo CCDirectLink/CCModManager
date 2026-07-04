@@ -1,4 +1,4 @@
-import { ModEntry, ModEntryLocal, ModImageConfig } from '../types';
+import type { ModEntry, ModEntryLocal, ModImageConfig } from '../types';
 import './list-entry-highlight';
 declare global {
     namespace modmanager.gui {

@@ -1,5 +1,5 @@
-import { ModEntry } from './types';
-export interface Fliters {
+import type { ModEntry } from './types';
+export interface Filters {
     name?: string;
     hasIcon?: boolean;
     includeLocal?: boolean;
@@ -7,4 +7,4 @@ export interface Fliters {
     tags?: string[];
     hasOptions?: boolean;
 }
-export declare function createFuzzyFilteredModList<T extends ModEntry>(filters: Fliters, mods: T[]): T[];
+export declare function createFuzzyFilteredModList<T extends ModEntry>(filters: Filters, mods: T[]): T[];

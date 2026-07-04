@@ -1,4 +1,4 @@
-import { ModOptionsOptionConstructor, ModOptionsOptionElement } from './all';
+import type { ModOptionsOptionConstructor, ModOptionsOptionElement } from './all';
 declare global {
     namespace modmanager.gui.Options {
         interface CONTROLS extends sc.OPTION_GUIS_DEFS.CONTROLS, ModOptionsOptionElement<'CONTROLS'> {
