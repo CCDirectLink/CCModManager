@@ -1,6 +1,6 @@
 import { ModDB } from '../moddb'
 import { InstallQueue, ModInstaller } from '../mod-installer'
-import { ModEntry, ModEntryServer } from '../types'
+import type { ModEntry, ModEntryServer } from '../types'
 import { ModInstallDialogs } from './install-dialogs'
 import { LocalMods } from '../local-mods'
 import { Lang } from '../lang-manager'

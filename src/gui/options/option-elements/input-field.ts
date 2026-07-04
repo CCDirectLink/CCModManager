@@ -1,5 +1,5 @@
-import { InputFieldIsValidFunc } from '../../../mod-options'
-import { ModOptionsOptionConstructor, ModOptionsOptionElement, optGet, optSet } from './all'
+import type { InputFieldIsValidFunc } from '../../../mod-options'
+import { optGet, optSet, type ModOptionsOptionConstructor, type ModOptionsOptionElement } from './all'
 
 declare global {
     namespace modmanager.gui {
@@ -77,8 +77,7 @@ declare global {
     namespace modmanager.gui.Options {
         interface INPUT_FIELD extends modmanager.gui.InputFieldWrapper, ModOptionsOptionElement<'INPUT_FIELD'> {}
         interface INPUT_FIELD_CONSTRUCTOR
-            extends ImpactClass<INPUT_FIELD>,
-                ModOptionsOptionConstructor<INPUT_FIELD, 'INPUT_FIELD'> {}
+            extends ImpactClass<INPUT_FIELD>, ModOptionsOptionConstructor<INPUT_FIELD, 'INPUT_FIELD'> {}
         var INPUT_FIELD: INPUT_FIELD_CONSTRUCTOR
     }
 }

@@ -1,6 +1,6 @@
 import { ModInstaller } from './mod-installer'
 import { ModDB } from './moddb'
-import { ModEntry, ModImageConfig as ModIconConfig, NPDatabase } from './types'
+import type { ModEntry, ModImageConfig as ModIconConfig, NPDatabase } from './types'
 
 const fs: typeof import('fs') = window.require?.('fs')
 
@@ -86,7 +86,7 @@ export class FileCache {
         return this.getDefaultModIconConfig()
     }
 
-    private static async saveFile(path: string, data: unknown) {
+    private static async saveFile(path: string, data: string | Uint8Array) {
         await fs.promises.writeFile(path, data)
         this.existsOnDisk.add(path)
     }

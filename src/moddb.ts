@@ -1,4 +1,4 @@
-import { ModEntry, ModEntryLocal, ModEntryServer, NPDatabase } from './types'
+import type { ModEntry, ModEntryLocal, ModEntryServer, NPDatabase } from './types'
 import { FileCache } from './cache'
 import { Opts } from './options'
 import { semver } from './library-providers'

@@ -1,7 +1,8 @@
 import { Lang } from '../lang-manager'
 import { LocalMods } from '../local-mods'
-import { InstallQueue, ModInstaller, ModInstallerDownloadingProgress } from '../mod-installer'
-import { ModEntry, ModEntryLocal, ModEntryServer } from '../types'
+import { InstallQueue, ModInstaller } from '../mod-installer'
+import type { ModInstallerDownloadingProgress } from '../mod-installer'
+import type { ModEntry, ModEntryLocal, ModEntryServer } from '../types'
 
 export function prepareModName(mod: { name: string }) {
     return mod.name

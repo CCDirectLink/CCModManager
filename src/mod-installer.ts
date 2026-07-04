@@ -1,12 +1,12 @@
 import { LocalMods } from './local-mods'
 import { ModDB } from './moddb'
-import { ModEntry, ModEntryLocal, ModEntryLocalVirtual, ModEntryServer } from './types'
+import type { ModEntry, ModEntryLocal, ModEntryLocalVirtual, ModEntryServer } from './types'
 import { ModInstallDialogs, prepareModName } from './gui/install-dialogs'
 import { Opts } from './options'
 import ModManager from './plugin'
 import { Lang } from './lang-manager'
 import { semver } from './library-providers'
-import { Unzipped, unzip } from 'fflate/browser'
+import { type Unzipped, unzip } from 'fflate/browser'
 
 const fs: typeof import('fs') = window.require?.('fs')
 const path: typeof import('path') = window.require?.('path')

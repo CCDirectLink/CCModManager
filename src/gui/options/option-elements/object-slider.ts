@@ -1,4 +1,4 @@
-import { ModOptionsOptionConstructor, ModOptionsOptionElement, optGet, optSet } from './all'
+import { optGet, optSet, type ModOptionsOptionConstructor, type ModOptionsOptionElement } from './all'
 
 declare global {
     namespace modmanager.gui.Options {
@@ -6,8 +6,7 @@ declare global {
             currentNumber: sc.TextGui
         }
         interface OBJECT_SLIDER_CONSTRUCTOR
-            extends ImpactClass<OBJECT_SLIDER>,
-                ModOptionsOptionConstructor<OBJECT_SLIDER, 'OBJECT_SLIDER'> {}
+            extends ImpactClass<OBJECT_SLIDER>, ModOptionsOptionConstructor<OBJECT_SLIDER, 'OBJECT_SLIDER'> {}
         var OBJECT_SLIDER: OBJECT_SLIDER_CONSTRUCTOR
     }
 }

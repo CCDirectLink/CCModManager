@@ -1,4 +1,4 @@
-import { ModOptionsOptionConstructor, ModOptionsOptionElement, optGet, optSet } from './all'
+import { optGet, optSet, type ModOptionsOptionConstructor, type ModOptionsOptionElement } from './all'
 
 declare global {
     namespace modmanager.gui.Options {
@@ -6,8 +6,7 @@ declare global {
             currentNumber: sc.TextGui
         }
         interface CHECKBOX_CONSTRUCTOR
-            extends ImpactClass<CHECKBOX>,
-                ModOptionsOptionConstructor<CHECKBOX, 'CHECKBOX'> {}
+            extends ImpactClass<CHECKBOX>, ModOptionsOptionConstructor<CHECKBOX, 'CHECKBOX'> {}
         var CHECKBOX: CHECKBOX_CONSTRUCTOR
     }
 }

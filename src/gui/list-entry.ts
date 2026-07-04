@@ -1,4 +1,4 @@
-import { ModEntry, ModEntryLocal, ModImageConfig } from '../types'
+import type { ModEntry, ModEntryLocal, ModImageConfig } from '../types'
 import { FileCache } from '../cache'
 import './list-entry-highlight'
 import { LocalMods } from '../local-mods'

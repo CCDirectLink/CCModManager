@@ -1,5 +1,5 @@
 import type { GuiOption, OptionVisibleTypes } from '../../mod-options'
-import { ModOptionsOptionElement } from './option-elements/all'
+import type { ModOptionsOptionElement } from './option-elements/all'
 import './option-elements/all'
 
 declare global {

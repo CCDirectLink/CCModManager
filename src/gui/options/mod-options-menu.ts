@@ -1,5 +1,5 @@
-import { ModEntry } from '../../types'
-import { GuiOption, ModOptionsSettings } from '../../mod-options'
+import type { ModEntry } from '../../types'
+import type { GuiOption, ModOptionsSettings } from '../../mod-options'
 import { LocalMods } from '../../local-mods'
 import { ModInstallDialogs } from '../install-dialogs'
 

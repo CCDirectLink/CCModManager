@@ -1,6 +1,6 @@
 import { Lang } from '../lang-manager'
 import { openLink } from '../plugin'
-import { ModEntryServer } from '../types'
+import type { ModEntryServer } from '../types'
 import { generateChangelogPage } from './changelog-page-generator'
 
 declare global {

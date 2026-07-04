@@ -1,4 +1,4 @@
-import { ReleasePage } from 'ccmoddb/build/src/types'
+import type { ReleasePage } from 'ccmoddb/build/src/types'
 import * as marked from 'marked'
 
 export function generateChangelogPage(page: ReleasePage): sc.MultiPageBoxGui.ConditionalPage {

@@ -1,10 +1,10 @@
 import { ValidTags } from 'ccmoddb/build/src/types'
 import { LocalMods } from './local-mods'
-import { ModEntry, ModEntryServer } from './types'
+import type { ModEntry, ModEntryServer } from './types'
 
 import fuzzysort from 'fuzzysort'
 
-export interface Fliters {
+export interface Filters {
     name?: string
     hasIcon?: boolean
     includeLocal?: boolean
@@ -13,7 +13,7 @@ export interface Fliters {
     hasOptions?: boolean
 }
 
-function doesFilterApply(filters: Fliters, mod: ModEntry): boolean {
+function doesFilterApply(filters: Filters, mod: ModEntry): boolean {
     if (filters.hasIcon && !mod.hasIcon) return false
     if (
         !filters.includeLocal &&
@@ -35,7 +35,7 @@ function doesFilterApply(filters: Fliters, mod: ModEntry): boolean {
     return true
 }
 
-export function createFuzzyFilteredModList<T extends ModEntry>(filters: Fliters, mods: T[]): T[] {
+export function createFuzzyFilteredModList<T extends ModEntry>(filters: Filters, mods: T[]): T[] {
     mods = mods.filter(mod => doesFilterApply(filters, mod))
 
     if (filters.name) {

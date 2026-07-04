@@ -1,5 +1,5 @@
 import { ModDB } from './moddb'
-import { Option } from './mod-options'
+import type { Option } from './mod-options'
 import { Opts } from './options'
 
 function isValidUrl(urlString: string) {

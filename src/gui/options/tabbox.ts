@@ -1,5 +1,5 @@
 import type { ModSettingsGui } from '../../mod-options'
-import { ModEntry } from '../../types'
+import type { ModEntry } from '../../types'
 
 export {}
 declare global {
@@ -321,7 +321,7 @@ modmanager.gui.OptionsTabBox = ig.GuiElementBase.extend({
             this._resetButtons(button)
             this._rearrangeTabs()
             this.lastButtonData = button.data
-            for (let i = this.tabArray.length; i--; )
+            for (let i = this.tabArray.length; i--;)
                 if (button == this.tabArray[i]) {
                     // this._refocusFromCycle = b
                     this.currentTab = i

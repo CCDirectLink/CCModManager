@@ -1,6 +1,6 @@
-import { ModEntry } from '../types'
+import type { ModEntry } from '../types'
 import { ModDB } from '../moddb'
-import { Fliters, createFuzzyFilteredModList } from '../filters'
+import { type Filters, createFuzzyFilteredModList } from '../filters'
 import { LocalMods } from '../local-mods'
 import { InstallQueue, ModInstaller } from '../mod-installer'
 import { Lang } from '../lang-manager'
@@ -11,7 +11,7 @@ import './list-entry'
 declare global {
     namespace modmanager.gui {
         interface MenuList extends sc.ListTabbedPane, sc.Model.Observer {
-            filters: Fliters
+            filters: Filters
             tabz: {
                 name: string
                 icon: string

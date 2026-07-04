@@ -1,4 +1,4 @@
-import { ModOptionsOptionConstructor, ModOptionsOptionElement } from './all'
+import type { ModOptionsOptionConstructor, ModOptionsOptionElement } from './all'
 
 declare global {
     namespace modmanager.gui.Options {
@@ -6,8 +6,7 @@ declare global {
             currentNumber: sc.TextGui
         }
         interface CONTROLS_CONSTRUCTOR
-            extends ImpactClass<CONTROLS>,
-                ModOptionsOptionConstructor<CONTROLS, 'CONTROLS'> {}
+            extends ImpactClass<CONTROLS>, ModOptionsOptionConstructor<CONTROLS, 'CONTROLS'> {}
         var CONTROLS: CONTROLS_CONSTRUCTOR
     }
 }
