@@ -34,7 +34,7 @@ export async function loadEverything(force?: boolean) {
     }
 }
 async function _loadEverything(force?: boolean) {
-    loadEverythingRunning = true
+    const gui = modmanager.gui
     try {
         LocalMods.init()
 
@@ -45,7 +45,8 @@ async function _loadEverything(force?: boolean) {
             await LocalMods.initAfterDatabaseLoaded()
             ModDB.removeModDuplicatesAndResolveTesting(ModDB.modRecord)
         }
-        modmanager.gui.menu?.list?.reloadEntries()
+
+        gui.menu?.list?.reloadEntries()
 
         return uncheckedDatabases
     } catch (e) {
