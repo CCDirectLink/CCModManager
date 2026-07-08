@@ -35,7 +35,7 @@ async function getETag(url: string): Promise<string> {
          * so just pick a random one to re-fetch each time */
         const etag = response.headers.get('etag') || `${Math.random()}`
         return etag
-    } catch (err) {
+    } catch {
         return 'nointernet'
     }
 }

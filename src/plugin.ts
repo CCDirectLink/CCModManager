@@ -23,37 +23,37 @@ export function openLink(url: string) {
 }
 
 let loadEverythingPromise: Promise<string[] | undefined> | undefined
-let loadEverythingRunning = false
 export async function loadEverything(force?: boolean) {
-    if (!loadEverythingPromise) {
-        return (loadEverythingPromise = _loadEverything(force))
-    }
-    if (loadEverythingRunning) await loadEverythingPromise
-    if (force) {
-        return (loadEverythingPromise = _loadEverything(force))
-    }
+    if (!force && loadEverythingPromise) return loadEverythingPromise
+
+    const previousPromise = loadEverythingPromise
+
+    loadEverythingPromise = (async () => {
+        if (previousPromise) {
+            try {
+                await previousPromise
+            } catch {}
+        }
+        return _loadEverything(force)
+    })()
+
+    return loadEverythingPromise
 }
 async function _loadEverything(force?: boolean) {
-    const gui = modmanager.gui
-    try {
-        LocalMods.init()
+    const gui = modmanager.gui /* keep correct reference after await to fix behaviour cc-multibakery */
+    LocalMods.init()
 
-        ModDB.loadDatabases(force)
-        let uncheckedDatabases: string[] | undefined
-        if (isFullMode()) {
-            uncheckedDatabases = await ModDB.loadAllMods(force)
-            await LocalMods.initAfterDatabaseLoaded()
-            ModDB.removeModDuplicatesAndResolveTesting(ModDB.modRecord)
-        }
-
-        gui.menu?.list?.reloadEntries()
-
-        return uncheckedDatabases
-    } catch (e) {
-        throw e
-    } finally {
-        loadEverythingRunning = false
+    ModDB.loadDatabases(force)
+    let uncheckedDatabases: string[] | undefined
+    if (isFullMode()) {
+        uncheckedDatabases = await ModDB.loadAllMods(force)
+        await LocalMods.initAfterDatabaseLoaded()
+        ModDB.removeModDuplicatesAndResolveTesting(ModDB.modRecord)
     }
+
+    gui.menu?.list?.reloadEntries()
+
+    return uncheckedDatabases
 }
 
 export default class ModManager {

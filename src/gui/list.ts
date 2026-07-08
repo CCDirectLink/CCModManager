@@ -160,7 +160,7 @@ modmanager.gui.MenuList = sc.ListTabbedPane.extend({
                 try {
                     this.currentList.buttonGroup.unfocusCurrentButton()
                     this.currentList.buttonGroup.focusCurrentButton(pos.x, pos.y)
-                } catch (e) {}
+                } catch {}
             }
 
             this.currentList.setScrollY(this.restoreLastPosition.scrollY, true)

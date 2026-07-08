@@ -503,7 +503,7 @@ export class ModInstaller {
         try {
             await fs.promises.access(filePath, fs.constants.F_OK)
             return true
-        } catch (_) {
+        } catch {
             return false
         }
     }
