@@ -8,6 +8,13 @@ import { Opts } from '../options'
 import { isFullMode } from '../plugin'
 import './list-entry'
 
+type ListPopulateFunc<T> = (
+    this: T,
+    list: sc.ButtonListBox,
+    buttonGroup: sc.ButtonGroup,
+    sort: modmanager.gui.MENU_SORT_ORDER
+) => void
+
 declare global {
     namespace modmanager.gui {
         interface MenuList extends sc.ListTabbedPane, sc.Model.Observer {
@@ -15,11 +22,7 @@ declare global {
             tabz: {
                 name: string
                 icon: string
-                populateFunc: (
-                    list: sc.ButtonListBox,
-                    buttonGroup: sc.ButtonGroup,
-                    sort: modmanager.gui.MENU_SORT_ORDER
-                ) => void
+                populateFunc: ListPopulateFunc<any>
             }[]
             currentSort: modmanager.gui.MENU_SORT_ORDER
             gridColumns: number
@@ -29,36 +32,11 @@ declare global {
             reloadFilters(this: this): void
             reloadEntries(this: this): void
             sortModEntries(this: this, mods: ModEntry[], sort: modmanager.gui.MENU_SORT_ORDER): void
-            populateOnline(
-                this: this,
-                list: sc.ButtonListBox,
-                buttonGroup: sc.ButtonGroup,
-                sort: modmanager.gui.MENU_SORT_ORDER
-            ): void
-            populateSelected(
-                this: this,
-                list: sc.ButtonListBox,
-                buttonGroup: sc.ButtonGroup,
-                sort: modmanager.gui.MENU_SORT_ORDER
-            ): void
-            populateEnabled(
-                this: this,
-                list: sc.ButtonListBox,
-                buttonGroup: sc.ButtonGroup,
-                sort: modmanager.gui.MENU_SORT_ORDER
-            ): void
-            populateDisabled(
-                this: this,
-                list: sc.ButtonListBox,
-                buttonGroup: sc.ButtonGroup,
-                sort: modmanager.gui.MENU_SORT_ORDER
-            ): void
-            populateSettings(
-                this: this,
-                list: sc.ButtonListBox,
-                buttonGroup: sc.ButtonGroup,
-                sort: modmanager.gui.MENU_SORT_ORDER
-            ): void
+            populateOnline: ListPopulateFunc<this>
+            populateSelected: ListPopulateFunc<this>
+            populateEnabled: ListPopulateFunc<this>
+            populateDisabled: ListPopulateFunc<this>
+            populateSettings: ListPopulateFunc<this>
             populateListFromMods(this: this, mods: ModEntry[], list: sc.ButtonListBox): void
             savePosition(this: this): void
         }
