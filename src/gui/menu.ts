@@ -4,6 +4,8 @@ import type { ModEntry, ModEntryServer } from '../types'
 import { ModInstallDialogs } from './install-dialogs'
 import { LocalMods } from '../local-mods'
 import { Lang } from '../lang-manager'
+import { isFullMode, loadEverything, openLink } from '../plugin'
+
 import './list'
 import './filters'
 import './multipage-button-box'
@@ -11,8 +13,6 @@ import './changelog'
 import './options/mod-options-menu'
 import './manual-enforcer'
 import './input-field/input-field'
-
-import { isFullMode, loadEverything, openLink } from '../plugin'
 
 declare global {
     namespace modmanager.gui {
@@ -64,7 +64,7 @@ declare global {
             updateInstallButtonText(this: this): void
             setTabEvent(this: this): void
             showModInstallDialog(this: this): void
-            getCurrentlyFocusedModEntry(this: this): modmanager.gui.ListEntry | undefined
+            getCurrentlyFocusedModEntry(this: this): modmanager.gui.ModListEntry | undefined
             openModSettings(this: this, mod: ModEntry): void
             openRepositoriesPopup(this: this): void
             openChangelogPopup(this: this, mod: ModEntryServer): void
@@ -416,11 +416,11 @@ modmanager.gui.Menu = (sc.ListInfoMenu ?? sc.SortableListMenu).extend({
             } else if (message == modmanager.gui.MENU_MESSAGES.SELECTED_ENTRIES_CHANGED) {
                 this.updateInstallButtonText()
             } else if (message == modmanager.gui.MENU_MESSAGES.ENTRY_FOCUSED) {
-                const entry = data as modmanager.gui.ListEntry
-                if (entry.mod.isLocal || (entry.mod.localCounterpart && isFullMode()))
-                    this.uninstallButton.setActive(true)
+                const entry = data as modmanager.gui.ModListEntry
+                const mod = entry.mod
+                if (mod.isLocal || (mod.localCounterpart && isFullMode())) this.uninstallButton.setActive(true)
 
-                const serverMod = entry.mod.isLocal ? entry.mod.serverCounterpart : entry.mod
+                const serverMod = mod.isLocal ? mod.serverCounterpart : mod
                 if (serverMod?.testingVersion) {
                     this.testingToggleButton.doStateTransition('DEFAULT')
                     this.testingToggleButton.setText('\\i[shiftOrL2] ' + Lang.testingButton)
@@ -428,9 +428,9 @@ modmanager.gui.Menu = (sc.ListInfoMenu ?? sc.SortableListMenu).extend({
                     this.testingToggleButton.doStateTransition('HIDDEN')
                 }
 
-                this.openRepositoryUrlButton.doStateTransition(entry.mod.repositoryUrl ? 'DEFAULT' : 'HIDDEN')
+                this.openRepositoryUrlButton.doStateTransition(mod.repositoryUrl ? 'DEFAULT' : 'HIDDEN')
 
-                this.modOptionsButton.doStateTransition(modmanager.optionConfigs[entry.mod.id] ? 'DEFAULT' : 'HIDDEN')
+                this.modOptionsButton.doStateTransition(modmanager.optionConfigs[mod.id] ? 'DEFAULT' : 'HIDDEN')
 
                 this.changelogButton.doStateTransition(serverMod?.releasePages ? 'DEFAULT' : 'HIDDEN')
             } else if (message == modmanager.gui.MENU_MESSAGES.ENTRY_UNFOCUSED) {
@@ -546,12 +546,16 @@ modmanager.gui.Menu = (sc.ListInfoMenu ?? sc.SortableListMenu).extend({
         }
     },
     getCurrentlyFocusedModEntry() {
-        return this.list.currentList.buttonGroup.elements
+        const listEntry = this.list.currentList.buttonGroup.elements
             .reduce((acc, v) => {
                 acc.push(...v)
                 return acc
             }, [])
-            .find((b: ig.FocusGui) => b.focus) as modmanager.gui.ListEntry
+            .find((b: ig.FocusGui) => b.focus) as modmanager.gui.ListEntry | undefined
+
+        if (listEntry instanceof modmanager.gui.ModListEntry) {
+            return listEntry
+        }
     },
     openModSettings(mod) {
         this.list.savePosition()

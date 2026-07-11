@@ -6,7 +6,8 @@ import { InstallQueue, ModInstaller } from '../mod-installer'
 import { Lang } from '../lang-manager'
 import { Opts } from '../options'
 import { isFullMode } from '../plugin'
-import './list-entry'
+
+import './mod-list-entry'
 
 type ListPopulateFunc<T> = (
     this: T,
@@ -289,7 +290,7 @@ modmanager.gui.MenuList = sc.ListTabbedPane.extend({
         const totalWidth = this.hook.size.x
         for (let i = 0; i < mods.length; i++) {
             const mod = mods[i]
-            const newModEntry = new modmanager.gui.ListEntry(mod, this)
+            const newModEntry = new modmanager.gui.ModListEntry(mod, this)
             const x = Opts.isGrid ? (i % this.gridColumns) * (totalWidth / this.gridColumns - 1) : 0
             list.addButton(newModEntry, undefined, x)
         }

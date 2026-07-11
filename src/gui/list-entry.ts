@@ -1,17 +1,22 @@
-import type { ModEntry, ModEntryLocal, ModImageConfig } from '../types'
-import { FileCache } from '../cache'
-import './list-entry-highlight'
-import { LocalMods } from '../local-mods'
-import { InstallQueue } from '../mod-installer'
-import { ModInstallDialogs, prepareModName } from './install-dialogs'
-import { ModDB } from '../moddb'
+import type { ModImageConfig } from '../types'
 import { Opts } from '../options'
+import { COLOR } from './colors'
+
+import './list-entry-highlight'
+
+export interface ListEntryConfig {
+    description?: string
+    version?: string
+    authors?: string[]
+    tags?: string[]
+    lastUpdateTimestamp?: number
+    stars?: number
+}
 
 declare global {
     namespace modmanager.gui {
-        export interface ListEntry extends ig.FocusGui, sc.Model.Observer {
+        interface ListEntry extends ig.FocusGui, sc.Model.Observer {
             ninepatch: ig.NinePatch
-            mod: ModEntry
             iconOffset: number
             nameIconPrefixesText: sc.TextGui
             nameText: sc.TextGui
@@ -31,29 +36,20 @@ declare global {
             addObservers(this: this): void
             removeObservers(this: this): void
             updateIcon(this: this, config: ModImageConfig): void
-            tryDisableMod(this: this, mod: ModEntryLocal): string | undefined
-            tryEnableMod(this: this, mod: ModEntryLocal): string | undefined
-            toggleSelection(this: this, force?: boolean): string | undefined
-            getModName(this: this): { icon: string; text: string }
-            onButtonPress(this: this): void
             setNameText(this: this, color?: COLOR): void
             updateHighlightWidth(this: this): void
-            onButtonPress(this: this): string | undefined
+
+            // abstract classes
+            getName(this: this): { icon: string; text: string }
+            getIcon(this: this): Promise<ModImageConfig>
+            onButtonPress(this: this): void
         }
         interface ListEntryConstructor extends ImpactClass<ListEntry> {
-            new (mod: ModEntry, modList: modmanager.gui.MenuList): ListEntry
+            new (config: ListEntryConfig, modList: modmanager.gui.MenuList): ListEntry
         }
         var ListEntry: ListEntryConstructor
     }
 }
-
-const COLOR = {
-    WHITE: 0,
-    RED: 1,
-    GREEN: 2,
-    YELLOW: 3,
-} as const
-type COLOR = (typeof COLOR)[keyof typeof COLOR]
 
 modmanager.gui.ListEntry = ig.FocusGui.extend({
     ninepatch: new ig.NinePatch('media/gui/CCModManager.png', {
@@ -66,18 +62,13 @@ modmanager.gui.ListEntry = ig.FocusGui.extend({
         offsets: { default: { x: 0, y: 0 }, focus: { x: 0, y: 41 } },
     }),
 
-    init(mod, modList) {
+    init(config, modList) {
         this.parent()
 
-        this.mod = mod
         this.modList = modList
 
-        if (!mod.isLocal && mod.testingVersion && ModDB.isModTestingOptIn(mod.id)) {
-            mod = mod.testingVersion
-        }
-
         const isGrid = Opts.isGrid
-        FileCache.getIconConfig(mod).then(config => this.updateIcon(config))
+        this.getIcon().then(config => this.updateIcon(config))
 
         const height = 42
         this.iconOffset = 25
@@ -93,20 +84,6 @@ modmanager.gui.ListEntry = ig.FocusGui.extend({
         this.nameIconPrefixesText = new sc.TextGui('')
         this.setNameText(COLOR.WHITE)
 
-        const localMod = mod.isLocal ? mod : mod.localCounterpart
-        const serverMod = mod.isLocal ? mod.serverCounterpart : mod
-
-        if (this.modList.currentTabIndex == modmanager.gui.MOD_MENU_TAB_INDEXES.DISABLED) this.setNameText(COLOR.RED)
-        else if (this.modList.currentTabIndex == modmanager.gui.MOD_MENU_TAB_INDEXES.ENABLED)
-            this.setNameText(COLOR.GREEN)
-        else {
-            if (localMod) {
-                if (localMod.active) this.setNameText(COLOR.GREEN)
-                else this.setNameText(COLOR.RED)
-            }
-        }
-        if (InstallQueue.has(mod)) this.setNameText(COLOR.YELLOW)
-
         this.highlight = new modmanager.gui.ListEntryHighlight(
             this.hook.size.x,
             this.hook.size.y,
@@ -119,7 +96,7 @@ modmanager.gui.ListEntry = ig.FocusGui.extend({
         this.addChildGui(this.nameIconPrefixesText)
 
         if (!isGrid) {
-            const tags = serverMod?.tags ?? localMod?.tags
+            const tags = config.tags
             if (tags) {
                 const tagsLength = tags.join(', ').length
                 const str = tags.map(a => `\\c[0]${a}\\c[0]`).join(', ')
@@ -134,7 +111,7 @@ modmanager.gui.ListEntry = ig.FocusGui.extend({
                 this.addChildGui(this.tags)
             }
 
-            this.description = new sc.TextGui(mod.description ?? '', {
+            this.description = new sc.TextGui(config.description ?? '', {
                 font: sc.fontsystem.smallFont,
                 maxWidth: this.hook.size.x - (this.tags?.hook.size.x ?? 0) - 50,
                 linePadding: -4,
@@ -142,20 +119,20 @@ modmanager.gui.ListEntry = ig.FocusGui.extend({
             this.description.setPos(4 + this.iconOffset, 14)
             this.addChildGui(this.description)
 
-            const authors = serverMod?.authors ?? localMod?.authors
+            const authors = config.authors
             if (authors && authors.length > 0) {
                 const str = `by ${authors.map(a => `\\c[3]${a}\\c[0]`).join(', ')}`
                 this.authors = new sc.TextGui(str, { font: sc.fontsystem.smallFont, linePadding: -1 })
                 this.addChildGui(this.authors)
             }
 
-            this.versionText = new sc.TextGui(`v${mod.version}`, { font: sc.fontsystem.tinyFont })
+            this.versionText = new sc.TextGui(`v${config.version}`, { font: sc.fontsystem.tinyFont })
             this.versionText.setAlign(ig.GUI_ALIGN.X_RIGHT, ig.GUI_ALIGN.Y_TOP)
             this.versionText.setPos(3, 3)
             this.addChildGui(this.versionText)
 
-            if (serverMod?.lastUpdateTimestamp) {
-                const date = new Date(serverMod.lastUpdateTimestamp)
+            if (config?.lastUpdateTimestamp !== undefined) {
+                const date = new Date(config.lastUpdateTimestamp)
                 const dateStr = date.toLocaleDateString('pl-PL', {
                     year: 'numeric',
                     month: '2-digit',
@@ -167,8 +144,8 @@ modmanager.gui.ListEntry = ig.FocusGui.extend({
                 this.addChildGui(this.lastUpdated)
             }
 
-            if (serverMod?.stars !== undefined) {
-                this.starCount = new sc.TextGui(`${serverMod.stars}\\i[save-star]`)
+            if (config?.stars !== undefined) {
+                this.starCount = new sc.TextGui(`${config.stars}\\i[save-star]`)
                 this.starCount.setAlign(ig.GUI_ALIGN_X.RIGHT, ig.GUI_ALIGN_Y.TOP)
                 this.starCount.setPos(53, 0)
                 this.addChildGui(this.starCount)
@@ -189,31 +166,9 @@ modmanager.gui.ListEntry = ig.FocusGui.extend({
         else this.iconGui.setPos(2, 8)
         this.addChildGui(this.iconGui)
     },
-    getModName() {
-        let icon: string = ''
-
-        icon += this.mod.database == 'LOCAL' ? '\\i[lore-others]' : '\\i[quest]'
-
-        if (this.mod.awaitingRestart) icon += `\\i[stats-general]`
-
-        const local = this.mod.isLocal ? this.mod : this.mod.localCounterpart
-        if (local && local.hasUpdate) {
-            icon += `\\i[item-news]`
-        }
-        if (local?.isGit) {
-            icon += '\\i[ccmodmanager-git]'
-        }
-
-        const serverMod = this.mod.isLocal ? this.mod.serverCounterpart : this.mod
-        if (serverMod?.testingVersion) {
-            icon += `\\i[ccmodmanager-testing-${ModDB.isModTestingOptIn(serverMod.id) ? 'on' : 'off'}]`
-        }
-
-        return { icon, text: prepareModName(this.mod) }
-    },
     setNameText(color?: COLOR) {
         color ??= this.textColor
-        const { text, icon } = this.getModName()
+        const { text, icon } = this.getName()
         this.nameIconPrefixesText.setText(icon)
         this.nameIconPrefixesText.setPos(4 + this.iconOffset, 0)
 
@@ -272,84 +227,5 @@ modmanager.gui.ListEntry = ig.FocusGui.extend({
         this.highlight.focus = this.focus
         sc.Model.notifyObserver(modmanager.gui.menu, modmanager.gui.MENU_MESSAGES.ENTRY_UNFOCUSED, this)
     },
-    tryEnableMod(mod: ModEntryLocal) {
-        ModInstallDialogs.showEnableModDialog(mod).then(() => {
-            this.updateHighlightWidth()
-        })
-        return 'Enabled'
-    },
-    tryDisableMod(mod: ModEntryLocal) {
-        if (!ModInstallDialogs.checkCanDisableMod(mod)) {
-            sc.BUTTON_SOUND.denied.play()
-            return
-        }
-        mod.awaitingRestart = !mod.awaitingRestart
-        this.setNameText(COLOR.RED)
-        sc.BUTTON_SOUND.toggle_off.play()
-        LocalMods.setModActive(mod, false)
-        this.updateHighlightWidth()
-        return 'Disabled'
-    },
-    modelChanged(model, message: modmanager.gui.MENU_MESSAGES, data) {
-        const d = data as { mod: ModEntryLocal; color: COLOR }
-        if (
-            model == modmanager.gui.menu &&
-            message == modmanager.gui.MENU_MESSAGES.ENTRY_UPDATE_COLOR &&
-            d.mod == this.mod
-        ) {
-            this.setNameText(d.color)
-        }
-    },
-    onButtonPress() {
-        let mod = this.mod
-        if (mod.isLocal) {
-            if (
-                this.modList.currentTabIndex == modmanager.gui.MOD_MENU_TAB_INDEXES.ENABLED ||
-                this.modList.currentTabIndex == modmanager.gui.MOD_MENU_TAB_INDEXES.DISABLED
-            ) {
-                if (mod.active) return this.tryDisableMod(mod)
-                else return this.tryEnableMod(mod)
-            } else if (this.modList.currentTabIndex == modmanager.gui.MOD_MENU_TAB_INDEXES.SETTINGS) {
-                modmanager.gui.menu.modOptionsButton.onButtonPress()
-            } else {
-                throw new Error('wat?')
-            }
-        } else if (mod.localCounterpart) {
-            return this.toggleSelection()
-        } else {
-            if (InstallQueue.has(mod)) {
-                InstallQueue.delete(mod)
-                sc.BUTTON_SOUND.toggle_off.play()
-                this.setNameText(COLOR.WHITE)
-                return 'Un-Selected'
-            } else {
-                InstallQueue.add(mod)
-                sc.BUTTON_SOUND.toggle_on.play()
-                this.setNameText(COLOR.YELLOW)
-                return 'Selected'
-            }
-        }
-    },
-    toggleSelection(force = false) {
-        const mod = this.mod
-        if (mod.isLocal) return
-        const localMod = mod.localCounterpart
-        if (!localMod) return
-        if ((force || localMod.hasUpdate) && !localMod.isGit) {
-            if (InstallQueue.has(mod)) {
-                if (localMod.active) this.setNameText(COLOR.GREEN)
-                else this.setNameText(COLOR.RED)
-                sc.BUTTON_SOUND.toggle_off.play()
-                InstallQueue.delete(mod)
-                this.updateHighlightWidth()
-                return 'Un-selected'
-            } else {
-                this.setNameText(COLOR.YELLOW)
-                sc.BUTTON_SOUND.toggle_on.play()
-                InstallQueue.add(mod)
-                this.updateHighlightWidth()
-                return 'Selected'
-            }
-        } else sc.BUTTON_SOUND.denied.play()
-    },
+    modelChanged() {},
 })
