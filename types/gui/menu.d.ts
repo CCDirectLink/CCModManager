@@ -52,7 +52,7 @@ declare global {
             updateInstallButtonText(this: this): void;
             setTabEvent(this: this): void;
             showModInstallDialog(this: this): void;
-            getCurrentlyFocusedModEntry(this: this): modmanager.gui.ListEntry | undefined;
+            getCurrentlyFocusedModEntry(this: this): modmanager.gui.ModListEntry | undefined;
             openModSettings(this: this, mod: ModEntry): void;
             openRepositoriesPopup(this: this): void;
             openChangelogPopup(this: this, mod: ModEntryServer): void;
