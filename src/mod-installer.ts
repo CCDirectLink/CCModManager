@@ -471,17 +471,19 @@ export class ModInstaller {
             })
         })
 
+        const basePath = path.join(prefixPath, id)
         const files = Object.entries(unzipped)
             .map(([zipRelativePath, data]) => {
                 const relative = path.relative(source, zipRelativePath)
                 if (relative.startsWith('../')) return
 
-                let filepath = path.join(prefixPath, id, relative)
+                let filepath = path.join(basePath, relative)
                 if (zipRelativePath.endsWith('/')) filepath += '/'
                 return { filepath, data }
             })
             .filter(Boolean) as { filepath: string; data: Uint8Array }[]
 
+        await mkdirRecursive(basePath)
         for (const { filepath } of files) {
             if (filepath.endsWith('/')) {
                 await mkdirRecursive(filepath)
