@@ -1,4 +1,4 @@
-import { ModInstaller } from './mod-installer'
+import { mkdirRecursive, ModInstaller } from './mod-installer'
 import { ModDB } from './moddb'
 import type { ModEntry, ModImageConfig as ModIconConfig, NPDatabase } from './types'
 
@@ -63,14 +63,14 @@ export class FileCache {
         this.readingPromises = {}
         if (!fs) return
 
-        await fs.promises.mkdir(`${this.cacheDir}`, { recursive: true })
+        await mkdirRecursive(`${this.cacheDir}`)
         for await (const path of getFilesRecursive(this.cacheDir)) {
             this.existsOnDisk.add(path)
         }
     }
 
     static prepareDatabase(name: string) {
-        fs?.promises.mkdir(`${this.cacheDir}/${name}/icons`, { recursive: true })
+        mkdirRecursive(`${this.cacheDir}/${name}/icons`)
     }
 
     static async getIconConfig(mod: ModEntry): Promise<ModIconConfig> {
@@ -220,6 +220,6 @@ export class FileCache {
 
     static async deleteOnDiskCache() {
         await ModInstaller.removeDirRecursive(this.cacheDir)
-        await fs.promises.mkdir(this.cacheDir, { recursive: true })
+        await mkdirRecursive(this.cacheDir)
     }
 }

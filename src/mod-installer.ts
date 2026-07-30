@@ -11,6 +11,27 @@ import { type Unzipped, unzip } from 'fflate/browser'
 const fs: typeof import('fs') = window.require?.('fs')
 const path: typeof import('path') = window.require?.('path')
 
+export async function mkdirRecursive(dir: string) {
+    if (!fs) return
+    try {
+        await fs.promises.mkdir(dir)
+    } catch (err) {
+        if (typeof err == 'object' && err && 'code' in err) {
+            if (err.code === 'EEXIST') {
+                const stats = await fs.promises.stat(dir)
+                if (!stats.isDirectory()) throw err
+                return
+            }
+            if (err.code === 'ENOENT') {
+                await mkdirRecursive(path.dirname(dir))
+                await fs.promises.mkdir(dir)
+                return
+            }
+        }
+        throw err
+    }
+}
+
 export class InstallQueue {
     private static queue: ModEntryServer[] = []
 
@@ -463,7 +484,7 @@ export class ModInstaller {
 
         for (const { filepath } of files) {
             if (filepath.endsWith('/')) {
-                await fs.promises.mkdir(filepath, { recursive: true })
+                await mkdirRecursive(filepath)
             }
         }
 
