@@ -2,6 +2,7 @@ import type { ModEntry } from '../../types'
 import type { GuiOption, ModOptionsSettings } from '../../mod-options'
 import { LocalMods } from '../../local-mods'
 import { ModInstallDialogs } from '../install-dialogs'
+import { popMenu } from '../pop-menu-fix'
 
 declare global {
     namespace modmanager {
@@ -139,7 +140,7 @@ modmanager.gui.OptionsMenu = sc.BaseMenu.extend({
 
         sc.menu.pushBackCallback(() => {
             sc.menu.popBackCallback()
-            sc.menu.popMenu()
+            popMenu()
         })
         sc.menu.moveLeaSprite(0, 0, sc.MENU_LEA_STATE.HIDDEN)
 
@@ -226,7 +227,7 @@ modmanager.gui.OptionsMenu = sc.BaseMenu.extend({
         /* re-open the menu to update the option guis with the new values */
         this.hide()
         sc.menu.popBackCallback()
-        sc.menu.popMenu()
+        popMenu()
         const mainMenu = sc.menu.guiReference
         mainMenu.removeChildGui(this)
         delete mainMenu.submenus[modOptionsMenuId]

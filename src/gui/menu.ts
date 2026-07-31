@@ -5,6 +5,7 @@ import { ModInstallDialogs } from './install-dialogs'
 import { LocalMods } from '../local-mods'
 import { Lang } from '../lang-manager'
 import { isFullMode, loadEverything, openLink } from '../plugin'
+import { popMenu } from './pop-menu-fix'
 
 import './list'
 import './filters'
@@ -576,6 +577,10 @@ modmanager.gui.Menu = (sc.ListInfoMenu ?? sc.SortableListMenu).extend({
 
         for (const func of this.runNextFrame) func()
         this.runNextFrame = []
+    },
+    onBackButtonPress() {
+        sc.menu.popBackCallback()
+        popMenu()
     },
 })
 
