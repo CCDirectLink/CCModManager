@@ -1,20 +1,6 @@
-import { mkdirRecursive, ModInstaller } from './mod-installer'
+import { getFilesRecursive, mkdirRecursive, readFile, removeDirRecursive, writeFile } from './fs-util'
 import { ModDB } from './moddb'
 import type { ModEntry, ModImageConfig as ModIconConfig, NPDatabase } from './types'
-
-const fs: typeof import('fs') = window.require?.('fs')
-
-async function* getFilesRecursive(dir: string): AsyncIterable<string> {
-    const dirents = await fs.promises.readdir(dir, { withFileTypes: true })
-    for (const dirent of dirents) {
-        const res = `${dir}/${dirent.name}`
-        if (dirent.isDirectory()) {
-            yield* getFilesRecursive(res)
-        } else {
-            yield res
-        }
-    }
-}
 
 async function getETag(url: string): Promise<string> {
     try {
@@ -61,7 +47,6 @@ export class FileCache {
 
         this.existsOnDisk = new Set()
         this.readingPromises = {}
-        if (!fs) return
 
         await mkdirRecursive(`${this.cacheDir}`)
         for await (const path of getFilesRecursive(this.cacheDir)) {
@@ -87,7 +72,7 @@ export class FileCache {
     }
 
     private static async saveFile(path: string, data: string | Uint8Array) {
-        await fs.promises.writeFile(path, data)
+        await writeFile(path, data)
         this.existsOnDisk.add(path)
     }
 
@@ -145,7 +130,7 @@ export class FileCache {
 
     private static async readDatabaseFromDisk(ccPath: string): Promise<NPDatabase | undefined> {
         try {
-            const str = await fs.promises.readFile(ccPath, 'utf8')
+            const str = await readFile(ccPath, 'utf8')
             const json = JSON.parse(str)
             if (!this.isJsonDatabase(json)) throw new Error('json is not a valid database')
 
@@ -219,7 +204,7 @@ export class FileCache {
     }
 
     static async deleteOnDiskCache() {
-        await ModInstaller.removeDirRecursive(this.cacheDir)
+        await removeDirRecursive(this.cacheDir)
         await mkdirRecursive(this.cacheDir)
     }
 }

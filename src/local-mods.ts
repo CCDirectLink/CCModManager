@@ -5,6 +5,7 @@ import type { ModEntry, ModEntryLocal, ModEntryServer } from './types'
 import { ModDB } from './moddb'
 import { ModInstaller } from './mod-installer'
 import type { ValidTags } from 'ccmoddb/build/src/types'
+import { isDirGit } from './fs-util'
 
 interface CCL2Mod {
     baseDirectory: string
@@ -97,7 +98,7 @@ export class LocalMods {
         for (const mod of this.cache) ModDB.resolveLocalModOrigin(mod)
         await Promise.all(
             this.cache.map(async mod => {
-                const isGit = await ModInstaller.isDirGit(mod.path)
+                const isGit = await isDirGit(mod.path)
                 mod.isGit = isGit
             })
         )

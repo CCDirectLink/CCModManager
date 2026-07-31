@@ -7,30 +7,9 @@ import ModManager from './plugin'
 import { Lang } from './lang-manager'
 import { semver } from './library-providers'
 import { type Unzipped, unzip } from 'fflate/browser'
+import { mkdirRecursive, readFile, removeDirRecursive, writeFile } from './fs-util'
 
-const fs: typeof import('fs') = window.require?.('fs')
 const path: typeof import('path') = window.require?.('path')
-
-export async function mkdirRecursive(dir: string) {
-    if (!fs) return
-    try {
-        await fs.promises.mkdir(dir)
-    } catch (err) {
-        if (typeof err == 'object' && err && 'code' in err) {
-            if (err.code === 'EEXIST') {
-                const stats = await fs.promises.stat(dir)
-                if (!stats.isDirectory()) throw err
-                return
-            }
-            if (err.code === 'ENOENT') {
-                await mkdirRecursive(path.dirname(dir))
-                await fs.promises.mkdir(dir)
-                return
-            }
-        }
-        throw err
-    }
-}
 
 export class InstallQueue {
     private static queue: ModEntryServer[] = []
@@ -84,8 +63,6 @@ export class ModInstaller {
     static byNameRecord: Record<string, ModEntryServer>
     static virtualMods: Record<string, ModEntryLocalVirtual>
     static modsDir: string
-
-    private static rimraf: any
 
     static init() {
         const version = LocalMods.getCCVersion()
@@ -448,7 +425,7 @@ export class ModInstaller {
     }
 
     private static async installCCMod(data: ArrayBuffer, id: string) {
-        return fs.promises.writeFile(`${this.modsDir}/${id}.ccmod`, new Uint8Array(data))
+        return writeFile(`${this.modsDir}/${id}.ccmod`, new Uint8Array(data))
     }
 
     private static async checkSHA256(data: ArrayBuffer, expected: string): Promise<boolean> {
@@ -490,9 +467,7 @@ export class ModInstaller {
             }
         }
 
-        await Promise.all(
-            files.map(({ filepath, data }) => !filepath.endsWith('/') && fs.promises.writeFile(filepath, data))
-        )
+        await Promise.all(files.map(({ filepath, data }) => !filepath.endsWith('/') && writeFile(filepath, data)))
     }
 
     private static async installCCLoader(mod: ModEntryServer) {
@@ -505,7 +480,7 @@ export class ModInstaller {
 
         const packageJsonPath: string = 'package.json'
         async function readPackageJson(): Promise<{ 'chromium-args': string }> {
-            return JSON.parse(await fs.promises.readFile(packageJsonPath, 'utf8'))
+            return JSON.parse(await readFile(packageJsonPath, 'utf8'))
         }
 
         let chromiumFlags: string | undefined
@@ -518,24 +493,8 @@ export class ModInstaller {
         if (chromiumFlags) {
             const packageJson = await readPackageJson()
             packageJson['chromium-args'] = chromiumFlags
-            await fs.promises.writeFile(packageJsonPath, JSON.stringify(packageJson, null, 4))
+            await writeFile(packageJsonPath, JSON.stringify(packageJson, null, 4))
         }
-    }
-
-    private static async fileExists(filePath: string) {
-        try {
-            await fs.promises.access(filePath, fs.constants.F_OK)
-            return true
-        } catch {
-            return false
-        }
-    }
-
-    static async isDirGit(dirPath: string): Promise<boolean> {
-        if (!dirPath.trim() || !fs) return false
-        const stat = await fs.promises.stat(dirPath)
-        if (!stat.isDirectory()) return false
-        return await this.fileExists(path.join(dirPath, '.git'))
     }
 
     static getWhatDependsOnAMod(mod: ModEntryLocal, on = false): ModEntryLocal[] {
@@ -551,13 +510,7 @@ export class ModInstaller {
         if (mod.disableUninstall) throw new Error('Attempted to uninstall mod that has uninstalling disabled!')
         if (mod.isGit) throw new Error('Attempted to uninstall mod that is git!')
         console.log('uninstall', mod.id)
-        return ModInstaller.removeDirRecursive(mod.path)
-    }
-
-    static async removeDirRecursive(path: string) {
-        // @ts-expect-error
-        if (!ModInstaller.rimraf) ModInstaller.rimraf = (await import('rimraf')).default
-        return new Promise<void>(resolve => ModInstaller.rimraf(path, fs, () => resolve()))
+        return removeDirRecursive(mod.path)
     }
 
     static restartGame() {
