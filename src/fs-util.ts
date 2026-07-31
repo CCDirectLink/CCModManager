@@ -1,20 +1,29 @@
 const fs: typeof import('fs') = window.require?.('fs')
 const path: typeof import('path') = window.require?.('path')
 
+// this has to support this environment: (speedrunning branch)
+// chromium : "66.0.3359.181"
+// node : "10.1.0"
+// node-webkit : "0.30.5"
+
+export async function isDirectory(path: string) {
+    return (await fs.promises.stat(path)).isDirectory()
+}
+
 export async function* getFilesRecursive(dir: string): AsyncIterable<string> {
     if (!fs) return
-    const dirents = await fs.promises.readdir(dir, { withFileTypes: true })
-    for (const dirent of dirents) {
-        const res = `${dir}/${dirent.name}`
-        if (dirent.isDirectory()) {
-            yield* getFilesRecursive(res)
+    const fileNames = await fs.promises.readdir(dir)
+    for (const name of fileNames) {
+        const subPath = `${dir}/${name}`
+        if (await isDirectory(subPath)) {
+            yield* getFilesRecursive(subPath)
         } else {
-            yield res
+            yield subPath
         }
     }
 }
 
-export async function mkdirRecursive(dir: string) {
+export async function mkdirRecursive(dir: string, noRecurse?: boolean) {
     if (!fs) return
     try {
         await fs.promises.mkdir(dir)
@@ -25,9 +34,9 @@ export async function mkdirRecursive(dir: string) {
                 if (!stats.isDirectory()) throw err
                 return
             }
-            if (err.code === 'ENOENT') {
+            if (!noRecurse && err.code === 'ENOENT') {
                 await mkdirRecursive(path.dirname(dir))
-                await fs.promises.mkdir(dir)
+                await mkdirRecursive(dir, true)
                 return
             }
         }
