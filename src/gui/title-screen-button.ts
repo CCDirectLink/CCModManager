@@ -61,9 +61,6 @@ sc.TitleScreenButtonGui.inject({
     },
     show() {
         this.parent()
-        this.showModsButton()
-    },
-    showModsButton() {
         if (Opts.showTitleScreenButton) {
             this.modsButton.doStateTransition('DEFAULT')
         } else {
@@ -73,14 +70,5 @@ sc.TitleScreenButtonGui.inject({
     hide(skipTransition) {
         this.parent(skipTransition)
         this.modsButton.doStateTransition('HIDDEN', skipTransition)
-    },
-})
-
-sc.TitleScreenGui.inject({
-    modelChanged(model, message, data) {
-        this.parent(model, message, data)
-        if (model == sc.menu && message == sc.MENU_EVENT.EXIT_MENU) {
-            this.buttons.showModsButton()
-        }
     },
 })

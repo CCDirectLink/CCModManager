@@ -6,7 +6,7 @@
         },
         "showTitleScreenButton": {
             "name": "Show title screen button",
-            "description": "Display a button on the title screen that opens the mod manager menu."
+            "description": "Display a button on the title screen that opens the mod manager menu. (restart required)"
         },
         "repositoriesButton": {
             "name": "Repositories",

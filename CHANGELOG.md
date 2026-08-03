@@ -11,6 +11,7 @@
 - Fix mod entries not showing at first when running a cc-multibakery server
 - Fix compatibility with speedrunner branch
 - Fix mod install error when extracting zip and mod has no subdirectories
+- Fix title screen button not hiding properly sometimes
 
 ## [1.2.0] 2026-05-17
 
