@@ -25,6 +25,9 @@ declare global {
             cursor: InputFieldCursor
             obscure: boolean
             obscureChar: string
+            tabDirection: "right" | "down";
+            maxLength: number;
+            onEnterPressedCallback?: (this: this) => void;
 
             calculateCursorPos(this: this): number
             getValueAsString(this: this): string
@@ -70,6 +73,8 @@ modmanager.gui.InputField = ig.FocusGui.extend({
     cursor: undefined,
     obscure: false,
     obscureChar: '*',
+    tabDirection: "down",
+    maxLength: 100,
     init(width: number, height: number, type?: modmanager.gui.InputFieldType, obscure?: boolean, obscureChar?: string) {
         this.parent(true)
         this.setSize(width, height)
@@ -145,6 +150,46 @@ modmanager.gui.InputField = ig.FocusGui.extend({
             case 'End':
                 this.cursorPos = this.value.length
                 break
+            case "Enter":
+                this.onEnterPressedCallback?.();
+                break;
+            case "ArrowDown":
+                this.buttonGroup.stepDown();
+                break;
+            case "ArrowUp":
+                this.buttonGroup.stepUp();
+                break;
+            case "Tab":
+                if (this.tabDirection == 'down') {
+                    if (event.shiftKey) {
+                        this.buttonGroup.stepUp();
+                    } else {
+                        this.buttonGroup.stepDown();
+                    }
+                } else {
+                    if (event.shiftKey) {
+                        this.buttonGroup.stepLeft();
+                    } else {
+                        this.buttonGroup.stepRight();
+                    }
+                }
+                break;
+            case "v":
+                if (event.ctrlKey) {
+                    navigator.clipboard.readText().then(text => {
+                        this.setText(text.substring(0, this.maxLength));
+                    })
+                        .catch(err => {
+                            console.error("Could not read from clipboard:");
+                            console.error(err);
+                        });
+                }
+                break;
+            case "u":
+                if (event.ctrlKey) {
+                    this.setText("");
+                }
+                break;
             default: {
                 let old = this.getValueAsString()
 
