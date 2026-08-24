@@ -7,6 +7,7 @@ import { Opts, registerOpts } from './options'
 import { modOptionsPoststart, modOptionsPrestart } from './mod-options'
 import { initLibraries } from './library-providers'
 import { LocalMods } from './local-mods'
+import { setModMetadata } from './mod-metadata'
 
 import type {} from 'crosscode-demonizer/src/demomod/types.d.ts'
 import './mod-options'
@@ -57,15 +58,10 @@ async function _loadEverything(force?: boolean) {
 }
 
 export default class ModManager {
-    static dir: string
-    static mod: Mod1
     private lang!: LangManager
 
     constructor(mod: Mod1) {
-        ModManager.dir = mod.baseDirectory
-        ModManager.mod = mod
-        ModManager.mod.isCCL3 = mod.findAllAssets ? true : false
-        ModManager.mod.isCCModPacked = mod.baseDirectory.endsWith('.ccmod/')
+        setModMetadata(mod)
     }
 
     async prestart() {

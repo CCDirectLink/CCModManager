@@ -1,11 +1,11 @@
 import type { Mod } from 'ultimate-crosscode-typedefs/modloader/mod'
 import { FileCache } from './cache'
-import ModManager from './plugin'
 import type { ModEntry, ModEntryLocal, ModEntryServer } from './types'
 import { ModDB } from './moddb'
 import { ModInstaller } from './mod-installer'
 import type { ValidTags } from 'ccmoddb/build/src/types'
 import { isDirGit } from './fs-util'
+import { modMetadata } from './mod-metadata'
 
 interface CCL2Mod {
     baseDirectory: string
@@ -68,7 +68,7 @@ export class LocalMods {
         if (this.cache) return
 
         let all: ModEntryLocal[]
-        if (ModManager.mod.isCCL3) {
+        if (modMetadata.mod.isCCL3) {
             all = [...modloader.installedMods].map(e => this.convertCCL3Mod(e[1]))
         } else {
             all = [...window.activeMods.map(this.convertCCL2Mod), ...window.inactiveMods.map(this.convertCCL2Mod)]
@@ -240,11 +240,11 @@ export class LocalMods {
     }
 
     static getCCVersion(): string {
-        return ModManager.mod.isCCL3 ? modloader.gameVersion.raw : versions.crosscode
+        return modMetadata.mod.isCCL3 ? modloader.gameVersion.raw : versions.crosscode
     }
 
     static getCCLoaderVersion(): string {
-        return ModManager.mod.isCCL3 ? modloader.version.raw : versions.ccloader
+        return modMetadata.mod.isCCL3 ? modloader.version.raw : versions.ccloader
     }
 
     static findDeps(

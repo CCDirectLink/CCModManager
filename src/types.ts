@@ -4,7 +4,6 @@ import type {} from 'ultimate-crosscode-typedefs'
 import type { InstallMethod, PackageDB, ValidTags, ReleasePage } from 'ccmoddb/build/src/types'
 
 export type Mod1 = Mod & {
-    isCCModPacked: boolean
     findAllAssets?(): void /* only there for ccl2, used to set isCCL3 */
 } & (
         | {

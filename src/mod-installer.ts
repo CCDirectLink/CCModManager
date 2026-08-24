@@ -3,11 +3,11 @@ import { ModDB } from './moddb'
 import type { ModEntry, ModEntryLocal, ModEntryLocalVirtual, ModEntryServer } from './types'
 import { prepareModName } from './gui/mod-name-util'
 import { Opts } from './options'
-import ModManager from './plugin'
 import { Lang } from './lang-manager'
 import { semver } from './library-providers'
 import { type Unzipped, unzip } from 'fflate/browser'
 import { mkdirRecursive, readFile, removeDirRecursive, writeFile } from './fs-util'
+import { modMetadata } from './mod-metadata'
 
 const path: typeof import('path') = window.require?.('path')
 
@@ -124,7 +124,7 @@ export class ModInstaller {
             },
         }
 
-        if (ModManager.mod.isCCL3) {
+        if (modMetadata.mod.isCCL3) {
             this.modsDir = modloader.config.modsDirs[0]
 
             for (const [id, version] of modloader.virtualPackages.entries()) {
