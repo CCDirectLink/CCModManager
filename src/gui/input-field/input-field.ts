@@ -25,9 +25,8 @@ declare global {
             cursor: InputFieldCursor
             obscure: boolean
             obscureChar: string
-            tabDirection: "right" | "down";
-            maxLength: number;
-            onEnterPressedCallback?: (this: this) => void;
+            maxPasteLength: number
+            onEnterPressedCallback?: (this: this) => void
 
             calculateCursorPos(this: this): number
             getValueAsString(this: this): string
@@ -65,7 +64,6 @@ modmanager.gui.InputField = ig.FocusGui.extend({
     blockedSound: sc.BUTTON_SOUND.denied,
     type: null,
     boundProcessInput: null,
-    validChars: /[a-zA-Z0-9,! ]*/,
     cursorPos: 0,
     onCharacterInput: undefined,
     dummyForClipping: null,
@@ -73,8 +71,8 @@ modmanager.gui.InputField = ig.FocusGui.extend({
     cursor: undefined,
     obscure: false,
     obscureChar: '*',
-    tabDirection: "down",
-    maxLength: 100,
+    maxPasteLength: 100,
+
     init(width: number, height: number, type?: modmanager.gui.InputFieldType, obscure?: boolean, obscureChar?: string) {
         this.parent(true)
         this.setSize(width, height)
@@ -100,21 +98,17 @@ modmanager.gui.InputField = ig.FocusGui.extend({
 
         this.textChild.setAlign(ig.GUI_ALIGN.X_LEFT, ig.GUI_ALIGN.Y_TOP)
 
-        // #region dummy
         this.dummyForClipping = new sc.DummyContainer(this.textChild)
         this.dummyForClipping.setAlign(ig.GUI_ALIGN.X_LEFT, ig.GUI_ALIGN.Y_TOP)
         this.dummyForClipping.setPos(4, 1)
         this.dummyForClipping.setSize(width - 8, height)
         this.addChildGui(this.dummyForClipping)
-        // #endregion
 
-        // #region cursor
         this.cursor = new modmanager.gui.InputFieldCursor('#FF6D00')
         this.cursor.hook.pos.y = 2
         // Set initial cursor position.
         this.cursor.hook.pos.x = this.calculateCursorPos()
         this.addChildGui(this.cursor)
-        // #endregion
 
         this.boundProcessInput = this.processInput.bind(this)
         // allow all ascii printable characters
@@ -138,60 +132,52 @@ modmanager.gui.InputField = ig.FocusGui.extend({
 
     processInput(event: KeyboardEvent) {
         event.preventDefault()
-        switch (event.code) {
-            case 'ArrowLeft':
-                this.updateCursorPos(-1)
-                break
-            case 'ArrowRight':
-                this.updateCursorPos(1)
-                break
-            case 'Home':
-                this.cursorPos = 0
-                break
-            case 'End':
-                this.cursorPos = this.value.length
-                break
-            case "Enter":
-                this.onEnterPressedCallback?.();
-                break;
-            case "ArrowDown":
-                this.buttonGroup.stepDown();
-                break;
-            case "ArrowUp":
-                this.buttonGroup.stepUp();
-                break;
-            case "Tab":
-                if (this.tabDirection == 'down') {
-                    if (event.shiftKey) {
-                        this.buttonGroup.stepUp();
-                    } else {
-                        this.buttonGroup.stepDown();
-                    }
-                } else {
-                    if (event.shiftKey) {
-                        this.buttonGroup.stepLeft();
-                    } else {
-                        this.buttonGroup.stepRight();
-                    }
-                }
-                break;
-            case "v":
-                if (event.ctrlKey) {
-                    navigator.clipboard.readText().then(text => {
-                        this.setText(text.substring(0, this.maxLength));
+        if (event.ctrlKey) {
+            if (event.code == 'KeyU') {
+                const text = ''
+                this.setText(text)
+                this.onCharacterInput?.(text, '')
+            } else if (event.code == 'KeyV') {
+                navigator.clipboard
+                    .readText()
+                    .then(clipboardText => {
+                        if (!this.cursor.active) return
+
+                        const sanitizedClipboardText: string[] = clipboardText
+                            .substring(0, this.maxPasteLength)
+                            .split('')
+                            .filter(c => this.validChars.test(c))
+
+                        if (sanitizedClipboardText.length > 0) {
+                            this.value.splice(this.cursorPos, 0, ...sanitizedClipboardText)
+                            this.updateCursorPos(sanitizedClipboardText.length)
+                            this.cursor.movingTimer = 1
+
+                            const text = this.getValueAsString()
+                            this.setTextChildText(text)
+                            this.onCharacterInput?.(text, event.key)
+
+                            this.cursor.hook.pos.x = this.calculateCursorPos()
+                        }
                     })
-                        .catch(err => {
-                            console.error("Could not read from clipboard:");
-                            console.error(err);
-                        });
-                }
-                break;
-            case "u":
-                if (event.ctrlKey) {
-                    this.setText("");
-                }
-                break;
-            default: {
+                    .catch()
+            }
+        } else {
+            if (event.code == 'ArrowLeft') {
+                this.updateCursorPos(-1)
+                this.cursor.movingTimer = 1
+            } else if (event.code == 'ArrowRight') {
+                this.updateCursorPos(1)
+                this.cursor.movingTimer = 1
+            } else if (event.code == 'Home') {
+                this.cursorPos = 0
+                this.cursor.movingTimer = 1
+            } else if (event.code == 'End') {
+                this.cursorPos = this.value.length
+                this.cursor.movingTimer = 1
+            } else if (event.code == 'Enter') {
+                this.onEnterPressedCallback?.()
+            } else {
                 let old = this.getValueAsString()
 
                 if (event.key.length === 1 && this.validChars.test(event.key)) {
@@ -208,15 +194,10 @@ modmanager.gui.InputField = ig.FocusGui.extend({
                 let text = this.getValueAsString()
                 if (text !== old) {
                     this.setTextChildText(text)
-
-                    if (this.onCharacterInput) {
-                        this.onCharacterInput(text, event.key)
-                    }
+                    this.onCharacterInput?.(text, event.key)
                 }
 
                 this.cursor.movingTimer = 1
-
-                break
             }
         }
 
@@ -257,6 +238,7 @@ modmanager.gui.InputField = ig.FocusGui.extend({
     setObscure(obscure) {
         this.obscure = obscure
         this.setTextChildText(this.getValueAsString())
+        this.cursor.hook.pos.x = this.calculateCursorPos()
     },
 
     // Liberated from ButtonGui
@@ -286,7 +268,7 @@ modmanager.gui.InputField = ig.FocusGui.extend({
         } else {
             this.alphaTimer = (this.alphaTimer + ig.system.actualTick) % 1
         }
-        this.focusTimer.limit(0, 0.1)
+        this.focusTimer = this.focusTimer.limit(0, 0.1)
         this.bg.currentTileOffset = this.keepPressed && this.pressed ? 'pressed' : this.focus ? 'focus' : 'default'
         if (this.highlight) {
             this.highlight.focusWeight = this.focusTimer / 0.1

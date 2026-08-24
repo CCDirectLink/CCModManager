@@ -4,6 +4,11 @@
 
 ## [Unreleased]
 
+### Added
+
+- Add CTRL+V keybinding to input field
+- Add CTRL+U (clear current text) keybinding to input field
+
 ### Fixed
 
 - Fix title screen button poping up for a split second when entering title screen from game
