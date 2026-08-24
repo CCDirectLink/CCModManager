@@ -117,7 +117,8 @@ modmanager.gui.InputField = ig.FocusGui.extend({
         // #endregion
 
         this.boundProcessInput = this.processInput.bind(this)
-        this.validChars = /[a-zA-Z0-9,! ]*/
+        // allow all ascii printable characters
+        this.validChars = /^[\x20-\x7E]$/
     },
 
     focusGained() {
