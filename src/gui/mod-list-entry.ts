@@ -4,7 +4,7 @@ import { LocalMods } from '../local-mods'
 import { InstallQueue } from '../mod-installer'
 import { prepareModName } from './mod-name-util'
 import { FileCache } from '../cache'
-import { COLOR } from './colors'
+import type { Color } from './colors'
 
 import './list-entry'
 
@@ -35,16 +35,16 @@ modmanager.gui.ModListEntry = modmanager.gui.ListEntry.extend({
 
         const localMod = this.mod.isLocal ? this.mod : this.mod.localCounterpart
 
-        if (this.modList.currentTabIndex == modmanager.gui.MOD_MENU_TAB_INDEXES.DISABLED) this.setNameText(COLOR.RED)
+        if (this.modList.currentTabIndex == modmanager.gui.MOD_MENU_TAB_INDEXES.DISABLED) this.setNameText('RED')
         else if (this.modList.currentTabIndex == modmanager.gui.MOD_MENU_TAB_INDEXES.ENABLED)
-            this.setNameText(COLOR.GREEN)
+            this.setNameText('GREEN')
         else {
             if (localMod) {
-                if (localMod.active) this.setNameText(COLOR.GREEN)
-                else this.setNameText(COLOR.RED)
+                if (localMod.active) this.setNameText('GREEN')
+                else this.setNameText('RED')
             }
         }
-        if (InstallQueue.has(this.mod)) this.setNameText(COLOR.YELLOW)
+        if (InstallQueue.has(this.mod)) this.setNameText('YELLOW')
     },
     getIcon() {
         return FileCache.getIconConfig(this.mod)
@@ -91,12 +91,12 @@ modmanager.gui.ModListEntry = modmanager.gui.ListEntry.extend({
             if (InstallQueue.has(this.mod)) {
                 InstallQueue.delete(this.mod)
                 sc.BUTTON_SOUND.toggle_off.play()
-                this.setNameText(COLOR.WHITE)
+                this.setNameText('WHITE')
                 return 'Un-Selected'
             } else {
                 InstallQueue.add(this.mod)
                 sc.BUTTON_SOUND.toggle_on.play()
-                this.setNameText(COLOR.YELLOW)
+                this.setNameText('YELLOW')
                 return 'Selected'
             }
         }
@@ -108,14 +108,14 @@ modmanager.gui.ModListEntry = modmanager.gui.ListEntry.extend({
         if (!localMod) return
         if ((force || localMod.hasUpdate) && !localMod.isGit) {
             if (InstallQueue.has(this.mod)) {
-                if (localMod.active) this.setNameText(COLOR.GREEN)
-                else this.setNameText(COLOR.RED)
+                if (localMod.active) this.setNameText('GREEN')
+                else this.setNameText('RED')
                 sc.BUTTON_SOUND.toggle_off.play()
                 InstallQueue.delete(this.mod)
                 this.updateHighlightWidth()
                 return 'Un-selected'
             } else {
-                this.setNameText(COLOR.YELLOW)
+                this.setNameText('YELLOW')
                 sc.BUTTON_SOUND.toggle_on.play()
                 InstallQueue.add(this.mod)
                 this.updateHighlightWidth()
@@ -137,7 +137,7 @@ modmanager.gui.ModListEntry = modmanager.gui.ListEntry.extend({
             return
         }
         mod.awaitingRestart = !mod.awaitingRestart
-        this.setNameText(COLOR.RED)
+        this.setNameText('RED')
         sc.BUTTON_SOUND.toggle_off.play()
         LocalMods.setModActive(mod, false)
         this.updateHighlightWidth()
@@ -147,7 +147,7 @@ modmanager.gui.ModListEntry = modmanager.gui.ListEntry.extend({
     modelChanged(model, message: modmanager.gui.MENU_MESSAGES, data) {
         this.parent(model, message, data)
 
-        const d = data as { mod: ModEntryLocal; color: COLOR }
+        const d = data as { mod: ModEntryLocal; color: Color }
         if (
             model == modmanager.gui.menu &&
             message == modmanager.gui.MENU_MESSAGES.ENTRY_UPDATE_COLOR &&

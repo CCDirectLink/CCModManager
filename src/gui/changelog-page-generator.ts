@@ -1,10 +1,8 @@
 import type { ReleasePage } from 'ccmoddb/build/src/types'
 import * as marked from 'marked'
+import { wrapInColor } from './colors'
 
 export function generateChangelogPage(page: ReleasePage): sc.MultiPageBoxGui.ConditionalPage {
-    const white = '\\c[0]'
-    const yellow = '\\c[3]'
-
     let bodyTxt = markdownToTxt(page.body)
     bodyTxt = htmlDecode(bodyTxt)
 
@@ -30,31 +28,25 @@ export function generateChangelogPage(page: ReleasePage): sc.MultiPageBoxGui.Con
         content: [lines.join('\n')],
 
         title:
-            yellow +
-            (page.version.startsWith('v') ? '' : 'v') +
-            page.version +
-            white +
+            wrapInColor('YELLOW', (page.version.startsWith('v') ? '' : 'v') + page.version) +
             ' from ' +
-            yellow +
-            new Date(page.timestamp).toLocaleDateString('pl-PL', {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit',
-            }) +
-            ` (${timeAgo(page.timestamp)})` +
-            white,
+            wrapInColor(
+                'YELLOW',
+                new Date(page.timestamp).toLocaleDateString('pl-PL', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                }) + ` (${timeAgo(page.timestamp)})`
+            ),
     }
 }
 
 function markdownToTxt(markdown: string, options?: marked.MarkedOptions): string {
-    const white = '\\c[0]'
-    const yellow = '\\c[3]'
-
     const TxtRenderer: marked.Renderer = {
         code: code => code,
         blockquote: quote => quote,
         html: () => '',
-        heading: (text, level) => '\n' + yellow + '#'.repeat(level) + ' ' + text + white + '\n',
+        heading: (text, level) => '\n' + wrapInColor('YELLOW', '#'.repeat(level) + ' ' + text) + '\n',
         hr: () => '\n',
         list: body => '\n@listOpen\n' + body + '\n@listClose\n',
         listitem: (text, _task, _checked) => '\n- ' + text + '',

@@ -1,6 +1,6 @@
 import type { ModImageConfig } from '../types'
 import { Opts } from '../options'
-import { COLOR } from './colors'
+import { wrapInColor, type Color } from './colors'
 
 import './list-entry-highlight'
 
@@ -20,7 +20,7 @@ declare global {
             iconOffset: number
             nameIconPrefixesText: sc.TextGui
             nameText: sc.TextGui
-            textColor: COLOR
+            textColor: Color
             description: sc.TextGui
             versionText: sc.TextGui
             starCount?: sc.TextGui
@@ -36,7 +36,7 @@ declare global {
             addObservers(this: this): void
             removeObservers(this: this): void
             updateIcon(this: this, config: ModImageConfig): void
-            setNameText(this: this, color?: COLOR): void
+            setNameText(this: this, color?: Color): void
             updateHighlightWidth(this: this): void
 
             // abstract classes
@@ -82,7 +82,7 @@ modmanager.gui.ListEntry = ig.FocusGui.extend({
 
         this.nameText = new sc.TextGui('')
         this.nameIconPrefixesText = new sc.TextGui('')
-        this.setNameText(COLOR.WHITE)
+        this.setNameText('WHITE')
 
         this.highlight = new modmanager.gui.ListEntryHighlight(
             this.hook.size.x,
@@ -99,7 +99,7 @@ modmanager.gui.ListEntry = ig.FocusGui.extend({
             const tags = config.tags
             if (tags) {
                 const tagsLength = tags.join(', ').length
-                const str = tags.map(a => `\\c[0]${a}\\c[0]`).join(', ')
+                const str = tags.map(a => wrapInColor('WHITE', a)).join(', ')
                 const useTinyFont = tagsLength > 100
                 this.tags = new sc.TextGui(str, {
                     font: useTinyFont ? sc.fontsystem.tinyFont : sc.fontsystem.smallFont,
@@ -121,7 +121,7 @@ modmanager.gui.ListEntry = ig.FocusGui.extend({
 
             const authors = config.authors
             if (authors && authors.length > 0) {
-                const str = `by ${authors.map(a => `\\c[3]${a}\\c[0]`).join(', ')}`
+                const str = `by ${authors.map(a => wrapInColor('YELLOW', a)).join(', ')}`
                 this.authors = new sc.TextGui(str, { font: sc.fontsystem.smallFont, linePadding: -1 })
                 this.addChildGui(this.authors)
             }
@@ -166,7 +166,7 @@ modmanager.gui.ListEntry = ig.FocusGui.extend({
         else this.iconGui.setPos(2, 8)
         this.addChildGui(this.iconGui)
     },
-    setNameText(color?: COLOR) {
+    setNameText(color?: Color) {
         color ??= this.textColor
         const { text, icon } = this.getName()
         this.nameIconPrefixesText.setText(icon)
@@ -174,7 +174,7 @@ modmanager.gui.ListEntry = ig.FocusGui.extend({
 
         this.nameText.setFont(sc.fontsystem.font)
         this.textColor = color
-        this.nameText.setText(`\\c[${color}]${text}\\c[0]`)
+        this.nameText.setText(wrapInColor(color, text))
         this.nameText.setPos(4 + this.iconOffset + this.nameIconPrefixesText.hook.size.x, 0)
 
         if (

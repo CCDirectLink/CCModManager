@@ -7,12 +7,8 @@ import { wrapInColor } from './colors'
 import { prepareModName } from './mod-name-util'
 
 function getModListStr(mods: { name: string }[]) {
-    return mods.map(mod => `- ${yellow}${prepareModName(mod)}${white}\n`).join('')
+    return mods.map(mod => `- ` + wrapInColor('YELLOW', prepareModName(mod)) + ` \n`).join('')
 }
-
-const white = '\\c[0]'
-const green = '\\c[2]'
-const yellow = '\\c[3]'
 
 declare global {
     namespace modmanager.gui {
@@ -47,14 +43,19 @@ class ModInstallDialogs {
                     } else if (status == STATUS.downloading) {
                         const progress = progressFunc!()
                         const [scale, unit] = progress.length >= MiB ? [MiB, 'MiB'] : [KiB, 'KiB']
-                        statusStr = `Downloading... ${yellow}${(progress.received / scale).round(0)}${white}/${yellow}${(progress.length / scale).round(0)}${white} ${unit}`
+                        statusStr =
+                            `Downloading... ` +
+                            wrapInColor('YELLOW', (progress.received / scale).round(0)) +
+                            `/` +
+                            wrapInColor('YELLOW', (progress.length / scale).round(0)) +
+                            ` ${unit}`
                     } else if (status == STATUS.installing) {
                         statusStr = 'Installing...'
                     } else {
-                        statusStr = `${green}Done${white}`
+                        statusStr = wrapInColor('GREEN', 'Done')
                     }
 
-                    return `${yellow}${mod.id}${white} ${mod.version} - ${statusStr}`
+                    return wrapInColor('YELLOW', mod.id) + ` ${mod.version} - ${statusStr}`
                 })
                 .join('\n')
 
@@ -147,7 +148,11 @@ class ModInstallDialogs {
             return mods
                 .map(mod => {
                     const localVersion = LocalMods.getAllRecord()[mod.id]?.version
-                    return `- ${yellow}${prepareModName(mod)}${white} ${localVersion ? `${localVersion} -> ` : ''}${mod.version}\n`
+                    return (
+                        `- ` +
+                        wrapInColor('YELLOW', prepareModName(mod)) +
+                        ` ${localVersion ? `${localVersion} -> ` : ''}${mod.version}\n`
+                    )
                 })
                 .join('')
         }
@@ -265,7 +270,7 @@ class ModInstallDialogs {
             mod.awaitingRestart = !mod.awaitingRestart
             sc.Model.notifyObserver(modmanager.gui.menu, modmanager.gui.MENU_MESSAGES.ENTRY_UPDATE_COLOR, {
                 mod,
-                color: 2,
+                color: 'GREEN',
             })
             sc.BUTTON_SOUND.toggle_on.play()
             LocalMods.setModActive(mod, true)
