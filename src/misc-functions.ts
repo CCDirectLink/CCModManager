@@ -1,3 +1,22 @@
+export function prepareModName(mod: { name: string }) {
+    return mod.name
+        .replace(/\\c\[\d]/g, '')
+        .replace(/\\i\[[a-zA-Z0-9-_]*\]/g, '')
+        .trim()
+}
+
+export function isFullMode() {
+    return !ig.isdemo && ig.platform == ig.PLATFORM_TYPES.DESKTOP
+}
+
+export function openLink(url: string) {
+    if (ig.platform == ig.PLATFORM_TYPES.DESKTOP) {
+        nw.Shell.openExternal(url)
+    } else {
+        window.open(url, '_blank')?.focus()
+    }
+}
+
 export function popMenu() {
     if (sc.version.major == 1 && sc.version.minor == 4) {
         sc.menu.popMenu()

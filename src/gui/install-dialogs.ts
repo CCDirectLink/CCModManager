@@ -4,7 +4,7 @@ import { InstallQueue, ModInstaller } from '../mod-installer'
 import type { ModInstallerDownloadingProgress } from '../mod-installer'
 import type { ModEntry, ModEntryLocal, ModEntryServer } from '../types'
 import { wrapInColor } from './colors'
-import { prepareModName } from './mod-name-util'
+import { prepareModName } from '../misc-functions'
 
 function getModListStr(mods: { name: string }[]) {
     return mods.map(mod => `- ` + wrapInColor('YELLOW', prepareModName(mod)) + ` \n`).join('')

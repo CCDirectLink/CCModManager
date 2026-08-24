@@ -2,7 +2,7 @@ import type { ModEntry, ModEntryLocal } from '../types'
 import { ModDB } from '../moddb'
 import { LocalMods } from '../local-mods'
 import { InstallQueue } from '../mod-installer'
-import { prepareModName } from './mod-name-util'
+import { prepareModName } from '../misc-functions'
 import { FileCache } from '../cache'
 import type { Color } from './colors'
 
@@ -36,8 +36,7 @@ modmanager.gui.ModListEntry = modmanager.gui.ListEntry.extend({
         const localMod = this.mod.isLocal ? this.mod : this.mod.localCounterpart
 
         if (this.modList.currentTabIndex == modmanager.gui.MOD_MENU_TAB_INDEXES.DISABLED) this.setNameText('RED')
-        else if (this.modList.currentTabIndex == modmanager.gui.MOD_MENU_TAB_INDEXES.ENABLED)
-            this.setNameText('GREEN')
+        else if (this.modList.currentTabIndex == modmanager.gui.MOD_MENU_TAB_INDEXES.ENABLED) this.setNameText('GREEN')
         else {
             if (localMod) {
                 if (localMod.active) this.setNameText('GREEN')

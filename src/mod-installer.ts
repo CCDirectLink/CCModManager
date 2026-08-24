@@ -1,7 +1,7 @@
 import { LocalMods } from './local-mods'
 import { ModDB } from './moddb'
 import type { ModEntry, ModEntryLocal, ModEntryLocalVirtual, ModEntryServer } from './types'
-import { prepareModName } from './gui/mod-name-util'
+import { prepareModName } from './misc-functions'
 import { Opts } from './options'
 import { Lang } from './lang-manager'
 import { semver } from './library-providers'

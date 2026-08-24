@@ -8,20 +8,10 @@ import { modOptionsPoststart, modOptionsPrestart } from './mod-options'
 import { initLibraries } from './library-providers'
 import { LocalMods } from './local-mods'
 import { setModMetadata } from './mod-metadata'
+import { isFullMode } from './misc-functions'
 
 import type {} from 'crosscode-demonizer/src/demomod/types.d.ts'
 import './mod-options'
-
-export function isFullMode() {
-    return !ig.isdemo && ig.platform == ig.PLATFORM_TYPES.DESKTOP
-}
-export function openLink(url: string) {
-    if (ig.platform == ig.PLATFORM_TYPES.DESKTOP) {
-        nw.Shell.openExternal(url)
-    } else {
-        window.open(url, '_blank')?.focus()
-    }
-}
 
 let loadEverythingPromise: Promise<string[] | undefined> | undefined
 export async function loadEverything(force?: boolean) {

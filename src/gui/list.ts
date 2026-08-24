@@ -5,7 +5,7 @@ import { LocalMods } from '../local-mods'
 import { InstallQueue, ModInstaller } from '../mod-installer'
 import { Lang } from '../lang-manager'
 import { Opts } from '../options'
-import { isFullMode } from '../plugin'
+import { isFullMode } from '../misc-functions'
 
 import './mod-list-entry'
 

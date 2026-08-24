@@ -1,5 +1,5 @@
 import { Lang } from '../lang-manager'
-import { openLink } from '../plugin'
+import { openLink } from '../misc-functions'
 import type { ModEntryServer } from '../types'
 import { generateChangelogPage } from './changelog-page-generator'
 
