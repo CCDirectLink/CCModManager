@@ -9,6 +9,10 @@
 - Add CTRL+V keybinding to input field
 - Add CTRL+U (clear current text) keybinding to input field
 
+### Changed
+
+- Increase mod title weight in mod fuzzy search
+
 ### Fixed
 
 - Fix title screen button poping up for a split second when entering title screen from game

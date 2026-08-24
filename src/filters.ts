@@ -43,7 +43,7 @@ export function createFuzzyFilteredModList<T extends ModEntry>(filters: Filters,
             keys: ['id', 'name', 'description', 'versionString'],
             scoreFn: a => {
                 const id = a[0] ? a[0].score.map(-100, 0, 0, 1000) : 0
-                const name = a[1] ? a[1].score.map(-100, 0, 0, 1000) : 0
+                const name = a[1] ? a[1].score.map(-100, 0, 0, 3000) : 0
                 const description = a[2] ? a[2].score.map(-1000000, 0, 0, 700) : 0
                 const version = a[3] ? a[3].score.map(-1000000, 0, 0, 700) : 0
 
