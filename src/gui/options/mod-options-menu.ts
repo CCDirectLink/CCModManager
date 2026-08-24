@@ -1,7 +1,6 @@
 import type { ModEntry } from '../../types'
 import type { GuiOption, ModOptionsSettings } from '../../mod-options'
 import { LocalMods } from '../../local-mods'
-import { ModInstallDialogs } from '../install-dialogs'
 import { popMenu } from '../pop-menu-fix'
 
 declare global {
@@ -114,11 +113,12 @@ modmanager.gui.OptionsMenu = sc.BaseMenu.extend({
             },
         }
         this.hotkeyDefault.onButtonPress = () => {
-            ModInstallDialogs.showYesNoDialog(ig.lang.get('sc.gui.dialogs.resetAsk'), sc.DIALOG_INFO_ICON.WARNING).then(
-                index => {
-                    if (index == 0) this.resetOptionsToDefault()
-                }
-            )
+            modmanager.gui.ModInstallDialogs.showYesNoDialog(
+                ig.lang.get('sc.gui.dialogs.resetAsk'),
+                sc.DIALOG_INFO_ICON.WARNING
+            ).then(index => {
+                if (index == 0) this.resetOptionsToDefault()
+            })
         }
     },
     initListBox() {

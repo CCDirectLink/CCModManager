@@ -1,7 +1,6 @@
 import { ModDB } from '../moddb'
 import { InstallQueue, ModInstaller } from '../mod-installer'
 import type { ModEntry, ModEntryServer } from '../types'
-import { ModInstallDialogs } from './install-dialogs'
 import { LocalMods } from '../local-mods'
 import { Lang } from '../lang-manager'
 import { isFullMode, loadEverything, openLink } from '../plugin'
@@ -14,6 +13,7 @@ import './changelog'
 import './options/mod-options-menu'
 import './manual-enforcer'
 import './input-field/input-field'
+import './install-dialogs'
 
 declare global {
     namespace modmanager.gui {
@@ -200,7 +200,7 @@ modmanager.gui.Menu = (sc.ListInfoMenu ?? sc.SortableListMenu).extend({
             const mod: ModEntry = this.getCurrentlyFocusedModEntry()!.mod
             const localMod = mod.isLocal ? mod : mod.localCounterpart
             if (localMod /* this should ALWAYS be true but anyways */) {
-                if (ModInstallDialogs.showModUninstallDialog(localMod)) {
+                if (modmanager.gui.ModInstallDialogs.showModUninstallDialog(localMod)) {
                     sc.BUTTON_SOUND.submit.play()
                 } else {
                     sc.BUTTON_SOUND.denied.play()
@@ -379,7 +379,7 @@ modmanager.gui.Menu = (sc.ListInfoMenu ?? sc.SortableListMenu).extend({
     },
     showModInstallDialog() {
         this.list.tabGroup._invokePressCallbacks(this.list.tabs[Lang.selectedModsTab], true)
-        ModInstallDialogs.showModInstallDialog()
+        modmanager.gui.ModInstallDialogs.showModInstallDialog()
     },
     updateInstallButtonText() {
         const count = InstallQueue.values().length
@@ -525,10 +525,12 @@ modmanager.gui.Menu = (sc.ListInfoMenu ?? sc.SortableListMenu).extend({
                     db => db.active && Object.values(db.modRecord ?? {}).some(mod => mod.awaitingRestart)
                 ))
         ) {
-            ModInstallDialogs.showYesNoDialog(Lang.modStatesChanged, sc.DIALOG_INFO_ICON.QUESTION).then(index => {
-                if (index == 0) ModInstaller.restartGame()
-                else modmanager.gui.onceDeclinedRestartAfterMenuExit = true
-            })
+            modmanager.gui.ModInstallDialogs.showYesNoDialog(Lang.modStatesChanged, sc.DIALOG_INFO_ICON.QUESTION).then(
+                index => {
+                    if (index == 0) ModInstaller.restartGame()
+                    else modmanager.gui.onceDeclinedRestartAfterMenuExit = true
+                }
+            )
         }
     },
     createHelpGui() {

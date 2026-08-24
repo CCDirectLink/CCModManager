@@ -1,7 +1,7 @@
 import { LocalMods } from './local-mods'
 import { ModDB } from './moddb'
 import type { ModEntry, ModEntryLocal, ModEntryLocalVirtual, ModEntryServer } from './types'
-import { ModInstallDialogs, prepareModName } from './gui/install-dialogs'
+import { prepareModName } from './gui/mod-name-util'
 import { Opts } from './options'
 import ModManager from './plugin'
 import { Lang } from './lang-manager'
@@ -546,6 +546,6 @@ export class ModInstaller {
 
     static async checkAllLocalModsForUpdate() {
         await this.appendToUpdateModsToQueue()
-        ModInstallDialogs.showAutoUpdateDialog()
+        modmanager.gui.ModInstallDialogs.showAutoUpdateDialog()
     }
 }

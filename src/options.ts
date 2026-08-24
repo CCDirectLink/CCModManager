@@ -1,5 +1,4 @@
 import { FileCache } from './cache'
-import { ModInstallDialogs } from './gui/install-dialogs'
 import { modDatabasesToInputFields, repoChangeEvent, repoIsValid } from './repo-add'
 import { Lang } from './lang-manager'
 import { LocalMods } from './local-mods'
@@ -103,7 +102,7 @@ export function registerOpts() {
                             for (const mod of reinstallableMods) mod.installStatus = 'update'
 
                             InstallQueue.add(...reinstallableMods)
-                            ModInstallDialogs.showModInstallDialog()
+                            modmanager.gui.ModInstallDialogs.showModInstallDialog()
                         },
                     },
                 },

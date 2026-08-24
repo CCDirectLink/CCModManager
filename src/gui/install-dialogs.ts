@@ -3,13 +3,8 @@ import { LocalMods } from '../local-mods'
 import { InstallQueue, ModInstaller } from '../mod-installer'
 import type { ModInstallerDownloadingProgress } from '../mod-installer'
 import type { ModEntry, ModEntryLocal, ModEntryServer } from '../types'
-
-export function prepareModName(mod: { name: string }) {
-    return mod.name
-        .replace(/\\c\[\d]/g, '')
-        .replace(/\\i\[[a-zA-Z0-9-_]*\]/g, '')
-        .trim()
-}
+import { wrapInColor } from './colors'
+import { prepareModName } from './mod-name-util'
 
 function getModListStr(mods: { name: string }[]) {
     return mods.map(mod => `- ${yellow}${prepareModName(mod)}${white}\n`).join('')
@@ -19,46 +14,14 @@ const white = '\\c[0]'
 const green = '\\c[2]'
 const yellow = '\\c[3]'
 
-export class ModInstallDialogs {
-    static showModInstallDialog(autoupdate?: boolean) {
-        const deps = InstallQueue.values().filter(mod => mod.installStatus == 'dependency')
-        const toInstall = InstallQueue.values().filter(mod => mod.installStatus == 'new')
-        const toUpdate = InstallQueue.values().filter(mod => mod.installStatus == 'update')
-        if (deps.length == 0 && toInstall.length == 0 && toUpdate.length == 0) return
+declare global {
+    namespace modmanager.gui {
+        var ModInstallDialogs: ModInstallDialogs
+    }
+}
 
-        function modsToStr(mods: ModEntry[]) {
-            return mods
-                .map(mod => {
-                    const localVersion = LocalMods.getAllRecord()[mod.id]?.version
-                    return `- ${yellow}${prepareModName(mod)}${white} ${localVersion ? `${localVersion} -> ` : ''}${mod.version}\n`
-                })
-                .join('')
-        }
-        const toInstallStr = toInstall.length > 0 ? `${Lang.toInstall}\n${modsToStr(toInstall)}` : ''
-        const toUpdateStr = toUpdate.length > 0 ? `${Lang.toUpdate}\n${modsToStr(toUpdate)}` : ''
-        const depsStr = deps.length > 0 ? `${Lang.dependencies}\n${modsToStr(deps)}` : ''
-
-        const str = `${toInstallStr}${toUpdateStr}${depsStr}`
-        const modCount = toInstall.length + toUpdate.length + deps.length
-
-        const dialog = new modmanager.gui.MultiPageButtonBoxGui(undefined, undefined, [
-            {
-                name: Lang.install,
-                onPress: installModsFunc,
-            },
-            {
-                name: ig.lang.get('sc.gui.shop.cancel'),
-                onPress() {
-                    dialog.closeMenu()
-                },
-            },
-        ])
-        dialog.setContent(Lang.installButton.replace(/\[modCount\]/, modCount.toString()), [
-            {
-                content: [str],
-            },
-        ])
-
+class ModInstallDialogs {
+    async installModsFunc(dialog: modmanager.gui.MultiPageButtonBoxGui, modCount: number, autoupdate?: boolean) {
         const STATUS = {
             preparing: 0,
             downloading: 1,
@@ -99,85 +62,126 @@ export class ModInstallDialogs {
             dialog.refreshPage()
         }
 
-        async function installModsFunc() {
-            const [installButton, cancelButton] = dialog.userButtons!
-            installButton.setActive(false)
-            cancelButton.setActive(false)
+        const [installButton, cancelButton] = dialog.userButtons!
+        installButton.setActive(false)
+        cancelButton.setActive(false)
 
-            dialog.setPageHeader(0, Lang.installingModsHeader.replace(/\[modCount\]/, modCount.toString()))
-            dialog.blockClosing = true
+        dialog.setPageHeader(0, Lang.installingModsHeader.replace(/\[modCount\]/, modCount.toString()))
+        dialog.blockClosing = true
 
-            const eventIndex = ModInstaller.eventListeners.push({
-                preparing(mod) {
-                    log.push({ mod, status: STATUS.preparing })
-                    displayLog()
-                },
-                downloading(mod, progressFunc) {
-                    const entry = log.find(e => e.mod == mod)!
-                    entry.status = STATUS.downloading
-                    entry.progressFunc = progressFunc
-                    displayLog()
-                },
-                installing(mod) {
-                    const entry = log.find(e => e.mod == mod)!
-                    entry.status = STATUS.installing
-                    displayLog()
-                },
-                done(mod) {
-                    const entry = log.find(e => e.mod == mod)!
-                    entry.status = STATUS.done
-                    displayLog()
-                },
-            })
-            const dialogUpdate = dialog.update.bind(dialog)
-            let frame = 0
-            dialog.update = function (this: typeof dialog) {
-                if (frame++ % 3 == 0) displayLog()
-                dialogUpdate()
-            }
+        const eventIndex = ModInstaller.eventListeners.push({
+            preparing(mod) {
+                log.push({ mod, status: STATUS.preparing })
+                displayLog()
+            },
+            downloading(mod, progressFunc) {
+                const entry = log.find(e => e.mod == mod)!
+                entry.status = STATUS.downloading
+                entry.progressFunc = progressFunc
+                displayLog()
+            },
+            installing(mod) {
+                const entry = log.find(e => e.mod == mod)!
+                entry.status = STATUS.installing
+                displayLog()
+            },
+            done(mod) {
+                const entry = log.find(e => e.mod == mod)!
+                entry.status = STATUS.done
+                displayLog()
+            },
+        })
+        const dialogUpdate = dialog.update.bind(dialog)
+        let frame = 0
+        dialog.update = function (this: typeof dialog) {
+            if (frame++ % 3 == 0) displayLog()
+            dialogUpdate()
+        }
 
-            const toInstall = InstallQueue.values()
-            try {
-                await ModInstaller.install(toInstall)
-            } catch (err) {
-                sc.Dialogs.showErrorDialog(err as Error)
-                dialog.blockClosing = false
-                dialog.closeMenu()
-                return
-            }
-
-            InstallQueue.clear()
-            if (modmanager.gui.menu)
-                sc.Model.notifyObserver(modmanager.gui.menu, modmanager.gui.MENU_MESSAGES.UPDATE_ENTRIES)
-
-            ModInstaller.eventListeners.splice(eventIndex, 1)
+        const toInstall = InstallQueue.values()
+        try {
+            await ModInstaller.install(toInstall)
+        } catch (err) {
+            sc.Dialogs.showErrorDialog(err as Error)
             dialog.blockClosing = false
             dialog.closeMenu()
+            return
+        }
 
-            sc.BUTTON_SOUND.shop_cash.play()
+        InstallQueue.clear()
+        if (modmanager.gui.menu)
+            sc.Model.notifyObserver(modmanager.gui.menu, modmanager.gui.MENU_MESSAGES.UPDATE_ENTRIES)
 
-            if (!autoupdate) {
-                for (const mod of toInstall) {
-                    const { deps } = LocalMods.findDeps(mod)
-                    const inactiveDependencies = [...deps].filter(mod => !mod.active)
-                    if (inactiveDependencies.length > 0) {
-                        await ModInstallDialogs.showEnableModDialog(mod as unknown as ModEntryLocal)
-                    }
-                }
-            }
+        ModInstaller.eventListeners.splice(eventIndex, 1)
+        dialog.blockClosing = false
+        dialog.closeMenu()
 
-            if ((await ModInstallDialogs.showYesNoDialog(Lang.askRestartInstall, sc.DIALOG_INFO_ICON.QUESTION)) == 0) {
-                ModInstaller.restartGame()
-            } else {
-                for (const mod of toInstall) {
-                    mod.awaitingRestart = true
+        sc.BUTTON_SOUND.shop_cash.play()
+
+        if (!autoupdate) {
+            for (const mod of toInstall) {
+                const { deps } = LocalMods.findDeps(mod)
+                const inactiveDependencies = [...deps].filter(mod => !mod.active)
+                if (inactiveDependencies.length > 0) {
+                    await this.showEnableModDialog(mod as unknown as ModEntryLocal)
                 }
             }
         }
+
+        if ((await this.showYesNoDialog(Lang.askRestartInstall, sc.DIALOG_INFO_ICON.QUESTION)) == 0) {
+            ModInstaller.restartGame()
+        } else {
+            for (const mod of toInstall) {
+                mod.awaitingRestart = true
+            }
+        }
+    }
+
+    showModInstallDialog(autoupdate?: boolean) {
+        const deps = InstallQueue.values().filter(mod => mod.installStatus == 'dependency')
+        const toInstall = InstallQueue.values().filter(mod => mod.installStatus == 'new')
+        const toUpdate = InstallQueue.values().filter(mod => mod.installStatus == 'update')
+        if (deps.length == 0 && toInstall.length == 0 && toUpdate.length == 0) return
+
+        function modsToStr(mods: ModEntry[]) {
+            return mods
+                .map(mod => {
+                    const localVersion = LocalMods.getAllRecord()[mod.id]?.version
+                    return `- ${yellow}${prepareModName(mod)}${white} ${localVersion ? `${localVersion} -> ` : ''}${mod.version}\n`
+                })
+                .join('')
+        }
+        const toInstallStr = toInstall.length > 0 ? `${Lang.toInstall}\n${modsToStr(toInstall)}` : ''
+        const toUpdateStr = toUpdate.length > 0 ? `${Lang.toUpdate}\n${modsToStr(toUpdate)}` : ''
+        const depsStr = deps.length > 0 ? `${Lang.dependencies}\n${modsToStr(deps)}` : ''
+
+        const str = `${toInstallStr}${toUpdateStr}${depsStr}`
+        const modCount = toInstall.length + toUpdate.length + deps.length
+
+        const dialog = new modmanager.gui.MultiPageButtonBoxGui(undefined, undefined, [
+            {
+                name: Lang.install,
+                onPress: () => {
+                    this.installModsFunc(dialog, modCount, autoupdate)
+                },
+            },
+            {
+                name: ig.lang.get('sc.gui.shop.cancel'),
+                onPress() {
+                    dialog.closeMenu()
+                },
+            },
+        ])
+        dialog.setContent(Lang.installButton.replace(/\[modCount\]/, modCount.toString()), [
+            {
+                content: [str],
+            },
+        ])
+
         dialog.openMenu()
     }
 
-    static showAutoUpdateDialog() {
+    showAutoUpdateDialog() {
         const deps = InstallQueue.values().filter(mod => mod.installStatus == 'dependency')
         const toInstall = InstallQueue.values().filter(mod => mod.installStatus == 'new')
         const toUpdate = InstallQueue.values().filter(mod => mod.installStatus == 'update')
@@ -197,7 +201,7 @@ export class ModInstallDialogs {
         )
     }
 
-    static showModUninstallDialog(localMod: ModEntryLocal): boolean {
+    showModUninstallDialog(localMod: ModEntryLocal): boolean {
         if (localMod.disableUninstall) {
             sc.Dialogs.showErrorDialog(
                 Lang.errors.cannotUninstallDisabled.replace(/\[modName\]/, prepareModName(localMod))
@@ -240,7 +244,7 @@ export class ModInstallDialogs {
         return true
     }
 
-    static checkCanDisableMod(mod: ModEntryLocal): boolean {
+    checkCanDisableMod(mod: ModEntryLocal): boolean {
         if (mod.disableDisabling) {
             sc.Dialogs.showErrorDialog(Lang.errors.cannotDisableDisabled.replace(/\[modName\]/, prepareModName(mod)))
             return false
@@ -253,8 +257,8 @@ export class ModInstallDialogs {
         return false
     }
 
-    static async showEnableModDialog(mod: ModEntryLocal) {
-        const deps = await ModInstallDialogs.checkCanEnableMod(mod)
+    async showEnableModDialog(mod: ModEntryLocal) {
+        const deps = await this.checkCanEnableMod(mod)
         if (deps === undefined) return
         deps.add(mod)
         for (const mod of deps) {
@@ -268,7 +272,7 @@ export class ModInstallDialogs {
         }
     }
 
-    static async checkCanEnableMod(mod: ModEntry): Promise<Set<ModEntryLocal> | undefined> {
+    async checkCanEnableMod(mod: ModEntry): Promise<Set<ModEntryLocal> | undefined> {
         const { deps, missing } = LocalMods.findDeps(mod)
         if (missing.size > 0) {
             sc.Dialogs.showErrorDialog(
@@ -297,9 +301,11 @@ export class ModInstallDialogs {
         }
     }
 
-    static showYesNoDialog(text: sc.TextLike, icon?: Nullable<sc.DIALOG_INFO_ICON>): Promise<number> {
+    showYesNoDialog(text: sc.TextLike, icon?: Nullable<sc.DIALOG_INFO_ICON>): Promise<number> {
         return new Promise<number>(resolve => {
             sc.Dialogs.showYesNoDialog(text, icon, button => resolve(button.data))
         })
     }
 }
+
+modmanager.gui.ModInstallDialogs = new ModInstallDialogs()

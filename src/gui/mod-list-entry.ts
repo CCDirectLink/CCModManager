@@ -2,7 +2,7 @@ import type { ModEntry, ModEntryLocal } from '../types'
 import { ModDB } from '../moddb'
 import { LocalMods } from '../local-mods'
 import { InstallQueue } from '../mod-installer'
-import { ModInstallDialogs, prepareModName } from './install-dialogs'
+import { prepareModName } from './mod-name-util'
 import { FileCache } from '../cache'
 import { COLOR } from './colors'
 
@@ -125,14 +125,14 @@ modmanager.gui.ModListEntry = modmanager.gui.ListEntry.extend({
     },
 
     tryEnableMod(mod: ModEntryLocal) {
-        ModInstallDialogs.showEnableModDialog(mod).then(() => {
+        modmanager.gui.ModInstallDialogs.showEnableModDialog(mod).then(() => {
             this.updateHighlightWidth()
         })
         return 'Enabled'
     },
 
     tryDisableMod(mod: ModEntryLocal) {
-        if (!ModInstallDialogs.checkCanDisableMod(mod)) {
+        if (!modmanager.gui.ModInstallDialogs.checkCanDisableMod(mod)) {
             sc.BUTTON_SOUND.denied.play()
             return
         }
