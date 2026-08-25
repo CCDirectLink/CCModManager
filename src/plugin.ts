@@ -43,6 +43,7 @@ async function _loadEverything(force?: boolean) {
     }
 
     gui.menu?.list?.reloadEntries()
+    gui.optionsMenu?.reopenMenu()
 
     return uncheckedDatabases
 }

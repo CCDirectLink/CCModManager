@@ -121,10 +121,8 @@ export function registerOpts() {
                             Opts.repositories = Opts.flatOpts.repositories.init
                             modDatabasesToInputFields()
 
-                            if (sc.menu?.currentMenu == sc.MENU_SUBMENU?.MOD_OPTIONS) {
-                                modmanager.gui.optionsMenu.reopenMenu()
-                            }
                             sc.Dialogs.showInfoDialog(Lang.opts.resetRepositoriesButton.onclickPopup)
+                            loadEverything(true)
                         },
                     },
 

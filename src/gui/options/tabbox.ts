@@ -43,7 +43,12 @@ declare global {
             hideMenu(this: this): void
             _createOptionList(this: this, category: string): void
             _rearrangeTabs(this: this): void
-            _createCacheList(this: this, category: string, bool1?: boolean, bool2?: boolean): void
+            _createCacheList(
+                this: this,
+                category: string,
+                noFocusRegain?: boolean,
+                ignoreFocusRegainSounds?: boolean
+            ): void
             _createTabButton(
                 this: this,
                 title: string,
@@ -177,9 +182,7 @@ modmanager.gui.OptionsTabBox = ig.GuiElementBase.extend({
         return (this.tabArray[x] = tabButton)
     },
 
-    _createCacheList(category: string, bool1?: boolean, bool2?: boolean) {
-        bool1 = bool1 || false
-        bool2 = bool2 || false
+    _createCacheList(category: string, noFocusRegain: boolean = false, ignoreFocusRegainSounds: boolean = false) {
         if (this.tabContent[this.prevIndex]) {
             this.list.deactivate()
             this.list.doStateTransition('HIDDEN', true)
@@ -192,7 +195,7 @@ modmanager.gui.OptionsTabBox = ig.GuiElementBase.extend({
             this.rowButtonGroup = tabContent.buttonGroup!
             this.list.activate()
             this.list.doStateTransition('DEFAULT', true)
-            !bool1 && this.rowButtonGroup.regainCurrentFocus(false, bool2)
+            !noFocusRegain && this.rowButtonGroup.regainCurrentFocus(false, ignoreFocusRegainSounds)
         } else {
             tabContent = { buttonGroup: null, list: null, rows: null }
             this.rowButtonGroup = new sc.RowButtonGroup()

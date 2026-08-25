@@ -224,30 +224,10 @@ modmanager.gui.OptionsMenu = sc.BaseMenu.extend({
         this.reopenMenu()
     },
     reopenMenu() {
-        /* re-open the menu to update the option guis with the new values */
-        this.hide()
-        sc.menu.popBackCallback()
-        popMenu()
-        const mainMenu = sc.menu.guiReference
-        mainMenu.removeChildGui(this)
-        delete mainMenu.submenus[modOptionsMenuId]
-        sc.menu.pushMenu(sc.MENU_SUBMENU.MOD_OPTIONS)
-        /* skip transitions */
-        mainMenu.menuDisplay.boxes.last().doStateTransition('DEFAULT', true)
-        modmanager.gui.optionsMenu.doStateTransition('DEFAULT', true)
-        modmanager.gui.optionsMenu.listBox.doStateTransition('DEFAULT', true)
-
-        modmanager.gui.optionsMenu.updateEntries(this.mod)
-        modmanager.gui.optionsMenu.listBox.setCurrentTab(this.listBox.currentTab)
-
-        /* skip transitions even more */
-        mainMenu.hotkeyBar._hotkeyTimer = 10e10
-        mainMenu.hotkeyBar.doStateTransition('DEFAULT', true)
-        for (const button of mainMenu.hotkeyBar.hook.children) button.doStateTransition('DEFAULT', true)
-
-        sc.menu.commitHotkeys()
-
-        ig.interact.setBlockDelay(0)
+        this.listBox.list.deactivate()
+        this.listBox.list.doStateTransition('HIDDEN', true)
+        delete this.listBox.tabContent[this.listBox.currentTab]
+        this.listBox._createCacheList(this.listBox.lastButtonData.type)
     },
 })
 

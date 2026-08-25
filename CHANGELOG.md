@@ -21,6 +21,7 @@
 - Fix compatibility with speedrunner branch
 - Fix mod install error when extracting zip and mod has no subdirectories
 - Fix title screen button not hiding properly sometimes
+- Fix mod options menu items becoming unfocusable on menu reload
 
 ## [1.2.0] 2026-05-17
 
