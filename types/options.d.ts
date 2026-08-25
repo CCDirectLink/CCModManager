@@ -3,66 +3,66 @@ export declare let Opts: ReturnType<typeof modmanager.registerAndGetModOptions<R
 export declare function registerOpts(): {
     readonly general: {
         readonly settings: {
-            readonly tabIcon: "general";
-            readonly title: "General";
+            readonly tabIcon: 'general';
+            readonly title: 'General';
         };
         readonly headers: {
             readonly general: {
                 readonly autoUpdate: {
-                    readonly type: "CHECKBOX";
+                    readonly type: 'CHECKBOX';
                     readonly init: true;
                 };
                 readonly showTitleScreenButton: {
-                    readonly type: "CHECKBOX";
+                    readonly type: 'CHECKBOX';
                     readonly init: true;
                 };
                 readonly testingOptInMods: {
-                    readonly type: "JSON_DATA";
+                    readonly type: 'JSON_DATA';
                     readonly init: string[];
                 };
                 readonly isGrid: {
-                    readonly type: "CHECKBOX";
+                    readonly type: 'CHECKBOX';
                     readonly init: false;
                     readonly hidden: true;
                     readonly changeEvent: () => void;
                 };
                 readonly hideLibraryMods: {
-                    readonly type: "CHECKBOX";
+                    readonly type: 'CHECKBOX';
                     readonly init: false;
                     readonly hidden: true;
                     readonly changeEvent: () => void;
                 };
                 readonly includeLocalModsInOnline: {
-                    readonly type: "CHECKBOX";
+                    readonly type: 'CHECKBOX';
                     readonly init: true;
                     readonly hidden: true;
                     readonly changeEvent: () => void;
                 };
                 readonly manualEnforcerRead: {
-                    readonly type: "JSON_DATA";
+                    readonly type: 'JSON_DATA';
                     readonly init: Record<string, boolean>;
                     readonly preventResettingToDefault: true;
                 };
             };
             readonly advanced: {
                 readonly unpackCCMods: {
-                    readonly type: "CHECKBOX";
+                    readonly type: 'CHECKBOX';
                     readonly init: false;
                 };
                 readonly keepChromiumFlags: {
-                    readonly type: "CHECKBOX";
+                    readonly type: 'CHECKBOX';
                     readonly init: true;
                 };
                 readonly ignoreCCLoaderMajorVersion: {
-                    readonly type: "CHECKBOX";
+                    readonly type: 'CHECKBOX';
                     readonly init: false;
                 };
                 readonly clearCacheButton: {
-                    readonly type: "BUTTON";
+                    readonly type: 'BUTTON';
                     readonly onPress: () => void;
                 };
                 readonly reinstallAllMods: {
-                    readonly type: "BUTTON";
+                    readonly type: 'BUTTON';
                     readonly onPress: () => void;
                 };
             };
@@ -70,11 +70,20 @@ export declare function registerOpts(): {
     };
     readonly repositories: {
         readonly settings: {
-            readonly tabIcon: "interface";
-            readonly title: "Repositories";
+            readonly tabIcon: 'interface';
+            readonly title: 'Repositories';
         };
         readonly headers: {
             readonly repositories: {
+                readonly resetRepositoriesButton: {
+                    readonly type: 'BUTTON';
+                    readonly onPress: () => void;
+                };
+                readonly repositories: {
+                    readonly type: 'JSON_DATA';
+                    readonly init: string[];
+                    readonly changeEvent: () => void;
+                };
                 readonly inputFieldRepo0: {
                     type: "INPUT_FIELD";
                     init: string;
@@ -116,15 +125,6 @@ export declare function registerOpts(): {
                     init: string;
                     changeEvent: typeof repoChangeEvent;
                     isValid: typeof repoIsValid;
-                };
-                readonly resetRepositoriesButton: {
-                    readonly type: "BUTTON";
-                    readonly onPress: () => void;
-                };
-                readonly repositories: {
-                    readonly type: "JSON_DATA";
-                    readonly init: string[];
-                    readonly changeEvent: () => void;
                 };
             };
         };

@@ -24,7 +24,6 @@ export declare class ModInstaller {
     static byNameRecord: Record<string, ModEntryServer>;
     static virtualMods: Record<string, ModEntryLocalVirtual>;
     static modsDir: string;
-    private static rimraf;
     static init(): void;
     private static getModByDepName;
     private static setOrAddNewer;
@@ -39,11 +38,8 @@ export declare class ModInstaller {
     private static checkSHA256;
     private static installModZip;
     private static installCCLoader;
-    private static fileExists;
-    static isDirGit(dirPath: string): Promise<boolean>;
     static getWhatDependsOnAMod(mod: ModEntryLocal, on?: boolean): ModEntryLocal[];
     static uninstallMod(mod: ModEntryLocal): Promise<void>;
-    static removeDirRecursive(path: string): Promise<void>;
     static restartGame(): void;
     static checkLocalModForUpdate(mod: ModEntryLocal): boolean;
     static appendToUpdateModsToQueue(): Promise<boolean>;

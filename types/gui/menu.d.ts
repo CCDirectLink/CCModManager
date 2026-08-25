@@ -6,6 +6,7 @@ import './changelog';
 import './options/mod-options-menu';
 import './manual-enforcer';
 import './input-field/input-field';
+import './install-dialogs';
 declare global {
     namespace modmanager.gui {
         enum MENU_SORT_ORDER {

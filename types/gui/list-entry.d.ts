@@ -1,5 +1,5 @@
 import type { ModImageConfig } from '../types';
-import { COLOR } from './colors';
+import { type Color } from './colors';
 import './list-entry-highlight';
 export interface ListEntryConfig {
     description?: string;
@@ -16,7 +16,7 @@ declare global {
             iconOffset: number;
             nameIconPrefixesText: sc.TextGui;
             nameText: sc.TextGui;
-            textColor: COLOR;
+            textColor: Color;
             description: sc.TextGui;
             versionText: sc.TextGui;
             starCount?: sc.TextGui;
@@ -37,7 +37,7 @@ declare global {
             addObservers(this: this): void;
             removeObservers(this: this): void;
             updateIcon(this: this, config: ModImageConfig): void;
-            setNameText(this: this, color?: COLOR): void;
+            setNameText(this: this, color?: Color): void;
             updateHighlightWidth(this: this): void;
             getName(this: this): {
                 icon: string;

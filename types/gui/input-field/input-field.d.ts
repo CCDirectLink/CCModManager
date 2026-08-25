@@ -24,6 +24,8 @@ declare global {
             cursor: InputFieldCursor;
             obscure: boolean;
             obscureChar: string;
+            maxPasteLength: number;
+            onEnterPressedCallback?: (this: this) => void;
             calculateCursorPos(this: this): number;
             getValueAsString(this: this): string;
             processInput(this: this, event: KeyboardEvent): void;

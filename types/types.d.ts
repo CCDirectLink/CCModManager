@@ -1,7 +1,6 @@
 import type { Mod } from 'ultimate-crosscode-typedefs/modloader/mod';
 import type { InstallMethod, PackageDB, ValidTags, ReleasePage } from 'ccmoddb/build/src/types';
 export type Mod1 = Mod & {
-    isCCModPacked: boolean;
     findAllAssets?(): void;
 } & ({
     isCCL3: true;

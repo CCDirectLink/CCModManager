@@ -37,7 +37,7 @@ declare global {
             hideMenu(this: this): void;
             _createOptionList(this: this, category: string): void;
             _rearrangeTabs(this: this): void;
-            _createCacheList(this: this, category: string, bool1?: boolean, bool2?: boolean): void;
+            _createCacheList(this: this, category: string, noFocusRegain?: boolean, ignoreFocusRegainSounds?: boolean): void;
             _createTabButton(this: this, title: string, x: number, categoryId: string, icon?: string): modmanager.gui.OptionsTabBox.TabButton;
             onButtonTraversal(this: this): void;
             _resetButtons(this: this, tabButton?: modmanager.gui.OptionsTabBox.TabButton, unfocus?: boolean): void;

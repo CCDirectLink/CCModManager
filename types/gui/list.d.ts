@@ -23,7 +23,6 @@ declare global {
             reloadEntries(this: this): void;
             sortModEntries(this: this, mods: ModEntry[], sort: modmanager.gui.MENU_SORT_ORDER): void;
             populateOnline: ListPopulateFunc<this>;
-            populateSets: ListPopulateFunc<this>;
             populateSelected: ListPopulateFunc<this>;
             populateEnabled: ListPopulateFunc<this>;
             populateDisabled: ListPopulateFunc<this>;
@@ -41,7 +40,6 @@ declare global {
             ENABLED: number;
             DISABLED: number;
             SETTINGS: number;
-            SETS: number;
         };
     }
 }
