@@ -6,6 +6,7 @@ import { ModInstaller } from './mod-installer'
 import type { ValidTags } from 'ccmoddb/build/src/types'
 import { isDirGit } from './fs-util'
 import { modMetadata } from './mod-metadata'
+import { semver } from './library-providers'
 
 interface CCL2Mod {
     baseDirectory: string
@@ -167,6 +168,12 @@ export class LocalMods {
         sc.options.persistOptions()
     }
 
+    private static sanitizeModVersion(version: string | undefined): string {
+        version ??= '0.0.0'
+        const parsed = semver.parse(version)
+        return parsed?.toString() ?? '0.0.0'
+    }
+
     private static convertCCL2Mod(mod: CCL2Mod): ModEntryLocal {
         const authors = mod.authors
         return {
@@ -176,7 +183,7 @@ export class LocalMods {
             id: mod.name,
             name: mod.displayName || mod.name,
             description: mod.description,
-            version: mod.version || 'Unknown',
+            version: LocalMods.sanitizeModVersion(mod.version),
             isLegacy: false /*duno how to check*/,
             hasIcon: !!mod.icons?.['24'],
             dependencies: mod.dependencies ?? {},
@@ -212,7 +219,7 @@ export class LocalMods {
             id: mod.id,
             name: ig.LangLabel.getText(mod.manifest.title || mod.id),
             description: mod.manifest.description ? ig.LangLabel.getText(mod.manifest.description) : undefined,
-            version: mod.version?.toString() || 'Unknown',
+            version: LocalMods.sanitizeModVersion(mod.version?.toString()),
             isLegacy: mod.legacyMode,
             hasIcon: !!mod.manifest.icons?.['24'],
             dependencies: [...mod.dependencies].reduce((acc: Record<string, string>, v) => {

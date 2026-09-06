@@ -3,6 +3,11 @@
 # Change Log
 
 ## [Unreleased]
+
+### Fixed
+
+- Sanitize local mod versions
+
 ## [1.2.1] 2026-08-25
 
 ### Added
