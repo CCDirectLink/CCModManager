@@ -12,21 +12,21 @@
         "types": "tsc --noEmit false --outDir types --emitDeclarationOnly true --declaration --isolatedModules false"
     },
     "devDependencies": {
-        "@types/bun": "^1.3.14",
-        "@types/chrome": "^0.2.2",
-        "@types/jquery": "=1.10.x",
-        "@types/node": "^26.1.0",
-        "@types/semver": "^7.5.8",
-        "bun": "^1.3.14",
+        "@types/bun": "^1.4.1",
+        "@types/chrome": "^0.2.8",
+        "@types/jquery": "^1.10.45",
+        "@types/node": "^26.4.1",
+        "@types/semver": "^7.8.0",
+        "bun": "^1.4.2",
         "ccmoddb": "github:CCDirectLink/CCModDB",
         "crosscode-demonizer": "github:krypciak/crosscode-demonizer",
-        "esbuild": "^0.28.1",
+        "esbuild": "^0.28.2",
         "fflate": "^0.8.3",
         "fuzzysort": "^2.0.4",
-        "marked": "=12.0.2",
+        "marked": "^12.0.2",
         "oxfmt": "^0.60.0",
         "rimraf": "^3.0.2",
-        "typescript": "^7.0.0",
+        "typescript": "^7.0.2",
         "ultimate-crosscode-typedefs": "github:krypciak/ultimate-crosscode-typedefs"
     }
 }
