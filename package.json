@@ -12,10 +12,10 @@
         "types": "tsc --noEmit false --outDir types --emitDeclarationOnly true --declaration --isolatedModules false"
     },
     "devDependencies": {
-        "@types/bun": "^1.4.1",
-        "@types/chrome": "^0.2.8",
+        "@types/bun": "^1.4.2",
+        "@types/chrome": "^0.2.9",
         "@types/jquery": "^1.10.45",
-        "@types/node": "^26.4.1",
+        "@types/node": "^26.6.4",
         "@types/semver": "^7.8.0",
         "bun": "^1.4.2",
         "ccmoddb": "github:CCDirectLink/CCModDB",
