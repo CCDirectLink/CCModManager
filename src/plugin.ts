@@ -84,7 +84,6 @@ export default class ModManager {
     }
 
     async poststart() {
-        modOptionsPoststart()
         this.lang.poststart()
     }
 }
