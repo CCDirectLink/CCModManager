@@ -7,6 +7,7 @@
 ### Fixed
 
 - Sanitize local mod versions
+- Use a proper ig.GameAddon for keybinding handling
 
 ## [1.2.1] 2026-08-25
 

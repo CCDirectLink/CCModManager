@@ -394,6 +394,16 @@ function registerAndGetModOptions<T extends Options>(settings: ModOptionsSetting
     return Opts
 }
 
+declare global {
+    namespace modmanager.gui {
+        interface KeybindingsAddon extends ig.GameAddon {}
+        interface KeybindingsAddonConstructor extends ImpactClass<KeybindingsAddon> {
+            new (): KeybindingsAddon
+        }
+        var KeybindingsAddon: KeybindingsAddonConstructor
+    }
+}
+
 export function modOptionsPrestart() {
     sc.CrossCode.inject({
         init() {
@@ -404,9 +414,11 @@ export function modOptionsPrestart() {
             this.parent()
         },
     })
-}
-export function modOptionsPoststart() {
-    ig.game.addons.preUpdate.push({
+
+    modmanager.gui.KeybindingsAddon = ig.GameAddon.extend({
+        init() {
+            this.parent('CCModManager keybindings')
+        },
         onPreUpdate() {
             const isInGame = sc.model.currentState == sc.GAME_MODEL_STATE.GAME && ig.interact.entries.length == 0
             for (const controlConfig of controlsToSet) {
@@ -421,4 +433,5 @@ export function modOptionsPoststart() {
             }
         },
     })
+    ig.addGameAddon(() => new modmanager.gui.KeybindingsAddon())
 }
